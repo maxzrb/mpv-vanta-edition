@@ -1611,3 +1611,21 @@ c:\Program portable\mpv2\
 - **资产核对**: 远端 6 资产名称与字节大小和本地完全一致；Release: https://github.com/maxzrb/mpv-portable/releases/tag/v1.4.2
 - **清理**: `build/` 暂存目录与 `tmp/release-notes-v1.4.2.md` 已删除；`release/` 保留本地产物与全量包（仅本地）。
 - **Git 状态**: 待提交发布结果记录；随后确认 master 与 origin/master 同步、工作树干净。
+
+
+---
+
+## 2026-08-10 · 发布前检查（v1.4.2 附装 Installer）
+
+### 任务
+按项目所有者指示：mpv 本体 01~05 包（v1.4.2）已构建且保持不变；新增并附加 VantaInstaller 作为 v1.4.2 Release 资产。
+
+### 检查清单
+- [x] git 状态：master 与 origin/master 同步（`## master...origin/master` 无 ahead/behind）
+- [x] 大改动 Gate：本次为**新增安装辅助工具 VantaInstaller 并作为 Release 附加资产**，命中 3.2 中"安装方式变化"条目；
+      项目所有者（用户）已明确拍板执行，不修改《发布流程.md》本身。
+- [x] 产物：01~05 包保持 v1.4.2 原样，不重新构建；私用全量包不上传。
+- [x] VantaInstaller Release 单文件自包含 exe 构建成功（v0.2.0，win-x64，139.8MB），启动验证通过。
+- [x] SHA-256：`173CAEE0911951A94ACA0954C46A6CE69790045D345FD611A89FF749FA08FC1E`
+- [x] git diff --check 通过；无构建产物（bin/obj/publish）混入提交。
+- [x] gh CLI 可用（2.95.0），用于 Release 资产上传。
