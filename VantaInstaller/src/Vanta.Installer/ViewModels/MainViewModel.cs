@@ -190,7 +190,18 @@ public partial class MainViewModel : ObservableObject
         CurrentMode = AppMode.Uninstall;
         CurrentPage = _uninstall;
         _uninstall.Refresh();
+        UpdateUninstallSteps(0);
         UpdatePanelState();
+    }
+
+    /// <summary>刷新卸载步骤高亮（0 检测与选项 / 1 执行 / 2 完成）</summary>
+    private void UpdateUninstallSteps(int index)
+    {
+        for (int i = 0; i < UninstallSteps.Count; i++)
+        {
+            UninstallSteps[i].IsCurrent = i == index;
+        }
+        OnPropertyChanged(nameof(CurrentSteps));
     }
 
     /// <summary>进入设置模式</summary>
@@ -216,10 +227,12 @@ public partial class MainViewModel : ObservableObject
         {
             if (CurrentPage is UninstallViewModel { IsCompleted: true })
             {
+                UpdateUninstallSteps(2);
                 GoHome();
             }
             else if (CurrentPage is UninstallViewModel u && u.CanProceed && !u.IsRunning)
             {
+                UpdateUninstallSteps(1);
                 u.StartUninstall();
             }
             return;

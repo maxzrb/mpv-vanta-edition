@@ -33,6 +33,38 @@ public partial class LocationViewModel : ObservableObject
     public bool CanProceed => !string.IsNullOrWhiteSpace(InstallDirectory)
         && !StatusIsWarning;
 
+    /// <summary>
+    /// 实际安装目录：在用户选择的基底目录下自动创建 "MPV Vanta Edition" 子文件夹，
+    /// 避免 mpv 文件散落到用户已有目录中。
+    /// 例外：所选目录本身已是有效 mpv 安装（含 mpv.exe）或已叫该名时，不再嵌套（覆盖升级）。
+    /// </summary>
+    public string FinalDirectory
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(InstallDirectory))
+            {
+                return string.Empty;
+            }
+
+            var baseDir = InstallDirectory.TrimEnd('\\', '/');
+
+            // 已是有效 mpv 安装目录（覆盖升级）→ 直接使用
+            if (File.Exists(Path.Combine(baseDir, "mpv.exe")))
+            {
+                return baseDir;
+            }
+
+            // 已是 "MPV Vanta Edition" 目录（不重复嵌套）
+            if (string.Equals(Path.GetFileName(baseDir), "MPV Vanta Edition", StringComparison.OrdinalIgnoreCase))
+            {
+                return baseDir;
+            }
+
+            return Path.Combine(baseDir, "MPV Vanta Edition");
+        }
+    }
+
     public LocationViewModel(AppSession session)
     {
         _session = session;
@@ -77,7 +109,9 @@ public partial class LocationViewModel : ObservableObject
 
     partial void OnInstallDirectoryChanged(string value)
     {
-        _session.InstallDirectory = value;
+        // 会话记录的是实际安装目录（自动补全子文件夹后的路径）
+        _session.InstallDirectory = FinalDirectory;
+        OnPropertyChanged(nameof(FinalDirectory));
         RefreshStatus();
     }
 
@@ -92,13 +126,16 @@ public partial class LocationViewModel : ObservableObject
             return;
         }
 
-        // 旧版本检测
-        IsUpgrade = File.Exists(Path.Combine(InstallDirectory, "mpv.exe"));
+        // 旧版本检测（针对实际安装目录）
+        IsUpgrade = File.Exists(Path.Combine(FinalDirectory, "mpv.exe"));
 
         // 目录不存在：全新安装，可自动创建（不警告）
-        if (!Directory.Exists(InstallDirectory))
+        if (!Directory.Exists(FinalDirectory))
         {
-            StatusText = $"目录不存在，将作为全新安装自动创建：{InstallDirectory}";
+            var createMsg = string.Equals(InstallDirectory, FinalDirectory, StringComparison.OrdinalIgnoreCase)
+                ? $"将作为全新安装自动创建：{FinalDirectory}"
+                : $"将在 {InstallDirectory} 下自动创建 MPV Vanta Edition 文件夹并安装";
+            StatusText = createMsg;
             StatusIsWarning = false;
             OnPropertyChanged(nameof(CanProceed));
             return;
@@ -108,7 +145,7 @@ public partial class LocationViewModel : ObservableObject
         var needed = _session.ScanResult?.SelectedTotalSize ?? 0;
         try
         {
-            var root = Path.GetPathRoot(Path.GetFullPath(InstallDirectory)) ?? "C:\\";
+            var root = Path.GetPathRoot(Path.GetFullPath(FinalDirectory)) ?? "C:\\";
             var drive = new DriveInfo(root);
             if (drive.IsReady && drive.AvailableFreeSpace < needed)
             {

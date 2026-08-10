@@ -34,6 +34,21 @@
                                        Appearance="Secondary" Command="{Binding ChooseDirectoryCommand}" />
                         </Grid>
 
+                        <!-- 实际安装目录（自动补全 MPV Vanta Edition 子文件夹） -->
+                        <Border Margin="0,14,0,0" Padding="12,10" CornerRadius="8"
+                                BorderThickness="1"
+                                BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+                            <StackPanel>
+                                <TextBlock FontSize="12"
+                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}">
+                                    实际安装目录（自动创建子文件夹）
+                                </TextBlock>
+                                <TextBlock Margin="0,4,0,0" FontSize="13" FontWeight="SemiBold" TextWrapping="Wrap"
+                                           Text="{Binding FinalDirectory, Mode=OneWay}"
+                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                            </StackPanel>
+                        </Border>
+
                         <!-- 状态：覆盖升级 / 全新安装 / 空间不足 -->
                         <ui:InfoBar IsOpen="True" Title="{Binding StatusText}" Margin="0,16,0,0">
                             <ui:InfoBar.Style>
