@@ -129,7 +129,8 @@ public partial class MainViewModel : ObservableObject
             new DoneViewModel(_session),
         ];
 
-        // 订阅安装页 VM 属性变化，实时刷新按钮状态
+        // 订阅所有页面 VM 属性变化，实时刷新按钮状态
+        // （此前只订阅安装页，导致卸载/设置状态变化不刷新主按钮）
         foreach (var page in _installPages)
         {
             if (page is ObservableObject observable)
@@ -137,6 +138,8 @@ public partial class MainViewModel : ObservableObject
                 observable.PropertyChanged += OnPagePropertyChanged;
             }
         }
+        (_uninstall as ObservableObject).PropertyChanged += OnPagePropertyChanged;
+        (_settings as ObservableObject).PropertyChanged += OnPagePropertyChanged;
 
         // 初始化安装步骤
         string[] installNames = ["欢迎", "安装位置", "选择组件", "开始安装", "完成"];
@@ -205,6 +208,12 @@ public partial class MainViewModel : ObservableObject
         }
         OnPropertyChanged(nameof(CurrentSteps));
     }
+
+    /// <summary>更新卸载步骤高亮（0 检测 / 1 执行 / 2 完成），供卸载 VM 调用</summary>
+    public void UpdateUninstallStep(int index) => UpdateUninstallSteps(index);
+
+    /// <summary>子页面 VM 状态变化时刷新主按钮（卸载/设置调用）</summary>
+    public void NotifySubViewModelChanged() => OnPagePropertyChanged(null, null!);
 
     /// <summary>进入设置模式</summary>
     [RelayCommand]

@@ -226,8 +226,12 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>页面激活时刷新（检测安装 + 备份列表 + 缓存统计）</summary>
     public void Refresh()
     {
-        var detected = InstallationDetector.Detect(_session.InstallDirectory)
-            ?? InstallationDetector.Detect();
+        // 指定目录存在但已无效（如刚卸载残留）时不采纳，兜底从程序目录向上找可用安装
+        var detected = InstallationDetector.Detect(_session.InstallDirectory);
+        if (detected is not { IsValid: true })
+        {
+            detected = InstallationDetector.Detect();
+        }
         Installation = detected;
         if (detected is { IsValid: true })
         {

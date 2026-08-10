@@ -1,6 +1,6 @@
-using System.Collections.ObjectModel;
-using System.IO;
+using System.Text;
 using System.Windows;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
@@ -9,7 +9,9 @@ using Vanta.Core.Services;
 namespace Vanta.Installer.ViewModels;
 
 /// <summary>
-/// 卸载流程：检测 → 选项 → 执行 → 完成
+/// 卸载流程：检测 → 选项 → 执行 → 完成。
+/// 全部状态变化通过 [ObservableProperty] 自动通知 + partial 方法联动派生属性，
+/// 并实时通知 MainViewModel 刷新主按钮与步骤条。
 /// </summary>
 public partial class UninstallViewModel : ObservableObject
 {
@@ -47,11 +49,8 @@ public partial class UninstallViewModel : ObservableObject
     [ObservableProperty]
     private string _currentMessage = "准备就绪";
 
-    /// <summary>卸载日志</summary>
-    public ObservableCollection<string> LogLines { get; } = [];
-
-    /// <summary>是否显示日志</summary>
-    public bool HasLog => LogLines.Count > 0;
+    /// <summary>卸载日志（命令行风格，批量刷新）</summary>
+    public string LogText { get; private set; } = string.Empty;
 
     /// <summary>结果：备份路径</summary>
     [ObservableProperty]
@@ -62,7 +61,10 @@ public partial class UninstallViewModel : ObservableObject
     private string _freedText = string.Empty;
 
     /// <summary>是否可开始卸载</summary>
-    public bool CanProceed => IsDetected && !IsRunning;
+    public bool CanProceed => IsDetected && !IsRunning && !IsCompleted;
+
+    /// <summary>是否显示日志</summary>
+    public bool HasLog => !string.IsNullOrEmpty(LogText);
 
     /// <summary>卸载目录</summary>
     public string UninstallDirectory => Installation?.Directory ?? string.Empty;
@@ -73,10 +75,43 @@ public partial class UninstallViewModel : ObservableObject
     /// <summary>体积</summary>
     public string SizeText => Installation?.SizeText ?? string.Empty;
 
+    private readonly StringBuilder _logBuffer = new();
+    private readonly object _logLock = new();
+    private readonly DispatcherTimer _logTimer;
+
     public UninstallViewModel(AppSession session, MainViewModel main)
     {
         _session = session;
         _main = main;
+
+        // 日志批量刷新：后台线程入缓冲，UI 定时器 120ms 合并追加，避免逐行卡顿
+        _logTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(120) };
+        _logTimer.Tick += (_, _) => FlushLogBuffer();
+        _logTimer.Start();
+    }
+
+    // ---- IsRunning / IsCompleted 变化 → 联动刷新派生属性与主按钮 ----
+
+    partial void OnIsRunningChanged(bool value)
+    {
+        OnPropertyChanged(nameof(CanProceed));
+        // 通知 MainViewModel 刷新主按钮（卸载中禁用"开始卸载"、隐藏"返回主页"等）
+        _main.NotifySubViewModelChanged();
+    }
+
+    partial void OnIsCompletedChanged(bool value)
+    {
+        OnPropertyChanged(nameof(CanProceed));
+        _main.NotifySubViewModelChanged();
+    }
+
+    partial void OnInstallationChanged(InstallationDetector.InstallationInfo? value)
+    {
+        OnPropertyChanged(nameof(IsDetected));
+        OnPropertyChanged(nameof(CanProceed));
+        OnPropertyChanged(nameof(UninstallDirectory));
+        OnPropertyChanged(nameof(VersionLine));
+        OnPropertyChanged(nameof(SizeText));
     }
 
     /// <summary>页面激活时刷新检测</summary>
@@ -85,7 +120,8 @@ public partial class UninstallViewModel : ObservableObject
         var detected = string.IsNullOrWhiteSpace(_session.InstallDirectory)
             ? InstallationDetector.Detect()
             : InstallationDetector.Detect(_session.InstallDirectory);
-        if (detected is null)
+        // 指定目录存在但已无效（如刚卸载残留）时不采纳，兜底向上查找
+        if (detected is not { IsValid: true })
         {
             detected = InstallationDetector.Detect();
         }
@@ -98,14 +134,15 @@ public partial class UninstallViewModel : ObservableObject
 
         IsCompleted = false;
         IsRunning = false;
-        LogLines.Clear();
+        lock (_logLock)
+        {
+            _logBuffer.Clear();
+        }
+        LogText = string.Empty;
         CurrentMessage = "准备就绪";
-        OnPropertyChanged(nameof(IsDetected));
-        OnPropertyChanged(nameof(CanProceed));
-        OnPropertyChanged(nameof(UninstallDirectory));
-        OnPropertyChanged(nameof(VersionLine));
-        OnPropertyChanged(nameof(SizeText));
+        OnPropertyChanged(nameof(LogText));
         OnPropertyChanged(nameof(HasLog));
+        OnPropertyChanged(nameof(CanProceed));
     }
 
     /// <summary>后台填充版本与体积（不阻塞 UI）</summary>
@@ -153,8 +190,19 @@ public partial class UninstallViewModel : ObservableObject
 
         IsRunning = true;
         IsCompleted = false;
-        LogLines.Clear();
+        IsSuccess = false;
+        lock (_logLock)
+        {
+            _logBuffer.Clear();
+        }
+        LogText = string.Empty;
         CurrentMessage = "正在卸载…";
+        OnPropertyChanged(nameof(LogText));
+        OnPropertyChanged(nameof(HasLog));
+
+        // 通知主按钮与步骤条：进入"执行"步骤
+        _main.NotifySubViewModelChanged();
+        _main.UpdateUninstallStep(1);
 
         try
         {
@@ -164,12 +212,14 @@ public partial class UninstallViewModel : ObservableObject
                 CleanupAssociations);
 
             var result = await Task.Run(() =>
-                UninstallEngine.RunAsync(options, line => DispatcherInvoke(() =>
+                UninstallEngine.RunAsync(options, line =>
                 {
-                    LogLines.Add(line);
-                    CurrentMessage = line;
-                    OnPropertyChanged(nameof(HasLog));
-                })));
+                    lock (_logLock)
+                    {
+                        _logBuffer.AppendLine(line);
+                    }
+                    DispatcherInvoke(() => CurrentMessage = line);
+                }));
 
             IsSuccess = result.Success;
             BackupPath = result.BackupPath;
@@ -180,29 +230,63 @@ public partial class UninstallViewModel : ObservableObject
 
             if (result.FailedFiles.Count > 0)
             {
-                DispatcherInvoke(() =>
+                lock (_logLock)
                 {
                     foreach (var f in result.FailedFiles.Take(20))
                     {
-                        LogLines.Add($"无法删除：{f}");
+                        _logBuffer.AppendLine($"无法删除：{f}");
                     }
-                });
+                }
             }
 
             // 卸载后刷新主页状态
             _main.RefreshHome();
+
+            // 卸载成功：清空会话指向的已删除目录，后续检测走程序目录向上查找
+            _session.InstallDirectory = null;
         }
         catch (Exception ex)
         {
             IsSuccess = false;
             CurrentMessage = $"卸载异常：{ex.Message}";
+            lock (_logLock)
+            {
+                _logBuffer.AppendLine($"[异常] {ex.Message}");
+            }
+            FlushLogBuffer();
         }
         finally
         {
             IsCompleted = true;
             IsRunning = false;
-            OnPropertyChanged(nameof(CanProceed));
+            FlushLogBuffer();
+            // 通知主按钮与步骤条：进入"完成"步骤
+            _main.UpdateUninstallStep(2);
+            _main.NotifySubViewModelChanged();
         }
+    }
+
+    /// <summary>把缓冲日志一次性追加到 LogText（UI 线程）</summary>
+    private void FlushLogBuffer()
+    {
+        string chunk;
+        lock (_logLock)
+        {
+            if (_logBuffer.Length == 0)
+            {
+                return;
+            }
+            chunk = _logBuffer.ToString();
+            _logBuffer.Clear();
+        }
+
+        if (LogText.Length > 1_000_000)
+        {
+            LogText = LogText[^500_000..] + "\n--- 日志过长已截断 ---\n";
+        }
+        LogText += chunk;
+        OnPropertyChanged(nameof(LogText));
+        OnPropertyChanged(nameof(HasLog));
     }
 
     private static void DispatcherInvoke(Action action)
