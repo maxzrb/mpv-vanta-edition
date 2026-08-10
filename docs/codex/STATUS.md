@@ -7,10 +7,10 @@
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master`（领先 `origin/master` 1 个提交，功能提交已本地化） |
 | **最新发布提交** | `909dede`（tag: `v1.4.1`） |
-| **工作区** | v1.4.3 全包构建完成（01/05 重建、02/03/04 推版本号）；待 docs 提交、标签与 Release |
+| **工作区** | v1.4.3 已发布：Release v1.4.3 七资产上传并核对一致；工作树干净，master 与 origin/master 同步 |
 | **MPV 核心版本** | v0.41.0-860-gc8c7d91a8 (2026-07-06, dyphire/mpv-winbuild) |
-| **项目版本** | v1.4.3（构建完成，待发布） |
-| **上次操作** | v1.4.3 构建：01/05 重建（installer bat、窗口设置），02/03/04 推版本号重打，全量包本地；VantaInstaller v0.2.0 重建（315DA1D8...） |
+| **项目版本** | v1.4.3（已发布） |
+| **上次操作** | v1.4.3 发布完成：Release 链接 https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.4.3；七资产远端 hash 与本地一致；全量包仅本地 |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
