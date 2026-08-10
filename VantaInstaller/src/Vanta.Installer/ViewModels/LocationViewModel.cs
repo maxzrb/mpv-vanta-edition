@@ -84,10 +84,11 @@ public partial class LocationViewModel : ObservableObject
             return;
         }
 
-        // 智能默认：仅在用户尚未填写时，向上查找已安装的 mpv.exe 所在目录
+        // 智能默认：仅在用户尚未填写时，默认安装在"安装器所在目录"下的 MPV Vanta Edition 子文件夹。
+        // （FinalDirectory 会处理：若安装器目录本身已是 mpv 安装，则直接使用不嵌套 → 覆盖升级）
         if (string.IsNullOrWhiteSpace(InstallDirectory))
         {
-            InstallDirectory = FindMpvDirectory() ?? string.Empty;
+            InstallDirectory = AppContext.BaseDirectory;
         }
         RefreshStatus();
     }
@@ -169,23 +170,4 @@ public partial class LocationViewModel : ObservableObject
         OnPropertyChanged(nameof(CanProceed));
     }
 
-    /// <summary>从程序目录向上查找 mpv.exe 所在目录（最多 5 层）</summary>
-    private static string? FindMpvDirectory()
-    {
-        var dir = AppContext.BaseDirectory;
-        for (int i = 0; i < 5; i++)
-        {
-            if (File.Exists(Path.Combine(dir, "mpv.exe")))
-            {
-                return dir;
-            }
-            var parent = Directory.GetParent(dir);
-            if (parent is null)
-            {
-                return null;
-            }
-            dir = parent.FullName;
-        }
-        return null;
-    }
 }
