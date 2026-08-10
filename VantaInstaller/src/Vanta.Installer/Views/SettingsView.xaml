@@ -119,20 +119,6 @@
                         <TextBlock Style="{StaticResource CardDescStyle}">
                             注册后用 mpv 打开视频/音频文件；写入注册表，需要管理员权限（弹 UAC）。
                         </TextBlock>
-                        <Grid Margin="0,14,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <ui:Button Grid.Column="0" Content="取消文件关联" Appearance="Secondary"
-                                       Command="{Binding UnregisterAssociationsCommand}"
-                                       IsEnabled="{Binding CanRegister}" Padding="16,8" />
-                            <TextBlock Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="11"
-                                       TextWrapping="Wrap"
-                                       Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}">
-                                取消后恢复默认打开方式；需要管理员权限（弹 UAC）。
-                            </TextBlock>
-                        </Grid>
 
                         <!-- 文件关联入口：多实例（mpv.exe）与单实例（umpv.exe）可分别注册，打开方式里自行选择 -->
                         <Border Margin="0,14,0,0" Padding="14,12" CornerRadius="8" BorderThickness="1"
@@ -146,12 +132,20 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <ui:Button Grid.Column="0" Content="注册多实例关联" Appearance="Primary"
                                                Command="{Binding RegisterMultiAssociationsCommand}"
                                                IsEnabled="{Binding CanRegister}" Padding="16,8" Margin="0,0,8,0" />
-                                    <ui:Button Grid.Column="1" Content="注册单实例关联" Appearance="Secondary"
+                                    <ui:Button Grid.Column="1" Content="注册单实例关联" Appearance="Primary"
                                                Command="{Binding RegisterSingleAssociationsCommand}"
+                                               IsEnabled="{Binding CanRegister}" Padding="16,8" Margin="0,0,8,0" />
+                                    <ui:Button Grid.Column="2" Content="取消多实例关联" Appearance="Secondary"
+                                               Command="{Binding UnregisterMultiAssociationsCommand}"
+                                               IsEnabled="{Binding CanRegister}" Padding="16,8" Margin="0,0,8,0" />
+                                    <ui:Button Grid.Column="3" Content="取消单实例关联" Appearance="Secondary"
+                                               Command="{Binding UnregisterSingleAssociationsCommand}"
                                                IsEnabled="{Binding CanRegister}" Padding="16,8" />
                                 </Grid>
                             </StackPanel>

@@ -852,11 +852,6 @@ public partial class SettingsViewModel : ObservableObject
 
     // ============ 文件关联 ============
 
-    /// <summary>取消文件关联（提权调用 mpv-uninstall.bat）</summary>
-    [RelayCommand]
-    private void UnregisterAssociations() =>
-        RunBatElevated(Path.Combine(InstallDirectory, "installer", "mpv-uninstall.bat"), "取消文件关联");
-
     /// <summary>注册多实例文件关联（指向 mpv.exe，提权调用 mpv-install.bat）</summary>
     [RelayCommand]
     private void RegisterMultiAssociations()
@@ -881,6 +876,32 @@ public partial class SettingsViewModel : ObservableObject
             return;
         }
         RunBatElevated(bat, "注册单实例文件关联");
+    }
+
+    /// <summary>取消多实例文件关联（提权调用 mpv-uninstall.bat）</summary>
+    [RelayCommand]
+    private void UnregisterMultiAssociations()
+    {
+        var bat = AssociationService.UninstallBatPath(InstallDirectory, PlaybackMode.MultiInstance);
+        if (bat is null)
+        {
+            OperationMessage = "未找到 mpv-uninstall.bat，请确认已安装完整。";
+            return;
+        }
+        RunBatElevated(bat, "取消多实例文件关联");
+    }
+
+    /// <summary>取消单实例文件关联（提权调用 single-instance 卸载脚本）</summary>
+    [RelayCommand]
+    private void UnregisterSingleAssociations()
+    {
+        var bat = AssociationService.UninstallBatPath(InstallDirectory, PlaybackMode.SingleInstance);
+        if (bat is null)
+        {
+            OperationMessage = "未找到 mpv-uninstall (single-instance).bat，请确认已安装完整。";
+            return;
+        }
+        RunBatElevated(bat, "取消单实例文件关联");
     }
 
     private void RunBatElevated(string? batPath, string actionName)
