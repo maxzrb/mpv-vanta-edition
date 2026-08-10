@@ -64,11 +64,17 @@
                     <StackPanel>
                         <TextBlock Text="安装日志" FontSize="14" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
-                        <ListBox ItemsSource="{Binding LogLines}" Margin="0,12,0,0" Height="200"
+                        <!-- 命令行风格日志：黑色背景 + 等宽字体 + 自动滚动 -->
+                        <TextBox x:Name="LogBox" Margin="0,12,0,0" Height="200"
+                                 Text="{Binding LogText, Mode=OneWay}"
                                  FontFamily="Cascadia Mono, Consolas" FontSize="12"
-                                 Background="Transparent"
-                                 BorderThickness="0"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+                                 Background="#FF101014" Foreground="#FFE6E6F0"
+                                 BorderBrush="#FF2A2A38" BorderThickness="1"
+                                 IsReadOnly="True" TextWrapping="NoWrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 Padding="10,8"
+                                 TextChanged="LogBox_TextChanged" />
                     </StackPanel>
                 </ui:Card>
             </StackPanel>

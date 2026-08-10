@@ -86,6 +86,7 @@ public partial class MainViewModel : ObservableObject
     {
         AppMode.Install => CurrentPage switch
         {
+            InstallViewModel { IsRunning: true } => "安装中…",
             InstallViewModel { IsCompleted: false } => "开始安装",
             InstallViewModel => "下一步",
             _ when IsLastStep => "完成",
@@ -100,6 +101,7 @@ public partial class MainViewModel : ObservableObject
     {
         AppMode.Install => CurrentPage switch
         {
+            InstallViewModel { IsRunning: true } => false,
             InstallViewModel => true,
             WelcomeViewModel w => w.CanProceed,
             LocationViewModel l => l.CanProceed,
