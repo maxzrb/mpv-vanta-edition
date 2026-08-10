@@ -10,7 +10,7 @@
 | **工作区** | v1.4.3 已发布：Release v1.4.3 七资产上传并核对一致；工作树干净，master 与 origin/master 同步 |
 | **MPV 核心版本** | v0.41.0-860-gc8c7d91a8 (2026-07-06, dyphire/mpv-winbuild) |
 | **项目版本** | v1.4.3（已发布） |
-| **上次操作** | v1.4.3 发布完成：Release 链接 https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.4.3；七资产远端 hash 与本地一致；全量包仅本地 |
+| **上次操作** | v1.4.3 发布完成：Release 链接 https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.4.3；七资产远端 hash 与本地一致；全量包仅本地；installer 二次重建覆盖（FD8E4181...） |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
