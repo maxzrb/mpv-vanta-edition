@@ -95,24 +95,26 @@
                         </StackPanel>
                     </ui:Card>
 
-                    <ui:Card Padding="24" Visibility="{Binding HasLog, Converter={StaticResource BoolToVis}}">
-                        <StackPanel>
-                            <TextBlock Text="卸载日志" FontSize="14" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
-                            <!-- 命令行风格日志：黑色背景 + 等宽字体 + 自动滚动 -->
-                            <TextBox x:Name="UninstallLogBox" Margin="0,12,0,0" Height="160"
-                                     Text="{Binding LogText, Mode=OneWay}"
-                                     FontFamily="Cascadia Mono, Consolas" FontSize="12"
-                                     Background="#FF101014" Foreground="#FFE6E6F0"
-                                     BorderBrush="#FF2A2A38" BorderThickness="1"
-                                     IsReadOnly="True" TextWrapping="NoWrap"
-                                     VerticalScrollBarVisibility="Auto"
-                                     HorizontalScrollBarVisibility="Auto"
-                                     Padding="10,8"
-                                     TextChanged="UninstallLogBox_TextChanged" />
-                        </StackPanel>
-                    </ui:Card>
                 </StackPanel>
+
+                <!-- 卸载日志（阶段2执行中 / 阶段3完成均显示） -->
+                <ui:Card Padding="24" Visibility="{Binding HasLog, Converter={StaticResource BoolToVis}}">
+                    <StackPanel>
+                        <TextBlock Text="卸载日志" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                        <!-- 命令行风格日志：黑色背景 + 等宽字体 + 自动滚动 -->
+                        <TextBox x:Name="UninstallLogBox" Margin="0,12,0,0" Height="160"
+                                 Text="{Binding LogText, Mode=OneWay}"
+                                 FontFamily="Cascadia Mono, Consolas" FontSize="12"
+                                 Background="#FF101014" Foreground="#FFE6E6F0"
+                                 BorderBrush="#FF2A2A38" BorderThickness="1"
+                                 IsReadOnly="True" TextWrapping="NoWrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 Padding="10,8"
+                                 TextChanged="UninstallLogBox_TextChanged" />
+                    </StackPanel>
+                </ui:Card>
             </StackPanel>
         </ScrollViewer>
     </Grid>

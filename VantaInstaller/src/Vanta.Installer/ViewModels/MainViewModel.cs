@@ -108,7 +108,15 @@ public partial class MainViewModel : ObservableObject
             PackagesViewModel p => p.CanProceed,
             _ => true,
         },
-        AppMode.Uninstall => CurrentPage is UninstallViewModel u && u.CanProceed,
+        AppMode.Uninstall => CurrentPage switch
+        {
+            // 卸载完成后：主按钮 = 返回主页，应始终可用
+            UninstallViewModel { IsCompleted: true } => true,
+            // 卸载中：禁用
+            UninstallViewModel { IsRunning: true } => false,
+            UninstallViewModel u => u.CanProceed,
+            _ => false,
+        },
         _ => false,
     };
 
