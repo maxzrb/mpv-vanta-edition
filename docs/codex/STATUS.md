@@ -75,6 +75,7 @@ c:\Program portable\mpv2\
 - **构建**：正式版 `VantaInstaller\publish\win-x64\VantaInstaller-win-x64-v0.2.0.exe`（67.5MB，压缩自包含单文件），启动验证通过。
 - **发布**：仅重建 installer（用户指示不全量构建），`gh release upload v1.4.2 --clobber` 覆盖；先误传为 `VantaInstaller.exe`（同名覆盖未命中），已删除并改用规范名重新上传。
 - **核对**：远端 `VantaInstaller-win-x64-v0.2.0.exe` SHA-256 `7E3D0B412CCA273FC26861972B459A84C61BE7F205B2AE27F2702AA4CBCF6FF3`，大小 67570562，与本地一致；旧 hash 资产已清除。
+- **收尾**：Release 说明已更新（installer SHA-256 改为 7E3D0B41... 并附 2026-08-11 重建说明）；docs 提交 `4edea12` 已推送，master 与 origin/master 同步。
 - **未提交/未夹带**：`portable_config/script-opts/window_size_position.conf`（用户私有改动）、`backup/`（测试残留）均未纳入提交。
 
 
