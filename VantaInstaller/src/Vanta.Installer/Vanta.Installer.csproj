@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>VantaInstaller</AssemblyName>
+    <RootNamespace>Vanta.Installer</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>assets\vanta-icon.ico</ApplicationIcon>
+    <Version>0.2.0</Version>
+    <Authors>maxzrb</Authors>
+    <Description>MPV Vanta Edition 辅助安装程序</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vanta.Core\Vanta.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 品牌图标：随输出复制（窗口/任务栏运行时使用） -->
+    <None Include="assets\vanta-icon.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

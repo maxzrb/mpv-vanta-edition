@@ -130,3 +130,11 @@ $RECYCLE.BIN/
 *.7z
 *.zip
 *.rar
+
+# --- Vanta Installer 构建产物 ---
+/VantaInstaller/src/*/bin/
+/VantaInstaller/src/*/obj/
+/VantaInstaller/**/bin/
+/VantaInstaller/**/obj/
+
+/VantaInstaller/**/publish/

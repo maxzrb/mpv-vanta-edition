@@ -1,0 +1,316 @@
+<ui:FluentWindow x:Class="Vanta.Installer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:vm="clr-namespace:Vanta.Installer.ViewModels"
+        xmlns:views="clr-namespace:Vanta.Installer.Views"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        Title="Vanta Installer"
+        Width="980" Height="640"
+        MinWidth="860" MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica"
+        PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown">
+
+    <ui:FluentWindow.Resources>
+        <!-- 按 ViewModel 类型自动切换视图 -->
+        <DataTemplate DataType="{x:Type vm:HomeViewModel}">
+            <views:HomeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:WelcomeViewModel}">
+            <views:WelcomeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:LocationViewModel}">
+            <views:LocationView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:PackagesViewModel}">
+            <views:PackagesView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:InstallViewModel}">
+            <views:InstallView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DoneViewModel}">
+            <views:DoneView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:UninstallViewModel}">
+            <views:UninstallView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView />
+        </DataTemplate>
+    </ui:FluentWindow.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- 左侧导航面板：与右侧统一背景，仅以细分隔线区分 -->
+        <Border Grid.Column="0"
+                Background="{DynamicResource Wpf.Ui.Brushes.ApplicationBackgroundBrush}"
+                BorderThickness="0,0,1,0"
+                BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+            <Grid Margin="24,28,20,24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0">
+                <!-- 苹果风格窗口控制按钮（红/黄/绿，悬停显示符号） -->
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="CloseButton" Width="13" Height="13" Click="CloseButton_Click"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand"
+                            AutomationProperties.Name="关闭" ToolTip="关闭">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Grid>
+                                    <Ellipse x:Name="Circle" Fill="#FF5F57" />
+                                    <Path x:Name="Glyph" Data="M 3.5,3.5 L 9.5,9.5 M 9.5,3.5 L 3.5,9.5"
+                                          Stroke="#FF1A1A24" StrokeThickness="1.1" StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round" Visibility="Collapsed" />
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Circle" Property="Fill" Value="#FFE04440" />
+                                        <Setter TargetName="Glyph" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="Circle" Property="Fill" Value="#FFD3322C" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button x:Name="MinimizeButton" Width="13" Height="13" Click="MinimizeButton_Click"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="8,0,0,0"
+                            AutomationProperties.Name="最小化" ToolTip="最小化">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Grid>
+                                    <Ellipse x:Name="Circle" Fill="#FFBD2E" />
+                                    <Path x:Name="Glyph" Data="M 3,6.5 L 10,6.5"
+                                          Stroke="#FF1A1A24" StrokeThickness="1.1" StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round" Visibility="Collapsed" />
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Circle" Property="Fill" Value="#FFE9A92E" />
+                                        <Setter TargetName="Glyph" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button x:Name="MaximizeButton" Width="13" Height="13" Click="MaximizeButton_Click"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="8,0,0,0"
+                            AutomationProperties.Name="最大化" ToolTip="最大化/还原">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Grid>
+                                    <Ellipse x:Name="Circle" Fill="#FF28C840" />
+                                    <Path x:Name="Glyph" Data="M 4,4 H 9 V 9 H 4 Z"
+                                          Stroke="#FF1A1A24" StrokeThickness="1.1" StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round" Visibility="Collapsed" />
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Circle" Property="Fill" Value="#FF3AD554" />
+                                        <Setter TargetName="Glyph" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </StackPanel>
+
+                <!-- 品牌区：紫色圆点 = 返回主页按钮，VANTA 文字点击也可返回 -->
+                <StackPanel Orientation="Horizontal" Margin="0,28,0,0">
+                    <Button Command="{Binding GoHomeCommand}" Width="13" Height="13" VerticalAlignment="Center"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand"
+                            AutomationProperties.Name="返回主页" ToolTip="返回主页">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Grid>
+                                    <Ellipse x:Name="Dot" Fill="#FF8A6BF8" />
+                                    <Canvas Width="13" Height="13"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Path x:Name="Arrow" Data="M 6.5,4.5 L 4.5,6.5 L 6.5,8.5"
+                                              Stroke="White" StrokeThickness="1.1" StrokeStartLineCap="Round"
+                                              StrokeEndLineCap="Round" Visibility="Collapsed" />
+                                    </Canvas>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Dot" Property="Fill" Value="#FF6B3FD8" />
+                                        <Setter TargetName="Arrow" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <TextBlock Text="VANTA" FontSize="26" FontWeight="SemiBold" Foreground="#FF1A1A24" Margin="12,0,0,0"
+                               Cursor="Hand" MouseLeftButtonUp="Brand_MouseLeftButtonUp"
+                               VerticalAlignment="Center" FontFamily="Segoe UI" />
+                </StackPanel>
+                <TextBlock Text="MPV TOOLKIT" FontSize="12" Foreground="#FF6E6E84" Margin="26,6,0,0"
+                           FontFamily="Segoe UI" />
+
+                <!-- 导航项（首页/设置模式显示）：选中 = 品牌紫 pill，与右侧 Primary 按钮统一 -->
+                <ItemsControl ItemsSource="{Binding NavItems}" Margin="13,24,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding Command}" Background="Transparent" BorderThickness="0"
+                                    AutomationProperties.Name="{Binding Name}"
+                                    HorizontalContentAlignment="Stretch" Padding="0" Margin="0,0,0,10">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Grid>
+                                            <!-- 左侧细竖条指示器（选中时显示） -->
+                                            <Border x:Name="Indicator" Width="3" Height="16" CornerRadius="1.5"
+                                                    Background="Transparent" HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center" />
+                                            <!-- 内容 pill：自适应内容宽度，左对齐，紧凑内边距 -->
+                                            <Border x:Name="Bg" CornerRadius="8" Background="Transparent"
+                                                    Padding="12,10,26,10" HorizontalAlignment="Left">
+                                                <ContentPresenter />
+                                            </Border>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <!-- 悬停：淡紫 -->
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bg" Property="Background" Value="#148A6BF8" />
+                                            </Trigger>
+                                            <!-- 选中：淡紫底 + 品牌紫竖条，背景平滑过渡 -->
+                                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                <DataTrigger.EnterActions>
+                                                    <BeginStoryboard x:Name="ActiveSb">
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetName="Bg"
+                                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                            To="#FFE8E0FB" Duration="0:0:0.18" />
+                                                            <ColorAnimation Storyboard.TargetName="Indicator"
+                                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                            To="#FF8A6BF8" Duration="0:0:0.18" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </DataTrigger.EnterActions>
+                                                <DataTrigger.ExitActions>
+                                                    <StopStoryboard BeginStoryboardName="ActiveSb" />
+                                                </DataTrigger.ExitActions>
+                                                <Setter TargetName="Bg" Property="Background" Value="#FFE8E0FB" />
+                                                <Setter TargetName="Indicator" Property="Background" Value="#FF8A6BF8" />
+                                            </DataTrigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:SymbolIcon x:Name="Icon" Symbol="{Binding Symbol}" FontSize="22"
+                                                   Foreground="#FF6E6E84" />
+                                    <TextBlock x:Name="Label" Text="{Binding Name}" Margin="10,0,0,0"
+                                               Foreground="#FF1A1A24" VerticalAlignment="Center" FontSize="16" />
+                                </StackPanel>
+                            </Button>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                    <Setter TargetName="Icon" Property="Foreground" Value="#FF6B3FD8" />
+                                    <Setter TargetName="Label" Property="Foreground" Value="#FF6B3FD8" />
+                                    <Setter TargetName="Label" Property="FontWeight" Value="SemiBold" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                </StackPanel>
+                <TextBlock Grid.Row="1" Text="v0.2.0" Foreground="#FF8A8AA0"
+                           FontSize="11" Margin="0,12,0,0" VerticalAlignment="Bottom" />
+            </Grid>
+        </Border>
+
+        <!-- 右侧内容区 -->
+        <Grid Grid.Column="1" Background="{DynamicResource Wpf.Ui.Brushes.ApplicationBackgroundBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- 内容区：顶部横向步骤条 + 页面 -->
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- 横向步骤指示（安装/卸载模式显示，跟随当前步骤高亮） -->
+                <Border Grid.Row="1" Margin="38,8,34,16"
+                        Visibility="{Binding ShowSteps, Converter={StaticResource BoolToVis}}">
+                    <ItemsControl ItemsSource="{Binding CurrentSteps}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,28,0">
+                                    <Border x:Name="Dot" Width="22" Height="22" CornerRadius="11"
+                                            BorderBrush="#FF8A6BF8" BorderThickness="1.5" VerticalAlignment="Center">
+                                        <TextBlock x:Name="Num" Text="{Binding Index, Mode=OneWay}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   FontSize="11" Foreground="#FF8A6BF8" />
+                                    </Border>
+                                    <TextBlock x:Name="Label" Text="{Binding Name, Mode=OneWay}"
+                                               Margin="8,0,0,0" VerticalAlignment="Center" FontSize="13"
+                                               Foreground="#FF6E6E84" />
+                                </StackPanel>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                        <Setter TargetName="Dot" Property="Background" Value="#FF8A6BF8" />
+                                        <Setter TargetName="Num" Property="Foreground" Value="White" />
+                                        <Setter TargetName="Label" Property="Foreground" Value="#FF1A1A24" />
+                                        <Setter TargetName="Label" Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+                <ContentControl x:Name="PageHost" Grid.Row="0" Content="{Binding CurrentPage}"
+                                Margin="34,36,34,12"
+                                RenderTransformOrigin="0.5,0">
+                    <ContentControl.RenderTransform>
+                        <TranslateTransform Y="0" />
+                    </ContentControl.RenderTransform>
+                </ContentControl>
+            </Grid>
+
+            <!-- 底部按钮条（安装/卸载模式显示） -->
+            <Border Grid.Row="1" Padding="34,16" BorderThickness="0,1,0,0"
+                    BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}"
+                    Background="{DynamicResource Wpf.Ui.Brushes.CardBackgroundFillColorDefaultBrush}"
+                    Visibility="{Binding ShowBottomBar, Converter={StaticResource BoolToVis}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:Button Grid.Column="1" Content="上一步" Appearance="Secondary"
+                               Command="{Binding BackCommand}" IsEnabled="{Binding CanGoBack, Mode=OneWay}"
+                               Visibility="{Binding ShowInstallSteps, Converter={StaticResource BoolToVis}}"
+                               Margin="0,0,12,0" Padding="18,7" />
+                    <ui:Button Grid.Column="2" Content="{Binding NextButtonText, Mode=OneWay}" Appearance="Primary"
+                               Command="{Binding NextCommand}" Padding="22,7"
+                               Visibility="{Binding ShowNextButton, Converter={StaticResource BoolToVis}}"
+                               IsEnabled="{Binding CanNext, Mode=OneWay}" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</ui:FluentWindow>

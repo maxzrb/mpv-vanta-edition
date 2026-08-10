@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Vanta.Core/Vanta.Core.csproj" />
+    <Project Path="src/Vanta.Installer/Vanta.Installer.csproj" />
+    <Project Path="src/Vanta.ScanTool/Vanta.ScanTool.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,206 @@
+using System.Diagnostics;
+using Vanta.Core.Models;
+
+namespace Vanta.Core.Services;
+
+/// <summary>
+/// 安装引擎：扫描包 → 校验 → 备份 → 按序解压 → 自检。
+/// </summary>
+public sealed class InstallEngine
+{
+    /// <summary>日志行</summary>
+    public event Action<string>? Log;
+
+    /// <summary>当前解压包进度（文件名，0~100）</summary>
+    public event Action<string, int>? PackageProgress;
+
+    /// <summary>整体进度（0~100）</summary>
+    public event Action<int>? GlobalProgress;
+
+    private readonly SevenZipService _sevenZip;
+
+    public InstallEngine(SevenZipService? sevenZip = null) => _sevenZip = sevenZip ?? new SevenZipService();
+
+    /// <summary>
+    /// 执行安装/覆盖升级。
+    /// </summary>
+    public async Task<InstallResult> RunAsync(InstallOptions options, IProgress<InstallProgress>? progress = null, CancellationToken ct = default)
+    {
+        var result = new InstallResult();
+        Log ??= _ => { };
+
+        try
+        {
+            // 1. 定位 7z
+            var sevenZipPath = await _sevenZip.LocateAsync();
+            result.Log.Add($"7z：{sevenZipPath}");
+
+            // 2. 扫描包
+            var scan = PackageScanner.Scan(options.SourceDirectory);
+            foreach (var e in scan.Errors)
+            {
+                result.Log.Add($"[错误] {e}");
+            }
+            if (!scan.CanInstall)
+            {
+                result.Success = false;
+                result.Error = string.Join(Environment.NewLine, scan.Errors);
+                return result;
+            }
+            result.Log.Add($"识别到 {scan.Packages.Count} 个包（统一版本 v{scan.UnifiedVersion}）");
+
+            // 3. 目标目录状态
+            result.IsUpgrade = File.Exists(Path.Combine(options.InstallDirectory, "mpv.exe"));
+            result.Log.Add(result.IsUpgrade
+                ? $"目标目录已有旧版，进入覆盖升级模式：{options.InstallDirectory}"
+                : $"全新安装：{options.InstallDirectory}");
+
+            // 4. 磁盘空间预检
+            Directory.CreateDirectory(options.InstallDirectory);
+            var selected = (options.SelectedPackageIds is null)
+                ? scan.Packages
+                : scan.Packages.Where(p => options.SelectedPackageIds.Contains(p.Id)).ToList();
+            if (selected.Count == 0)
+            {
+                result.Success = false;
+                result.Error = "没有选中的包，无法安装。";
+                return result;
+            }
+
+            var needed = selected.Sum(p => p.TotalSize);
+            var root = Path.GetPathRoot(Path.GetFullPath(options.InstallDirectory)) ?? "C:\\";
+            var drive = new DriveInfo(root);
+            if (drive.IsReady && drive.AvailableFreeSpace < needed)
+            {
+                result.Success = false;
+                result.Error = $"磁盘空间不足：需要 {VantaPackage.FormatSize(needed)}，可用 {VantaPackage.FormatSize(drive.AvailableFreeSpace)}。";
+                return result;
+            }
+            result.Log.Add($"磁盘空间充足：需要 {VantaPackage.FormatSize(needed)}");
+
+            // 5. 覆盖升级前备份
+            if (result.IsUpgrade && options.BackupBeforeUpgrade)
+            {
+                var backupRoot = Path.Combine(options.InstallDirectory, "backup");
+                result.BackupPath = BackupService.BackupConfig(options.InstallDirectory, backupRoot, options.KeepBackups);
+                result.Log.Add(result.BackupPath is null
+                    ? "未发现 portable_config，跳过备份。"
+                    : $"已备份配置到：{result.BackupPath}");
+            }
+
+            // 6. 按序解压
+            result.Log.Add($"将安装 {selected.Count} 个包：{string.Join(" → ", selected.Select(p => p.Id))}");
+            progress?.Report(new InstallProgress(0, "开始安装"));
+
+            for (int i = 0; i < selected.Count; i++)
+            {
+                ct.ThrowIfCancellationRequested();
+                var pkg = selected[i];
+                result.Log.Add($"[{pkg.Id}] 开始解压 {pkg.EntryFile} …");
+
+                // 包级进度 → 整体进度（当前包占 90%，跨包滚动）
+                void OnProgress(int pct)
+                {
+                    PackageProgress?.Invoke(pkg.EntryFile, pct);
+                    var overall = (int)((i * 100.0 + pct * 0.9) / selected.Count);
+                    GlobalProgress?.Invoke(overall);
+                    progress?.Report(new InstallProgress(overall, $"正在解压 {pkg.DisplayName}"));
+                }
+
+                _sevenZip.ProgressChanged += OnProgress;
+                try
+                {
+                    await _sevenZip.ExtractAsync(pkg.EntryPath, options.InstallDirectory, ct);
+                }
+                finally
+                {
+                    _sevenZip.ProgressChanged -= OnProgress;
+                }
+
+                result.Log.Add($"[{pkg.Id}] 完成");
+                progress?.Report(new InstallProgress((int)((i + 1) * 100.0 / selected.Count), $"{pkg.DisplayName} 完成"));
+            }
+
+            // 7. 自检
+            var mpvExe = Path.Combine(options.InstallDirectory, "mpv.exe");
+            result.MpvExists = File.Exists(mpvExe);
+            if (result.MpvExists)
+            {
+                result.MpvVersionLine = await TryGetMpvVersionAsync(mpvExe);
+                result.Log.Add($"自检通过：{result.MpvVersionLine}");
+            }
+            else
+            {
+                result.Log.Add("警告：安装后未找到 mpv.exe，请检查是否选择了 01 号包。");
+            }
+
+            // 8. 写入版本标记（供检查更新识别当前包版本）
+            if (!string.IsNullOrWhiteSpace(scan.UnifiedVersion))
+            {
+                try
+                {
+                    var marker = Path.Combine(options.InstallDirectory, "portable_config", ".vanta-version");
+                    var markerDir = Path.GetDirectoryName(marker);
+                    if (markerDir is not null)
+                    {
+                        Directory.CreateDirectory(markerDir);
+                        File.WriteAllText(marker, scan.UnifiedVersion.Trim());
+                        result.Log.Add($"已写入版本标记：{scan.UnifiedVersion}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result.Log.Add($"警告：写入版本标记失败 {ex.Message}");
+                }
+            }
+
+            result.Success = true;
+            progress?.Report(new InstallProgress(100, "安装完成"));
+            return result;
+        }
+        catch (OperationCanceledException)
+        {
+            result.Success = false;
+            result.Error = "安装已取消。";
+            return result;
+        }
+        catch (Exception ex)
+        {
+            result.Success = false;
+            result.Error = ex.Message;
+            result.Log.Add($"[异常] {ex.Message}");
+            return result;
+        }
+    }
+
+    private static async Task<string?> TryGetMpvVersionAsync(string mpvExe)
+    {
+        try
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = mpvExe,
+                Arguments = "--version",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                // mpv 以 UTF-8 输出版本信息；不显式指定会按系统 GBK 解码导致 © 变乱码
+                StandardOutputEncoding = System.Text.Encoding.UTF8,
+                StandardErrorEncoding = System.Text.Encoding.UTF8,
+            };
+            using var proc = Process.Start(psi);
+            if (proc is null)
+            {
+                return null;
+            }
+            var line = await proc.StandardOutput.ReadLineAsync();
+            await proc.WaitForExitAsync();
+            return line;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+}
