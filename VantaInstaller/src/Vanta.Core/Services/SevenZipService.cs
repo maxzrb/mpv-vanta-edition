@@ -86,8 +86,8 @@ public sealed partial class SevenZipService
         var psi = new ProcessStartInfo
         {
             FileName = exe,
-            // x 解压 -y 全部覆盖 -o 输出目录（-o 后无空格）
-            Arguments = $"x -y -o\"{targetDirectory}\" \"{archivePath}\"",
+            // x 解压 -y 全部覆盖 -bsp1 强制进度输出到 stdout（重定向时默认关闭进度）
+            Arguments = $"x -y -bsp1 -o\"{targetDirectory}\" \"{archivePath}\"",
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardOutput = true,
@@ -99,26 +99,20 @@ public sealed partial class SevenZipService
         using var proc = Process.Start(psi)
             ?? throw new InvalidOperationException("无法启动 7z 进程。");
 
-        // 逐行读取输出，解析进度（行首为 "NN%"）
-        while (true)
+        // 7z 进度输出在重定向下默认关闭，需 -bsp1 强制；行格式 "NN% ..."（\n 结尾）
+        // 或旧版 \r 覆盖。改用逐块读取 + 手动按 \r/\n 拆行，实时解析 NN% 并转发输出。
+        var progress = new ProgressTextParser();
+        await ReadStreamIncrementalAsync(proc.StandardOutput, ct, (line, isProgress, pct) =>
         {
-            var line = await proc.StandardOutput.ReadLineAsync(ct);
-            if (line is null)
+            if (isProgress)
             {
-                break;
+                ProgressChanged?.Invoke(pct);
             }
-            if (string.IsNullOrWhiteSpace(line))
+            else if (!string.IsNullOrWhiteSpace(line))
             {
-                continue;
+                OutputReceived?.Invoke(line);
             }
-
-            OutputReceived?.Invoke(line);
-            var m = PercentRegex().Match(line);
-            if (m.Success)
-            {
-                ProgressChanged?.Invoke(int.Parse(m.Groups[1].Value));
-            }
-        }
+        }, progress);
 
         var errorText = await proc.StandardError.ReadToEndAsync(ct);
         await proc.WaitForExitAsync(ct);
@@ -160,6 +154,101 @@ public sealed partial class SevenZipService
 
     [GeneratedRegex(@"^\s*(\d{1,3})%")]
     private static partial Regex PercentRegex();
+
+    /// <summary>
+    /// 增量读取进程输出流，按 \r/\n 拆行回调。
+    /// 7z 的解压进度是同一行用 \r 反复刷新（如 "40% - file"），
+    /// 拆行时遇到 \r 视为进度更新（行首 NN%），\n 视为完整日志行。
+    /// </summary>
+    private static async Task ReadStreamIncrementalAsync(
+        StreamReader reader,
+        CancellationToken ct,
+        Action<string, bool, int> onLine,
+        ProgressTextParser parser)
+    {
+        var buffer = new char[4096];
+        var pending = new StringBuilder();
+
+        while (true)
+        {
+            var read = await reader.ReadAsync(buffer, ct);
+            if (read <= 0)
+            {
+                break;
+            }
+
+            for (int i = 0; i < read; i++)
+            {
+                var c = buffer[i];
+                if (c == '\n')
+                {
+                    // 完整行（换行结尾）
+                    FlushLine(pending, onLine, parser, isCarriageReturnLine: false);
+                }
+                else if (c == '\r')
+                {
+                    // 回车：7z 进度刷新标记，把当前累积内容作为进度行处理
+                    FlushLine(pending, onLine, parser, isCarriageReturnLine: true);
+                }
+                else
+                {
+                    pending.Append(c);
+                }
+            }
+        }
+
+        // 尾部残留（无终止符）
+        if (pending.Length > 0)
+        {
+            FlushLine(pending, onLine, parser, isCarriageReturnLine: false);
+        }
+    }
+
+    private static void FlushLine(
+        StringBuilder pending,
+        Action<string, bool, int> onLine,
+        ProgressTextParser parser,
+        bool isCarriageReturnLine)
+    {
+        var text = pending.ToString().Trim();
+        pending.Clear();
+
+        // 无论 \r 还是 \n 结尾，只要行首是 NN% 一律按进度处理（避免进度行刷进日志）
+        if (parser.TryParse(text, out var pct))
+        {
+            onLine(text, true, pct);
+            return;
+        }
+
+        // 只有 \r 结尾且非进度：可能是不完整段，跳过（避免半行噪音）
+        if (isCarriageReturnLine)
+        {
+            return;
+        }
+
+        onLine(text, false, 0);
+    }
+
+    /// <summary>解析 7z 进度文本（如 "40% 12 file" 或 "40% - 文件"）</summary>
+    private sealed class ProgressTextParser
+    {
+        public bool TryParse(string text, out int percent)
+        {
+            percent = 0;
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return false;
+            }
+
+            var m = PercentRegex().Match(text);
+            if (m.Success)
+            {
+                percent = int.Parse(m.Groups[1].Value);
+                return true;
+            }
+            return false;
+        }
+    }
 
     private static string? FindInPath(string exeName)
     {

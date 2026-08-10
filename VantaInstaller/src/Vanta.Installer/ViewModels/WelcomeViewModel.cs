@@ -38,6 +38,12 @@ public partial class WelcomeViewModel : ObservableObject
     /// <summary>是否有警告</summary>
     public bool HasWarnings => ScanResult is { Warnings.Count: > 0 };
 
+    /// <summary>是否检测到个人全量包</summary>
+    public bool HasFullPackage => ScanResult?.FullPackage is not null;
+
+    /// <summary>全量包显示文本</summary>
+    public string? FullPackageText => ScanResult?.FullPackage?.DisplayText;
+
     public WelcomeViewModel(AppSession session)
     {
         _session = session;
@@ -102,6 +108,8 @@ public partial class WelcomeViewModel : ObservableObject
             OnPropertyChanged(nameof(CanProceed));
             OnPropertyChanged(nameof(HasErrors));
             OnPropertyChanged(nameof(HasWarnings));
+            OnPropertyChanged(nameof(HasFullPackage));
+            OnPropertyChanged(nameof(FullPackageText));
         }
     }
 }

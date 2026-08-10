@@ -92,6 +92,27 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+
+                        <!-- 个人全量包（解压即用一体包） -->
+                        <Border Margin="0,10,0,0" Padding="12,10" CornerRadius="8"
+                                BorderThickness="1"
+                                BorderBrush="#FFD9C9FB"
+                                Background="#14FFFFFF"
+                                Visibility="{Binding HasFullPackage, Converter={StaticResource BoolToVis}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding FullPackageText, Mode=OneWay}"
+                                           VerticalAlignment="Center" FontSize="13"
+                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                                <Border Grid.Column="1" Background="#FFE8E0FB" CornerRadius="4" Padding="6,2"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="解压即用" FontSize="11" Foreground="#FF6B3FD8" />
+                                </Border>
+                            </Grid>
+                        </Border>
                     </StackPanel>
                 </ui:Card>
 

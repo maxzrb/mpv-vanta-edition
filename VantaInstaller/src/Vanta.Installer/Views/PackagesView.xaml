@@ -35,7 +35,8 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
+                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}"
+                                                  IsEnabled="{Binding IsEnabled}" VerticalAlignment="Center" />
 
                                         <StackPanel Grid.Column="1" Margin="14,0,0,0">
                                             <StackPanel Orientation="Horizontal">

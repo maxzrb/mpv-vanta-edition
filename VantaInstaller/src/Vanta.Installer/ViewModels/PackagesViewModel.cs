@@ -57,6 +57,11 @@ public partial class PackagesViewModel : ObservableObject
                 {
                     item.IsSelected = selected;
                 }
+                // 全量包被选中时增量包保持禁用（返回本页不重置互斥状态）
+                if (previousSelection.TryGetValue("00", out var fullSel) && fullSel)
+                {
+                    item.IsEnabled = false;
+                }
                 item.PropertyChanged += OnItemPropertyChanged;
                 Packages.Add(item);
             }
@@ -72,12 +77,28 @@ public partial class PackagesViewModel : ObservableObject
     {
         if (e.PropertyName == nameof(PackageItem.IsSelected))
         {
-            // 二选一联动：勾选全量包 → 取消所有增量包；取消全量包 → 恢复默认全选增量包
+            // 强互斥联动：
+            // - 勾选全量包 → 取消并禁用所有增量包（避免混装出问题）
+            // - 取消全量包 → 恢复增量包可勾选（保持已选状态）
+            // - 勾选任一增量包 → 自动取消全量包
             if (sender is PackageItem item && item.Id == "00")
             {
                 foreach (var other in Packages.Where(p => p.Id != "00"))
                 {
                     other.IsSelected = !item.IsSelected;
+                    other.IsEnabled = !item.IsSelected;
+                }
+            }
+            else if (sender is PackageItem inc && inc.IsSelected)
+            {
+                var full = Packages.FirstOrDefault(p => p.Id == "00");
+                if (full is { IsSelected: true })
+                {
+                    full.IsSelected = false;
+                    foreach (var other in Packages.Where(p => p.Id != "00"))
+                    {
+                        other.IsEnabled = true;
+                    }
                 }
             }
 
@@ -118,6 +139,10 @@ public partial class PackageItem : ObservableObject
     /// <summary>是否选中</summary>
     [ObservableProperty]
     private bool _isSelected = true;
+
+    /// <summary>是否可勾选（全量包选中时增量包禁用，避免混装）</summary>
+    [ObservableProperty]
+    private bool _isEnabled = true;
 
     public PackageItem(VantaPackage package)
     {

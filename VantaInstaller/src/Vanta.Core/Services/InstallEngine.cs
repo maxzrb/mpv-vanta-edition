@@ -29,17 +29,24 @@ public sealed class InstallEngine
         var result = new InstallResult();
         Log ??= _ => { };
 
+        // 日志助手：同时写入 result.Log 并通过 Log 事件实时推送 UI（方法级，catch 也可用）
+        void AddLog(string line)
+        {
+            result.Log.Add(line);
+            Log?.Invoke(line);
+        }
+
         try
         {
             // 1. 定位 7z
             var sevenZipPath = await _sevenZip.LocateAsync();
-            result.Log.Add($"7z：{sevenZipPath}");
+            AddLog($"7z：{sevenZipPath}");
 
             // 2. 扫描包
             var scan = PackageScanner.Scan(options.SourceDirectory);
             foreach (var e in scan.Errors)
             {
-                result.Log.Add($"[错误] {e}");
+                AddLog($"[错误] {e}");
             }
             if (!scan.CanInstall)
             {
@@ -49,13 +56,13 @@ public sealed class InstallEngine
             }
             // 全量包模式：用户选中 "00"（个人全量包）时，只解压全量包（解压即用一体包），忽略增量包
             var wantFull = options.SelectedPackageIds?.Contains("00") == true;
-            result.Log.Add(wantFull
+            AddLog(wantFull
                 ? $"检测到个人全量包 v{scan.FullPackage!.Version}（解压即用一体包），将跳过增量包安装"
                 : $"识别到 {scan.Packages.Count} 个增量包（统一版本 v{scan.UnifiedVersion}）");
 
             // 3. 目标目录状态
             result.IsUpgrade = File.Exists(Path.Combine(options.InstallDirectory, "mpv.exe"));
-            result.Log.Add(result.IsUpgrade
+            AddLog(result.IsUpgrade
                 ? $"目标目录已有旧版，进入覆盖升级模式：{options.InstallDirectory}"
                 : $"全新安装：{options.InstallDirectory}");
 
@@ -71,7 +78,7 @@ public sealed class InstallEngine
                     return result;
                 }
                 selected = [scan.FullPackage];
-                result.Log.Add($"选择安装个人全量包：{scan.FullPackage.EntryFile}（v{scan.FullPackage.Version}，解压即用一体包）");
+                AddLog($"选择安装个人全量包：{scan.FullPackage.EntryFile}（v{scan.FullPackage.Version}，解压即用一体包）");
             }
             else
             {
@@ -95,27 +102,27 @@ public sealed class InstallEngine
                 result.Error = $"磁盘空间不足：需要 {VantaPackage.FormatSize(needed)}，可用 {VantaPackage.FormatSize(drive.AvailableFreeSpace)}。";
                 return result;
             }
-            result.Log.Add($"磁盘空间充足：需要 {VantaPackage.FormatSize(needed)}");
+            AddLog($"磁盘空间充足：需要 {VantaPackage.FormatSize(needed)}");
 
             // 5. 覆盖升级前备份
             if (result.IsUpgrade && options.BackupBeforeUpgrade)
             {
                 var backupRoot = Path.Combine(options.InstallDirectory, "backup");
                 result.BackupPath = BackupService.BackupConfig(options.InstallDirectory, backupRoot, options.KeepBackups);
-                result.Log.Add(result.BackupPath is null
+                AddLog(result.BackupPath is null
                     ? "未发现 portable_config，跳过备份。"
                     : $"已备份配置到：{result.BackupPath}");
             }
 
             // 6. 按序解压
-            result.Log.Add($"将安装 {selected.Count} 个包：{string.Join(" → ", selected.Select(p => p.Id))}");
+            AddLog($"将安装 {selected.Count} 个包：{string.Join(" → ", selected.Select(p => p.Id))}");
             progress?.Report(new InstallProgress(0, "开始安装"));
 
             for (int i = 0; i < selected.Count; i++)
             {
                 ct.ThrowIfCancellationRequested();
                 var pkg = selected[i];
-                result.Log.Add($"[{pkg.Id}] 开始解压 {pkg.EntryFile} …");
+                AddLog($"[{pkg.Id}] 开始解压 {pkg.EntryFile} …");
 
                 // 包级进度 → 整体进度（当前包占 90%，跨包滚动）
                 void OnProgress(int pct)
@@ -125,8 +132,14 @@ public sealed class InstallEngine
                     GlobalProgress?.Invoke(overall);
                     progress?.Report(new InstallProgress(overall, $"正在解压 {pkg.DisplayName}"));
                 }
+                void OnOutput(string line)
+                {
+                    // 7z 原始输出进日志，方便观察解压明细
+                    AddLog($"    {line}");
+                }
 
                 _sevenZip.ProgressChanged += OnProgress;
+                _sevenZip.OutputReceived += OnOutput;
                 try
                 {
                     await _sevenZip.ExtractAsync(pkg.EntryPath, options.InstallDirectory, ct);
@@ -134,9 +147,10 @@ public sealed class InstallEngine
                 finally
                 {
                     _sevenZip.ProgressChanged -= OnProgress;
+                    _sevenZip.OutputReceived -= OnOutput;
                 }
 
-                result.Log.Add($"[{pkg.Id}] 完成");
+                AddLog($"[{pkg.Id}] 完成");
                 progress?.Report(new InstallProgress((int)((i + 1) * 100.0 / selected.Count), $"{pkg.DisplayName} 完成"));
             }
 
@@ -146,11 +160,11 @@ public sealed class InstallEngine
             if (result.MpvExists)
             {
                 result.MpvVersionLine = await TryGetMpvVersionAsync(mpvExe);
-                result.Log.Add($"自检通过：{result.MpvVersionLine}");
+                AddLog($"自检通过：{result.MpvVersionLine}");
             }
             else
             {
-                result.Log.Add("警告：安装后未找到 mpv.exe，请检查是否选择了 01 号包。");
+                AddLog("警告：安装后未找到 mpv.exe，请检查是否选择了 01 号包。");
             }
 
             // 8. 写入版本标记（供检查更新识别当前包版本）；全量包模式用全量包版本
@@ -165,12 +179,12 @@ public sealed class InstallEngine
                     {
                         Directory.CreateDirectory(markerDir);
                         File.WriteAllText(marker, installVersion.Trim());
-                        result.Log.Add($"已写入版本标记：{installVersion}");
+                        AddLog($"已写入版本标记：{installVersion}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    result.Log.Add($"警告：写入版本标记失败 {ex.Message}");
+                    AddLog($"警告：写入版本标记失败 {ex.Message}");
                 }
             }
 
@@ -188,7 +202,7 @@ public sealed class InstallEngine
         {
             result.Success = false;
             result.Error = ex.Message;
-            result.Log.Add($"[异常] {ex.Message}");
+            AddLog($"[异常] {ex.Message}");
             return result;
         }
     }
