@@ -148,6 +148,7 @@ Lossless Scaling\Lossless.dll
 
 ### 界面
 - 基于 [uosc](https://github.com/tomasklaen/uosc) 的现代化 OSC
+- 移植了来自[杳知mpv整合包](https://github.com/Yaozhil/mpv-Yaozhi/)的优秀uosc界面，并在此基础上做了个人定制
 - 弹幕系统（[uosc_danmaku](https://github.com/Loukyuu1120/uosc_danmaku)）
 - 汉化统计信息 OSD
 
@@ -158,7 +159,7 @@ Lossless Scaling\Lossless.dll
 
 ### 快捷键
 - `h/j/k/l` — 基本播放控制
-- `i` — 临时显示统计信息，`I` — 常驻显示
+- `i` — 临时显示统计信息，`I`或`TAB` — 常驻显示
 - `1`~`5`/`0` — 切换统计信息页面
 - `Ctrl+数字` — 快速切换着色器
 - `Alt+数字` — 切换预设配置组
@@ -185,6 +186,7 @@ gaoxing64/MPV-lazy-full (v2.0.0)
     └── dyphire/mpv-config (配置参考)
     └── hooke007/mpv_PlayKit (着色器)
     └── LumeCraft-Labs/K7sfunc (VapourSynth 脚本)
+    └── Yaozhil/mpv-Yaozhi (uosc界面参考)
 ```
 
 ## License
