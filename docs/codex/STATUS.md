@@ -7,10 +7,10 @@
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master`（领先 `origin/master` 1 个提交，功能提交已本地化） |
 | **最新发布提交** | `909dede`（tag: `v1.4.1`） |
-| **工作区** | v1.4.2 已重建发布（含右键菜单定位修复）；工作树干净，master 与 origin/master 同步 |
+| **工作区** | v1.4.2 installer 已重建（VantaInstaller 源码大改）；功能提交 9b1c6a1，待 docs 提交与推送 |
 | **MPV 核心版本** | v0.41.0-860-gc8c7d91a8 (2026-07-06, dyphire/mpv-winbuild) |
 | **项目版本** | v1.4.1（已发布） |
-| **上次操作** | v1.4.2 重建覆盖发布完成：旧 Release/标签已删，新正式 Release 6 资产上传并核对一致；全量包仅本地 |
+| **上次操作** | v1.4.2 installer 重建并覆盖上传：VantaInstaller-win-x64-v0.2.0.exe（SHA-256 7E3D0B41...）；mpv 包 01~05 未重打 |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -67,6 +67,16 @@ c:\Program portable\mpv2\
 ---
 
 ## 会话日志
+## 会话日志
+
+### 2026-08-11 会话: VantaInstaller 增强与 v1.4.2 installer 重建
+
+- **功能提交** `9b1c6a1`：指定已安装 mpv 位置（首页/设置/卸载三处，持久化优先识别）；配置备份目录选择（立即备份/历史/恢复跟随）；卸载前配置默认备份到 `文档\MPV Vanta Edition\uninstall-backups`；修复 WPF-UI InfoBar 显式 Style 覆盖默认模板导致高度塌陷不可见；新增 `InverseBooleanToVisibilityConverter` 修复 Visibility 绑定静默失败；根目录 `portable_config/.vanta-version` 标记（1.4.2）。
+- **构建**：正式版 `VantaInstaller\publish\win-x64\VantaInstaller-win-x64-v0.2.0.exe`（67.5MB，压缩自包含单文件），启动验证通过。
+- **发布**：仅重建 installer（用户指示不全量构建），`gh release upload v1.4.2 --clobber` 覆盖；先误传为 `VantaInstaller.exe`（同名覆盖未命中），已删除并改用规范名重新上传。
+- **核对**：远端 `VantaInstaller-win-x64-v0.2.0.exe` SHA-256 `7E3D0B412CCA273FC26861972B459A84C61BE7F205B2AE27F2702AA4CBCF6FF3`，大小 67570562，与本地一致；旧 hash 资产已清除。
+- **未提交/未夹带**：`portable_config/script-opts/window_size_position.conf`（用户私有改动）、`backup/`（测试残留）均未纳入提交。
+
 
 ### 2026-07-30 会话: 统一 v1.2.0 打包与归档审计
 
