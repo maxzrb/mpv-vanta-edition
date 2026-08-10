@@ -7,10 +7,10 @@
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master`（领先 `origin/master` 1 个提交，功能提交已本地化） |
 | **最新发布提交** | `909dede`（tag: `v1.4.1`） |
-| **工作区** | v1.4.2 installer 已重建（VantaInstaller 源码大改）；功能提交 9b1c6a1，待 docs 提交与推送 |
+| **工作区** | v1.4.3 全包构建完成（01/05 重建、02/03/04 推版本号）；待 docs 提交、标签与 Release |
 | **MPV 核心版本** | v0.41.0-860-gc8c7d91a8 (2026-07-06, dyphire/mpv-winbuild) |
-| **项目版本** | v1.4.1（已发布） |
-| **上次操作** | v1.4.2 installer 重建并覆盖上传：VantaInstaller-win-x64-v0.2.0.exe（SHA-256 7E3D0B41...）；mpv 包 01~05 未重打 |
+| **项目版本** | v1.4.3（构建完成，待发布） |
+| **上次操作** | v1.4.3 构建：01/05 重建（installer bat、窗口设置），02/03/04 推版本号重打，全量包本地；VantaInstaller v0.2.0 重建（315DA1D8...） |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -67,6 +67,20 @@ c:\Program portable\mpv2\
 ---
 
 ## 会话日志
+## 会话日志
+
+### 2026-08-11 发布前记录：v1.4.3 发布（文件关联注册入口分离）
+
+- **版本**：v1.4.3（用户指定；02/03/04 无内容改动仅推版本号，01/05 重建，VantaInstaller v0.2.0 重建）。
+- **改动清单**：
+  - 设置中心文件关联卡片：注册多实例（mpv.exe）/ 注册单实例（umpv.exe）独立按钮，可分别注册，Windows 打开方式自行选择。
+  - 安装向导组件页：勾选注册多实例/单实例关联（可同时勾选），安装后自动注册（各弹一次 UAC）。
+  - 单实例脚本 `FriendlyAppName`：mpv → mpv-single（打开方式可区分）。
+  - `portable_config/script-opts/window_size_position.conf`：size=1280x720、position=center（05 包内容变化）。
+- **影响包**：01（installer bat + 版本标记）、05（window_size_position.conf）重建；02/03/04 无改动推版本号；VantaInstaller 源码改动独立构建。
+- **Git 状态**：功能提交 `5bf448d`、chore `UI 截图删除` 已本地；master 与 origin/master 同步；工作树干净。
+- **验证计划**：7z t 完整性、SHA-256、门禁、.vanta-version 逐字节核验（01=1.4.3、05 不含、根目录副本=1.4.3）。
+
 ## 会话日志
 
 ### 2026-08-11 会话: VantaInstaller 增强与 v1.4.2 installer 重建
