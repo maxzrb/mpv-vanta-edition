@@ -58,7 +58,7 @@ foreach ($dir in $cacheDirs) {
 
 $Readme = Join-Path $Stage 'README-Config包.txt'
 @"
-MPV Portable 05 Config v${Version}
+MPV Vanta Edition 05 Config v${Version}
 ==================================
 
 这是最终覆盖层，包含个人定制的脚本、OSC 主题、字体和设置。

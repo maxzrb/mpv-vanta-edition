@@ -45,7 +45,7 @@ $Readme = Join-Path $Stage 'README-FasterWhisper扩展包.txt'
 @"
 MPV Faster-Whisper 扩展包 v${Version}
 
-本包为 mpv-portable 的 AI 语音识别字幕扩展，可公开分发。
+本包为 mpv-vanta-edition 的 AI 语音识别字幕扩展，可公开分发。
 语音模型由 Faster-Whisper 在首次选择时自动下载。
 
 安装与覆盖顺序：

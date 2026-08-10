@@ -1,7 +1,7 @@
 
 <#
 .SYNOPSIS
-    MPV Portable Release Builder - 01 Base + 02 Extras public build script
+    MPV Vanta Edition Release Builder - 01 Base + 02 Extras public build script
 .DESCRIPTION
     Creates two numbered public packages:
       - 01-mpv-base-vX.Y.Z.7z     Core player + config = ready to play (installed first)
@@ -52,7 +52,7 @@ $ExtrasName = "02-mpv-extras-v${Version}"
 
 Write-Host ""
 Write-Host "===============================================" -ForegroundColor Cyan
-Write-Host "  MPV Portable Release Builder v${Version}" -ForegroundColor Cyan
+Write-Host "  MPV Vanta Edition Release Builder v${Version}" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -275,7 +275,7 @@ if (-not $SkipExtras) {
     # Extras 包内说明同时保留完整的覆盖顺序，避免用户只下载分卷时漏看根 README。
     $extrasReadme = Join-Path $ExtrasBuild "EXTRAS-README.txt"
 @"
-MPV Portable 02 Extras v${Version}
+MPV Vanta Edition 02 Extras v${Version}
 ==================================
 
 安装与覆盖顺序：

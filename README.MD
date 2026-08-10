@@ -1,4 +1,4 @@
-# MPV Portable
+# MPV Vanta Edition
 
 > 个人定制版 MPV 便携播放器，按编号覆盖、按需组装。
 >
@@ -51,7 +51,7 @@ Lossless Scaling 为商业软件，尚未购买正版授权的用户请自行决
 
 ### 方案一：完整安装（推荐）
 
-从 [Releases](https://github.com/maxzrb/mpv-portable/releases) 下载：
+从 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 下载：
 
 1. 下载 `01-mpv-base-vX.Y.Z.7z`
 2. 下载 `03-mpv-extras-vX.Y.Z.7z.001` 和 `.002`（两个分卷都需要）
@@ -61,7 +61,7 @@ Lossless Scaling 为商业软件，尚未购买正版授权的用户请自行决
 
 ```
 最终目录结构：
-mpv-portable/
+mpv-vanta-edition/
 ├── mpv.exe
 ├── portable_config/    ← Config 包的完整内容
 │   ├── mpv.conf
