@@ -22,11 +22,8 @@
                 <StackPanel>
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsRunning}" Value="True">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
+                            <Setter Property="Visibility"
+                                    Value="{Binding ShowOptions, Converter={StaticResource BoolToVis}}" />
                         </Style>
                     </StackPanel.Style>
                     <ui:Card Padding="24" Margin="0,0,0,16">

@@ -63,6 +63,9 @@ public partial class UninstallViewModel : ObservableObject
     /// <summary>是否可开始卸载</summary>
     public bool CanProceed => IsDetected && !IsRunning && !IsCompleted;
 
+    /// <summary>是否显示"检测与选项"阶段（未执行且未完成时）</summary>
+    public bool ShowOptions => !IsRunning && !IsCompleted;
+
     /// <summary>是否显示日志</summary>
     public bool HasLog => !string.IsNullOrEmpty(LogText);
 
@@ -95,6 +98,7 @@ public partial class UninstallViewModel : ObservableObject
     partial void OnIsRunningChanged(bool value)
     {
         OnPropertyChanged(nameof(CanProceed));
+        OnPropertyChanged(nameof(ShowOptions));
         // 通知 MainViewModel 刷新主按钮（卸载中禁用"开始卸载"、隐藏"返回主页"等）
         _main.NotifySubViewModelChanged();
     }
@@ -102,6 +106,7 @@ public partial class UninstallViewModel : ObservableObject
     partial void OnIsCompletedChanged(bool value)
     {
         OnPropertyChanged(nameof(CanProceed));
+        OnPropertyChanged(nameof(ShowOptions));
         _main.NotifySubViewModelChanged();
     }
 
@@ -214,11 +219,11 @@ public partial class UninstallViewModel : ObservableObject
             var result = await Task.Run(() =>
                 UninstallEngine.RunAsync(options, line =>
                 {
+                    // 只入缓冲（批量刷新），不做逐行跨线程 DispatcherInvoke，避免删除大量文件时卡顿
                     lock (_logLock)
                     {
                         _logBuffer.AppendLine(line);
                     }
-                    DispatcherInvoke(() => CurrentMessage = line);
                 }));
 
             IsSuccess = result.Success;
@@ -260,6 +265,13 @@ public partial class UninstallViewModel : ObservableObject
             IsCompleted = true;
             IsRunning = false;
             FlushLogBuffer();
+
+            // 卸载完成：重新检测安装状态（session 目录已清，向上查找其他可用安装或 null）
+            Installation = InstallationDetector.Detect();
+            OnPropertyChanged(nameof(IsDetected));
+            OnPropertyChanged(nameof(CanProceed));
+            OnPropertyChanged(nameof(UninstallDirectory));
+
             // 通知主按钮与步骤条：进入"完成"步骤
             _main.UpdateUninstallStep(2);
             _main.NotifySubViewModelChanged();

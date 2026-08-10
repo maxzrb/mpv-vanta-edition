@@ -58,7 +58,7 @@ public static class UninstallEngine
             var failed = new List<string>();
             long freed = 0;
 
-            // 先统计并删除文件（可能被占用，记录失败）
+            // 先统计并删除文件（可能被占用，记录失败；逐条输出删除明细供日志查看）
             foreach (var file in Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories))
             {
                 ct.ThrowIfCancellationRequested();
@@ -67,6 +67,7 @@ public static class UninstallEngine
                     var fi = new FileInfo(file);
                     freed += fi.Length;
                     File.Delete(file);
+                    log($"删除文件：{Path.GetRelativePath(dir, file)}");
                 }
                 catch
                 {
@@ -86,6 +87,7 @@ public static class UninstallEngine
                         continue;
                     }
                     Directory.Delete(sub, recursive: true);
+                    log($"删除目录：{Path.GetRelativePath(dir, sub)}");
                 }
                 catch
                 {
@@ -99,6 +101,7 @@ public static class UninstallEngine
                 if (!Directory.EnumerateFileSystemEntries(dir).Any())
                 {
                     Directory.Delete(dir, recursive: true);
+                    log("删除根目录（已空）");
                 }
             }
             catch
