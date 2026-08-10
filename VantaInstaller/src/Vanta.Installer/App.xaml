@@ -40,6 +40,7 @@
             <!-- 通用转换器 -->
             <BooleanToVisibilityConverter x:Key="BoolToVis" />
             <local:InverseBooleanConverter x:Key="InverseBool" />
+            <local:InverseBooleanToVisibilityConverter x:Key="InverseVis" />
             <local:StringNotEmptyConverter x:Key="StringNotEmpty" />
         </ResourceDictionary>
     </Application.Resources>

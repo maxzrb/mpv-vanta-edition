@@ -108,7 +108,10 @@ public sealed class InstallEngine
             if (result.IsUpgrade && options.BackupBeforeUpgrade)
             {
                 var backupRoot = Path.Combine(options.InstallDirectory, "backup");
-                result.BackupPath = BackupService.BackupConfig(options.InstallDirectory, backupRoot, options.KeepBackups);
+                result.BackupPath = BackupService.BackupConfig(
+                    Path.Combine(options.InstallDirectory, "portable_config"),
+                    backupRoot,
+                    options.KeepBackups);
                 AddLog(result.BackupPath is null
                     ? "未发现 portable_config，跳过备份。"
                     : $"已备份配置到：{result.BackupPath}");
@@ -191,6 +194,9 @@ public sealed class InstallEngine
             // 记忆上次安装位置（下次检测优先命中）
             InstallLocationStore.SaveLastInstallDirectory(options.InstallDirectory);
             AddLog($"已记忆安装位置：{options.InstallDirectory}");
+            // 新装/覆盖升级后清除此前的手动指定，避免工具台继续指向旧位置
+            InstallLocationStore.SaveManualMpvPath(null);
+            AddLog("已清除手动指定的 mpv 位置");
 
             result.Success = true;
             progress?.Report(new InstallProgress(100, "安装完成"));

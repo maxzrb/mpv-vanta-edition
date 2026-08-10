@@ -18,21 +18,20 @@ public static class ConfigManager
     }
 
     /// <summary>
-    /// 手动备份 portable_config 到 backup\。
+    /// 手动备份配置目录到 backup\。
     /// </summary>
-    public static string? CreateBackup(string installDirectory, int keep = 10)
-        => BackupService.BackupConfig(installDirectory, BackupRoot(installDirectory), keep);
+    public static string? CreateBackup(string configDirectory, string backupRoot, int keep = 10)
+        => BackupService.BackupConfig(configDirectory, backupRoot, keep);
 
     /// <summary>列出历史备份（按时间倒序）</summary>
-    public static List<BackupEntry> ListBackups(string installDirectory)
+    public static List<BackupEntry> ListBackups(string backupRoot)
     {
-        var root = BackupRoot(installDirectory);
-        if (!Directory.Exists(root))
+        if (!Directory.Exists(backupRoot))
         {
             return [];
         }
 
-        return Directory.EnumerateDirectories(root, "portable_config-*")
+        return Directory.EnumerateDirectories(backupRoot, "portable_config-*")
             .Select(dir =>
             {
                 var name = Path.GetFileName(dir);
@@ -47,7 +46,7 @@ public static class ConfigManager
     /// <summary>
     /// 从指定备份恢复到安装目录的 portable_config（先备份当前，再整体替换）。
     /// </summary>
-    public static string? Restore(string installDirectory, string backupPath, int keepBefore = 10)
+    public static string? Restore(string configDirectory, string backupRoot, string backupPath, int keepBefore = 10)
     {
         if (!Directory.Exists(backupPath))
         {
@@ -55,9 +54,9 @@ public static class ConfigManager
         }
 
         // 恢复前先备份当前状态
-        BackupService.BackupConfig(installDirectory, BackupRoot(installDirectory), keepBefore);
+        BackupService.BackupConfig(configDirectory, backupRoot, keepBefore);
 
-        var dest = Path.Combine(installDirectory, "portable_config");
+        var dest = configDirectory;
         if (Directory.Exists(dest))
         {
             Directory.Delete(dest, recursive: true);

@@ -68,18 +68,15 @@
                 <!-- 状态与操作 -->
                 <ui:Card Padding="24" Margin="0,0,0,16">
                     <StackPanel>
-                        <ui:InfoBar IsOpen="True" Margin="0,0,0,16">
+                        <ui:InfoBar IsOpen="True" Margin="0,0,0,16"
+                                    Title="{Binding StatusTitle, Mode=OneWay}"
+                                    Message="{Binding StatusMessage, Mode=OneWay}">
                             <ui:InfoBar.Style>
-                                <Style TargetType="ui:InfoBar">
+                                <Style TargetType="ui:InfoBar" BasedOn="{StaticResource {x:Type ui:InfoBar}}">
                                     <Setter Property="Severity" Value="Informational" />
-                                    <Setter Property="Title" Value="{Binding StatusTitle, Mode=OneWay}" />
-                                    <Setter Property="Message" Value="{Binding InstallDirectory, Mode=OneWay}" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsVanta}" Value="True">
                                             <Setter Property="Severity" Value="Success" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsInstalled}" Value="False">
-                                            <Setter Property="Message" Value="请先使用“安装”模式安装 MPV Vanta Edition。" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -91,6 +88,8 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <ui:Button Grid.Column="0" Content="启动 mpv" Appearance="Primary"
                                        Command="{Binding LaunchMpvCommand}" IsEnabled="{Binding IsInstalled}"
@@ -101,7 +100,15 @@
                             <ui:Button Grid.Column="2" Content="打开配置目录" Appearance="Secondary"
                                        Command="{Binding OpenConfigDirCommand}" IsEnabled="{Binding IsInstalled}"
                                        Padding="16,8" />
+                            <ui:Button Grid.Column="3" Content="指定MPV目录" Appearance="Secondary"
+                                       Command="{Binding ChooseManualPathCommand}"
+                                       Padding="16,8" Margin="8,0,0,0" />
+                            <ui:Button Grid.Column="4" Content="清除指定" Appearance="Secondary"
+                                       Command="{Binding ClearManualPathCommand}"
+                                       Visibility="{Binding ShowManualClear, Converter={StaticResource BoolToVis}}"
+                                       Padding="16,8" Margin="8,0,0,0" />
                         </Grid>
+
                     </StackPanel>
                 </ui:Card>
 
@@ -146,6 +153,31 @@
                                        Command="{Binding OpenBackupDirCommand}" IsEnabled="{Binding IsInstalled}"
                                        Padding="16,8" />
                         </Grid>
+
+                        <!-- 备份目录：可手动指定，立即备份/历史备份/恢复均跟随 -->
+                        <Border Margin="0,14,0,0" Padding="14,12" CornerRadius="8" BorderThickness="1"
+                                BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="备份目录" VerticalAlignment="Center" FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                                <TextBlock Grid.Column="1" Margin="10,0,10,0" VerticalAlignment="Center"
+                                           Text="{Binding BackupDirectory, Mode=OneWay}" TextWrapping="Wrap" FontSize="12"
+                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                                <ui:Button Grid.Column="2" Content="清除指定" Appearance="Secondary" Padding="12,6"
+                                           Command="{Binding ClearBackupDirectoryCommand}"
+                                           Visibility="{Binding ShowBackupClear, Converter={StaticResource BoolToVis}}"
+                                           Margin="0,0,8,0" />
+                                <ui:Button Grid.Column="3" Content="选择备份目录…" Appearance="Secondary" Padding="12,6"
+                                           Command="{Binding ChooseBackupDirectoryCommand}"
+                                           IsEnabled="{Binding IsInstalled}" />
+                            </Grid>
+                        </Border>
 
                         <StackPanel Margin="0,16,0,0"
                                     Visibility="{Binding HasBackups, Converter={StaticResource BoolToVis}}">
@@ -327,7 +359,7 @@
                                 <ui:Button Content="开始下载" Appearance="Primary"
                                            Command="{Binding StartDownloadCommand}"
                                            IsEnabled="{Binding CanDownload}"
-                                           Visibility="{Binding IsDownloading, Converter={StaticResource InverseBool}}"
+                                           Visibility="{Binding IsDownloading, Converter={StaticResource InverseVis}}"
                                            Padding="16,7" />
                                 <ui:Button Content="停止" Appearance="Secondary"
                                            Command="{Binding StopDownloadCommand}"
@@ -452,8 +484,14 @@
 
                 <!-- 操作结果 -->
                 <ui:InfoBar IsOpen="{Binding OperationMessage, Converter={StaticResource StringNotEmpty}}"
-                            Title="{Binding OperationMessage, Mode=OneWay}" Severity="Informational"
-                            Margin="0,0,0,4" />
+                            Title="{Binding OperationMessage, Mode=OneWay}"
+                            Margin="0,0,0,4">
+                    <ui:InfoBar.Style>
+                        <Style TargetType="ui:InfoBar" BasedOn="{StaticResource {x:Type ui:InfoBar}}">
+                            <Setter Property="Severity" Value="Informational" />
+                        </Style>
+                    </ui:InfoBar.Style>
+                </ui:InfoBar>
             </StackPanel>
         </ScrollViewer>
     </Grid>

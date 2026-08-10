@@ -42,7 +42,7 @@
                         <!-- 结果 InfoBar -->
                         <ui:InfoBar IsOpen="{Binding IsCompleted, Mode=OneWay}" Margin="0,16,0,0">
                             <ui:InfoBar.Style>
-                                <Style TargetType="ui:InfoBar">
+                                <Style TargetType="ui:InfoBar" BasedOn="{StaticResource {x:Type ui:InfoBar}}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsSuccess, Mode=OneWay}" Value="True">
                                             <Setter Property="Severity" Value="Success" />

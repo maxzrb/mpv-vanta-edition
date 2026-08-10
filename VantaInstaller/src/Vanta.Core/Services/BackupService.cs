@@ -6,20 +6,19 @@ namespace Vanta.Core.Services;
 public static class BackupService
 {
     /// <summary>
-    /// 备份目标目录的 portable_config 到 backupRoot。保留最近 keep 份。
+    /// 备份指定配置目录（portable_config）到 backupRoot。保留最近 keep 份。
     /// </summary>
     /// <returns>备份目录路径；源不存在时返回 null</returns>
-    public static string? BackupConfig(string installDirectory, string backupRoot, int keep = 5)
+    public static string? BackupConfig(string configDirectory, string backupRoot, int keep = 5)
     {
-        var src = Path.Combine(installDirectory, "portable_config");
-        if (!Directory.Exists(src))
+        if (!Directory.Exists(configDirectory))
         {
             return null;
         }
 
         var stamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
         var dst = Path.Combine(backupRoot, $"portable_config-{stamp}");
-        CopyDirectory(src, dst);
+        CopyDirectory(configDirectory, dst);
 
         Prune(backupRoot, keep);
         return dst;

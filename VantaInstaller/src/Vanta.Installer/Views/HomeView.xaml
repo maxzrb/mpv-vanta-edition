@@ -19,12 +19,12 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <!-- 当前状态 -->
-                <ui:InfoBar IsOpen="True" Margin="0,0,0,20">
+                <ui:InfoBar IsOpen="True" Margin="0,0,0,20"
+                            Title="{Binding StatusTitle, Mode=OneWay}"
+                            Message="{Binding StatusSubtitle, Mode=OneWay}">
                     <ui:InfoBar.Style>
-                        <Style TargetType="ui:InfoBar">
+                        <Style TargetType="ui:InfoBar" BasedOn="{StaticResource {x:Type ui:InfoBar}}">
                             <Setter Property="Severity" Value="Informational" />
-                            <Setter Property="Title" Value="{Binding StatusTitle}" />
-                            <Setter Property="Message" Value="{Binding StatusSubtitle}" />
                             <Style.Triggers>
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
@@ -58,6 +58,57 @@
                                    FontFamily="Cascadia Mono, Consolas" FontSize="12"
                                    Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}"
                                    TextTrimming="CharacterEllipsis" />
+                        <!-- 手动指定位置时提示，可一键清除恢复自动检测 -->
+                        <Grid Margin="0,12,0,0"
+                              Visibility="{Binding HasManualPath, Converter={StaticResource BoolToVis}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12"
+                                       Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}">
+                                <Run Text="手动指定：" /><Run Text="{Binding ManualMpvPath, Mode=OneWay}" />
+                            </TextBlock>
+                            <ui:Button Grid.Column="1" Content="清除指定" Appearance="Secondary" Padding="10,4"
+                                       Margin="12,0,0,0" Command="{Binding ClearManualPathCommand}" />
+                        </Grid>
+                    </StackPanel>
+                </ui:Card>
+
+                <!-- 指定已安装的 mpv 位置（仅未检测到安装时显示，作为补救入口） -->
+                <ui:Card Padding="24" Margin="0,0,0,20"
+                         Visibility="{Binding IsInstalled, Converter={StaticResource InverseVis}}">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock Text="指定已安装的 mpv 位置" FontSize="16" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                                <TextBlock Margin="0,6,0,0" TextWrapping="Wrap" FontSize="12"
+                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}">
+                                    手动指定一个已安装的 mpv 目录（Vanta 或任意 mpv），工具台将优先识别该位置；适用于未自动检测到的安装。
+                                </TextBlock>
+                                <!-- 当前手动指定路径 -->
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0"
+                                            Visibility="{Binding HasManualPath, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="当前指定：" FontSize="12" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                                    <TextBlock Text="{Binding ManualMpvPath, Mode=OneWay}" FontSize="12"
+                                               VerticalAlignment="Center" TextWrapping="Wrap"
+                                               Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                                <ui:Button Content="清除指定" Appearance="Secondary" Padding="14,7" Margin="0,0,8,0"
+                                           Command="{Binding ClearManualPathCommand}"
+                                           Visibility="{Binding HasManualPath, Converter={StaticResource BoolToVis}}" />
+                                <ui:Button Content="浏览…" Appearance="Secondary" Padding="14,7"
+                                           Command="{Binding ChooseManualPathCommand}" />
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </ui:Card>
 

@@ -36,17 +36,42 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>安装目录</summary>
     public string InstallDirectory => Installation?.Directory ?? string.Empty;
 
+    /// <summary>状态消息（信息栏 Message；未检测到安装时提示先安装）</summary>
+    public string StatusMessage => IsInstalled
+        ? InstallDirectory
+        : "请先使用“安装”模式安装 MPV Vanta Edition。";
+
     /// <summary>版本行</summary>
     public string VersionLine => Installation?.VersionLine ?? string.Empty;
 
     /// <summary>占用空间</summary>
     public string SizeText => Installation?.SizeText ?? string.Empty;
 
-    /// <summary>配置目录路径</summary>
+    /// <summary>用户手动指定的已安装 mpv 位置（持久化，优先识别）</summary>
+    public string ManualMpvPath => InstallLocationStore.GetManualMpvPath() ?? string.Empty;
+
+    /// <summary>是否有手动指定位置</summary>
+    public bool HasManualPath => !string.IsNullOrWhiteSpace(ManualMpvPath);
+
+    /// <summary>是否显示"清除手动指定"（已检测到安装且存在手动指定时）</summary>
+    public bool ShowManualClear => IsInstalled && HasManualPath;
+
+    /// <summary>配置目录路径（mpv 调节、缓存清理等操作目标）</summary>
     public string ConfigDirectory => Path.Combine(InstallDirectory, "portable_config");
 
-    /// <summary>备份目录路径</summary>
-    public string BackupDirectory => Path.Combine(InstallDirectory, "backup");
+    /// <summary>用户手动指定的配置备份目录（持久化，优先于安装目录下 backup\）</summary>
+    public string ManualBackupPath => InstallLocationStore.GetManualBackupPath() ?? string.Empty;
+
+    /// <summary>是否有手动指定备份目录</summary>
+    public bool HasManualBackupPath => !string.IsNullOrWhiteSpace(ManualBackupPath);
+
+    /// <summary>是否显示"清除备份指定"（存在手动指定备份目录时）</summary>
+    public bool ShowBackupClear => HasManualBackupPath;
+
+    /// <summary>备份目录路径：手动指定优先，否则用安装目录下 backup\</summary>
+    public string BackupDirectory => HasManualBackupPath
+        ? ManualBackupPath
+        : Path.Combine(InstallDirectory, "backup");
 
     /// <summary>是否可注册关联（存在 mpv-install.bat）</summary>
     public bool CanRegister =>
@@ -216,7 +241,7 @@ public partial class SettingsViewModel : ObservableObject
 
     /// <summary>mpv.conf 路径</summary>
     private string MpvConfigPath =>
-        IsInstalled ? Path.Combine(InstallDirectory, "portable_config", "mpv.conf") : string.Empty;
+        IsInstalled ? Path.Combine(ConfigDirectory, "mpv.conf") : string.Empty;
 
     public SettingsViewModel(AppSession session)
     {
@@ -234,11 +259,11 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>页面激活时刷新（检测安装 + 备份列表 + 缓存统计）</summary>
     public void Refresh()
     {
-        // 指定目录存在但已无效（如刚卸载残留）时不采纳，兜底从程序目录向上找可用安装
-        var detected = InstallationDetector.Detect(_session.InstallDirectory);
-        if (detected is not { IsValid: true })
+        // 优先全局检测（手动指定 > 记忆位置 > 向上查找）；会话目标目录作为兜底
+        var detected = InstallationDetector.Detect();
+        if (detected is not { IsValid: true } && !string.IsNullOrWhiteSpace(_session.InstallDirectory))
         {
-            detected = InstallationDetector.Detect();
+            detected = InstallationDetector.Detect(_session.InstallDirectory);
         }
         Installation = detected;
         if (detected is { IsValid: true })
@@ -255,13 +280,44 @@ public partial class SettingsViewModel : ObservableObject
         OnPropertyChanged(nameof(IsInstalled));
         OnPropertyChanged(nameof(IsVanta));
         OnPropertyChanged(nameof(StatusTitle));
+        OnPropertyChanged(nameof(StatusMessage));
         OnPropertyChanged(nameof(InstallDirectory));
         OnPropertyChanged(nameof(VersionLine));
         OnPropertyChanged(nameof(SizeText));
         OnPropertyChanged(nameof(ConfigDirectory));
+        OnPropertyChanged(nameof(ManualBackupPath));
+        OnPropertyChanged(nameof(HasManualBackupPath));
+        OnPropertyChanged(nameof(ShowBackupClear));
         OnPropertyChanged(nameof(BackupDirectory));
         OnPropertyChanged(nameof(CanRegister));
         OnPropertyChanged(nameof(ShowMpvConfig));
+        OnPropertyChanged(nameof(ManualMpvPath));
+        OnPropertyChanged(nameof(HasManualPath));
+        OnPropertyChanged(nameof(ShowManualClear));
+    }
+
+    /// <summary>指定已安装的 mpv 位置（Vanta 或任意 mpv）</summary>
+    [RelayCommand]
+    private void ChooseManualPath()
+    {
+        var dlg = new OpenFolderDialog
+        {
+            Title = "指定已安装的 mpv 位置",
+            Multiselect = false,
+        };
+        if (dlg.ShowDialog() == true)
+        {
+            InstallLocationStore.SaveManualMpvPath(dlg.FolderName);
+            Refresh();
+        }
+    }
+
+    /// <summary>清除手动指定，恢复自动检测</summary>
+    [RelayCommand]
+    private void ClearManualPath()
+    {
+        InstallLocationStore.SaveManualMpvPath(null);
+        Refresh();
     }
 
     /// <summary>加载 mpv.conf 配置项（仅首次/恢复时）</summary>
@@ -698,7 +754,7 @@ public partial class SettingsViewModel : ObservableObject
         Backups.Clear();
         if (IsInstalled)
         {
-            foreach (var b in ConfigManager.ListBackups(InstallDirectory))
+            foreach (var b in ConfigManager.ListBackups(BackupDirectory))
             {
                 Backups.Add(b);
             }
@@ -709,7 +765,7 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>刷新缓存统计</summary>
     private void RefreshCacheStats()
     {
-        CacheStats = IsInstalled ? CacheService.GetCacheStats(InstallDirectory) : null;
+        CacheStats = IsInstalled ? CacheService.GetCacheStats(ConfigDirectory) : null;
         OnPropertyChanged(nameof(CacheSizeText));
         OnPropertyChanged(nameof(CacheDetailText));
     }
@@ -751,6 +807,30 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>打开备份目录</summary>
     [RelayCommand]
     private void OpenBackupDir() => OpenDirectory(BackupDirectory);
+
+    /// <summary>选择配置备份目录（持久化；立即备份/历史备份/恢复均跟随）</summary>
+    [RelayCommand]
+    private void ChooseBackupDirectory()
+    {
+        var dlg = new OpenFolderDialog
+        {
+            Title = "选择配置备份目录",
+            Multiselect = false,
+        };
+        if (dlg.ShowDialog() == true)
+        {
+            InstallLocationStore.SaveManualBackupPath(dlg.FolderName);
+            Refresh();
+        }
+    }
+
+    /// <summary>清除手动指定备份目录，恢复安装目录下 backup\</summary>
+    [RelayCommand]
+    private void ClearBackupDirectory()
+    {
+        InstallLocationStore.SaveManualBackupPath(null);
+        Refresh();
+    }
 
     private void OpenDirectory(string path)
     {
@@ -820,9 +900,9 @@ public partial class SettingsViewModel : ObservableObject
 
         try
         {
-            var path = ConfigManager.CreateBackup(InstallDirectory);
+            var path = ConfigManager.CreateBackup(ConfigDirectory, BackupDirectory);
             OperationMessage = path is null
-                ? "未找到 portable_config，无法备份。"
+                ? "未找到配置目录，无法备份。"
                 : $"已备份到：{path}";
             RefreshBackups();
         }
@@ -853,7 +933,7 @@ public partial class SettingsViewModel : ObservableObject
 
         try
         {
-            var dest = ConfigManager.Restore(InstallDirectory, entry.Path);
+            var dest = ConfigManager.Restore(ConfigDirectory, BackupDirectory, entry.Path);
             OperationMessage = dest is null ? "恢复失败。" : $"已恢复到：{dest}";
             RefreshBackups();
         }
@@ -952,7 +1032,7 @@ public partial class SettingsViewModel : ObservableObject
 
         try
         {
-            var freed = CacheService.CleanCache(InstallDirectory);
+            var freed = CacheService.CleanCache(ConfigDirectory);
             OperationMessage = $"已清理缓存，释放 {VantaPackage.FormatSize(freed)}。";
             RefreshCacheStats();
         }

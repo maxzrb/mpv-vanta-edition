@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using System.Windows.Input;
 using Vanta.Core.Services;
 
@@ -29,6 +31,15 @@ public partial class HomeViewModel : ObservableObject
 
     /// <summary>占用空间</summary>
     public string SizeText => Installation?.SizeText ?? string.Empty;
+
+    /// <summary>用户手动指定的已安装 mpv 位置（持久化，优先识别）</summary>
+    public string ManualMpvPath => InstallLocationStore.GetManualMpvPath() ?? string.Empty;
+
+    /// <summary>是否有手动指定位置</summary>
+    public bool HasManualPath => !string.IsNullOrWhiteSpace(ManualMpvPath);
+
+    /// <summary>是否显示"清除手动指定"（已检测到安装且存在手动指定时）</summary>
+    public bool ShowManualClear => IsInstalled && HasManualPath;
 
     /// <summary>状态标题</summary>
     public string StatusTitle => IsInstalled
@@ -73,6 +84,9 @@ public partial class HomeViewModel : ObservableObject
         OnPropertyChanged(nameof(SizeText));
         OnPropertyChanged(nameof(StatusTitle));
         OnPropertyChanged(nameof(StatusSubtitle));
+        OnPropertyChanged(nameof(ManualMpvPath));
+        OnPropertyChanged(nameof(HasManualPath));
+        OnPropertyChanged(nameof(ShowManualClear));
     }
 
     /// <summary>后台填充版本与体积（不阻塞 UI）</summary>
@@ -93,5 +107,29 @@ public partial class HomeViewModel : ObservableObject
         {
             // 忽略：保持仅目录信息
         }
+    }
+
+    /// <summary>指定已安装的 mpv 位置（Vanta 或任意 mpv）</summary>
+    [RelayCommand]
+    private void ChooseManualPath()
+    {
+        var dlg = new OpenFolderDialog
+        {
+            Title = "指定已安装的 mpv 位置",
+            Multiselect = false,
+        };
+        if (dlg.ShowDialog() == true)
+        {
+            InstallLocationStore.SaveManualMpvPath(dlg.FolderName);
+            Refresh();
+        }
+    }
+
+    /// <summary>清除手动指定，恢复自动检测</summary>
+    [RelayCommand]
+    private void ClearManualPath()
+    {
+        InstallLocationStore.SaveManualMpvPath(null);
+        Refresh();
     }
 }

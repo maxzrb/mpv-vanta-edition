@@ -35,8 +35,9 @@ public static class InstallationDetector
     /// 快速检测已安装目录（仅存在性检查，不统计体积/版本，避免大目录卡顿）。
     /// 优先级：
     /// 1. 显式指定目录（有效才返回，无效返回 null 由调用方兜底）；
-    /// 2. 记忆的上次安装位置（有效即返回，Vanta 优先）；
-    /// 3. 程序目录向上查找（最多 10 层，优先带 Vanta 标记的目录，其次任意 mpv）。
+    /// 2. 用户手动指定的已安装 mpv 位置（持久化，有效即返回）；
+    /// 3. 记忆的上次安装位置（有效即返回）；
+    /// 4. 程序目录向上查找（最多 10 层，优先带 Vanta 标记的目录，其次任意 mpv）。
     /// </summary>
     public static InstallationInfo? Detect(string? directory = null)
     {
@@ -47,7 +48,18 @@ public static class InstallationDetector
             return info.IsValid ? info : null;
         }
 
-        // 2. 记忆的上次安装位置（有效即采纳；Vanta 优先）
+        // 2. 用户手动指定的已安装 mpv 位置（优先级高于记忆位置）
+        var manual = InstallLocationStore.GetManualMpvPath();
+        if (!string.IsNullOrWhiteSpace(manual) && Directory.Exists(manual))
+        {
+            var manualInfo = Inspect(manual);
+            if (manualInfo.IsValid)
+            {
+                return manualInfo;
+            }
+        }
+
+        // 3. 记忆的上次安装位置（有效即采纳）
         var remembered = InstallLocationStore.GetLastInstallDirectory();
         if (!string.IsNullOrWhiteSpace(remembered) && Directory.Exists(remembered))
         {
@@ -58,7 +70,7 @@ public static class InstallationDetector
             }
         }
 
-        // 3. 程序目录向上查找：Vanta 标记优先，任意 mpv 作为兜底
+        // 4. 程序目录向上查找：Vanta 标记优先，任意 mpv 作为兜底
         InstallationInfo? fallback = null;
         var dir = AppContext.BaseDirectory;
         for (int i = 0; i < 10; i++)
@@ -79,7 +91,8 @@ public static class InstallationDetector
             var parent = Directory.GetParent(dir);
             if (parent is null)
             {
-                return null;
+                // 到达驱动器根目录：停止向上，返回已找到的最优结果
+                break;
             }
             dir = parent.FullName;
         }

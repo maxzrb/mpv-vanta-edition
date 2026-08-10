@@ -52,7 +52,7 @@
                         <!-- 状态：覆盖升级 / 全新安装 / 空间不足 -->
                         <ui:InfoBar IsOpen="True" Title="{Binding StatusText}" Margin="0,16,0,0">
                             <ui:InfoBar.Style>
-                                <Style TargetType="ui:InfoBar">
+                                <Style TargetType="ui:InfoBar" BasedOn="{StaticResource {x:Type ui:InfoBar}}">
                                     <Setter Property="Severity" Value="Success" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding StatusIsWarning}" Value="True">

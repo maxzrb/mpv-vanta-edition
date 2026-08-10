@@ -49,7 +49,7 @@
                 <ui:InfoBar IsOpen="True" Title="{Binding StatusText}" Severity="Informational"
                             Margin="0,0,0,16">
                     <ui:InfoBar.Style>
-                        <Style TargetType="ui:InfoBar">
+                        <Style TargetType="ui:InfoBar" BasedOn="{StaticResource {x:Type ui:InfoBar}}">
                             <Setter Property="Severity" Value="Success" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding HasErrors}" Value="True">

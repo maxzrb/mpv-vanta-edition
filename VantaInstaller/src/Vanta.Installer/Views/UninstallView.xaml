@@ -34,14 +34,24 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding UninstallDirectory, Mode=OneWay}"
                                            VerticalAlignment="Center" TextWrapping="Wrap"
                                            Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
-                                <ui:Button Grid.Column="1" Content="浏览…" Appearance="Secondary"
+                                <ui:Button Grid.Column="1" Content="清除指定" Appearance="Secondary"
+                                           Margin="10,0,0,0" Padding="14,6"
+                                           Command="{Binding ClearManualPathCommand}"
+                                           Visibility="{Binding HasManualPath, Converter={StaticResource BoolToVis}}" />
+                                <ui:Button Grid.Column="2" Content="浏览…" Appearance="Secondary"
                                            Margin="10,0,0,0" Padding="14,6"
                                            Command="{Binding ChooseDirectoryCommand}" />
                             </Grid>
+                            <TextBlock Margin="0,8,0,0" FontSize="11" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}"
+                                       Visibility="{Binding HasManualPath, Converter={StaticResource BoolToVis}}">
+                                <Run Text="手动指定位置：" /><Run Text="{Binding ManualMpvPath, Mode=OneWay}" />
+                            </TextBlock>
                             <TextBlock Margin="0,10,0,0" Text="{Binding VersionLine, Mode=OneWay}" FontSize="12"
                                        FontFamily="Cascadia Mono, Consolas" TextWrapping="Wrap"
                                        Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
@@ -52,7 +62,7 @@
 
                             <ui:InfoBar IsOpen="{Binding IsDetected}" Margin="0,16,0,0">
                                 <ui:InfoBar.Style>
-                                    <Style TargetType="ui:InfoBar">
+                                    <Style TargetType="ui:InfoBar" BasedOn="{StaticResource {x:Type ui:InfoBar}}">
                                         <Setter Property="Severity" Value="Warning" />
                                         <Setter Property="Title" Value="检测到 mpv（非 Vanta 安装）" />
                                         <Style.Triggers>

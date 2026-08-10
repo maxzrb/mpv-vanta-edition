@@ -81,6 +81,12 @@ public partial class UninstallViewModel : ObservableObject
     /// <summary>体积</summary>
     public string SizeText => Installation?.SizeText ?? string.Empty;
 
+    /// <summary>用户手动指定的已安装 mpv 位置（持久化，优先识别）</summary>
+    public string ManualMpvPath => InstallLocationStore.GetManualMpvPath() ?? string.Empty;
+
+    /// <summary>是否有手动指定位置</summary>
+    public bool HasManualPath => !string.IsNullOrWhiteSpace(ManualMpvPath);
+
     private readonly StringBuilder _logBuffer = new();
     private readonly object _logLock = new();
     private readonly DispatcherTimer _logTimer;
@@ -126,13 +132,11 @@ public partial class UninstallViewModel : ObservableObject
     /// <summary>页面激活时刷新检测</summary>
     public void Refresh()
     {
-        var detected = string.IsNullOrWhiteSpace(_session.InstallDirectory)
-            ? InstallationDetector.Detect()
-            : InstallationDetector.Detect(_session.InstallDirectory);
-        // 指定目录存在但已无效（如刚卸载残留）时不采纳，兜底向上查找
-        if (detected is not { IsValid: true })
+        // 优先全局检测（手动指定 > 记忆位置 > 向上查找）；会话目标目录作为兜底
+        var detected = InstallationDetector.Detect();
+        if (detected is not { IsValid: true } && !string.IsNullOrWhiteSpace(_session.InstallDirectory))
         {
-            detected = InstallationDetector.Detect();
+            detected = InstallationDetector.Detect(_session.InstallDirectory);
         }
         Installation = detected;
         if (detected is { IsValid: true })
@@ -152,6 +156,8 @@ public partial class UninstallViewModel : ObservableObject
         OnPropertyChanged(nameof(LogText));
         OnPropertyChanged(nameof(HasLog));
         OnPropertyChanged(nameof(CanProceed));
+        OnPropertyChanged(nameof(ManualMpvPath));
+        OnPropertyChanged(nameof(HasManualPath));
     }
 
     /// <summary>后台填充版本与体积（不阻塞 UI）</summary>
@@ -173,7 +179,7 @@ public partial class UninstallViewModel : ObservableObject
         }
     }
 
-    /// <summary>浏览选择已安装的 mpv 目录</summary>
+    /// <summary>浏览选择已安装的 mpv 目录（持久化为手动指定位置）</summary>
     [RelayCommand]
     private void ChooseDirectory()
     {
@@ -185,8 +191,18 @@ public partial class UninstallViewModel : ObservableObject
         if (dlg.ShowDialog() == true)
         {
             _session.InstallDirectory = dlg.FolderName;
+            InstallLocationStore.SaveManualMpvPath(dlg.FolderName);
             Refresh();
         }
+    }
+
+    /// <summary>清除手动指定，恢复自动检测</summary>
+    [RelayCommand]
+    private void ClearManualPath()
+    {
+        _session.InstallDirectory = null;
+        InstallLocationStore.SaveManualMpvPath(null);
+        Refresh();
     }
 
     /// <summary>开始卸载（由主按钮触发）</summary>
@@ -255,6 +271,8 @@ public partial class UninstallViewModel : ObservableObject
             _session.InstallDirectory = null;
             // 清除记忆的上次安装位置（已卸载，不再指向已删目录）
             InstallLocationStore.SaveLastInstallDirectory(null);
+            // 若卸载的正是手动指定位置，一并清除
+            InstallLocationStore.SaveManualMpvPath(null);
         }
         catch (Exception ex)
         {

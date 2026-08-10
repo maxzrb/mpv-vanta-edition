@@ -3,7 +3,7 @@ using Vanta.Core.Models;
 namespace Vanta.Core.Services;
 
 /// <summary>
-/// 缓存清理服务：统计并清理 portable_config 下的缓存目录。
+    /// 缓存清理服务：统计并清理配置目录（portable_config）下的缓存目录。
 /// </summary>
 public static class CacheService
 {
@@ -25,10 +25,10 @@ public static class CacheService
         public string SizeText => VantaPackage.FormatSize(Size);
     }
 
-    /// <summary>统计 portable_config 下的缓存体积</summary>
-    public static CacheStats GetCacheStats(string installDirectory)
+    /// <summary>统计配置目录下的缓存体积</summary>
+    public static CacheStats GetCacheStats(string configDirectory)
     {
-        var config = Path.Combine(installDirectory, "portable_config");
+        var config = configDirectory;
         if (!Directory.Exists(config))
         {
             return new CacheStats(0, 0, []);
@@ -79,9 +79,9 @@ public static class CacheService
     }
 
     /// <summary>清理缓存，返回释放的空间</summary>
-    public static long CleanCache(string installDirectory)
+    public static long CleanCache(string configDirectory)
     {
-        var config = Path.Combine(installDirectory, "portable_config");
+        var config = configDirectory;
         if (!Directory.Exists(config))
         {
             return 0;

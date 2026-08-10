@@ -46,11 +46,14 @@ public static class UninstallEngine
             string? backupPath = null;
             if (options.BackupConfig)
             {
+                // 卸载前配置默认备份到"文档\MPV Vanta Edition\uninstall-backups"，
+                // 不放在安装目录内，避免删除安装目录时一并被清掉。
                 var backupRoot = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "VantaInstaller", "uninstall-backups");
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    "MPV Vanta Edition", "uninstall-backups");
                 log($"备份配置到：{backupRoot}");
-                backupPath = BackupService.BackupConfig(dir, backupRoot, keep: 10);
+                backupPath = BackupService.BackupConfig(
+                    Path.Combine(dir, "portable_config"), backupRoot, keep: 10);
             }
 
             // 2. 删除安装目录内容
