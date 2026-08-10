@@ -18,7 +18,7 @@
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <TextBlock Text="{Binding SummaryText}" FontSize="13" Margin="4,0,0,12"
+                <TextBlock Text="{Binding SummaryText}" FontSize="12" Margin="4,0,0,12"
                            Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
 
                 <ui:Card Padding="24">

@@ -74,7 +74,7 @@
                 <ui:Card Padding="24" Margin="0,0,0,16"
                          Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}">
                     <StackPanel>
-                        <TextBlock Text="正在卸载…" FontSize="16" FontWeight="SemiBold"
+                        <TextBlock Text="正在卸载…" FontSize="14" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
                         <TextBlock Margin="0,12,0,0" Text="{Binding CurrentMessage, Mode=OneWay}" TextWrapping="Wrap"
                                    Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
@@ -100,7 +100,7 @@
 
                     <ui:Card Padding="24" Visibility="{Binding HasLog, Converter={StaticResource BoolToVis}}">
                         <StackPanel>
-                            <TextBlock Text="卸载日志" FontSize="16" FontWeight="SemiBold"
+                            <TextBlock Text="卸载日志" FontSize="14" FontWeight="SemiBold"
                                        Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
                             <ListBox ItemsSource="{Binding LogLines}" Margin="0,12,0,0" Height="160"
                                      FontFamily="Cascadia Mono, Consolas" FontSize="12"

@@ -1625,7 +1625,7 @@ c:\Program portable\mpv2\
 - [x] 大改动 Gate：本次为**新增安装辅助工具 VantaInstaller 并作为 Release 附加资产**，命中 3.2 中"安装方式变化"条目；
       项目所有者（用户）已明确拍板执行，不修改《发布流程.md》本身。
 - [x] 产物：01~05 包保持 v1.4.2 原样，不重新构建；私用全量包不上传。
-- [x] VantaInstaller Release 单文件自包含 exe 构建成功（v0.2.0，win-x64，139.8MB），启动验证通过。
-- [x] SHA-256：`173CAEE0911951A94ACA0954C46A6CE69790045D345FD611A89FF749FA08FC1E`
+- [x] VantaInstaller Release 单文件自包含压缩 exe 构建成功（v0.2.0，win-x64，64.3MB），启动验证通过。
+- [x] SHA-256：`2BB37136CFC9B976BB68E633393C3EAAA6B0D4F640CE1FFAB9E294EB528C7157`
 - [x] git diff --check 通过；无构建产物（bin/obj/publish）混入提交。
 - [x] gh CLI 可用（2.95.0），用于 Release 资产上传。
