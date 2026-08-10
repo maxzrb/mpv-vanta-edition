@@ -77,6 +77,7 @@ c:\Program portable\mpv2\
 - **核对**：远端 `VantaInstaller-win-x64-v0.2.0.exe` SHA-256 `7E3D0B412CCA273FC26861972B459A84C61BE7F205B2AE27F2702AA4CBCF6FF3`，大小 67570562，与本地一致；旧 hash 资产已清除。
 - **收尾**：Release 说明已更新（installer SHA-256 改为 7E3D0B41... 并附 2026-08-11 重建说明）；docs 提交 `4edea12` 已推送，master 与 origin/master 同步。
 - **未提交/未夹带**：`portable_config/script-opts/window_size_position.conf`（用户私有改动）、`backup/`（测试残留）均未纳入提交。
+- **流程修订**（用户指示，写入《发布流程.md》）：① VantaInstaller 使用独立版本号（如 v0.2.0），是 mpv 附属工具，功能/界面/版本迭代**不触发**大改动 Gate、不提升 mpv 项目版本号；② 资产命名铁律——本地 VantaInstaller 产物文件名必须与远端资产名完全一致（`VantaInstaller-win-x64-v<版本>.exe`），禁止通用名上传，`--clobber` 仅覆盖同名资产，上传后须核对无重复资产。
 
 
 ### 2026-07-30 会话: 统一 v1.2.0 打包与归档审计
