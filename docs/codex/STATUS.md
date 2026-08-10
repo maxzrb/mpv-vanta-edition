@@ -1629,3 +1629,14 @@ c:\Program portable\mpv2\
 - [x] SHA-256：`2BB37136CFC9B976BB68E633393C3EAAA6B0D4F640CE1FFAB9E294EB528C7157`
 - [x] git diff --check 通过；无构建产物（bin/obj/publish）混入提交。
 - [x] gh CLI 可用（2.95.0），用于 Release 资产上传。
+
+
+---
+
+## 2026-08-10 · 发布结果（v1.4.2 附装 VantaInstaller）
+
+- 推送：master 与 origin/master 同步（含 3 个新提交：feat VantaInstaller / docs 记录 / style 字号统一；rebase 合并远端 2 个 README 提交）。
+- Release：`v1.4.2`（正式，非草稿/预发布）新增资产 `VantaInstaller-win-x64-v0.2.0.exe`（64.3MB）。
+- 远端资产核对：7 个资产全部在位；VantaInstaller 远端 SHA-256 `2bb37136...` 与本地完全一致。
+- Release 说明已追加 VantaInstaller 一节（用途、免运行时、校验和）。
+- 未上传私用全量包；mpv 本体 01~05 未重新构建。
