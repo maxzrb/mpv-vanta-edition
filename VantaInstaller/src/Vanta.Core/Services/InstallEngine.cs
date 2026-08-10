@@ -47,7 +47,11 @@ public sealed class InstallEngine
                 result.Error = string.Join(Environment.NewLine, scan.Errors);
                 return result;
             }
-            result.Log.Add($"识别到 {scan.Packages.Count} 个包（统一版本 v{scan.UnifiedVersion}）");
+            // 全量包模式：用户选中 "00"（个人全量包）时，只解压全量包（解压即用一体包），忽略增量包
+            var wantFull = options.SelectedPackageIds?.Contains("00") == true;
+            result.Log.Add(wantFull
+                ? $"检测到个人全量包 v{scan.FullPackage!.Version}（解压即用一体包），将跳过增量包安装"
+                : $"识别到 {scan.Packages.Count} 个增量包（统一版本 v{scan.UnifiedVersion}）");
 
             // 3. 目标目录状态
             result.IsUpgrade = File.Exists(Path.Combine(options.InstallDirectory, "mpv.exe"));
@@ -57,9 +61,24 @@ public sealed class InstallEngine
 
             // 4. 磁盘空间预检
             Directory.CreateDirectory(options.InstallDirectory);
-            var selected = (options.SelectedPackageIds is null)
-                ? scan.Packages
-                : scan.Packages.Where(p => options.SelectedPackageIds.Contains(p.Id)).ToList();
+            List<VantaPackage> selected;
+            if (wantFull)
+            {
+                if (scan.FullPackage is null)
+                {
+                    result.Success = false;
+                    result.Error = "未找到个人全量包，无法安装。";
+                    return result;
+                }
+                selected = [scan.FullPackage];
+                result.Log.Add($"选择安装个人全量包：{scan.FullPackage.EntryFile}（v{scan.FullPackage.Version}，解压即用一体包）");
+            }
+            else
+            {
+                selected = (options.SelectedPackageIds is null)
+                    ? scan.Packages
+                    : scan.Packages.Where(p => options.SelectedPackageIds.Contains(p.Id)).ToList();
+            }
             if (selected.Count == 0)
             {
                 result.Success = false;
@@ -134,8 +153,9 @@ public sealed class InstallEngine
                 result.Log.Add("警告：安装后未找到 mpv.exe，请检查是否选择了 01 号包。");
             }
 
-            // 8. 写入版本标记（供检查更新识别当前包版本）
-            if (!string.IsNullOrWhiteSpace(scan.UnifiedVersion))
+            // 8. 写入版本标记（供检查更新识别当前包版本）；全量包模式用全量包版本
+            var installVersion = wantFull ? scan.FullPackage!.Version : scan.UnifiedVersion;
+            if (!string.IsNullOrWhiteSpace(installVersion))
             {
                 try
                 {
@@ -144,8 +164,8 @@ public sealed class InstallEngine
                     if (markerDir is not null)
                     {
                         Directory.CreateDirectory(markerDir);
-                        File.WriteAllText(marker, scan.UnifiedVersion.Trim());
-                        result.Log.Add($"已写入版本标记：{scan.UnifiedVersion}");
+                        File.WriteAllText(marker, installVersion.Trim());
+                        result.Log.Add($"已写入版本标记：{installVersion}");
                     }
                 }
                 catch (Exception ex)

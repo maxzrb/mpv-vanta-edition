@@ -38,6 +38,18 @@ public partial class PackagesViewModel : ObservableObject
 
         if (_session.ScanResult is { } scan)
         {
+            // 个人全量包：解压即用一体包，与 01~05 增量包二选一（默认不选）
+            if (scan.FullPackage is { } full)
+            {
+                var fullItem = new PackageItem(full)
+                {
+                    // 保留用户之前的选择；全新扫描默认不选全量包
+                    IsSelected = previousSelection.TryGetValue("00", out var s) && s,
+                };
+                fullItem.PropertyChanged += OnItemPropertyChanged;
+                Packages.Add(fullItem);
+            }
+
             foreach (var pkg in scan.Packages)
             {
                 var item = new PackageItem(pkg);
@@ -60,6 +72,15 @@ public partial class PackagesViewModel : ObservableObject
     {
         if (e.PropertyName == nameof(PackageItem.IsSelected))
         {
+            // 二选一联动：勾选全量包 → 取消所有增量包；取消全量包 → 恢复默认全选增量包
+            if (sender is PackageItem item && item.Id == "00")
+            {
+                foreach (var other in Packages.Where(p => p.Id != "00"))
+                {
+                    other.IsSelected = !item.IsSelected;
+                }
+            }
+
             // 同步到会话，供安装页读取
             _session.SelectedPackageIds = Packages
                 .Where(p => p.IsSelected)

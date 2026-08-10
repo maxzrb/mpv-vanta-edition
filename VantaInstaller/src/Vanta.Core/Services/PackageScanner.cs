@@ -32,6 +32,10 @@ public static partial class PackageScanner
     [GeneratedRegex(@"^(?<id>\d{2})-(?<name>[\w-]+?)-v(?<ver>\d+\.\d+\.\d+)\.7z\.(?<part>\d{3})$", RegexOptions.IgnoreCase)]
     private static partial Regex PartFileRegex();
 
+    /// <summary>个人全量包：mpv-full-private-vX.Y.Z.7z</summary>
+    [GeneratedRegex(@"^mpv-full-private-v(?<ver>\d+\.\d+\.\d+)\.7z$", RegexOptions.IgnoreCase)]
+    private static partial Regex FullPrivateVersionRegex();
+
     /// <summary>扫描指定目录</summary>
     public static PackageScanResult Scan(string directory)
     {
@@ -62,6 +66,25 @@ public static partial class PackageScanner
             {
                 result.FullPrivateFile = name;
                 result.Warnings.Add($"检测到私用全量包 {name}：仅限本地使用，不得公开分发。");
+
+                // 解析为可安装的全量包（Id="00"，解压即用一体包）
+                var ver = FullPrivateVersionRegex().Match(name).Groups["ver"].Value;
+                if (!string.IsNullOrEmpty(ver))
+                {
+                    result.FullPackage = new VantaPackage
+                    {
+                        Id = "00",
+                        DisplayName = "Full · 个人全量包",
+                        Version = ver,
+                        EntryFile = name,
+                        Files = [name],
+                        Required = false,
+                        IsComplete = true,
+                        MissingParts = [],
+                        TotalSize = new FileInfo(Path.Combine(directory, name)).Length,
+                        SourceDirectory = directory,
+                    };
+                }
                 continue;
             }
 
@@ -157,29 +180,36 @@ public static partial class PackageScanner
         // 按编号排序
         result.Packages.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
 
-        // 版本一致性
+        // 版本一致性（仅增量包；全量包是独立一体包，不参与）
         var versions = result.Packages.Select(p => p.Version).Distinct().ToList();
         if (versions.Count == 1)
         {
             result.UnifiedVersion = versions[0];
         }
-        else
+        else if (versions.Count > 1)
         {
             result.Errors.Add($"包版本不一致：{string.Join(" / ", versions)}。请确保所有包来自同一版本。");
         }
 
-        // 必选包检查
-        var foundIds = result.Packages.Select(p => p.Id).ToHashSet();
-        foreach (var rid in RequiredIds)
+        // 必选包检查：存在全量包时放宽（全量包解压即用，无需 01~05 齐全）
+        if (result.FullPackage is null)
         {
-            if (!foundIds.Contains(rid))
+            var foundIds = result.Packages.Select(p => p.Id).ToHashSet();
+            foreach (var rid in RequiredIds)
             {
-                result.MissingRequiredIds.Add(rid);
+                if (!foundIds.Contains(rid))
+                {
+                    result.MissingRequiredIds.Add(rid);
+                }
+            }
+            if (result.MissingRequiredIds.Count > 0)
+            {
+                result.Errors.Add($"缺少必选包：{string.Join("、", result.MissingRequiredIds.Select(id => $"{id} 号包"))}。");
             }
         }
-        if (result.MissingRequiredIds.Count > 0)
+        else
         {
-            result.Errors.Add($"缺少必选包：{string.Join("、", result.MissingRequiredIds.Select(id => $"{id} 号包"))}。");
+            result.Warnings.Add("检测到个人全量包：可直接安装全量包（解压即用），增量包可不齐全。");
         }
 
         // 分卷完整性错误

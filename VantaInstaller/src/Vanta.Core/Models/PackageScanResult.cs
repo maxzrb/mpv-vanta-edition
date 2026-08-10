@@ -11,6 +11,12 @@ public sealed class PackageScanResult
     /// <summary>扫描到的私用全量包文件名（仅本地，不应分发）</summary>
     public string? FullPrivateFile { get; set; }
 
+    /// <summary>
+    /// 识别出的个人全量包（mpv-full-private-vX.Y.Z.7z，解压即用的一体包）。
+    /// 为 null 表示目录中无全量包；存在时用户可选择直接安装它。
+    /// </summary>
+    public VantaPackage? FullPackage { get; set; }
+
     /// <summary>统一版本号（所有包一致时有效）</summary>
     public string? UnifiedVersion { get; set; }
 
