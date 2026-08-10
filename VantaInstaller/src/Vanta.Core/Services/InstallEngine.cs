@@ -188,6 +188,10 @@ public sealed class InstallEngine
                 }
             }
 
+            // 记忆上次安装位置（下次检测优先命中）
+            InstallLocationStore.SaveLastInstallDirectory(options.InstallDirectory);
+            AddLog($"已记忆安装位置：{options.InstallDirectory}");
+
             result.Success = true;
             progress?.Report(new InstallProgress(100, "安装完成"));
             return result;

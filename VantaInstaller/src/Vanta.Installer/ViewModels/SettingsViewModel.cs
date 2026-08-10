@@ -25,6 +25,14 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>是否已安装</summary>
     public bool IsInstalled => Installation is { IsValid: true };
 
+    /// <summary>是否为带 .vanta-version 标记的 Vanta 安装</summary>
+    public bool IsVanta => Installation is { IsVanta: true };
+
+    /// <summary>状态标题（区分 Vanta 安装与任意 mpv）</summary>
+    public string StatusTitle => IsInstalled
+        ? (IsVanta ? "MPV Vanta Edition" : "检测到 mpv（非 Vanta 安装）")
+        : "尚未检测到安装";
+
     /// <summary>安装目录</summary>
     public string InstallDirectory => Installation?.Directory ?? string.Empty;
 
@@ -245,6 +253,8 @@ public partial class SettingsViewModel : ObservableObject
             LoadMpvSettings();
         }
         OnPropertyChanged(nameof(IsInstalled));
+        OnPropertyChanged(nameof(IsVanta));
+        OnPropertyChanged(nameof(StatusTitle));
         OnPropertyChanged(nameof(InstallDirectory));
         OnPropertyChanged(nameof(VersionLine));
         OnPropertyChanged(nameof(SizeText));

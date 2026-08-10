@@ -72,11 +72,13 @@
                             <ui:InfoBar.Style>
                                 <Style TargetType="ui:InfoBar">
                                     <Setter Property="Severity" Value="Informational" />
-                                    <Setter Property="Title" Value="{Binding VersionLine, Mode=OneWay}" />
+                                    <Setter Property="Title" Value="{Binding StatusTitle, Mode=OneWay}" />
                                     <Setter Property="Message" Value="{Binding InstallDirectory, Mode=OneWay}" />
                                     <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsVanta}" Value="True">
+                                            <Setter Property="Severity" Value="Success" />
+                                        </DataTrigger>
                                         <DataTrigger Binding="{Binding IsInstalled}" Value="False">
-                                            <Setter Property="Title" Value="尚未检测到安装" />
                                             <Setter Property="Message" Value="请先使用“安装”模式安装 MPV Vanta Edition。" />
                                         </DataTrigger>
                                     </Style.Triggers>

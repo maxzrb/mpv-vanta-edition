@@ -25,6 +25,9 @@ public partial class UninstallViewModel : ObservableObject
     /// <summary>是否检测到有效安装</summary>
     public bool IsDetected => Installation is { IsValid: true };
 
+    /// <summary>是否为带 .vanta-version 标记的 Vanta 安装</summary>
+    public bool IsVanta => Installation is { IsVanta: true };
+
     /// <summary>是否备份配置（默认开）</summary>
     [ObservableProperty]
     private bool _backupConfig = true;
@@ -113,6 +116,7 @@ public partial class UninstallViewModel : ObservableObject
     partial void OnInstallationChanged(InstallationDetector.InstallationInfo? value)
     {
         OnPropertyChanged(nameof(IsDetected));
+        OnPropertyChanged(nameof(IsVanta));
         OnPropertyChanged(nameof(CanProceed));
         OnPropertyChanged(nameof(UninstallDirectory));
         OnPropertyChanged(nameof(VersionLine));
@@ -249,6 +253,8 @@ public partial class UninstallViewModel : ObservableObject
 
             // 卸载成功：清空会话指向的已删除目录，后续检测走程序目录向上查找
             _session.InstallDirectory = null;
+            // 清除记忆的上次安装位置（已卸载，不再指向已删目录）
+            InstallLocationStore.SaveLastInstallDirectory(null);
         }
         catch (Exception ex)
         {
@@ -268,9 +274,10 @@ public partial class UninstallViewModel : ObservableObject
 
             // 卸载完成：重新检测安装状态（session 目录已清，向上查找其他可用安装或 null）
             Installation = InstallationDetector.Detect();
-            OnPropertyChanged(nameof(IsDetected));
-            OnPropertyChanged(nameof(CanProceed));
-            OnPropertyChanged(nameof(UninstallDirectory));
+        OnPropertyChanged(nameof(IsDetected));
+        OnPropertyChanged(nameof(IsVanta));
+        OnPropertyChanged(nameof(CanProceed));
+        OnPropertyChanged(nameof(UninstallDirectory));
 
             // 通知主按钮与步骤条：进入"完成"步骤
             _main.UpdateUninstallStep(2);

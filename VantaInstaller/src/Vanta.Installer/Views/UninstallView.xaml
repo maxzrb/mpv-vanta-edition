@@ -50,8 +50,20 @@
                                 <Run Text="占用空间：" /><Run Text="{Binding SizeText, Mode=OneWay}" />
                             </TextBlock>
 
-                            <ui:InfoBar IsOpen="{Binding IsDetected}" Margin="0,16,0,0" Severity="Success"
-                                        Title="检测到有效安装" />
+                            <ui:InfoBar IsOpen="{Binding IsDetected}" Margin="0,16,0,0">
+                                <ui:InfoBar.Style>
+                                    <Style TargetType="ui:InfoBar">
+                                        <Setter Property="Severity" Value="Warning" />
+                                        <Setter Property="Title" Value="检测到 mpv（非 Vanta 安装）" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsVanta}" Value="True">
+                                                <Setter Property="Severity" Value="Success" />
+                                                <Setter Property="Title" Value="检测到 Vanta 安装" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:InfoBar.Style>
+                            </ui:InfoBar>
                         </StackPanel>
                     </ui:Card>
 

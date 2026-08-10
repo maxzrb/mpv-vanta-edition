@@ -26,9 +26,20 @@
                             <Setter Property="Title" Value="{Binding StatusTitle}" />
                             <Setter Property="Message" Value="{Binding StatusSubtitle}" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsInstalled}" Value="True">
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsInstalled}" Value="True" />
+                                        <Condition Binding="{Binding IsVanta}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
                                     <Setter Property="Severity" Value="Success" />
-                                </DataTrigger>
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsInstalled}" Value="True" />
+                                        <Condition Binding="{Binding IsVanta}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Severity" Value="Warning" />
+                                </MultiDataTrigger>
                             </Style.Triggers>
                         </Style>
                     </ui:InfoBar.Style>

@@ -14,11 +14,18 @@ public static class InstallationDetector
         bool HasMpv,
         bool HasConfig,
         bool HasInstallerScripts,
+        bool HasVantaMarker,
         string? VersionLine,
         long TotalSize)
     {
         /// <summary>是否为有效安装</summary>
         public bool IsValid => HasMpv && HasConfig;
+
+        /// <summary>
+        /// 是否为 Vanta 安装（带 .vanta-version 标记）。
+        /// 用于区分"本安装器装出的 Vanta mpv"与"任意 mpv 目录"。
+        /// </summary>
+        public bool IsVanta => HasMpv && HasConfig && HasVantaMarker;
 
         /// <summary>人类可读体积</summary>
         public string SizeText => Models.VantaPackage.FormatSize(TotalSize);
@@ -26,24 +33,46 @@ public static class InstallationDetector
 
     /// <summary>
     /// 快速检测已安装目录（仅存在性检查，不统计体积/版本，避免大目录卡顿）。
-    /// 优先用指定目录，否则从程序目录向上查找（最多 10 层）。
+    /// 优先级：
+    /// 1. 显式指定目录（有效才返回，无效返回 null 由调用方兜底）；
+    /// 2. 记忆的上次安装位置（有效即返回，Vanta 优先）；
+    /// 3. 程序目录向上查找（最多 10 层，优先带 Vanta 标记的目录，其次任意 mpv）。
     /// </summary>
     public static InstallationInfo? Detect(string? directory = null)
     {
+        // 1. 显式指定目录
         if (!string.IsNullOrWhiteSpace(directory) && Directory.Exists(directory))
         {
-            return Inspect(directory);
+            var info = Inspect(directory);
+            return info.IsValid ? info : null;
         }
 
+        // 2. 记忆的上次安装位置（有效即采纳；Vanta 优先）
+        var remembered = InstallLocationStore.GetLastInstallDirectory();
+        if (!string.IsNullOrWhiteSpace(remembered) && Directory.Exists(remembered))
+        {
+            var rememberedInfo = Inspect(remembered);
+            if (rememberedInfo.IsValid)
+            {
+                return rememberedInfo;
+            }
+        }
+
+        // 3. 程序目录向上查找：Vanta 标记优先，任意 mpv 作为兜底
+        InstallationInfo? fallback = null;
         var dir = AppContext.BaseDirectory;
         for (int i = 0; i < 10; i++)
         {
             if (Directory.Exists(dir))
             {
                 var info = Inspect(dir);
-                if (info.IsValid)
+                if (info.IsVanta)
                 {
                     return info;
+                }
+                if (info.IsValid && fallback is null)
+                {
+                    fallback = info;
                 }
             }
 
@@ -55,7 +84,7 @@ public static class InstallationDetector
             dir = parent.FullName;
         }
 
-        return null;
+        return fallback;
     }
 
     /// <summary>
@@ -95,9 +124,11 @@ public static class InstallationDetector
         var hasMpv = File.Exists(mpvPath);
         var hasConfig = File.Exists(configPath);
         var hasScripts = Directory.Exists(Path.Combine(directory, "installer"));
+        // Vanta 安装标记：portable_config\.vanta-version（由安装引擎在成功安装后写入）
+        var hasVantaMarker = File.Exists(Path.Combine(directory, "portable_config", ".vanta-version"));
 
         // 注意：此处不做体积统计与版本查询（耗时），由 EnrichAsync 后台填充
-        return new InstallationInfo(directory, hasMpv, hasConfig, hasScripts, null, 0);
+        return new InstallationInfo(directory, hasMpv, hasConfig, hasScripts, hasVantaMarker, null, 0);
     }
 
     /// <summary>读取 mpv --version 首行（显式 UTF-8，避免 © 乱码）</summary>
