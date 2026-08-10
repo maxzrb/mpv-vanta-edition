@@ -39,9 +39,9 @@
 包之间允许存在交集以保证各自可用性。04 包含 LSFG 控制脚本以保联动，
 05 作为最终覆盖层可覆盖前面所有包的同名文件。单独更新配置只需解压 05。
 
-`04` 可以公开分发，已内置 LSFG 补帧所需的 `Lossless.dll`，解压后即可开箱使用。
+`04` 已内置 LSFG 补帧所需的 `Lossless.dll`，解压后即可开箱使用。
 Lossless Scaling 为商业软件，尚未购买正版授权的用户请自行决定是否支持正版。
-包内不包含 `LosslessScaling.dll`、语言资源 DLL、.NET/WPF DLL 或任何 EXE。
+
 
 个人本地也可以生成 `mpv-full-private-vX.Y.Z.7z`。它会按 01～05 的顺序合并全部
 公开包，并加入完整 `Lossless Scaling` 目录备份，形成解压即用的一体包。
