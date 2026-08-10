@@ -100,4 +100,5 @@ public static class InstallLocationStore
         data.ManualBackupPath = string.IsNullOrWhiteSpace(directory) ? null : directory;
         Write(data);
     }
+
 }

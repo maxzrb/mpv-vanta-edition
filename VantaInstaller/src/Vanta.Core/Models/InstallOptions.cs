@@ -22,4 +22,11 @@ public sealed class InstallOptions
     /// 为 null 时安装全部扫描到的包。
     /// </summary>
     public IReadOnlyCollection<string>? SelectedPackageIds { get; init; }
+
+    /// <summary>
+    /// 安装完成后要注册的文件关联入口（null/空=不注册）。
+    /// 多实例注册 mpv.exe、单实例注册 umpv.exe；两者是独立入口，可同时注册，
+    /// 注册后可在 Windows「打开方式」里自行选择用哪个打开。
+    /// </summary>
+    public IReadOnlyCollection<PlaybackMode>? RegisterAssociations { get; init; }
 }

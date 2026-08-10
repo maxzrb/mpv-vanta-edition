@@ -198,6 +198,26 @@ public sealed class InstallEngine
             InstallLocationStore.SaveManualMpvPath(null);
             AddLog("已清除手动指定的 mpv 位置");
 
+            // 安装完成后注册文件关联（可选）：多实例 → mpv.exe；单实例 → umpv.exe（各弹一次 UAC）
+            if (options.RegisterAssociations is { Count: > 0 } regModes)
+            {
+                foreach (var regMode in regModes)
+                {
+                    var modeText = regMode == PlaybackMode.SingleInstance ? "单实例" : "多实例";
+                    var bat = AssociationService.InstallBatPath(options.InstallDirectory, regMode);
+                    if (bat is null)
+                    {
+                        AddLog($"警告：未找到 {modeText} 关联脚本（installer\\mpv-install*.bat），跳过注册。");
+                    }
+                    else
+                    {
+                        AddLog($"正在注册{modeText}文件关联（{Path.GetFileName(bat)}，需 UAC 确认）…");
+                        await RunBatElevatedAsync(bat, options.InstallDirectory);
+                        AddLog($"已触发{modeText}文件关联注册。");
+                    }
+                }
+            }
+
             result.Success = true;
             progress?.Report(new InstallProgress(100, "安装完成"));
             return result;
@@ -245,6 +265,27 @@ public sealed class InstallEngine
         catch
         {
             return null;
+        }
+    }
+
+    /// <summary>以管理员身份运行 bat（弹 UAC）；用户取消或失败不阻断安装</summary>
+    private static async Task RunBatElevatedAsync(string batPath, string workingDir)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = $"/c \"\"{batPath}\"\"",
+                WorkingDirectory = workingDir,
+                UseShellExecute = true,
+                Verb = "runas",
+            });
+            await Task.Delay(500);
+        }
+        catch
+        {
+            // 用户取消 UAC 或提权失败，不阻断安装
         }
     }
 }

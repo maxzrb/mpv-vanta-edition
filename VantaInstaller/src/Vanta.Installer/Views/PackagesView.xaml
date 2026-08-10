@@ -2,6 +2,16 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <UserControl.Resources>
+        <!-- 卡片描述（12 灰） -->
+        <Style x:Key="CardDescStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,6,0,0" />
+            <Setter Property="Foreground" Value="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -73,6 +83,27 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+                </ui:Card>
+
+                <!-- 文件关联注册 -->
+                <ui:Card Padding="24" Margin="0,16,0,0">
+                    <StackPanel>
+                        <TextBlock Text="文件关联注册" FontSize="16" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                        <TextBlock Style="{StaticResource CardDescStyle}">
+                            安装完成后把播放器注册为文件打开方式（写注册表，需 UAC）。可同时勾选两种入口，之后在 Windows「打开方式」里自行选择用哪个打开视频。
+                        </TextBlock>
+                        <StackPanel Margin="0,14,0,0">
+                            <CheckBox Content="注册多实例关联（双击经 mpv.exe 新开窗口）"
+                                      IsChecked="{Binding RegisterMultiInstance}" Margin="0,0,0,10" />
+                            <CheckBox Content="注册单实例关联（双击经 umpv.exe 复用同一窗口）"
+                                      IsChecked="{Binding RegisterSingleInstance}" />
+                        </StackPanel>
+                        <TextBlock Margin="0,10,0,0" FontSize="11" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}">
+                            不勾选也能正常安装，之后可在「设置 → 文件关联」随时注册或取消。
+                        </TextBlock>
+                    </StackPanel>
                 </ui:Card>
             </StackPanel>
         </ScrollViewer>

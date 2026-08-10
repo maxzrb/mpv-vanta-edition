@@ -121,16 +121,41 @@
                         </TextBlock>
                         <Grid Margin="0,14,0,0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <ui:Button Grid.Column="0" Content="注册文件关联" Appearance="Primary"
-                                       Command="{Binding RegisterAssociationsCommand}"
-                                       IsEnabled="{Binding CanRegister}" Padding="16,8" Margin="0,0,8,0" />
-                            <ui:Button Grid.Column="1" Content="取消文件关联" Appearance="Secondary"
+                            <ui:Button Grid.Column="0" Content="取消文件关联" Appearance="Secondary"
                                        Command="{Binding UnregisterAssociationsCommand}"
                                        IsEnabled="{Binding CanRegister}" Padding="16,8" />
+                            <TextBlock Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="11"
+                                       TextWrapping="Wrap"
+                                       Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}">
+                                取消后恢复默认打开方式；需要管理员权限（弹 UAC）。
+                            </TextBlock>
                         </Grid>
+
+                        <!-- 文件关联入口：多实例（mpv.exe）与单实例（umpv.exe）可分别注册，打开方式里自行选择 -->
+                        <Border Margin="0,14,0,0" Padding="14,12" CornerRadius="8" BorderThickness="1"
+                                BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+                            <StackPanel>
+                                <TextBlock Text="注册入口" Style="{StaticResource CardTitleStyle}" />
+                                <TextBlock Style="{StaticResource CardDescStyle}">
+                                    多实例 = 每次双击新开窗口（mpv.exe）；单实例 = 经 umpv 复用同一窗口。可分别注册，之后在 Windows「打开方式」里自行选择。
+                                </TextBlock>
+                                <Grid Margin="0,12,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:Button Grid.Column="0" Content="注册多实例关联" Appearance="Primary"
+                                               Command="{Binding RegisterMultiAssociationsCommand}"
+                                               IsEnabled="{Binding CanRegister}" Padding="16,8" Margin="0,0,8,0" />
+                                    <ui:Button Grid.Column="1" Content="注册单实例关联" Appearance="Secondary"
+                                               Command="{Binding RegisterSingleAssociationsCommand}"
+                                               IsEnabled="{Binding CanRegister}" Padding="16,8" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ui:Card>
 

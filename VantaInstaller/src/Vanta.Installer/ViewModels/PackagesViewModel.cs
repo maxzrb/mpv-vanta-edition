@@ -18,6 +18,14 @@ public partial class PackagesViewModel : ObservableObject
     /// <summary>是否可进入下一步（至少一个选中）</summary>
     public bool CanProceed => Packages.Any(p => p.IsSelected);
 
+    /// <summary>是否勾选「注册多实例关联」（文件关联指向 mpv.exe）</summary>
+    [ObservableProperty]
+    private bool _registerMultiInstance;
+
+    /// <summary>是否勾选「注册单实例关联」（文件关联指向 umpv.exe）</summary>
+    [ObservableProperty]
+    private bool _registerSingleInstance;
+
     /// <summary>汇总文本</summary>
     public string SummaryText => $"共 {Packages.Count} 个包，选中 {Packages.Count(p => p.IsSelected)} 个 · 需要 {VantaPackage.FormatSize(_session.ScanResult?.SelectedTotalSize ?? 0)}";
 
@@ -32,6 +40,10 @@ public partial class PackagesViewModel : ObservableObject
     /// </summary>
     public void Refresh()
     {
+        // 沿用会话中已选的注册项（返回本页不重置）
+        RegisterMultiInstance = _session.RegisterAssociations?.Contains(PlaybackMode.MultiInstance) == true;
+        RegisterSingleInstance = _session.RegisterAssociations?.Contains(PlaybackMode.SingleInstance) == true;
+
         // 保留用户已勾选状态（返回本页时不重置）
         var previousSelection = Packages.ToDictionary(p => p.Id, p => p.IsSelected);
         Packages.Clear();
@@ -71,6 +83,25 @@ public partial class PackagesViewModel : ObservableObject
         _session.SelectedPackageIds = Packages.Where(p => p.IsSelected).Select(p => p.Id).ToList();
         OnPropertyChanged(nameof(CanProceed));
         OnPropertyChanged(nameof(SummaryText));
+    }
+
+    partial void OnRegisterMultiInstanceChanged(bool value) => SyncRegisterAssociations();
+
+    partial void OnRegisterSingleInstanceChanged(bool value) => SyncRegisterAssociations();
+
+    /// <summary>把勾选结果同步到会话（可同时勾选，都注册）</summary>
+    private void SyncRegisterAssociations()
+    {
+        var modes = new List<PlaybackMode>();
+        if (RegisterMultiInstance)
+        {
+            modes.Add(PlaybackMode.MultiInstance);
+        }
+        if (RegisterSingleInstance)
+        {
+            modes.Add(PlaybackMode.SingleInstance);
+        }
+        _session.RegisterAssociations = modes.Count > 0 ? modes : null;
     }
 
     private void OnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)

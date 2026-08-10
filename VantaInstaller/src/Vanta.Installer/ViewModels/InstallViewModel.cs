@@ -111,6 +111,7 @@ public partial class InstallViewModel : ObservableObject
                 SourceDirectory = _session.SourceDirectory!,
                 InstallDirectory = _session.InstallDirectory!,
                 SelectedPackageIds = _session.SelectedPackageIds,
+                RegisterAssociations = _session.RegisterAssociations,
             };
 
             var progress = new Progress<InstallProgress>(p =>

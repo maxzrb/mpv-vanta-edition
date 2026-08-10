@@ -852,15 +852,36 @@ public partial class SettingsViewModel : ObservableObject
 
     // ============ 文件关联 ============
 
-    /// <summary>注册文件关联（提权调用 mpv-install.bat）</summary>
-    [RelayCommand]
-    private void RegisterAssociations() =>
-        RunBatElevated(Path.Combine(InstallDirectory, "installer", "mpv-install.bat"), "注册文件关联");
-
     /// <summary>取消文件关联（提权调用 mpv-uninstall.bat）</summary>
     [RelayCommand]
     private void UnregisterAssociations() =>
         RunBatElevated(Path.Combine(InstallDirectory, "installer", "mpv-uninstall.bat"), "取消文件关联");
+
+    /// <summary>注册多实例文件关联（指向 mpv.exe，提权调用 mpv-install.bat）</summary>
+    [RelayCommand]
+    private void RegisterMultiAssociations()
+    {
+        var bat = AssociationService.InstallBatPath(InstallDirectory, PlaybackMode.MultiInstance);
+        if (bat is null)
+        {
+            OperationMessage = "未找到 mpv-install.bat，请确认已安装完整。";
+            return;
+        }
+        RunBatElevated(bat, "注册多实例文件关联");
+    }
+
+    /// <summary>注册单实例文件关联（指向 umpv.exe，提权调用 single-instance 脚本）</summary>
+    [RelayCommand]
+    private void RegisterSingleAssociations()
+    {
+        var bat = AssociationService.InstallBatPath(InstallDirectory, PlaybackMode.SingleInstance);
+        if (bat is null)
+        {
+            OperationMessage = "未找到 mpv-install (single-instance).bat，请确认已安装完整。";
+            return;
+        }
+        RunBatElevated(bat, "注册单实例文件关联");
+    }
 
     private void RunBatElevated(string? batPath, string actionName)
     {
