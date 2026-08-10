@@ -1640,3 +1640,14 @@ c:\Program portable\mpv2\
 - 远端资产核对：7 个资产全部在位；VantaInstaller 远端 SHA-256 `2bb37136...` 与本地完全一致。
 - Release 说明已追加 VantaInstaller 一节（用途、免运行时、校验和）。
 - 未上传私用全量包；mpv 本体 01~05 未重新构建。
+
+
+---
+
+## 2026-08-10 · v1.4.2 base 补 Vanta 安装标记
+
+- 需求：让已发布/新装 base 包带 `.vanta-version` 标记，安装器据此区分 Vanta 安装与任意 mpv。
+- 改动：`build-release.ps1` base 打包自动写入 `portable_config/.vanta-version = 版本号`；`build-config-public.ps1` 05 打包排除该标记（防止 05 覆盖）。
+- 重打：`01-mpv-base-v1.4.2.7z`（含标记，95.5MB），已重传 v1.4.2 Release（--clobber），远端 hash 核对一致。
+- 新 SHA-256：`535E7A1990F45D4619D50BF850223C8CA799E48EDD3028FDD672A675BAA8426D`
+- 02~05 未重打（内容不变）；02 沿用上次分卷。

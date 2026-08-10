@@ -166,6 +166,11 @@ $null = New-Item -ItemType Directory -Force $BaseBuild
 # Config content
 Invoke-CopyConfig $BaseBuild
 
+# Vanta 安装标记：供安装器区分"Vanta 安装"与"任意 mpv"
+$vantaMarker = Join-Path $BaseBuild "portable_config/.vanta-version"
+Set-Content -Path $vantaMarker -Value $Version -Encoding UTF8 -NoNewline
+Write-Host "       Vanta 标记: .vanta-version = $Version" -ForegroundColor Gray
+
 # MPV core
 Write-Host "       Copying mpv core..." -ForegroundColor Gray
 Copy-IfExists "mpv.exe" $BaseBuild

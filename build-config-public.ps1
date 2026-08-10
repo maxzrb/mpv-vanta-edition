@@ -37,9 +37,13 @@ foreach ($exclude in @('shaders', 'vs', 'cache', 'files')) {
 # 启动 Logo 素材（启动页/起播格式 Logo）归 01 Base，Config 不重复携带
 $assetsPath = Join-Path $configDest 'script-assets'
 if (Test-Path $assetsPath) { Remove-Item -Recurse -Force $assetsPath }
-# 个人运行时状态（窗口记忆）不进公开包
-$stateFile = Join-Path $configDest 'script-opts/window_state.conf'
-if (Test-Path $stateFile) { Remove-Item -Force $stateFile }
+    # 个人运行时状态（窗口记忆）不进公开包
+    $stateFile = Join-Path $configDest 'script-opts/window_state.conf'
+    if (Test-Path $stateFile) { Remove-Item -Force $stateFile }
+
+    # Vanta 安装标记由 01 Base 写入，05 Config 不得覆盖（防止 05 覆盖版本标记）
+    $vantaMarker = Join-Path $configDest '.vanta-version'
+    if (Test-Path $vantaMarker) { Remove-Item -Force $vantaMarker }
 
 # 项目文件
 foreach ($file in @('README.MD', '.gitignore')) {
