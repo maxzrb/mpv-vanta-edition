@@ -2075,3 +2075,11 @@ c:\Program portable\mpv2\
 - **文件**：同步更新 `portable_config/scripts/uosc/main.lua` 内置默认值和 `portable_config/script-opts/uosc.conf` 实际配置，不新增 MediaInfo/Speed 私有选项。
 - **验证**：尺寸矩阵覆盖 1280/1080/960/800/640px 与 200% DPI 小窗口，断言 compact 不低于 0.75；独立 uosc 在 800×450、scale=1/2 下退出 0、无 Lua/stack/script-opts 错误。未构建、未打包、未发布。
 - **工作树边界**：用户写入 `uosc.conf` 的 `proximity_scale_min=0.8` 说明文字继续保留为未提交修改；backup 目录不跟踪。
+
+### 2026-08-11 22:52 会话：音量条复用统一窄窗口缩放
+
+- **实现**：Volume 容器宽度/高度、窗口边缘间距、悬浮背景外扩，VolumeSlider 的配置边框与 100 刻度命中 padding 均改用 `get_controls_scale()`；轨道、把手、数字和静音按钮继续由容器尺寸派生，因此整体与底栏、MediaInfo、Speed 同步缩放。
+- **边界**：音量文字描边和全局圆角仍沿用 `state.scale/state.radius`，与底栏按钮一致，避免小窗口把发丝线压得过细；不新增音量专用下限。
+- **尺寸**：volume_size=40 时，1280px=40、1080px=34、≤960px=30；200% DPI 的 960 逻辑像素小窗为 60px，统一受 75% compact 下限约束。
+- **验证**：尺寸矩阵覆盖 1280/1080/960/800/640px 与 200% DPI 小窗口；独立 uosc 在 800×450、scale=1/2、volume=right 下退出 0，无 Lua/stack/script-opts 错误。未构建、未打包、未发布。
+- **工作树边界**：用户的 `proximity_scale_min=0.8` 说明文字继续保持未提交；backup 目录不跟踪。

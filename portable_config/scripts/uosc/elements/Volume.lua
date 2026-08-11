@@ -18,7 +18,7 @@ function VolumeSlider:init(props)
 end
 
 function VolumeSlider:update_dimensions()
-	self.border_size = math.max(0, round(options.volume_border * state.scale))
+	self.border_size = math.max(0, round(options.volume_border * get_controls_scale()))
 end
 
 function VolumeSlider:get_visibility() return Elements.volume:get_visibility(self) end
@@ -70,7 +70,7 @@ function VolumeSlider:render()
 	-- 音量 100 刻度标记：两个小三角形位于轨道上音量 100 的刻度处（最大音量可能是 130），点击直接调到 100
 	local marker_size = math.max(3, round(track_width * 1.3))
 	local marker_gap = round(track_width * 0.5)
-	local marker_pad = round(2 * state.scale)
+	local marker_pad = round(2 * get_controls_scale())
 	local marker_fraction = clamp(0, 100 / state.volume_max, 1)
 	local marker_y = track_by - (track_by - track_ay) * marker_fraction
 	local marker_ay = marker_y - marker_size / 2 - marker_pad
@@ -180,7 +180,8 @@ function Volume:get_visibility()
 end
 
 function Volume:update_dimensions()
-	self.size = round(options.volume_size * state.scale)
+	-- 与底栏、MediaInfo、Speed 共用 HiDPI + 窄窗口 compact 比例。
+	self.size = round(options.volume_size * get_controls_scale())
 	local min_y = Elements:v('top_bar', 'by') or Elements:v('window_border', 'size', 0)
 	local max_y = Elements:v('controls', 'ay') or Elements:v('timeline', 'ay')
 		or display.height - Elements:v('window_border', 'size', 0)
@@ -214,6 +215,7 @@ end
 function Volume:render()
 	local visibility = self:get_visibility()
 	if visibility <= 0 then return end
+	local controls_scale = get_controls_scale()
 
 	-- Reset volume on secondary click
 	cursor:zone('secondary_click', self, function()
@@ -225,8 +227,8 @@ function Volume:render()
 	local mute_rect = {ax = self.ax, ay = self.mute_ay, bx = self.bx, by = self.by}
 	cursor:zone('primary_click', mute_rect, function() self:toggle_mute() end)
 	local ass = assdraw.ass_new()
-	ass:rect(self.ax - round(4 * state.scale), self.ay - round(6 * state.scale),
-		self.bx + round(4 * state.scale), self.by + round(4 * state.scale), {
+	ass:rect(self.ax - round(4 * controls_scale), self.ay - round(6 * controls_scale),
+		self.bx + round(4 * controls_scale), self.by + round(4 * controls_scale), {
 			color = bg,
 			opacity = visibility * 0.82,
 			radius = state.radius,
