@@ -4,6 +4,9 @@
 local msg = require 'mp.msg'
 local options = require 'mp.options'
 local utils = require 'mp.utils'
+local logo_bounds = dofile(mp.command_native({
+    'expand-path', '~~/script-modules/startup-logo-bounds.lua',
+}))
 
 local o = {
     enabled = true,
@@ -19,6 +22,8 @@ local o = {
     detect_encoded_bars = true,
     encoded_bar_threshold = 16,
     encoded_bar_delay = 0.18,
+    encoded_bar_samples = 3,
+    encoded_bar_sample_interval = 0.22,
     scale = 1.0,
     portrait_scale = 1.18,
     margin_x = 60,
@@ -1069,95 +1074,6 @@ local function has_video_geometry()
         and tonumber(dimensions.w) > 0
         and tonumber(dimensions.h) > 0
 end
-
-
-local function parse_encoded_bar_insets(frame)
-    if type(frame) ~= 'table' or frame.format ~= 'bgr0'
-        or type(frame.data) ~= 'string' then return nil end
-    local width = tonumber(frame.w) or 0
-    local height = tonumber(frame.h) or 0
-    local stride = tonumber(frame.stride) or width * 4
-    if width < 320 or height < 180 or stride < width * 4 then return nil end
-
-    local data = frame.data
-    local threshold = clamp(math.floor(tonumber(o.encoded_bar_threshold) or 16), 0, 48)
-    local samples = 48
-    local function row_is_black(y)
-        local bright = 0
-        for index = 0, samples - 1 do
-            local x = math.min(width - 1, math.floor((index + 0.5) * width / samples))
-            local offset = y * stride + x * 4 + 1
-            local blue, green, red = data:byte(offset, offset + 2)
-            if not blue or math.max(blue, green, red) > threshold then
-                bright = bright + 1
-                if bright > 2 then return false end
-            end
-        end
-        return true
-    end
-    local function column_is_black(x)
-        local bright = 0
-        for index = 0, samples - 1 do
-            local y = math.min(height - 1, math.floor((index + 0.5) * height / samples))
-            local offset = y * stride + x * 4 + 1
-            local blue, green, red = data:byte(offset, offset + 2)
-            if not blue or math.max(blue, green, red) > threshold then
-                bright = bright + 1
-                if bright > 2 then return false end
-            end
-        end
-        return true
-    end
-
-    local function scan_edges(length, check)
-        local step = math.max(1, math.floor(length / 540))
-        local limit = math.floor(length * 0.30)
-        local first = 0
-        while first < limit and check(first) do first = first + step end
-        local last = 0
-        while last < limit and check(length - 1 - last) do last = last + step end
-        return math.min(first, limit), math.min(last, limit)
-    end
-
-    local known_aspects = {2.76, 2.55, 2.40, 2.39, 2.35, 2.20, 2.10, 2.00, 1.90, 1.85, 16 / 9, 4 / 3, 1.25}
-    local function aspect_is_plausible(aspect, source_aspect)
-        if math.abs(aspect - source_aspect) < 0.06 then return false end
-        for _, known in ipairs(known_aspects) do
-            if math.abs(aspect - known) <= 0.065 then return true end
-        end
-        return false
-    end
-    local function symmetric(a, b, length)
-        local minimum = length * 0.012
-        return a >= minimum and b >= minimum
-            and math.abs(a - b) <= math.max(12, length * 0.025)
-    end
-
-    local top, bottom = scan_edges(height, row_is_black)
-    local left, right = scan_edges(width, column_is_black)
-    local source_aspect = width / height
-    local insets = {left = 0, top = 0, right = 0, bottom = 0}
-    local found = false
-    if symmetric(top, bottom, height) then
-        local content_height = height - top - bottom
-        local aspect = content_height > 0 and width / content_height or 0
-        if aspect_is_plausible(aspect, source_aspect) then
-            insets.top, insets.bottom = top / height, bottom / height
-            found = true
-        end
-    end
-    if not found and symmetric(left, right, width) then
-        local content_width = width - left - right
-        local aspect = content_width > 0 and content_width / height or 0
-        if aspect_is_plausible(aspect, source_aspect) then
-            insets.left, insets.right = left / width, right / width
-            found = true
-        end
-    end
-    return found and insets or nil
-end
-
-
 local function prepare_display_after_frame(reason)
     local file_generation = state.file_generation
     local function continue_detection(insets, suffix)
@@ -1185,29 +1101,52 @@ local function prepare_display_after_frame(reason)
     schedule('bar-detect', math.max(0, tonumber(o.encoded_bar_delay) or 0.18), function()
         if file_generation ~= state.file_generation or not state.loaded then return end
         local completed = false
+        local probes = {}
+        local sample_count = clamp(math.floor(tonumber(o.encoded_bar_samples) or 3), 1, 5)
+        local sample_interval = clamp(tonumber(o.encoded_bar_sample_interval) or 0.22, 0.05, 0.75)
         local function finish(insets, suffix)
             if completed then return end
             completed = true
             continue_detection(insets, suffix)
         end
-        schedule('bar-detect-timeout', 1.2, function()
-            finish(nil, '-bar-timeout')
+        schedule('bar-detect-timeout', 1.4 + sample_count * sample_interval, function()
+            local insets = logo_bounds.merge(probes)
+            finish(insets, insets and '-encoded-bars-timeout' or '-bar-timeout')
         end)
-        local ok, request = pcall(mp.command_native_async, {
-            name = 'screenshot-raw', flags = 'video', format = 'bgr0',
-        }, function(success, frame)
-            if not success then
-                finish(nil, '-bar-unavailable')
-                return
+
+        local function request_sample(index)
+            if completed or file_generation ~= state.file_generation or not state.loaded then return end
+            local ok, request = pcall(mp.command_native_async, {
+                name = 'screenshot-raw', flags = 'video', format = 'bgr0',
+            }, function(success, frame)
+                if completed then return end
+                if success then
+                    local insets = logo_bounds.detect(frame, o.encoded_bar_threshold)
+                    if insets then probes[#probes + 1] = insets end
+                end
+                if index >= sample_count then
+                    local insets = logo_bounds.merge(probes)
+                    finish(insets, insets and '-encoded-bars' or '-frame-bounds')
+                else
+                    schedule('bar-detect-sample', sample_interval, function()
+                        request_sample(index + 1)
+                    end)
+                end
+            end)
+            if not ok then
+                if index >= sample_count then
+                    local insets = logo_bounds.merge(probes)
+                    finish(insets, insets and '-encoded-bars' or '-bar-unavailable')
+                else
+                    schedule('bar-detect-sample', sample_interval, function()
+                        request_sample(index + 1)
+                    end)
+                end
+            else
+                state.bar_request = request
             end
-            local insets = parse_encoded_bar_insets(frame)
-            finish(insets, insets and '-encoded-bars' or '-frame-bounds')
-        end)
-        if not ok then
-            finish(nil, '-bar-unavailable')
-        else
-            state.bar_request = request
         end
+        request_sample(1)
     end)
 end
 
