@@ -53,7 +53,8 @@ local o = {
     plot_bg_border_width = 1.25,
 
     -- Text style
-    font = "",
+    -- 统计标题与普通文本默认跟随内置 HarmonyOS Sans SC。
+    font = "HarmonyOS Sans SC",
     font_mono = "monospace",   -- monospaced digits are sufficient
     font_size = 20,
     font_color = "",

@@ -453,7 +453,7 @@ function Menu:update_content_dimensions()
 	-- 紧凑菜单：字号在默认比例基础上再减 1px（随 DPI 缩放）
 	self.font_size = math.max(
 		round(8 * state.scale),
-		round(self.item_height * 0.46 * options.font_scale) - round(1 * state.scale)
+		round(self.item_height * 0.5 * options.font_scale) - round(1 * state.scale)
 	)
 	self.font_size_hint = self.font_size - 1
 	self.font = options.menu_font ~= '' and options.menu_font or config.font

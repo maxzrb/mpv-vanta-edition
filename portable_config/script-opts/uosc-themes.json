@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "default": "gulf-blue",
+  "palettes": [
+    {
+      "id": "gulf-blue",
+      "name": "海湾蓝",
+      "accent": "56E5F1",
+      "accentText": "071522",
+      "accentBorder": "56E5F1",
+      "description": "清澈明亮的青蓝色，作为 Vanta 默认强调色。"
+    },
+    {
+      "id": "capri-blue",
+      "name": "卡布里蓝",
+      "accent": "4A8FF7",
+      "accentText": "071522",
+      "accentBorder": "4A8FF7",
+      "description": "参考蓝色铝片与纳米颜料呈现的纯净海岸蓝，清爽而有高级感。"
+    },
+    {
+      "id": "sunset-red",
+      "name": "赤霞红",
+      "accent": "F05A50",
+      "accentText": "21100D",
+      "accentBorder": "F05A50",
+      "description": "参考朝霞光泽变化的鲜明红色，热烈而富有立体感。"
+    },
+    {
+      "id": "lava-orange",
+      "name": "熔岩橙",
+      "accent": "FF6A3D",
+      "accentText": "20110C",
+      "accentBorder": "FF6A3D",
+      "description": "参考双层橙色与金属珠光呈现的高饱和暖橙，充满速度感。"
+    },
+    {
+      "id": "viridian-green",
+      "name": "靛石绿",
+      "accent": "3C927A",
+      "accentText": "071522",
+      "accentBorder": "3C927A",
+      "description": "参考孔雀石珠光与竹炭黑底层形成的深绿至蓝绿色调。"
+    },
+    {
+      "id": "golden-pink",
+      "name": "流金粉",
+      "accent": "F2A7B8",
+      "accentText": "211015",
+      "accentBorder": "F2A7B8",
+      "description": "带暖金光感的柔和粉色，轻盈而不过分甜腻。"
+    },
+    {
+      "id": "radiant-purple",
+      "name": "霞光紫",
+      "accent": "A979E6",
+      "accentText": "150C22",
+      "accentBorder": "A979E6",
+      "description": "参考霞光下的柔和紫色，浪漫并带有冷调光泽。"
+    },
+    {
+      "id": "brilliant-magenta",
+      "name": "璀璨洋红",
+      "accent": "E851B9",
+      "accentText": "21091B",
+      "accentBorder": "E851B9",
+      "description": "高识别度的冷调洋红色，鲜明但保留金属漆般的深度。"
+    },
+    {
+      "id": "elegant-gray",
+      "name": "雅灰",
+      "accent": "A7AAAD",
+      "accentText": "071522",
+      "accentBorder": "A7AAAD",
+      "description": "温和中性的浅灰色，低调、克制且耐看。"
+    },
+    {
+      "id": "pearl-white",
+      "name": "珍珠白",
+      "accent": "F2EFE6",
+      "accentText": "071522",
+      "accentBorder": "F2EFE6",
+      "description": "参考珠光粉形成的柔润白色，明亮但不生硬。"
+    },
+    {
+      "id": "miku-green",
+      "name": "初音绿",
+      "installerName": "大葱绿",
+      "accent": "39C5BB",
+      "accentText": "071522",
+      "accentBorder": "39C5BB",
+      "description": "参考初音未来代表性的青绿色，清亮、活泼且在深色界面上保持良好识别度。"
+    }
+  ]
+}

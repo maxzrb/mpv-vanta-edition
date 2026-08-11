@@ -13,6 +13,7 @@ osd = mp.create_osd_overlay('ass-events')
 QUARTER_PI_SIN = math.sin(math.pi / 4)
 
 require('lib/std')
+local Theme = require('lib/theme')
 
 --[[ OPTIONS ]]
 
@@ -25,6 +26,7 @@ defaults = {
 	progress_line_width = 20,
 	timeline_persistency = '',
 	timeline_border = 1,
+	chapter_marker_border = 0,
 	timeline_step = '5',
 	timeline_cache = true,
 	timeline_heatmap = 'overlay',
@@ -38,6 +40,8 @@ defaults = {
 	controls_size = 32,
 	controls_margin = 8,
 	controls_spacing = 2,
+	controls_compact_threshold = 1280,
+	controls_compact_min_scale = 0.6,
 	controls_persistency = '',
 	button_tooltips = true,
 	idle_branding = true,
@@ -82,6 +86,7 @@ defaults = {
 	font_scale = 1,
 	text_border = 1.2,
 	border_radius = 4,
+	theme = 'gulf-blue',
 	color = '',
 	opacity = '',
 	animation_duration = 100,
@@ -89,6 +94,9 @@ defaults = {
 	flash_duration = 1000,
 	proximity_in = 40,
 	proximity_out = 120,
+	proximity_adaptive = false,
+	proximity_scale_min = 0.35,
+	proximity_scale_max = 2,
 	total_time = false, -- deprecated by below
 	destination_time = 'playtime-remaining',
 	time_precision = 0,
@@ -160,6 +168,8 @@ local config_defaults = {
 		success = serialize_rgba('a5e075').color,
 		error = serialize_rgba('ff616e').color,
 		match = serialize_rgba('69c5ff').color,
+		accent = serialize_rgba('69c5ff').color,
+		accent_text = serialize_rgba('000000').color,
 		heatmap = serialize_rgba('00adee').color,
 		menu_background = serialize_rgba('10243a').color,
 		menu_foreground = serialize_rgba('829db5').color,
@@ -171,6 +181,7 @@ local config_defaults = {
 		timeline_track = serialize_rgba('607986').color,
 		time_current = serialize_rgba('d8e7ed').color,
 		time_muted = serialize_rgba('a1b4be').color,
+		chapter = serialize_rgba('69c5ff').color,
 	},
 	opacity = {
 		timeline = 0.9,
@@ -251,6 +262,7 @@ config = {
 		return ranges
 	end)(),
 	color = table_copy(config_defaults.color),
+	theme = nil,
 	opacity = table_copy(config_defaults.opacity),
 	cursor_leave_fadeout_elements = {'timeline', 'volume', 'top_bar', 'controls'},
 	timeline_step = 5,
@@ -308,10 +320,28 @@ function update_config()
 		config.opacity.chapters = config_defaults.opacity.chapters
 	end
 
-	-- Color
-	config.color = table_assign({}, config_defaults.color, serialize_key_value_list(options.color, function(value)
+	-- 主题注册表提供统一强调色；color= 仍可作为最后一级精确覆盖。
+	local selected_theme = Theme.get(options.theme)
+	local theme_colors = {}
+	for key, value in pairs(Theme.to_color_overrides(selected_theme)) do
+		theme_colors[key] = serialize_rgba(value).color
+	end
+
+	local custom_colors = serialize_key_value_list(options.color, function(value)
 		return serialize_rgba(value).color
-	end))
+	end)
+	-- 兼容旧版 color=match=...：把 match 视为统一 accent 接口的别名。
+	if custom_colors.match and not custom_colors.accent then custom_colors.accent = custom_colors.match end
+	if custom_colors.accent then
+		for _, key in ipairs({'match', 'heatmap', 'menu_selection', 'menu_active', 'menu_title', 'chapter'}) do
+			if not custom_colors[key] then custom_colors[key] = custom_colors.accent end
+		end
+	end
+	if custom_colors.accent_text and not custom_colors.menu_title_text then
+		custom_colors.menu_title_text = custom_colors.accent_text
+	end
+	config.color = table_assign({}, config_defaults.color, theme_colors, custom_colors)
+	config.theme = selected_theme
 
 	-- Global color shorthands
 	fg, bg = config.color.foreground, config.color.background
@@ -978,25 +1008,44 @@ bind_command('playlist', create_self_updating_menu_opener({
 	end,
 	on_remove = function(event) mp.commandv('playlist-remove', tostring(event.value - 1)) end,
 }))
+local set_chapter_display
 bind_command('chapters', create_self_updating_menu_opener({
 	title = t('Chapters'),
 	type = 'chapters',
 	list_prop = 'chapter-list',
 	active_prop = 'chapter',
 	serializer = function(chapters, current_chapter)
-		local items = {}
+		local items = {
+			{
+				title = '显示进度条章节标记',
+				hint = options.chapter_display and '已开启' or '已关闭',
+				icon = 'bookmark',
+				value = '{chapter-display-toggle}',
+				active = options.chapter_display,
+				keep_open = true,
+				separator = true,
+			},
+		}
 		chapters = normalize_chapters(chapters)
 		for index, chapter in ipairs(chapters) do
-			items[index] = {
+			items[#items + 1] = {
 				title = chapter.title or '',
 				hint = format_time(chapter.time, state.duration),
 				value = index,
 				active = index - 1 == current_chapter,
 			}
 		end
-		return items
+		local selected_index = type(current_chapter) == 'number' and current_chapter >= 0
+			and current_chapter + 2 or 1
+		return items, selected_index
 	end,
-	on_activate = function(event) mp.commandv('set', 'chapter', tostring(event.value - 1)) end,
+	on_activate = function(event)
+		if event.value == '{chapter-display-toggle}' then
+			set_chapter_display('toggle', true)
+		else
+			mp.commandv('set', 'chapter', tostring(event.value - 1))
+		end
+	end,
 }))
 bind_command('editions', create_self_updating_menu_opener({
 	title = t('Editions'),
@@ -1249,7 +1298,7 @@ local function publish_chapter_display_state()
 		options.chapter_display and 'yes' or 'no'
 	)
 end
-mp.register_script_message('chapter-display-toggle', function(value)
+set_chapter_display = function(value, silent)
 	local requested = tostring(value or 'toggle'):lower()
 	if requested == 'yes' or requested == 'on' or requested == 'true' or requested == '1' then
 		options.chapter_display = true
@@ -1263,11 +1312,14 @@ mp.register_script_message('chapter-display-toggle', function(value)
 	persist_uosc_option('chapter_display', options.chapter_display)
 	publish_chapter_display_state()
 	if options.chapter_display then Elements:flash({'timeline'}) end
-	mp.osd_message(
-		options.chapter_display and '视频章节显示：开启' or '视频章节显示：关闭',
-		2
-	)
-end)
+	if not silent then
+		mp.osd_message(
+			options.chapter_display and '视频章节显示：开启' or '视频章节显示：关闭',
+			2
+		)
+	end
+end
+mp.register_script_message('chapter-display-toggle', set_chapter_display)
 publish_chapter_display_state()
 -- 打开方式单选：replace=替换当前实例，new=启动新实例（持久化）
 local function set_open_file_mode(mode)

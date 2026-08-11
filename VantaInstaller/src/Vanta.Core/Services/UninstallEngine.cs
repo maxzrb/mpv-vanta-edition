@@ -1,10 +1,9 @@
-using System.Diagnostics;
 using Vanta.Core.Models;
 
 namespace Vanta.Core.Services;
 
 /// <summary>
-/// 卸载引擎：备份配置（可选）→ 删除安装目录 → 清理注册表关联（可选）。
+/// 卸载引擎：备份配置（可选）→ 清理当前用户文件关联（可选）→ 删除安装目录。
 /// </summary>
 public static class UninstallEngine
 {
@@ -56,7 +55,17 @@ public static class UninstallEngine
                     Path.Combine(dir, "portable_config"), backupRoot, keep: 10);
             }
 
-            // 2. 删除安装目录内容
+            // 2. 清理当前用户注册表关联（必须在删除安装目录之前执行）
+            if (options.CleanupAssociations)
+            {
+                log("正在清理当前用户文件关联…");
+                var associationResult = AssociationService.UnregisterAll();
+                log(associationResult.Success
+                    ? associationResult.Message
+                    : $"警告：{associationResult.Message}");
+            }
+
+            // 3. 删除安装目录内容
             log("正在删除安装目录…");
             var failed = new List<string>();
             long freed = 0;
@@ -112,17 +121,6 @@ public static class UninstallEngine
                 // 根目录可能因失败文件残留
             }
 
-            // 3. 清理注册表关联（可选，提权）
-            if (options.CleanupAssociations)
-            {
-                var uninstallBat = Path.Combine(dir, "installer", "mpv-uninstall.bat");
-                if (File.Exists(uninstallBat))
-                {
-                    log("调用 mpv-uninstall.bat 清理文件关联（需 UAC 确认）…");
-                    await RunBatElevatedAsync(uninstallBat, Path.GetDirectoryName(dir) ?? string.Empty);
-                }
-            }
-
             var success = failed.Count == 0;
             return new UninstallResult(
                 success,
@@ -141,24 +139,4 @@ public static class UninstallEngine
         }
     }
 
-    /// <summary>以管理员身份运行 bat（弹 UAC）</summary>
-    private static async Task RunBatElevatedAsync(string batPath, string workingDir)
-    {
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = "cmd.exe",
-                Arguments = $"/c \"\"{batPath}\"\"",
-                WorkingDirectory = workingDir,
-                UseShellExecute = true,
-                Verb = "runas",
-            });
-            await Task.Delay(500);
-        }
-        catch
-        {
-            // 用户取消 UAC 或提权失败，不阻断卸载
-        }
-    }
 }

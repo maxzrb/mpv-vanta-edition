@@ -22,6 +22,8 @@ local options = {
   disable = false,
   logging = false,
   osd_logging = true,
+  startup_osd_offset_x = 20,
+  startup_osd_offset_y = 42,
   ipv4 = true,
   ipv6 = true,
   audio_devices = '',
@@ -793,6 +795,25 @@ local function log_osd(text)
   mp.osd_message(MSG_PREFIX .. text, 5)
 end
 
+-- 启动成功提示单独放到左上标题区下方；错误信息仍使用普通 OSD 位置。
+local function log_startup_osd(text)
+  if not options.osd_logging then
+    return
+  end
+  local ass_start = mp.get_property_osd("osd-ass-cc/0")
+  local ass_stop = mp.get_property_osd("osd-ass-cc/1")
+  if not ass_start or not ass_stop then
+    log_osd(text)
+    return
+  end
+  local hidpi_scale = mp.get_property_number("display-hidpi-scale", 1) or 1
+  local x = math.floor(options.startup_osd_offset_x * hidpi_scale + 0.5)
+  local y = math.floor(options.startup_osd_offset_y * hidpi_scale + 0.5)
+  local escaped = mp.command_native({"escape-ass", MSG_PREFIX .. text}):gsub("\n", "\\N")
+  local tags = string.format("{\\an7\\pos(%d,%d)}", x, y)
+  mp.osd_message(ass_start .. tags .. escaped .. ass_stop, 5)
+end
+
 local function handle_static_get(path)
   if path == "/" then
     path = 'index.html'
@@ -1049,7 +1070,7 @@ if passwd ~= 1 then
     end
 
     local startup_msg = ("v" .. VERSION .. "\n" .. listen_string)
-    message = function() log_osd(startup_msg) end
+    message = function() log_startup_osd(startup_msg) end
     mp.msg.info(startup_msg)
     if passwd  ~= nil then
       mp.msg.info('Basic authentication is enabled.')

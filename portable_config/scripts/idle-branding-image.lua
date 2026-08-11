@@ -135,15 +135,22 @@ local function branding_enabled()
     return mp.get_property('user-data/uosc/idle-branding', 'yes') ~= 'no'
 end
 
--- 只有全屏文件浏览器需要隐藏启动页；uosc 菜单打开时保留图片
+-- overlay-add 位于 uosc 的 ASS 菜单之上；菜单打开时必须隐藏启动页图片，
+-- 否则图片会盖住菜单内容。菜单关闭后由属性观察器自动恢复。
 local function file_browser_open()
     return mp.get_property_bool('user-data/file_browser/open', false)
+end
+
+local function uosc_menu_open()
+    local menu_type = mp.get_property_native('user-data/uosc/menu/type')
+    return menu_type ~= nil and menu_type ~= false and tostring(menu_type) ~= ''
 end
 
 local function render_overlay()
     if not mp.get_property_bool('idle-active', false)
         or not branding_enabled()
-        or file_browser_open() then
+        or file_browser_open()
+        or uosc_menu_open() then
         remove_overlay()
         publish_mode()
         return

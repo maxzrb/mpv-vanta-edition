@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace Vanta.Installer;
 
@@ -33,6 +34,29 @@ public sealed class StringNotEmptyConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         => !string.IsNullOrWhiteSpace(value as string);
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+/// <summary>六位 RGB 十六进制字符串 → 主题预览色刷。</summary>
+public sealed class HexColorToBrushConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        try
+        {
+            var hex = value as string ?? string.Empty;
+            var color = (Color)ColorConverter.ConvertFromString("#" + hex)!;
+            var brush = new SolidColorBrush(color);
+            brush.Freeze();
+            return brush;
+        }
+        catch
+        {
+            return Brushes.Transparent;
+        }
+    }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         => throw new NotSupportedException();

@@ -308,10 +308,10 @@ function TopBar:render()
 
 		-- Playlist position
 		if state.has_playlist then
-			local text = state.playlist_pos .. '' .. state.playlist_count
-			local formatted_text = '{\\b1}' .. state.playlist_pos .. '{\\b0\\fs' .. self.font_size * 0.9 .. '}/'
-				.. state.playlist_count
-			local opts = {size = self.font_size, wrap = 2, color = fgt, opacity = visibility}
+			local text = state.playlist_pos .. '/' .. state.playlist_count
+			-- 当前位置、斜杠和总数统一使用同一字号与粗体，避免产生字体不一致的观感。
+			local formatted_text = '{\\b1}' .. text .. '{\\b0}'
+			local opts = {size = self.font_size, bold = true, wrap = 2, color = fgt, opacity = visibility}
 			local rect_width = round(text_width(text, opts) + padding * 2)
 			local ax = left_aligned and title_bx - rect_width or title_ax
 			local rect = {

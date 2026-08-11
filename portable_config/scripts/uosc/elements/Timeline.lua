@@ -469,29 +469,35 @@ function Timeline:render()
 		local rax = chapter_range.start < 0.1 and bax or t2x(chapter_range.start)
 		local rbx = chapter_range['end'] > state.duration - 0.1 and bbx
 			or t2x(math.min(chapter_range['end'], state.duration))
-		ass:rect(rax, fay, rbx, fby, {color = chapter_range.color, opacity = chapter_range.opacity})
+		ass:rect(rax, fay, rbx, fby, {
+			color = chapter_range.color,
+			opacity = visibility * chapter_range.opacity,
+		})
 		-- 细条上保留显式的片段边界刻度，让片头/片尾起止点可读
 		local tick_width = math.max(2, round(2 * state.scale))
 		local tick_overhang = math.max(3, round(3 * state.scale))
 		ass:rect(
 			rax - tick_width / 2, fay - tick_overhang,
 			rax + tick_width / 2, fby + tick_overhang,
-			{color = chapter_range.color, opacity = math.max(chapter_range.opacity, 0.92)}
+			{color = chapter_range.color, opacity = visibility * math.max(chapter_range.opacity, 0.92)}
 		)
 		ass:rect(
 			rbx - tick_width / 2, fay - tick_overhang,
 			rbx + tick_width / 2, fby + tick_overhang,
-			{color = chapter_range.color, opacity = math.max(chapter_range.opacity, 0.92)}
+			{color = chapter_range.color, opacity = visibility * math.max(chapter_range.opacity, 0.92)}
 		)
 	end
 
 	-- Chapters
 	local hovered_chapter = nil
-	if (config.opacity.chapters > 0 and (#state.chapters > 0 or state.ab_loop_a or state.ab_loop_b)) then
-		-- 章节标记：每个章节位置画两个暗夜蓝色小三角形（进度条上方一个尖端朝下、下方一个尖端朝上），
-		-- 替代原菱形标记，在细进度条上更醒目
-		-- serialize_rgba 将 RGB 暗夜蓝 #1E3A8A 转为 ASS 的 BGR 顺序，避免直接写 BGR 值
-		local CHAPTER_COLOR = serialize_rgba('1E3A8A').color -- 暗夜蓝
+	-- 直接复用进度条的可见度动画，章节、片段边界与 A-B 标记同步随鼠标渐隐。
+	local chapter_visibility = visibility * config.opacity.chapters
+	if (chapter_visibility > 0 and (#state.chapters > 0 or state.ab_loop_a or state.ab_loop_b)) then
+		-- 章节标记：每个章节位置绘制上下两个低饱和钢蓝色小三角形，
+		-- 上方尖端朝下、下方尖端朝上，保持双箭头辨识度
+		-- 章节颜色统一复用当前主题 accent；实心色块不加深色描边，避免边缘显脏。
+		local CHAPTER_COLOR = config.color.chapter or config.color.accent or config.color.match
+		local chapter_marker_border = math.max(0, options.chapter_marker_border or 0) * state.scale
 		local chapter_border = options.timeline_border and math.max(options.timeline_border, 1) or 1
 		local triangle_half_width = math.max(2, round(self.chapter_size * 0.9))
 		local triangle_height = math.max(2, round(self.chapter_size * 1.5))
@@ -509,8 +515,9 @@ function Timeline:render()
 				local function draw_triangle(x1, y1, x2, y2, x3, y3)
 					ass:new_event()
 					ass:append(string.format(
-						'{\\pos(0,0)\\rDefault\\an7\\blur0\\yshad0.01\\bord%f\\1c&H%s\\3c&H%s\\4c&H%s\\1a&H%X&\\3a&H00&\\4a&H00&}',
-						chapter_border, CHAPTER_COLOR, bg, bg, opacity_to_alpha(config.opacity.chapters)
+						'{\\pos(0,0)\\rDefault\\an7\\blur0\\bord%f\\shad0\\1c&H%s\\3c&H%s\\alpha&H%X&}',
+						chapter_marker_border, CHAPTER_COLOR, CHAPTER_COLOR,
+						opacity_to_alpha(chapter_visibility)
 					))
 					ass:draw_start()
 					ass:move_to(x1, y1)
@@ -576,8 +583,8 @@ function Timeline:render()
 				local x = t2x(time)
 				ass:new_event()
 				ass:append(string.format(
-					'{\\pos(0,0)\\rDefault\\an7\\blur0\\yshad0.01\\bord%f\\1c&H%s\\3c&H%s\\4c&H%s\\1a&H%X&\\3a&H00&\\4a&H00&}',
-					chapter_border, fg, bg, bg, opacity_to_alpha(config.opacity.chapters)
+					'{\\pos(0,0)\\rDefault\\an7\\blur0\\yshad0.01\\bord%f\\1c&H%s\\3c&H%s\\4c&H%s\\alpha&H%X&}',
+					chapter_border, fg, bg, bg, opacity_to_alpha(chapter_visibility)
 				))
 				ass:draw_start()
 				ass:move_to(x, fby - ab_radius)

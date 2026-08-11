@@ -42,6 +42,7 @@
             <local:InverseBooleanConverter x:Key="InverseBool" />
             <local:InverseBooleanToVisibilityConverter x:Key="InverseVis" />
             <local:StringNotEmptyConverter x:Key="StringNotEmpty" />
+            <local:HexColorToBrushConverter x:Key="HexColorBrush" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

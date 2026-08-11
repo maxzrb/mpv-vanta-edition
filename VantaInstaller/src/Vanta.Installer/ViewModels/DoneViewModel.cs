@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Diagnostics;
 using System.IO;
 using Vanta.Core.Models;
+using Vanta.Core.Services;
 
 namespace Vanta.Installer.ViewModels;
 
@@ -48,14 +49,8 @@ public partial class DoneViewModel : ObservableObject
     /// <summary>是否显示备份提示</summary>
     public bool HasBackup => !string.IsNullOrEmpty(BackupPath);
 
-    /// <summary>是否可注册文件关联（目标目录存在 installer\mpv-install.bat）</summary>
+    /// <summary>是否可注册多实例文件关联</summary>
     public bool CanRegister { get; private set; }
-
-    /// <summary>注册脚本路径</summary>
-    private string? RegisterBatPath => Path.Combine(InstallDirectory, "installer", "mpv-install.bat");
-
-    /// <summary>取消注册脚本路径</summary>
-    private string? UnregisterBatPath => Path.Combine(InstallDirectory, "installer", "mpv-uninstall.bat");
 
     public DoneViewModel(AppSession session)
     {
@@ -78,7 +73,7 @@ public partial class DoneViewModel : ObservableObject
         MpvVersion = result.MpvVersionLine ?? string.Empty;
         BackupPath = result.BackupPath;
         InstallDirectory = _session.InstallDirectory ?? string.Empty;
-        CanRegister = File.Exists(RegisterBatPath);
+        CanRegister = AssociationService.CanRegister(InstallDirectory, PlaybackMode.MultiInstance);
 
         OnPropertyChanged(nameof(Summary));
         OnPropertyChanged(nameof(CanLaunch));
@@ -129,46 +124,25 @@ public partial class DoneViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    /// 注册文件关联（调用 01 包内置 installer\mpv-install.bat，需管理员提权）。
-    /// </summary>
+    /// <summary>为当前用户注册多实例文件关联。</summary>
     [RelayCommand]
     private void RegisterAssociations()
     {
-        RunBatElevated(RegisterBatPath, "注册文件关联");
+        ShowAssociationResult(AssociationService.Register(InstallDirectory, PlaybackMode.MultiInstance));
     }
 
-    /// <summary>取消文件关联（调用 mpv-uninstall.bat，需管理员提权）</summary>
+    /// <summary>取消当前用户的多实例文件关联。</summary>
     [RelayCommand]
     private void UnregisterAssociations()
     {
-        RunBatElevated(UnregisterBatPath, "取消文件关联");
+        ShowAssociationResult(AssociationService.Unregister(PlaybackMode.MultiInstance));
     }
 
-    private void RunBatElevated(string? batPath, string actionName)
+    private static void ShowAssociationResult(AssociationService.AssociationResult result)
     {
-        if (string.IsNullOrEmpty(batPath) || !File.Exists(batPath))
-        {
-            System.Windows.MessageBox.Show($"未找到 {batPath}", "Vanta Installer");
-            return;
-        }
-
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = "cmd.exe",
-                Arguments = $"/c \"\"{batPath}\"\"",
-                WorkingDirectory = InstallDirectory,
-                UseShellExecute = true,
-                // 提权：mpv-install.bat 内部要求管理员写 HKLM
-                Verb = "runas",
-            });
-        }
-        catch (Exception ex)
-        {
-            // 用户取消 UAC 或提权失败
-            System.Windows.MessageBox.Show($"{actionName}失败：{ex.Message}", "Vanta Installer");
-        }
+        var icon = result.Success
+            ? System.Windows.MessageBoxImage.Information
+            : System.Windows.MessageBoxImage.Error;
+        System.Windows.MessageBox.Show(result.Message, "Vanta Installer", System.Windows.MessageBoxButton.OK, icon);
     }
 }

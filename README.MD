@@ -67,8 +67,19 @@ Lossless Scaling 为商业软件，尚未购买正版授权的用户请自行决
 | 多实例 | **mpv** | 每次双击经 `mpv.exe` 新开窗口 |
 | 单实例 | **mpv-single** | 经 `umpv.exe` 通过 IPC 复用已运行的 mpv 窗口（保持 mpv 常驻时生效） |
 
-- 设置中心「文件关联」卡片提供「注册/取消多实例关联」「注册/取消单实例关联」四个按钮，可分别注册；写入注册表需管理员权限（弹 UAC）。
-- 安装向导「选择组件」页可同时勾选两种入口，安装完成后自动注册。
+- 设置中心「文件关联」卡片提供「注册/取消多实例关联」「注册/取消单实例关联」四个按钮，可分别注册；关联写入当前用户，无需管理员权限或 UAC。
+- 安装向导「选择组件」页可同时勾选两种入口，安装完成后自动注册；两套应用身份与 ProgID 完全独立，注册或取消其中一个不会影响另一个。
+- 默认声明常见视频与音频格式，但不直接篡改扩展名默认值；最终默认播放器仍由 Windows「默认应用」或「打开方式」决定。
+- 新版使用 `installer\associations\icons\mpv-document.ico` 作为稳定文档图标。注册时若检测到确属当前目录的旧版 `io.mpv.*` 系统级 ProgID，会创建带标记的 HKCU 兼容覆盖，修复旧图标路径和打开命令，但不会修改 Windows 的 `UserChoice`。
+
+仅使用 01 包或个人全量包、没有 VantaInstaller 时，可直接在 `installer\` 根目录双击以下新版当前用户镜像入口；它们会转发到 `installer\associations\current-user\` 中的唯一实现：
+
+| 操作 | 多实例 | 单实例 |
+|------|--------|--------|
+| 注册 | `register-multi.bat` | `register-single.bat` |
+| 取消 | `unregister-multi.bat` | `unregister-single.bat` |
+
+四个 `mpv-install/uninstall*.bat` 已集中到 `installer\associations\legacy-system-wide\`，明确保留为**旧版系统级兜底入口**：它们写入 HKLM、需要管理员权限，主要用于兼容或清理旧注册，不作为新版默认方案。
 
 ## 下载与安装
 
@@ -146,17 +157,24 @@ Lossless Scaling\Lossless.dll
 ### 分别构建
 
 ```powershell
-.\build-release.ps1 -Version '1.2.0'
-.\build-lsfg-public.ps1 -Version '1.2.0'
+.\build-01-base.ps1 -Version '1.2.0'
+.\build-02-extras.ps1 -Version '1.2.0'
+.\build-03-fasterwhisper.ps1 -Version '1.2.0'
+.\build-04-lsfg.ps1 -Version '1.2.0'
+.\build-05-config.ps1 -Version '1.2.0'
 .\build-full-private.ps1 -Version '1.2.0'
 ```
 
-- `build-release.ps1`：构建 01 Base + 02 Extras。
-- `build-fasterwhisper-public.ps1`：构建 03，AI 语音识别运行时。
-- `build-lsfg-public.ps1`：构建 04，含控制脚本以保证联动可用性。
-- `build-config-public.ps1`：构建 05，个人设置最终覆盖层（不含启动 Logo 素材，归 01）。
-- `build-full-private.ps1`：完整合并 01～05，并加入完整 Lossless Scaling 目录备份。
-- 所有脚本可用 `-OutputDir '目录名'` 修改输出目录。
+每个公开子包都有独立脚本，可单独构建，也可按需组合：
+
+- `build-01-base.ps1`：构建 01，播放核心 + 运行时 + 基础配置（含 `.vanta-version` 版本标记与内置字体）。
+- `build-02-extras.ps1`：构建 02，着色器 + VapourSynth + Python + 工具（自动分卷）。
+- `build-03-fasterwhisper.ps1`：构建 03，AI 语音识别运行时。
+- `build-04-lsfg.ps1`：构建 04，补帧 Layer + 控制脚本 + 内置 Lossless.dll。
+- `build-05-config.ps1`：构建 05，个人设置最终覆盖层（不含启动 Logo 素材，归 01）。
+- `build-full-private.ps1`：完整合并 01～05，并加入完整 Lossless Scaling 目录备份（仅本地）。
+- `build-all-packages.ps1`：按 01→05 顺序一次构建五个公开包，`-IncludePrivate` 追加个人全量包。
+- 所有脚本可用 `-OutputDir '目录名'` 修改输出目录，默认 `release`。
 
 ## 配置特性
 
@@ -168,6 +186,11 @@ Lossless Scaling\Lossless.dll
 - 多语言、多格式字幕渲染
 - AI 字幕生成（Faster-Whisper，需自行下载模型）
 - 在线字幕下载（Assrt.net）
+
+### 字体
+- 便携包内置 HarmonyOS Sans SC Regular/Bold，mpv、uosc、纯文本字幕和相关脚本默认使用该字体，无需安装到 Windows。
+- Windows 使用 DirectWrite 处理字体缺字回退；在系统存在时，最终回退到 Microsoft YaHei。统计面板的普通文本使用 HarmonyOS Sans SC，数据列和控制台补全等需要列对齐的字段仍保留 Noto Sans Mono CJK SC。
+- HarmonyOS Sans SC 未被修改；原始版权与授权协议见 `portable_config/licenses/HarmonyOS-Sans-SC-LICENSE.md`。
 
 ### 界面
 - 基于 [uosc](https://github.com/tomasklaen/uosc) 的现代化 OSC
@@ -198,6 +221,8 @@ Lossless Scaling\Lossless.dll
 | `profiles.conf` | 条件配置组（分辨率/HDR自适应） |
 | `scripts/` | Lua 脚本 |
 | `script-opts/` | 脚本配置 |
+| `fonts/` | 内置 HarmonyOS Sans SC 与图标字体 |
+| `licenses/` | 内置第三方字体的原始授权文件 |
 | `shaders/` | GLSL 着色器（Extras 包） |
 | `vs/` | VapourSynth 脚本（Extras 包） |
 

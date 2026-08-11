@@ -8,12 +8,13 @@ local TimeDisplay = require('elements/TimeDisplay')
 -- sizing:
 --   static - shrink, have highest claim on available space, disappear when there's not enough of it
 --   dynamic - shrink to make room for static elements until they reach their ratio_min, then disappear
+--   floating - uses the control size but does not occupy horizontal space in the controls row
 --   gap - shrink if there's no space left
 --   space - expands to fill available space, shrinks as needed
 -- scale - `options.controls_size` scale factor.
 -- ratio - Width/height ratio of a static or dynamic element.
 -- ratio_min Min ratio for 'dynamic' sized element.
----@alias ControlItem {element?: Element; kind: string; sizing: 'space' | 'static' | 'dynamic' | 'gap'; scale: number; ratio?: number; ratio_min?: number; hide: boolean; narrow_priority?: integer; dispositions?: {[string]: boolean}[]}
+---@alias ControlItem {element?: Element; kind: string; sizing: 'space' | 'static' | 'dynamic' | 'floating' | 'gap'; scale: number; ratio?: number; ratio_min?: number; hide: boolean; narrow_priority?: integer; dispositions?: {[string]: boolean}[]}
 
 -- Per-icon glyph width ratios. MaterialIconsRound glyphs fill different
 -- fractions of the em-square: narrow icons like more_vert are ~28% wide,
@@ -45,7 +46,8 @@ end
 function Controls:init_options()
 	-- Serialize control elements
 	local shorthands = {
-		['play-pause'] = 'cycle:pause:pause:no/yes=play_arrow?' .. t('Play/Pause'),
+		-- 暂停时标记为 active，复用全屏按钮的主题色填充与主题文字色。
+		['play-pause'] = 'cycle:pause:pause:no/yes=play_arrow!?' .. t('Play/Pause'),
 		menu = 'command:menu_book:script-binding uosc/menu-blurred?' .. t('Menu'),
 		subtitles = 'command:closed_caption:script-binding uosc/subtitles#sub>1?' .. t('Subtitles'),
 		audio = 'command:graphic_eq:script-binding uosc/audio#audio>1?' .. t('Audio'),
@@ -218,7 +220,9 @@ function Controls:init_options()
 				local element = Speed:new({anchor_id = 'controls', render_order = self.render_order})
 				local scale = tonumber(params[1]) or 1.3
 				table_assign(control, {
-					element = element, sizing = 'dynamic', scale = scale, ratio = 3.5, ratio_min = 2,
+					-- 速度滑块由 Speed 自己居中并处理双行碰撞；这里只提供尺寸，
+					-- 不再为已经浮出底栏的元素保留横向幽灵占位。
+					element = element, sizing = 'floating', scale = scale, ratio = 3.5, ratio_min = 2,
 				})
 			else
 				msg.error('there can only be 1 speed slider')
@@ -355,9 +359,20 @@ end
 
 function Controls:update_dimensions()
 	local window_border = Elements:v('window_border', 'size', 0)
-	local size = round(options.controls_size * state.scale)
-	local spacing = round(options.controls_spacing * state.scale)
-	local margin = round(options.controls_margin * state.scale)
+	-- 控件基准尺寸是逻辑像素。窗口窄于阈值时按逻辑宽度平滑缩小，
+	-- 同时保留 HiDPI 与全屏缩放，避免小窗口仍维持桌面级绝对尺寸。
+	local hidpi_scale = state.hidpi_scale or 1
+	local logical_width = display.width / hidpi_scale
+	local compact_threshold = options.controls_compact_threshold
+	local compact_scale = 1
+	if compact_threshold > 0 then
+		local compact_min_scale = clamp(0.1, options.controls_compact_min_scale, 1)
+		compact_scale = clamp(compact_min_scale, logical_width / compact_threshold, 1)
+	end
+	local controls_scale = state.scale * compact_scale
+	local size = round(options.controls_size * controls_scale)
+	local spacing = round(options.controls_spacing * controls_scale)
+	local margin = round(options.controls_margin * controls_scale)
 
 	-- Disable when not enough space
 	local available_space = display.height - window_border * 2 - Elements:v('top_bar', 'size', 0)
@@ -444,7 +459,7 @@ function Controls:update_dimensions()
 		for priority = 0, 3 do
 			for _, index in ipairs(hide_order) do
 				local control = self.layout[index]
-				if control.sizing ~= 'gap' and control.sizing ~= 'space'
+				if (control.sizing == 'static' or control.sizing == 'dynamic')
 					and (control.narrow_priority or 0) == priority then
 					hide_control(control)
 				end
@@ -479,6 +494,9 @@ function Controls:update_dimensions()
 			height = size * scale
 			width = max_dynamics_width < width_for_dynamics
 				and height * ratio or width_for_dynamics * ((scale * ratio) / dynamic_units)
+		elseif sizing == 'floating' then
+			height = size * scale
+			width = height * ratio
 		end
 		return width, height
 	end
@@ -554,7 +572,11 @@ function Controls:update_dimensions()
 					round(center_y + height / 2)
 				)
 			end
-			current_x = (sizing == 'static' or sizing == 'dynamic') and bx + spacing or bx
+			if sizing == 'static' or sizing == 'dynamic' then
+				current_x = bx + spacing
+			elseif sizing ~= 'floating' then
+				current_x = bx
+			end
 		end
 	end
 

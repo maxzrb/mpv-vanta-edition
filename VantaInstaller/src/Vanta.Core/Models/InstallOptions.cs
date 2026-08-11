@@ -25,8 +25,8 @@ public sealed class InstallOptions
 
     /// <summary>
     /// 安装完成后要注册的文件关联入口（null/空=不注册）。
-    /// 多实例注册 mpv.exe、单实例注册 umpv.exe；两者是独立入口，可同时注册，
-    /// 注册后可在 Windows「打开方式」里自行选择用哪个打开。
+    /// 为当前用户注册 mpv.exe 多实例或 umpv.exe 单实例入口；两套应用身份和 ProgID 完全独立，
+    /// 可同时注册并在 Windows「打开方式」里自行选择。
     /// </summary>
     public IReadOnlyCollection<PlaybackMode>? RegisterAssociations { get; init; }
 }

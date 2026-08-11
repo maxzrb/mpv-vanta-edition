@@ -61,7 +61,7 @@
                                        Command="{Binding OpenDirectoryCommand}" />
                         </Grid>
 
-                        <!-- 文件关联（可选，需管理员） -->
+                        <!-- 当前用户文件关联（可选，无需管理员权限） -->
                         <StackPanel Margin="0,20,0,0">
                             <TextBlock Text="文件关联（可选）" FontSize="14" FontWeight="SemiBold"
                                        Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />

@@ -7,10 +7,10 @@
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master`（领先 `origin/master` 1 个提交，功能提交已本地化） |
 | **最新发布提交** | `909dede`（tag: `v1.4.1`） |
-| **工作区** | v1.4.3 已发布：Release v1.4.3 七资产上传并核对一致；工作树干净，master 与 origin/master 同步 |
-| **MPV 核心版本** | v0.41.0-860-gc8c7d91a8 (2026-07-06, dyphire/mpv-winbuild) |
+| **工作区** | shinchiro 核心、文件关联重构均已完成；uosc 已加入共享 SU7 灵感十色主题、VantaInstaller 选择入口、media info/速度滑块碰撞检测双行布局，以及内置 HarmonyOS Sans SC 字体；功能与记录未提交 |
+| **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.4.3（已发布） |
-| **上次操作** | v1.4.3 发布完成：Release 链接 https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.4.3；七资产远端 hash 与本地一致；全量包仅本地；installer 二次重建覆盖（FD8E4181...） |
+| **上次操作** | 只读审计 uosc DPI/像素适配：主体尺寸已缩放，待修重点集中在 Timeline、TopBar 自适应距离调用方及菜单细节 |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -18,7 +18,7 @@
 - **操作系统**: Windows 11 Pro for Workstations 10.0.26220
 - **架构**: x86_64
 - **Python**: 3.14.6（便携，根目录）
-- **MPV 构建源**: dyphire/mpv-winbuild
+- **MPV 构建源**: shinchiro/mpv-winbuild-cmake
 
 ## 工作目录结构
 
@@ -47,7 +47,12 @@ c:\Program portable\mpv2\
 - [x] 修复 manager 的 PlayKit 分支、quality-menu 白名单、同名脚本覆盖和 Git blob 误报
 - [x] 手工完成小型依赖维护：uosc 5.13 关键修复、blacklist/config 一致性和弹幕 API 兜底
 - [x] 基于现有 uosc 5.13 分阶段移植参考界面（媒体参数胶囊与配色已完成；紧凑底栏已完成；起播格式 Logo 已移植参考版完整方案）
+- [x] 为 uosc 建立 SU7 车漆灵感十色主题注册表，并接入配置文件和 VantaInstaller 设置页
+- [x] 从官方 HarmonyOS Sans 字体包内置 SC Regular/Bold，设为 mpv/uosc/字幕默认字体并保留 Microsoft YaHei 回退（未发布，待发布 Gate 审核）
 - [x] 用官方 `audio-spdif`/WASAPI 实现默认关闭、失败回退的 Dolby/DTS 源码直通菜单
+- [x] 采用 mpv 上游式 Applications/Capabilities 结构重构 VantaInstaller 文件关联：当前用户、音视频、双入口独立、无需 UAC
+- [x] 为不使用 VantaInstaller 的 01/全量包用户补齐四个当前用户手动注册/取消入口，并保留旧 HKLM BAT 兜底
+- [x] 将本机 mpv 核心从已停更的 dyphire 构建切换到 shinchiro 20260811，并验证 D3D11、Vulkan、D3D11VA、FEL 选项和完整配置
 - [x] 安装 Faster-Whisper-XXL 公开版 r245.4，从 Extras 拆分为独立 04 增量包
 - [x] 恢复“着色器 / 视频滤镜”一级分类，在完整技术分类前补充少量互斥推荐入口
 - [x] 为 Anime4K v4 增加 HQ/Fast 两档 A、B、C、A+A、B+B、C+A 共 12 套官方标准预设
@@ -1677,3 +1682,368 @@ c:\Program portable\mpv2\
 - 重打：`01-mpv-base-v1.4.2.7z`（含标记，95.5MB），已重传 v1.4.2 Release（--clobber），远端 hash 核对一致。
 - 新 SHA-256：`535E7A1990F45D4619D50BF850223C8CA799E48EDD3028FDD672A675BAA8426D`
 - 02~05 未重打（内容不变）；02 沿用上次分卷。
+
+### 2026-08-11 13:16 会话：本机核心切换到 shinchiro 20260811
+
+- **Git 起点**：`git pull --ff-only` 返回 Already up to date；`master` 领先 `origin/master` 1 个提交（`5335a39`）；保留用户未提交的 `portable_config/script-opts/window_size_position.conf`，未纳入本次核心操作。
+- **切换内容**：
+  - `mpv.exe` / `mpv.com`：`v0.41.0-860-gc8c7d91a8`（dyphire，FFmpeg N-125480）→ `v0.41.0-922-gf4d13e1c2`（shinchiro 20260811，FFmpeg N-126056）。
+  - 安装 shinchiro 随包的 `d3dcompiler_43.dll`；dyphire 随包的 `vulkan-1.dll` 已移出根目录，避免形成混合核心。
+  - shinchiro 包内的注册、反注册和更新批处理未复制，继续使用本项目自己的安装与关联流程。
+- **回滚点**：旧 `mpv.exe`、`mpv.com`、`vulkan-1.dll` 保存在 `tmp/core-backup-dyphire-c8c7d91a8-20260811/`。
+- **验证**：
+  - `--version` 正确报告新版本；D3D11 gpu-next、Vulkan winvk、P7 FEL `format=enhancement-layer=yes` 测试均正常退出，日志无 error/fatal。
+  - 完整配置使用 2.39:1 黑边演示素材播放 120 帧，D3D11VA-copy 硬解、起播格式徽章覆盖与退出均正常，日志无 error/fatal。
+  - 新旧视频解码器列表一致。音频侧 shinchiro 不含可选 `libfdk_aac` 解码器，但保留 FFmpeg 原生 AAC/AAC Fixed，并新增 `pcm_dvda`；常规 AAC 播放能力未缺失。
+  - 测试日志保存在 `tmp/core-switch-test/`；新 `mpv.exe` SHA-256 为 `786E8A92CB316B6FB34661BD8086B56D56D92D2B222A7E0FA0B23E566CFD4B90`。
+- **发布 Gate**：本次仅切换 gitignore 内的本机核心，未打包、未发布。核心运行时更换命中《发布流程.md》3.2；未来把 shinchiro 核心纳入公开包前，必须停止发布并由项目所有者确认流程修订或豁免。
+- **下一步**：用户日常播放观察稳定性；如遇兼容问题，可从上述备份目录原样回滚。状态记录尚未提交。
+
+### 2026-08-11 13:40 会话：VantaInstaller 当前用户文件关联重构
+
+- **决策**：不直接采用 shinchiro 的 BAT 包装器；由 VantaInstaller 自己管理注册表，但采用 mpv 上游 `Applications + Capabilities + RegisteredApplications` 结构。用户追加确认接管常见音频格式；图片、播放列表和压缩包暂不接管。
+- **核心改动**：
+  - `AssociationService.cs` 从 BAT 路径选择器重构为 HKCU 注册表服务，不再要求管理员权限或 UAC。
+  - 多实例 `mpv.exe` 与单实例 `umpv.exe` 使用独立 RegisteredApplications 名称、Clients/Media Capabilities 和 ProgID（`MPV.Vanta.Multi.File` / `MPV.Vanta.Single.File`），注册或取消一方不再覆盖、删除另一方。
+  - 声明 100 个去重后的音视频扩展名；继续由 Windows“默认应用/打开方式”决定默认播放器，不直接写扩展名所有权。
+  - 创建当前用户开始菜单快捷方式以辅助 Windows 系统媒体控制识别；注册失败会回滚本入口的部分写入，并通知 Shell 刷新关联缓存。
+- **流程接入**：
+  - 安装引擎、设置页和完成页全部改为直接调用 `AssociationService`，删除 BAT + `runas` + 固定等待 500ms 的旧路径。
+  - 卸载引擎在删除安装目录之前调用 `UnregisterAll()`，修复旧逻辑先删掉 `mpv-uninstall.bat`、随后无法清理关联的问题。
+  - README 和卸载页说明同步改为“当前用户、无需 UAC、视频与音频”。旧 BAT 保留为手工兼容入口，但 VantaInstaller 不再依赖。
+- **旧版迁移**：只读检测到本机仍有 `HKLM\SOFTWARE\RegisteredApplications\mpv` 旧版系统级关联。新服务不会越权删除，并会提示只有确认属于旧版 Vanta 时才用旧卸载脚本管理员清理；本轮未执行任何注册或取消操作，注册表未被修改。
+- **验证**：
+  - `dotnet build Vanta.Installer -c Release`：0 警告、0 错误；`Vanta.ScanTool` Release 构建同样通过。
+  - 按正式参数执行 win-x64 单文件自包含发布构建成功，临时产物 `tmp/vanta-association-publish/VantaInstaller.exe` 为 67,459,877 字节。
+  - 反射结构检查：100 个扩展名全部去重、格式合法，包含 `.mp4`、`.mp3`、`.flac`；两入口身份和 ProgID 独立；根目录 `mpv.exe`/`umpv.exe` 均满足注册条件。
+  - 源码扫描无 `InstallBatPath`、`RunBatElevated`、文件关联 `runas` 残留；关联写入只使用 HKCU，HKLM 仅只读检测旧项；`git diff --check` 通过。
+- **发布状态**：仅完成功能实现与验证，未提交、未重建正式安装器、未发布；VantaInstaller 自身功能变化按《发布流程.md》3.2 豁免条款不触发大改动 Gate。
+
+### 2026-08-11 13:55 会话：纯 01/全量包手动关联入口补齐
+
+- **需求**：没有 VantaInstaller 时仍能使用新版当前用户双入口方案；原 `mpv-install/uninstall*.bat` 明确作为已验证的旧版系统级兜底保留。
+- **新增入口**（均位于 `installer/`）：
+  - `vanta-register-multi.bat` / `vanta-unregister-multi.bat`：注册或取消 `mpv.exe` 多实例入口。
+  - `vanta-register-single.bat` / `vanta-unregister-single.bat`：注册或取消 `umpv.exe` 单实例入口。
+  - 四个 BAT 统一调用 `vanta-associations.ps1`；逻辑与 VantaInstaller 一致：HKCU、无需 UAC、独立 Applications/Capabilities/ProgID、100 个音视频扩展、Shell 刷新与共享开始菜单快捷方式。
+- **旧入口定位**：原四个 `mpv-install/uninstall*.bat` 每个只增加 5 行 `[LEGACY SYSTEM-WIDE FALLBACK]` 和新版入口提示；原 HKLM、管理员权限及清理逻辑未修改，继续作为兼容/旧关联清理兜底。
+- **文档与打包**：README 增加纯包手动入口表。`build-release.ps1` 已确认递归复制整个 `installer/` 到 01；个人全量包由 01 合并生成，因此无需改构建脚本即可同时包含五个新文件。
+- **兼容处理**：`vanta-associations.ps1` 使用 UTF-8 BOM + LF；BOM 是 Windows PowerShell 5.1 正确读取中文注释所必需的兼容例外。四个 BAT 保持 ASCII 可执行内容 + LF，避免旧 `cmd.exe` 误解析 UTF-8 中文注释。
+- **验证**：
+  - Windows PowerShell 5.1 直接 dry-run 通过；四个 BAT 经 `VANTA_ASSOC_DRY_RUN=1` 逐一调用全部退出 0，无 ParserError 或“not recognized”。
+  - C# 与 PowerShell 扩展名集合均为 100 个、差异 0；多/单实例 ProgID、RegisteredApplications 名称和 `mpv-single` 标识一致。
+  - VantaInstaller 清理生成缓存后 Release 全量重建通过（0 警告、0 错误）；首次增量失败确认为先前跨 RID publish 遗留的 WPF BAML 缓存，`dotnet clean` 后消失。
+  - 新文件均为 LF、无尾随空白；`git diff --check` 通过。本轮仅 dry-run，未写注册表、未构建正式 01/全量包、未发布。
+
+### 2026-08-11 14:04 会话：installer 文件关联入口分层整理
+
+- **目录结构**：
+  - `installer/associations/current-user/`：推荐入口 `register/unregister-multi/single.bat` 与共享 `vanta-associations.ps1`。
+  - `installer/associations/legacy-system-wide/`：原四个 `mpv-install/uninstall*.bat` 及专用 `mpv-icon.ico`、`mpv-document.ico`。
+  - `installer/associations/README.txt`：纯包用户可直接阅读的入口说明；`installer/` 根目录不再散落任何关联脚本或关联图标。
+- **路径修正**：新版 PowerShell 从三级父目录解析播放器根目录；旧注册 BAT 同样改为三级回溯，图标仍与脚本同目录。旧 BAT 的 HKLM 注册/清理逻辑未改变。
+- **文档**：README 手动入口表更新为新目录和简化后的 BAT 名称；`AssociationService.cs` 的同步维护注释指向新 PowerShell 路径。
+- **验证**：
+  - 移动后四个当前用户 BAT 在 Windows PowerShell 5.1 下 dry-run 全部退出 0，均正确解析根目录 `C:\Program portable\mpv2`、100 个音视频扩展和对应 ProgID。
+  - legacy 目录三级回溯结果与仓库根目录一致；`mpv.exe`、`umpv.exe` 和两枚旧图标均命中。
+  - VantaInstaller Release 构建通过（0 警告、0 错误）；C# / PowerShell 扩展集合仍为 100、差异 0。
+  - 全部文本归一为 LF、无尾随空白；PowerShell 保留 UTF-8 BOM 以兼容 5.1；`git diff --check` 通过。
+  - `build-release.ps1` 仍递归复制整个 `installer/`，所以 01 与由其合并的全量包都会保留新层级；未实际构建或发布。
+- **发布 Gate**：本次改变了公开包内 `installer/` 路径结构，命中《发布流程.md》3.2“包结构变化”。后续正式打包/发布前必须停下，由项目所有者确认流程修订或明确豁免；本轮未修改《发布流程.md》。
+
+### 2026-08-11 14:14 会话：根目录便捷入口与 VantaInstaller 圆角图标
+
+- **根目录镜像**：在 `installer/` 根目录新增 `register-multi.bat`、`unregister-multi.bat`、`register-single.bat`、`unregister-single.bat`。四个文件仅转发到 `associations/current-user/` 的同名实现，方便纯包用户直接双击，同时避免复制和分叉注册逻辑。
+- **文档同步**：根目录 `README.MD` 与 `installer/associations/README.txt` 均将根目录镜像标为推荐便捷入口，并保留 current-user 实现目录和 legacy-system-wide 兜底目录的说明。
+- **图标替换**：废弃首版带尖锐 V 形延伸的生成方案；用户确认后采用规则圆角紫色方块与标准白色播放三角。透明源图保存为 `VantaInstaller/src/Vanta.Installer/assets/vanta-icon.png`，并生成包含 16/20/24/32/40/48/64/128/256 px 的 `vanta-icon.ico`。
+- **图像处理**：使用内置 ImageGen 生成，色键背景经官方 `remove_chroma_key.py` 转为透明；随后清理绿色溢色并将主体占比调整到约 84%。PNG 为 1024×1024 RGBA，四角透明。
+- **验证**：四个根目录 BAT 在 `VANTA_ASSOC_DRY_RUN=1` 下全部退出 0，正确识别多/单实例、HKCU 和 100 个音视频扩展，未写注册表；VantaInstaller Release clean/build 通过（0 警告、0 错误）；构建输出中的 ICO 与源文件 SHA-256 一致。
+- **用户配置保护**：`portable_config/script-opts/window_size_position.conf` 仍为用户指定的 `size=1080x720`，未改动。
+- **发布状态**：未打包、未发布。此前因 `installer/` 包结构变化触发的大改动 Gate 仍然有效。
+
+### 2026-08-11 14:18 会话：文件关联按钮灰置修复
+
+- **原因**：用户用 `bin/Debug/net10.0-windows/VantaInstaller.exe` 启动的是重构前残留的旧 Debug 产物；旧程序仍依赖根目录旧 BAT 判断可用性，脚本分层后四个按钮因此全部灰置。此前只重建了 Release，没有刷新用户实际运行的 Debug 目录。
+- **界面修正**：文件关联说明从“管理员权限（弹 UAC）”改为“当前用户、无需管理员权限、由 Windows 打开方式选择默认播放器”。
+- **启用条件**：原共享 `CanRegister` 拆为 `CanRegisterMulti` 和 `CanRegisterSingle`；多实例检查 `mpv.exe`，单实例检查 `mpv.exe + umpv.exe`。两个取消按钮不再依赖播放器文件，允许在播放器缺失时清理当前用户关联。
+- **反馈修正**：确认原来的通用 `OperationMessage` InfoBar 位于整个长设置页最底部，当前文件关联视口看不到，导致有效点击也像“没反应”。关联卡片内现增加就地 InfoBar，并实时显示“多实例/单实例：已注册或未注册”；`AssociationService.IsRegistered()` 根据当前用户 RegisteredApplications 值读取真实状态。
+- **验证**：关闭旧 Debug 进程后，Debug 与 Release 均执行 clean/build，全部 0 警告、0 错误；随后已从用户原命令对应路径重新启动新版 Debug。使用 Windows UI Automation 真实调用四个按钮：多实例与单实例注册均写入各自 HKCU Capabilities，取消均成功清除；状态文本即时切换。测试结束后两套测试关联均已取消。
+
+### 2026-08-11 14:23 会话：文件关联阶段日志
+
+- **服务回调**：`AssociationService.Register()` 与 `Unregister()` 增加可选 `Action<string>` 阶段回调；安装引擎、完成页等既有调用无需传入，原行为保持兼容。
+- **卡片日志**：设置页关联卡片增加 `AssociationLog` 列表，每次操作先清空上一轮日志，再按真实执行阶段显示编号行；汇总 InfoBar 与实时已注册/未注册状态继续保留。
+- **注册阶段**：检查播放器 → 清理旧入口 → 写入 Applications 与 100 个格式 → 写入 ProgID/Capabilities/命令 → 更新开始菜单入口 → 刷新 Shell → 完成。
+- **取消阶段**：清理 Applications/ProgID/Capabilities → 检查共享快捷方式 → 刷新 Shell → 完成。错误也会作为最后一条阶段日志显示。
+- **验证**：Debug、Release clean/build 均为 0 警告、0 错误。Windows UI Automation 点击新版 Debug 的多实例注册按钮，读取到 7 条可见阶段日志且 HKCU RegisteredApplications 写入正确；取消按钮显示 4 个阶段并清理成功。测试关联已取消，未留下测试注册状态。
+
+### 2026-08-11 会话：启动页菜单遮挡与 HDR 参考白
+
+- **启动页层级**：`idle-branding-image.lua` 使用 `overlay-add`，其图片会压在 uosc ASS 菜单之上。现在观察 `user-data/uosc/menu/type`：任意 uosc 菜单打开时移除启动页图片，菜单关闭后自动恢复；全屏文件浏览器的原隐藏逻辑继续保留。mpv 隔离加载通过，无 Lua 错误。
+- **HDR 参考白**：用户确认 100 nit 参考白导致 DV/HDR→SDR 观感偏亮后，将 `[HDR]` 条件配置的 `hdr-reference-white` 默认值从 `100` 调整为 `203`。`mpv --show-profile=HDR` 已确认实际解析为 203。
+- **实片诊断**：对《天气之子》P7.6 FEL 实际探测到 `el_pair` 与 `sh_dovi_compose_nlq`，输入为 Dolby Vision/BT.2020/PQ，显示目标为 SDR BT.709/Gamma 2.2；FEL 配对与 DV 合成链均已运行。
+- **用户配置保护**：窗口设置仍为 `size=1080x720`；本轮未打包、未发布。
+
+### 2026-08-11 会话：旧文件关联图标迁移
+
+- **根因**：Windows `.mkv` 的 `UserChoice` 仍是旧系统级 `io.mpv.mkv`；其 `DefaultIcon` 指向已经因目录整理而失效的 `installer\mpv-document.ico`，旧单实例打开命令还缺少结尾引号。新版 `MPV.Vanta.Multi.File` 自身并未损坏。
+- **稳定图标**：新增 `installer/associations/icons/mpv-document.ico`，内容与已验证的旧文档图标一致；新版多/单实例 ProgID 也优先使用该稳定资源，缺失时才回退到 `mpv.exe` 图标。
+- **无 UAC 迁移**：C# 与 PowerShell 注册服务会枚举 HKLM `io.mpv.*`，仅对图标或命令确认属于当前安装目录的旧项创建带 `VantaLegacyCompat=1` 标记的 HKCU 覆盖；修复图标和引号，不修改受哈希保护的 Windows `UserChoice`，也不碰其他 mpv 安装。
+- **清理规则**：取消最后一个 Vanta 入口时删除所有带上述标记的兼容覆盖；另一入口仍注册时保留共享兼容项。`UnregisterAll()` 同样清理。
+- **实机迁移**：当前旧系统级集合共修复 37 个 ProgID；`.mkv` 合并结果已指向存在的稳定 ICO，命令恢复为 `"umpv.exe" "%L"`。`SHGetFileInfo` 实际取得正常紫色媒体文档图标。
+- **验证**：PowerShell 5.1 dry-run/实际注册通过；VantaInstaller Debug、Release 均 0 警告、0 错误。进一步先取消再由 C# Debug UI 注册，迁移阶段日志显示“修复 37 个”，注册表与图标均正确；最终保持多实例已注册。
+- **参考白说明**：mpv 官方允许 `hdr-reference-white=auto` 或 10–10000 nit 的任意值；项目 `Ctrl+T` 只是人为选择 100/203 两个常用预设。`mpv.conf` 注释已修正为当前官方范围和 auto 行为，`[HDR]` 默认仍为用户指定的 203。
+
+### 2026-08-11 会话：Ctrl+T 与 mpv.conf 官方文档审计
+
+- **快捷键**：`Ctrl+T` 的 `hdr-reference-white` 循环由 `100 → 203` 扩展为 `auto → 100 → 203`；保留小写 `Ctrl+t` 的 `target-trc` 绑定，两者按 mpv 键名大小写区分。
+- **审计依据**：以本机 shinchiro `v0.41.0-922-gf4d13e1c2 --list-options/--help` 为实际构建基准，并对照 mpv 官方 master 手册；只更新注释和示例，不重置用户已启用参数。
+- **明确修正**：
+  - Dolby Vision：删除“gpu-next 不支持 EL”的旧说明，更新为当前默认 `format:enhancement-layer=yes` 可应用 P7 FEL。
+  - Windows/窗口：修正 media-controls、border-background、idle、window-affinity、autofit、current-window-scale 等默认值、枚举或属性/选项区别。
+  - 解码/文件：补齐当前 hwdec-codecs 默认集合、directory-filter-types 与 audio/sub 自动匹配扩展名。
+  - ICC/HDR：重写 ICC 自动配置、转换意图、对比度覆盖和缓存清理说明；校正 target-prim/trc/peak、tone-mapping/param、gamut mapping、HDR 动态峰值、阈值范围和字幕 HDR 白默认值。
+  - 脚本/截图：`load-osd-console` 更新为 `load-console`；移除不存在的 `ytdl-extract-chapters` 示例；修正截图目录、OSD 字号与字体目录说明。
+  - 拼写：`dcale-antiring` 修正为 `dscale-antiring`。
+- **静态验证**：从 `mpv.conf` 解析 352 行候选配置并与当前 `--list-options` 对照，未知选项 0、废弃选项 0；三个配置文件均为 LF、无尾随空白，`git diff --check` 通过。
+- **运行验证**：用《天气之子》P7.6 FEL 完整配置实片启动，通过 IPC 读取到 `hdr-reference-white=203`、`video-target-params/max-luma=203.0`，并确认唯一参考白绑定为 `cycle-values hdr-reference-white auto 100 203`；运行日志无 error/fatal。
+- **用户配置保护**：`size=1080x720` 保持不变；未打包、未发布。
+
+### 2026-08-11 16:43 会话：uosc 章节标记复用进度条渐隐
+
+- **实现方式**：`Timeline.lua` 不新增独立计时器或补间动画，直接复用进度条本体的 `visibility = self:get_visibility()`。
+- **同步对象**：章节上下双三角、片段范围填充及起止刻度、A-B 循环标记均乘入同一可见度；原有章节悬停放大和点击跳转保持不变。
+- **验证**：静态断言确认章节透明度不再直接使用固定 `config.opacity.chapters`；完整配置播放演示素材退出码为 0，日志无 error/fatal；`git diff --check` 通过。
+- **用户配置保护**：`size=1080x720` 保持不变；未打包、未发布，安装结构大改动 Gate 继续有效。
+
+### 2026-08-11 16:48 会话：章节边框渐隐与速度滑块同步
+
+- **章节突现根因**：上一轮只把章节三角填充通道 `\1a` 接入可见度，但 ASS 的边框/阴影通道仍被 `\3a&H00&`、`\4a&H00&` 强制为完全不透明，因此视觉上仍像突然出现。
+- **章节修正**：章节三角和 A-B 标记改用全通道 `\alpha`，填充、边框与阴影共同使用 `chapter_visibility`；片段范围和边界刻度继续乘入进度条 `visibility`。
+- **速度滑块**：删除自身 `Element.get_visibility()` 与距离渐隐的二次计算，`Speed:get_visibility()` 直接返回 `Timeline:get_visibility()`；拖动状态也不再强制不透明，整块滑块与进度条严格同步。
+- **验证**：静态断言确认章节两个 ASS 绘制入口均使用全通道透明度、速度滑块不再调用独立 hover fade；完整配置运行期间 uosc 无 Lua/error/fatal，测试进程已单独清理；`git diff --check` 通过。
+- **用户配置保护**：现有用户播放进程未终止；修改需重启 mpv 后加载。`size=1080x720` 保持不变，未打包、未发布。
+
+### 2026-08-11 16:49 会话：纠正速度滑块可见度复用对象
+
+- **需求纠正**：速度滑块不应复用时间轴本体的可见度，否则鼠标落在时间轴时滑块不会像媒体信息胶囊一样避让隐藏。
+- **最终实现**：`Speed:get_visibility()` 直接委托 `MediaInfo:get_visibility()`，因此速度滑块与胶囊共同保留“靠近时间轴隐藏、离开后渐显、位于胶囊/滑块所在高度时保持可交互”的行为；media info 不存在时回退自身基础可见度。
+- **章节状态**：章节三角和 A-B 标记的 ASS 全通道渐隐修复保持不变。
+- **验证**：静态断言确认速度滑块只委托 media info、不再自行调用 hover fade 或委托 timeline；`git diff --check` 通过。
+
+### 2026-08-11 16:54 会话：章节标记钢蓝/灰蓝配色试版
+
+- **配色**：章节三角填充从暗夜蓝 `#1E3A8A` 调整为低饱和钢蓝 `#2B5D7A`；ASS 边框从纯白调整为主题 `time_muted` 灰蓝 `#A1B4BE`。
+- **范围**：仅调整章节三角；A-B 标记保持现有颜色，章节渐隐和速度滑块复用 media info 胶囊可见度不变。
+- **验证**：静态颜色断言通过，`git diff --check` 通过；需重启 mpv 后进行视觉确认。
+
+### 2026-08-11 16:55 会话：章节标记改为单三角
+
+- **布局**：删除进度条上方朝下三角，仅保留下方底边在外、尖端朝上的单个章节标记。
+- **交互**：章节悬停放大、提示、点击跳转和可见度渐隐保持不变；当前钢蓝/灰蓝配色保持不变。
+- **验证**：静态断言确认每个章节只绘制一次三角且不存在上方三角坐标；`git diff --check` 通过。
+
+### 2026-08-11 17:01 会话：恢复章节双三角
+
+- **布局回退**：按用户视觉反馈恢复进度条上方朝下、下方朝上的双三角章节标记。
+- **保持内容**：钢蓝/灰蓝配色、ASS 全通道渐隐、悬停放大、提示和点击跳转均未回退。
+- **验证**：静态断言确认每个章节恢复上下两次三角绘制；`git diff --check` 通过。
+
+### 2026-08-11 17:23 会话：uosc 共享十色主题与 VantaInstaller 入口
+
+- **单一色号来源**：新增 `portable_config/script-opts/uosc-themes.json`，Lua 与 C# 均读取同一注册表；`uosc.conf` 仅保存 `theme=<id>`，避免各组件维护近似色号。
+- **最终主题集合**：海湾蓝 `#56E5F1` 为默认，另含卡布里蓝、赤霞红、熔岩橙、靛石绿、流金粉、霞光紫、璀璨洋红、雅灰、珍珠白，共 10 套。
+- **色值边界**：小米官方资料用于确认车色名称与视觉性格；除用户明确指定的海湾蓝外，其余 HEX 是为暗色 uosc 和屏幕对比度设计的“车漆观感映射色”，不宣称为小米官方色号。所有 accent/accentText 对比度均不低于 4.9:1。
+- **uosc 接口**：新增 `lib/theme.lua`，把当前色板统一映射到 `accent`、`accent_text`、`accent_border`，并同步供应 `match`、heatmap、菜单选择/活动/标题和章节标记；旧 `color=match=...` 自动兼容为统一 accent 覆盖。
+- **配置入口**：`uosc.conf` 新增 `theme=gulf-blue` 及完整 ID 注释；原 `color=` 保留中性色覆盖，不再锁死强调色。章节双三角不再硬编码色号，活动按钮文字使用当前主题 `accent_text`。
+- **安装器入口**：设置页新增“界面配色”卡片，包含色块、名称、HEX、说明与“应用主题”按钮；C# 服务验证 ID/HEX、备份原 `uosc.conf` 后只写主题 ID，缺失或非法注册表会就地报错。
+- **验证**：共享注册表实测 10 套且默认项正确；C# apply/read/backup/非法 ID 拒绝均通过；VantaInstaller Debug/Release clean build 均 0 警告、0 错误，隐藏启动通过；uosc 目录脚本正常加载注册表且无 Lua/error/fatal；`git diff --check` 通过。
+- **用户配置保护**：`size=1080x720` 保持不变；未提交、未打包、未发布，安装结构大改动 Gate 继续有效。
+
+### 2026-08-11 17:32 会话：主题色实心元素去深色描边
+
+- **视觉规则**：主题强调色用于实心几何时不再叠加黑色/深色描边或阴影，避免彩色边缘发脏；文字和图标的可读性描边继续保留。
+- **具体调整**：章节上下双三角改为 `bord0/shad0` 的纯 accent 填充；速度滑块刻度删除背景色边框，中心指示三角改为无描边。
+- **接口收敛**：Lua 与新 C# 模型移除独立 `accent_border`；共享 JSON 暂保留 `accentBorder` 兼容旧 Debug 安装器，但其值强制与 `accent` 完全相同，从数据层杜绝深色强调边和色差。
+- **用户现场状态**：检测到用户已通过 VantaInstaller 将当前主题切换为 `sunset-red`（赤霞红），本轮保留该选择及其自动生成的 uosc 备份。
+- **验证**：静态断言确认章节与速度强调色几何无深色描边；Release 完整构建 0 警告、0 错误，共享注册表 10 套校验通过。Debug 重建仅因用户当前打开的 VantaInstaller PID 6068 锁定输出 DLL 而未执行，未强制关闭用户窗口；此前 Debug 构建已通过。
+
+### 2026-08-11 17:37 会话：章节标记可选同色描边
+
+- **配置接口**：新增 `chapter_marker_border`，默认 `0` 为无描边；在 `uosc.conf` 设置为 `1` 可启用 1 个逻辑像素、随 DPI 缩放的同色描边。
+- **实现**：ASS 填充色和边框色都使用同一个 `CHAPTER_COLOR`，描边只加粗轮廓，不会形成黑边或近似色差；A-B 标记继续独立使用原 `timeline_border`。
+- **当前状态**：保留用户 `theme=sunset-red` 与 `chapter_marker_border=0`，因此当前视觉仍是无描边赤霞红；静态断言与 `git diff --check` 通过。
+
+### 2026-08-11 17:56 会话：media info 与速度滑块碰撞检测双行布局
+
+- **碰撞检测**：`MediaInfo.lua` 记录本帧实际绘制的胶囊范围，不使用固定窗口宽度阈值；`Speed.lua` 用实际矩形与速度滑块正常位置做水平、垂直相交判断。
+- **双行布局**：无碰撞时保持速度滑块居中并与 media info 同行；发生碰撞时按 6px（随 DPI 缩放）间距优先移到 media info 上方，顶部空间不足时尝试放到下方，并受视频画面纵向边界约束。
+- **复用关系**：速度滑块继续复用 media info 胶囊的可见度；媒体信息提供画面边界接口，避免在 Speed 中重复实现信箱黑边计算。
+- **验证**：LuaJIT 语法检查通过；`mpv --no-config --idle=once --script=portable_config/scripts/uosc/main.lua` 启动检查通过；完整配置下 16:9、方形柱状黑边、竖向柱状黑边演示素材均以 `vo=null` 播放退出码 0；`git diff --check` 通过。
+- **用户配置保护**：`size=1080x720` 保持不变；未打包、未发布，安装结构大改动 Gate 继续有效。尚未做窗口实机视觉确认，需重启 mpv 后在小窗口观察两行切换。
+
+### 2026-08-11 18:04 会话：排查双击视频无窗口
+
+- **现象定位**：之前的无头运行验证使用了完整配置；配置中的 `input-ipc-server=\\.\pipe\mpvsocket` 与 `idle=yes` 让测试进程继续驻留且没有窗口。当前 `.mkv` 的旧兼容关联 `io.mpv.mkv` 走 `umpv.exe` 单实例入口，因此双击时文件被发送到这些无窗口进程，看起来像没有启动。
+- **处理**：按命令行逐一核对并清理本轮创建的 7 个测试 mpv 进程，没有终止用户进程；清理后确认没有遗留 mpv/umpv 进程。
+- **验证**：直接调用当前 `umpv.exe -foreground tmp/demo/normal-169.mp4` 成功拉起带窗口的 mpv；关联命令仍为存在的 `"C:\Program portable\mpv2\umpv.exe" "%L"`，未发现本次碰撞布局改动造成启动崩溃。
+- **当前建议**：请重新双击原视频测试；若仍无窗口，再把具体扩展名和是否出现 mpv 进程告诉我。未修改注册表和用户配置，`size=1080x720` 保持不变。
+
+### 2026-08-11 18:20 会话：内置 HarmonyOS Sans SC 字体
+
+- **字体资产**：从 Huawei 官方 `huawei-fonts/HarmonyOS-Sans` 仓库提供的 `HarmonyOS Sans.zip` 中提取未修改的 `HarmonyOS_Sans_SC_Regular.ttf` 与 `HarmonyOS_Sans_SC_Bold.ttf`；字体内部家族名确认是 `HarmonyOS Sans SC`。
+- **默认字体**：`mpv.conf` 的 OSD/纯文本字幕、uosc 的 UI/菜单、播放列表/画质菜单、Faster-Whisper 字幕和弹幕默认字体均改为 HarmonyOS Sans SC；统计/控制台等需要列对齐的等宽界面继续使用 Noto Sans Mono CJK SC。
+- **回退策略**：Windows 使用 DirectWrite 自动回退；`F` 字幕字体循环把 Microsoft YaHei 放在最后，系统安装时作为最终手动/系统回退。未将微软雅黑字体文件复制进包，避免无授权复制 Windows 系统字体。
+- **许可证**：原始 HarmonyOS Sans 字体授权文件随配置放在 `portable_config/licenses/HarmonyOS-Sans-SC-LICENSE.md`，字体目录不放文本文件，避免 mpv 把许可证误当字体加载。
+- **验证**：字体 name 表解析通过；mpv 无配置字体加载检查成功，日志确认两套字体均被加载且无 `Error opening memory font`；输入配置解析和 `git diff --check` 通过；没有遗留 mpv 测试进程。
+- **发布边界**：新增约 16.4 MiB 第三方字体属于《发布流程.md》3.2 大改动 Gate 的字体/第三方版权范围；本次未打包、未发布，后续公开 Release 前必须按发布流程由用户决定是否纳入公开包。`size=1080x720` 保持不变。
+
+### 2026-08-11 18:42 会话：新增初音绿/安装器大葱绿主题
+
+- **共享色板**：`portable_config/script-opts/uosc-themes.json` 新增 `miku-green`，强调色为初音未来常用代表色 `#39C5BB`，填充和边框保持同色，深色文字使用 `#071522`。
+- **名称分层**：主题注册名保持“初音绿”；新增可选 `installerName` 字段，VantaInstaller 的下拉框、当前状态和应用结果显示为“大葱绿”，不影响 mpv/uosc 的主题 ID 与 Lua 读取。
+- **安装器**：`UoscThemePalette.DisplayName` 对旧色板回退到 `name`，因此旧版注册表仍兼容；设置页统一绑定 `DisplayName`。
+- **验证**：共享 JSON 校验通过，共 11 套色板；VantaInstaller Debug 构建 0 警告、0 错误；编码、LF 与 `git diff --check` 检查通过。
+- **用户配置保护**：`size=1080x720` 未改动；未打包、未发布，字体/安装结构大改动 Gate 继续有效。
+
+### 2026-08-11 19:00 会话：播放/暂停按钮接入主题色
+
+- **按钮逻辑**：`portable_config/scripts/uosc/elements/Controls.lua` 的 `play-pause` 快捷配置把暂停状态 `yes=play_arrow` 标记为 active，行为与全屏按钮的 `yes=fullscreen_exit!` 对齐。
+- **主题复用**：播放/暂停按钮直接复用 `Button.lua` 已有的 `config.color.match` 背景和 `config.color.accent_text` 图标颜色，因此会跟随海湾蓝、初音绿/大葱绿及其他主题切换，不新增第二套色号。
+- **状态表现**：播放中显示普通按钮；暂停时显示当前主题强调色填充与主题文字色图标；悬停、提示和按钮尺寸逻辑保持不变。
+- **验证**：静态断言确认播放/暂停和全屏均使用 active 状态语法；完整配置 mpv 以 `theme=miku-green` 无头播放演示素材退出码 0，未出现 Lua/error/fatal；`git diff --check` 通过。
+- **用户配置保护**：`size=1080x720` 未改动；未打包、未发布。
+
+### 2026-08-11 19:09 会话：修正统计 OSD 字体未跟随 HarmonyOS Sans SC
+
+- **问题定位**：普通 mpv OSD 与 uosc 已从新启动日志确认使用 `HarmonyOS Sans SC`；用户可见的统计面板仍由 `portable_config/script-opts/stats.conf` 显式指定 `Noto Sans Mono CJK SC`，因此看起来不像默认 OSD 字体。
+- **修正**：统计面板普通文本改为 `HarmonyOS Sans SC`；`font_mono` 继续保留 `Noto Sans Mono CJK SC`，仅用于数值/列对齐字段，避免破坏统计表格布局。
+- **边界说明**：控制台补全和文件浏览器正文仍是有意保留的等宽字体；Material Icons 仍使用图标字体，不应替换成 HarmonyOS Sans SC。
+- **验证**：新配置启动并触发统计面板切换退出码 0；确认 HarmonyOS Sans SC 字体文件被 DirectWrite 加载；`git diff --check` 通过。
+- **用户配置保护**：`size=1080x720` 未改动；未打包、未发布。
+
+### 2026-08-11 19:15 会话：确认“显示设备”统计标题字体
+
+- **具体标题**：用户所指的“显示设备:”来自 `portable_config/scripts/stats.lua` 的默认统计页 `add_video_out()`，不是 uosc media info。
+- **字体链路**：统计页先由 `text_style()` 写入普通字体，标题通过 `bold()` 使用同一字体的粗体；`stats.conf` 和 `stats.lua` 默认值均已固定为 HarmonyOS Sans SC。
+- **实际验证**：GPU OSD 冒烟日志在切换统计页后显示 `fontselect: (HarmonyOS Sans SC, 700, 0) -> HarmonyOS_Sans_SC_Bold`；随后出现的 Noto Sans Mono CJK SC 仅对应数据列字体。无 Lua/error/fatal。
+- **兼容兜底**：即使用户缺少 `stats.conf`，`stats.lua` 内置默认也会使用 HarmonyOS Sans SC；`font_mono` 仍用于数字/列对齐。
+- **用户配置保护**：需完全重启 mpv 才能加载新的脚本配置；`size=1080x720` 未改动，未打包、未发布。
+
+### 2026-08-11 会话：只读审计今日改动 + 发布前修正（未打包、未构建）
+
+- **审计范围**：起播徽章多帧检测、uosc 主题/章节/速度滑块/碰撞布局、文件关联 C# 重写与旧项迁移、字体内置、安装器界面。未发现致命逻辑问题；历史旧入口、旧配置、旧关联均有兼容路径。
+- **mpv.conf 去 BOM**：首行被写入 UTF-8 BOM（首行为注释时 mpv 可正常解析，但不符合仓库 UTF-8 无 BOM 约定，且会让 diff 首行噪声化）；已用字节级处理移除，全文件保持 LF、650 行不变。
+- **FEL 注释修正**：删除不存在的 `format:enhancement-layer=yes` 选项说法（当前构建 `--list-options/--help` 无此选项）；改为“FFmpeg 解码器与 gpu-next 渲染链自动配对并应用 P7 FEL，无需配置项”。
+- **截图设置**：`screenshot-format=jxl` 与 `screenshot-jpeg-quality=100` 为用户本人确认的有意修改，保留。
+- **打包排除 backup**：`build-release.ps1`（01）与 `build-config-public.ps1`（05）新增递归删除 `portable_config/backup` 与 `portable_config/script-opts/backup`（个人 mpv.conf 备份 + 12 个主题应用备份不再进公开包）；PowerShell 5.1 查找匹配实测通过（两目录均命中），脚本 AST 解析通过。
+- **05 排除字体**：`build-config-public.ps1` 排除 `fonts/` 与 `licenses/`，HarmonyOS Sans SC 及授权文件只由 01 Base 携带；`build-full-private.ps1` 按 01→05 解压合并，全量包自动从 01 获得字体，无需额外改动。
+- **uosc.conf 注释补全**：主题可选列表补上 `miku-green（大葱绿）`。
+- **画质菜单等宽字体**：`quality-menu.conf` 的 `style_ass_tags` 由 HarmonyOS Sans SC 改回 `Noto Sans Mono CJK SC`，保持多列对齐。
+- **安装器版本**：`VantaInstaller.csproj` 由 `0.2.0` 提升到 `0.3.0`（本轮关联重写 + 主题功能），行尾统一为 LF。
+- **编码/行尾**：本次涉及全部文件 UTF-8 无 BOM、LF；`git diff --check` 通过；未打包、未构建，字体/安装结构大改动 Gate 继续有效。
+
+### 2026-08-11 会话：发布脚本重构——每子包独立构建（未打包、未发布）
+
+- **背景**：原 `build-release.ps1` 把 01 Base 与 02 Extras 耦合在一个脚本，02 只能整体 `-SkipExtras`，无法单独构建任一子包；03/04/05 虽已独立但命名不统一。
+- **新结构**（根目录，统一 `build-NN-*` 命名，全部 `-Version` 必填 + `-OutputDir` 可选，默认 `release`）：
+  - `build-01-base.ps1`：01 播放核心 + 运行时 + 基础配置（含 `.vanta-version`、内置字体、排除 backup/window_state/script-assets 保留）。
+  - `build-02-extras.ps1`：02 着色器 + VapourSynth + Python + 工具（保持 1900MB 分卷）。
+  - `build-03-fasterwhisper.ps1`：由 `build-fasterwhisper-public.ps1` 重命名（git mv 保留历史），内容不变。
+  - `build-04-lsfg.ps1`：由 `build-lsfg-public.ps1` 重命名（git mv 保留历史），内容不变。
+  - `build-05-config.ps1`：由 `build-config-public.ps1` 重命名（git mv 保留历史），内容不变（含 fonts/licenses 排除、.vanta-version 排除）。
+  - `build-full-private.ps1`：保留原名（合并包而非子包），逻辑不变。
+  - `build-all-packages.ps1`：01→05 顺序调用子脚本 + `-IncludePrivate`；子脚本只清理各自暂存目录，总入口末尾统一删除 `build/`。
+- **删除**：`build-release.ps1`（含其上轮未提交的 backup 排除逻辑，已完整并入 `build-01-base.ps1` 的 `Invoke-CopyConfig`）。
+- **README**：`打包脚本`章节更新为 6 个独立脚本 + 总入口说明。
+- **验证**：7 个脚本 PowerShell 5.1 AST 解析全部通过；全部 UTF-8 无 BOM、LF；`git diff --check` 通过。
+- **实跑验证**：`build-01-base.ps1 -Version 9.9.9 -OutputDir tmp\buildtest-01` 实际构建成功（103.6 MB），包内 `.vanta-version=9.9.9` 无换行、`portable_config\fonts\HarmonyOS_*` 与 `licenses\HarmonyOS-Sans-SC-LICENSE.md` 均在、`backup/` 与 `window_state.conf` 均排除；验证后测试产物与 `build/` 已清理，未触碰 `release/`。
+- **待用户处理**：《发布流程.md》第 78～86 行仍引用旧脚本名（`build-release.ps1` 等），按规则 agent 不修改该文件，需项目所有者同步更新。03/04/05 为重命名未实跑，建议正式发布前完整跑一次 `build-all-packages.ps1 -IncludePrivate`。
+
+### 2026-08-11 会话：发布流程更新 + 全量构建测试（版本号 9.9.9，输出 tmp\buildtest-9.9.9）
+
+- **《发布流程.md》更新（用户指示）**：第 4.1 节子包调用链改为 `build-01-base.ps1`（01）→ `build-02-extras.ps1`（02）→ `build-03-fasterwhisper.ps1`（03）→ `build-04-lsfg.ps1`（04）→ `build-05-config.ps1`（05）→ `build-full-private.ps1`（仅 `-IncludePrivate`）；补充各子包可独立构建及 `-OutputDir` 说明；`.vanta-version` 写入/排除段落同步更新脚本名。
+- **五个公开包实跑**（`-Version 9.9.9 -OutputDir tmp\buildtest-9.9.9`，全部退出 0）：
+  - 01 Base 108,585,306 B（103.6 MB）；02 Extras 分卷 1,992,294,400 + 781,608,366 B（1900 + 745.4 MB）；03 FW 1,476,001,985 B（1408 MB）；04 LSFG 3,197,543 B；05 Config 5,104,891 B（4.9 MB，字体已排除）。
+- **包内容审计（防误排除）**：以 7z `-slt` 列表对三个公开包逐一断言——
+  - 01：今天改动的 24 个 portable_config 文件（含 uosc-themes.json、theme.lua、startup-logo-bounds.lua）全部在包内；`portable_config\fonts\` 8 个文件（含 HarmonyOS Regular/Bold）、`licenses\` 1 个授权、`script-assets\` 679 个启动素材均在；`.vanta-version` 存在；`backup/` 与 `window_state.conf` 无。
+  - 05：今天改动的 24 个文件全部在包内；fonts/licenses/script-assets/backup/`.vanta-version`/window_state 全部排除，无误含。
+  - 04：`lsfg_control.lua`、`start-mpv-lsfg.ps1`、`Lossless.dll`、`lsfg-vk-layer.dll`、`research/UPSTREAM.md` 均在。
+  - 02：着色器、VapourSynth、Python、工具、EXTRAS-README 关键项均在，未误含 fonts。
+  - 01 包内 README.MD 与 .gitignore 已随根目录最新版复制。
+- **解析注意事项**：7z 26.02 对 solid 归档的表格输出在文件行省略 Compressed 列、且 stdout 为 GBK 编码；审计改用 `7z l -slt` + Python 解析 `Path = ` 行（GBK 解码）最可靠。曾出现的“MISS”均为解析脚本问题，非包内容问题。
+- **状态**：五个公开包已生成到 `tmp\buildtest-9.9.9` 供用户实测；未触碰 `release/`，未构建个人全量包，未发布。正式发布前建议按流程完整跑 `build-all-packages.ps1 -IncludePrivate` 并做 7z t / SHA-256 核验。
+- **拆分无损复核（机械对比）**：取回 HEAD 的 `build-release.ps1`，用脚本提取新旧两侧全部“复制源”集合（Copy-IfExists / Invoke-CopyTo / 数组 / foreach / pyd 通配 / 目录整体复制）做差集——01 Base 丢失 0 项、02 Extras 丢失 0 项；helper 函数 `Invoke-CopyTo`、`Copy-IfExists`、`Remove-GeneratedArtifacts` 逐字一致；`Invoke-CopyConfig` 仅多出上轮有意新增的 backup 排除；`Invoke-Pack` 仅移除 `-Split` 开关（01 固定不分卷、02 固定 `-v1900m` 分卷，属设计调整）；EXTRAS-README 文本逐字一致；`.vanta-version` 写入、7z 检查、生成物清理均保留。结论：拆分未丢失任何应打包文件。
+
+### 2026-08-11 会话：VantaInstaller v0.3.0 Release 构建（未发布）
+
+- **命令**：`dotnet publish src\Vanta.Installer\Vanta.Installer.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish\win-x64`（dotnet 10.0.301），0 警告 0 错误，退出码 0。
+- **产物**：`VantaInstaller\publish\win-x64\VantaInstaller-win-x64-v0.3.0.exe`（67,648,516 字节 ≈ 64.5 MB，单文件自包含压缩，免 .NET 运行时）；与 `VantaInstaller.exe` 的 SHA-256 完全一致（`575d3415…c32df7`）；旧 `v0.2.0` 产物保留在同目录未删除。
+- **启动验证**：`Start-Process -WindowStyle Hidden` 启动 4 秒后进程存活（PID 5800），确认 Release 单文件版可运行，测试进程已关闭。
+- **状态**：仅本地构建，未上传 GitHub Release，未触发发布流程；按 4.1 安装器独立构建，不提升 mpv 包版本号。
+
+### 2026-08-11 20:28 会话：uosc 窄窗口自适应与播放列表计数字重
+
+- **根因定位**：当前底栏由原 32px/8px/2px 调整为 36px/18px/10px，并加入更多常驻控件；尺寸只乘 DPI/全屏比例，不随窗口宽度变化。速度滑块已经在时间轴上方独立居中，但 `Controls` 仍为它保留最大约 164px 的横向占位；1172px 截图下两个弹性 `space` 被压为 0，播放键居中补偿不执行，理论偏移 -69.99px，与截图约 -68～-70px 一致。
+- **浮动速度布局**：为 `Controls` 新增 `floating` sizing；速度滑块继续由底栏提供自适应宽高，但不再推进底栏横向流。当前 `uosc.conf` 删除 speed 后已失效的 `gap:0.12` 与 `reserve:0.20` 幽灵占位；`reserve` 解析能力保留，兼容其他自定义布局。
+- **窄窗口缩放**：新增 `controls_compact_threshold=1280` 与 `controls_compact_min_scale=0.6`。按扣除 HiDPI 后的逻辑窗口宽度平滑缩放 controls size/spacing/margin，阈值为 0 时可关闭；HiDPI 与 `scale`/`scale_fullscreen` 仍正常叠加。
+- **布局仿真**：当前全控件、章节与播放列表均存在时，1172px 为 33px 控件、播放键偏移 0；用户默认 1080px 窗口为 30px、偏移 0；960px 为 27px、偏移 0；800px 为 23px、偏移 0。640px 以下受最低点击尺寸约束，允许逐步隐藏外围控件。
+- **左上角计数**：`TopBar` 的 `当前位置/总数` 改为左侧当前位置常规字重、右侧总数粗体，保留斜杠/总数 90% 字号；宽度测量补入此前遗漏的 `/`，避免两位数时胶囊过窄。
+- **验证**：4 个 Lua 文件经 LuaJIT `loadfile` 语法检查通过；完整配置以两段视频组成播放列表实跑，退出码 0、无 Lua/runtime/fatal；`git diff --check` 无空白错误；涉及文件全部 UTF-8 无 BOM、LF。未构建、未打包、未发布。
+- **Git 状态**：`master` 领先 `origin/master` 1 个提交，工作树仍含今日整批未提交改动；本次新增修改集中在 `uosc.conf`、`main.lua`、`Controls.lua`、`Speed.lua`、`TopBar.lua` 及 HandShake 记录。
+
+### 2026-08-11 20:31 会话：uosc 全局渐隐距离按分辨率与窗口自适应
+
+- **问题**：`proximity_in=80`、`proximity_out=160` 原本直接作为 OSD 坐标像素使用；1080p 全屏合适，但 1440p/4K 相对范围偏小，小窗口则相对覆盖区域过大、容易到处触发。
+- **方案**：新增 `proximity_adaptive`、`proximity_scale_min`、`proximity_scale_max`。开启后把 80/160 视为 1920×1080 全屏基准，实际比例取 `min(窗口宽/1920, 窗口高/1080)`，默认限制在 0.35～2.0；同时使用宽高归一化可避免超宽屏或竖屏按单一边长过度放大。
+- **实际距离**：1920×1080=80/160；2560×1440≈106.7/213.3；3840×2160=160/320；1080×720=45/90；用户截图 1172×658≈48.7/97.5；640×360 触及下限后为 28/56。
+- **边界**：仅作用于 `Element:update_proximity()` 的全局渐显/渐隐范围；media info 与速度滑块靠近时间轴时的 2～9px 局部同步渐隐仍独立使用 `state.scale`，未被分辨率比例重复放大。
+- **验证**：LuaJIT 语法检查通过；完整配置双文件播放列表实跑退出码 0、无 Lua/runtime/fatal；目标文件 `git diff --check` 通过。未构建、未打包、未发布。
+
+### 2026-08-11 20:40 会话：播放列表计数统一粗体与左上角标题点击诊断
+
+- **计数样式**：按用户反馈将左上角 `当前位置/总数` 的两侧数字、斜杠统一为同一字号和粗体；文本宽度测量同步使用 bold，避免粗体字符超出胶囊。
+- **标题点击用途**：当前 `top_bar_alt_title_place=toggle` 会给主标题注册 `primary_click`，用途是在 mpv `title` 与 `media-title` 间切换。该文件两者相同或互相包含时，uosc 去重后备用标题为空，点击只翻转不可见状态，因此视觉上无效果。
+- **拖动冲突**：uosc 光标框架规定 `primary_click` 区默认禁止 VO 窗口拖动，所以即使无备用标题，主标题点击区仍会抢占拖动；全局 `MBTN_LEFT` 绑定为暂停并闪烁暂停指示器，用户看到的重复暂停图标来自两套鼠标处理在该区域的交互，并非标题功能。当前章节行另有点击区，正常用途是打开章节菜单。
+- **范围**：本轮只按明确要求改计数样式，未擅自改变标题点击/拖动行为；后续可选择仅在备用标题确实存在时注册切换区，或关闭 toggle 让主标题用于拖动。
+- **验证**：TopBar LuaJIT 语法、目标 diff 空白检查和双文件播放列表实跑均通过，退出码 0、无 Lua 运行时错误。未构建、未打包、未发布。
+
+### 2026-08-11 20:42 会话：关闭 WebUI 启动地址 OSD
+
+- **来源定位**：`simple-mpv-webui/main.lua` 在首次 `file-loaded` 时通过 `mp.osd_message` 显示 `[webui] v3.0.0` 与监听地址，持续 5 秒；已有官方配置项 `osd_logging` 控制，无需修改第三方脚本。
+- **配置调整**：`portable_config/script-opts/webui.conf` 将 `osd_logging=yes` 改为 `no`，并补充说明。WebUI 仍启用、端口仍为 8060、IPv4 监听保持不变；启动地址仍可写入控制台，仅不再覆盖播放器左上角标题。
+- **验证**：完整配置单文件实跑退出码 0；配置 diff 空白检查通过，文件保持 UTF-8 无 BOM、LF。未构建、未打包、未发布。
+
+### 2026-08-11 20:49 会话：恢复并下移 WebUI 启动地址 OSD
+
+- **用户决定**：WebUI 的局域网访问地址提示有实用价值，恢复显示，但不能覆盖 uosc 左上角标题。
+- **独立定位**：`simple-mpv-webui/main.lua` 新增 `log_startup_osd()`，通过 `osd-ass-cc` 与 ASS `an7/pos` 只定位“启动成功”提示；默认逻辑坐标为 x=20、y=72，并乘 `display-hidpi-scale`。普通 WebUI 错误继续使用原生 OSD 位置，避免严重信息被固定在较低位置。
+- **配置接口**：`webui.conf` 恢复 `osd_logging=yes`，新增 `startup_osd_offset_x=20`、`startup_osd_offset_y=72`。用户可只改 y 为 84/96 继续下移，无需修改 Lua。
+- **验证**：WebUI LuaJIT 语法、目标 diff 空白与 UTF-8 无 BOM/LF 检查通过；完整配置单文件实跑退出码 0、无 Lua/runtime/fatal。未构建、未打包、未发布。
+
+### 2026-08-11 20:52 会话：微调 WebUI 启动提示纵坐标
+
+- 用户实机确认 y=72 过低；`webui.conf` 与 WebUI 脚本内置默认同步调整为 `startup_osd_offset_y=42`，x=20 不变，避免配置缺失时位置回跳。
+- WebUI LuaJIT 语法与目标 diff 空白检查通过；需重启 mpv 观察。未构建、未打包、未发布。
+
+### 2026-08-11 20:57 会话：章节菜单加入进度条章节标记开关
+
+- **菜单入口**：uosc `chapters` 自更新菜单首项新增“显示进度条章节标记”，带 bookmark 图标、已开启/已关闭提示、active 勾选/强调状态及下方分隔线；章节列表从第二项继续显示。
+- **状态复用**：菜单项直接调用现有 `chapter_display` 切换函数，继续复用 `Ctrl+Shift+C`、`user-data/uosc/chapter-display`、时间轴 opacity 更新和 `uosc.conf` 持久化，不建立第二份状态。
+- **交互优化**：`create_self_updating_menu_opener` 补齐对 Menu 已有 `keep_open` 字段的支持；开关点击后菜单保持打开并立即重建条目，勾选和提示同步变化。普通章节点击仍跳转并关闭菜单。
+- **选中位置**：初次打开菜单时显式将选择定位到当前章节（考虑首项开关后的 +1 偏移）；无当前章节时定位到开关。
+- **验证**：LuaJIT 语法、UTF-8 无 BOM/LF 和 `git diff --check` 通过；IPC 实测章节菜单打开成功，状态 `yes → no → yes`，首次切换后菜单仍为 `chapters`，最终恢复原配置 `chapter_display=yes`；测试进程已清理。未构建、未打包、未发布。
+
+### 2026-08-11 21:06 会话：uosc DPI/固定像素只读审计
+
+- **审计范围**：只读检查 uosc 的坐标、尺寸、边距、命中区、描边、拖动阈值和自定义组件；未修改播放器代码。主体控件、media info、速度胶囊位置、菜单基本尺寸、顶栏、音量、圆角和文字描边大多已使用 `state.scale`。
+- **高优先级缺口**：
+  - `Timeline.progress_size/min_progress_size` 直接使用 `options.progress_size`，未乘 DPI；200% 时细进度仍为 2px 而非 4px。
+  - `Timeline.chapter_size=max(...,3)` 的最小值未缩放；当前 `timeline_size=12` 时 100% 与 200% 都落到 3px，章节双三角基本不随 DPI 增长。A-B 标记的最小半径 8、尖端 ±3 和边框也未缩放。
+  - Timeline 纵向定位仍按 `controls_size/margin × state.scale` 计算，没有复用新增的小窗 `controls_compact_scale`；1080px 窗口实际 controls 为 30/15，但 Timeline 仍按 36/18 预留。
+  - TopBar 点击区继续减原始 `options.proximity_in`，没有使用自适应后的有效距离；4K/小窗下可见范围与命中范围不一致。
+  - 缩略图边框 `max(2,state.radius/2) × state.scale` 对已经缩放过的 `state.radius` 再乘一次 DPI，属于重复缩放；200% 下约 14px，合理值约 7px。
+- **中优先级缺口**：时间轴 heatmap 高度 40/裁切 10、hover 水平容差 24、拖拽判定 5、Controls/Timeline 空间阈值 10；菜单滚动槽 `-2/+1`、最小滑块 40、标题内缩 2/3、提示字号差 1；Speed 刻度 1/1.5 和中心指针底边 2；BufferingIndicator 基础尺寸 30。以上应分别按 `state.scale`，其中菜单/速度的 1px 发丝线可保留物理像素。
+- **应保留固定物理像素**：Timeline 的 0.5px 像素中心采样、部分 `+1` 防空矩形判断、真正的 1px 发丝边框、`min_width_px` 显式像素模式和鼠标历史时间阈值；这些不是 DPI 漏适配。
+- **建议顺序**：先建立共享的 `controls_scale` 与 effective proximity 接口，再修 Timeline 章节/进度/A-B/缩略图，最后统一菜单与 Speed 的装饰常量；分两步实机验证 100%/150%/200% DPI，避免一次性放大所有细线导致界面变粗。
+- **状态**：本轮仅报告，未构建、未打包、未发布；工作树仍含今日整批未提交修改。

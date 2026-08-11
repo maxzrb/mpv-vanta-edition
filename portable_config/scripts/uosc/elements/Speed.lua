@@ -1,5 +1,13 @@
 local Element = require('elements/Element')
 
+local SPEED_LAYOUT_GAP = 6
+
+local function rects_overlap(rect_a, rect_b)
+	return rect_a and rect_b
+		and rect_a.ax < rect_b.bx and rect_a.bx > rect_b.ax
+		and rect_a.ay < rect_b.by and rect_a.by > rect_b.ay
+end
+
 ---@alias Dragging { start_time: number; start_x: number; distance: number; speed_distance: number; start_speed: number; }
 
 ---@class Speed : Element
@@ -23,13 +31,8 @@ function Speed:init(props)
 end
 
 function Speed:get_visibility()
-	-- 鼠标 Y 轴靠近进度条时渐隐，避免硬切；鼠标在滑块自身交互区内保持可见
-	local base = Element.get_visibility(self)
-	local fade, mouse_in_element = get_timeline_hover_fade(Elements.timeline, self.ay, self.by)
-	if mouse_in_element then return base end
-	if fade <= 0 then return base end
-	if fade >= 1 then return 0 end
-	return base * (1 - fade)
+	-- 速度滑块直接复用媒体信息胶囊的可见度：靠近进度条时同步隐藏，离开后同步渐显。
+	return Elements:maybe('media_info', 'get_visibility') or Element.get_visibility(self)
 end
 
 function Speed:on_coordinates()
@@ -43,7 +46,7 @@ end
 function Speed:on_options() self:on_coordinates() end
 
 -- 独立于底部控制栏：居中显示在时间轴上方几个像素处。
--- Controls 布局中仍保留 speed 占位，因此播放键居中不受影响。
+-- Controls 只提供尺寸、不保留横向占位，避免窄窗口下挤掉播放键的居中空间。
 ---@return boolean 是否定位成功（时间轴可用）
 function Speed:update_position()
 	local timeline = Elements.timeline
@@ -61,7 +64,32 @@ function Speed:update_position()
 	if center_y then
 		ay = round(center_y - height / 2)
 	else
-		ay = timeline.ay - height - round(6 * state.scale)
+		ay = timeline.ay - height - round(SPEED_LAYOUT_GAP * state.scale)
+	end
+
+	-- 小窗口下媒体信息可能从左侧伸到速度滑块，碰撞时将速度滑块上移一行。
+	-- 优先放在媒体信息上方；若画面顶部空间不足，则尝试放到下方。
+	local normal_rect = {ax = ax, ay = ay, bx = ax + width, by = ay + height}
+	local media_rect = Elements:maybe('media_info', 'get_layout_rect')
+	if rects_overlap(media_rect, normal_rect) then
+		local gap = round(SPEED_LAYOUT_GAP * state.scale)
+		local above_ay = media_rect.ay - gap - height
+		local below_ay = media_rect.by + gap
+		local picture_top, picture_bottom = Elements:maybe('media_info', 'get_picture_bounds')
+		local min_ay = picture_top or 0
+		local max_ay = (picture_bottom or display.height) - height
+		if min_ay <= max_ay then
+			if above_ay >= min_ay then
+				ay = above_ay
+			elseif below_ay <= max_ay then
+				ay = below_ay
+			else
+				ay = clamp(min_ay, above_ay, max_ay)
+			end
+		else
+			-- 画面高度不足以容纳两行时，至少保持速度滑块在媒体信息上方。
+			ay = above_ay
+		end
 	end
 	if self.ax ~= ax or self.ay ~= ay or self.height ~= height then
 		self:set_coordinates(ax, ay, ax + width, ay + height)
@@ -142,7 +170,7 @@ function Speed:handle_wheel_down() mp.set_property_native('speed', self:speed_st
 function Speed:render()
 	if not self:update_position() then return end
 	local visibility = self:get_visibility()
-	local opacity = self.dragging and 1 or visibility
+	local opacity = visibility
 
 	if opacity <= 0 then return end
 
@@ -207,8 +235,6 @@ function Speed:render()
 
 			ass:rect(notch_x - notch_thickness, notch_ay, notch_x + notch_thickness, notch_by, {
 				color = notch_color,
-				border = 1,
-				border_color = bg,
 				opacity = math.min(1.2 - (math.abs((notch_x - ax - half_width) / half_width)), 1) * opacity,
 			})
 		end
@@ -216,7 +242,7 @@ function Speed:render()
 
 	-- Center guide
 	ass:new_event()
-	ass:append('{\\rDefault\\an7\\blur0\\bord1\\shad0\\1c&H' .. (config.color.match or fg) .. '\\3c&H' .. bg .. '}')
+	ass:append('{\\rDefault\\an7\\blur0\\bord0\\shad0\\1c&H' .. (config.color.match or fg) .. '}')
 	ass:opacity(opacity)
 	ass:pos(0, 0)
 	ass:draw_start()

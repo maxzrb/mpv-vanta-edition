@@ -49,7 +49,7 @@ function Button:render()
 	local ass = assdraw.ass_new()
 	local is_clickable = self.is_clickable and self.on_click ~= nil
 	local is_hover = self.proximity_raw <= 0
-	local foreground = self.active and config.color.background or self.foreground
+	local foreground = self.active and (config.color.accent_text or config.color.background) or self.foreground
 	local background = self.active and config.color.match or self.background
 	local background_opacity = self.active and 1 or config.opacity.controls
 

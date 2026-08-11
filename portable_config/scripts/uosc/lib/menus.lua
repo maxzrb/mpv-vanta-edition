@@ -201,7 +201,14 @@ function create_self_updating_menu_opener(opts)
 					remove_or_delete(event.index, event.value, event.menu_id, event.modifiers)
 				else
 					opts.on_activate(event --[[@as MenuEventActivate]])
-					if not event.modifiers and not event.action then cleanup_and_close() end
+					if event.keep_open then
+						-- 开关类菜单项在原菜单中立即刷新勾选状态，不打断连续操作。
+						list = mp.get_property_native(opts.list_prop)
+						active = opts.active_prop and mp.get_property_native(opts.active_prop) or nil
+						update()
+					elseif not event.modifiers and not event.action then
+						cleanup_and_close()
+					end
 				end
 			elseif event.type == 'key' then
 				local item = event.selected_item

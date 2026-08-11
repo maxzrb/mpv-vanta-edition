@@ -112,12 +112,63 @@
                     </StackPanel>
                 </ui:Card>
 
+                <!-- uosc 统一主题色板 -->
+                <ui:Card Padding="24" Margin="0,0,0,16"
+                         Visibility="{Binding ShowThemeSettings, Converter={StaticResource BoolToVis}}">
+                    <StackPanel>
+                        <TextBlock Text="界面配色" Style="{StaticResource CardTitleStyle}" />
+                        <TextBlock Style="{StaticResource CardDescStyle}">
+                            色号统一读取 portable_config\script-opts\uosc-themes.json；这里只保存主题 ID，避免章节、进度、音量和菜单高亮出现近似色差。
+                        </TextBlock>
+
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ComboBox Grid.Column="0" ItemsSource="{Binding ThemeOptions}"
+                                      SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
+                                      MinWidth="340" Margin="0,0,12,0"
+                                      AutomationProperties.Name="uosc 界面配色">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Width="18" Height="18" CornerRadius="5"
+                                                    Margin="0,0,10,0" BorderThickness="1"
+                                                    BorderBrush="{DynamicResource Wpf.Ui.Brushes.ControlStrokeColorDefaultBrush}"
+                                                    Background="{Binding Accent, Converter={StaticResource HexColorBrush}}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding DisplayName}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" Text="{Binding AccentDisplay}" Margin="10,0,0,0"
+                                                       VerticalAlignment="Center" FontSize="11"
+                                                       Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <ui:Button Grid.Column="1" Content="应用主题" Appearance="Primary"
+                                       Command="{Binding ApplyUoscThemeCommand}" Padding="18,8" />
+                        </Grid>
+
+                        <TextBlock Text="{Binding SelectedTheme.Description}" Margin="0,10,0,0"
+                                   FontSize="12" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
+                        <ui:InfoBar IsOpen="{Binding ThemeMessage, Converter={StaticResource StringNotEmpty}}"
+                                    Title="{Binding ThemeMessage, Mode=OneWay}"
+                                    Severity="Informational" Margin="0,12,0,0" />
+                    </StackPanel>
+                </ui:Card>
+
                 <!-- 文件关联 -->
                 <ui:Card Padding="24" Margin="0,0,0,16">
                     <StackPanel>
                         <TextBlock Text="文件关联" Style="{StaticResource CardTitleStyle}" />
                         <TextBlock Style="{StaticResource CardDescStyle}">
-                            注册后用 mpv 打开视频/音频文件；写入注册表，需要管理员权限（弹 UAC）。
+                            为当前用户注册 mpv 视频/音频入口，无需管理员权限；默认播放器仍由 Windows「打开方式」选择。
                         </TextBlock>
 
                         <!-- 文件关联入口：多实例（mpv.exe）与单实例（umpv.exe）可分别注册，打开方式里自行选择 -->
@@ -137,17 +188,36 @@
                                     </Grid.ColumnDefinitions>
                                     <ui:Button Grid.Column="0" Content="注册多实例关联" Appearance="Primary"
                                                Command="{Binding RegisterMultiAssociationsCommand}"
-                                               IsEnabled="{Binding CanRegister}" Padding="16,8" Margin="0,0,8,0" />
+                                               IsEnabled="{Binding CanRegisterMulti}" Padding="16,8" Margin="0,0,8,0" />
                                     <ui:Button Grid.Column="1" Content="注册单实例关联" Appearance="Primary"
                                                Command="{Binding RegisterSingleAssociationsCommand}"
-                                               IsEnabled="{Binding CanRegister}" Padding="16,8" Margin="0,0,8,0" />
+                                               IsEnabled="{Binding CanRegisterSingle}" Padding="16,8" Margin="0,0,8,0" />
                                     <ui:Button Grid.Column="2" Content="取消多实例关联" Appearance="Secondary"
                                                Command="{Binding UnregisterMultiAssociationsCommand}"
-                                               IsEnabled="{Binding CanRegister}" Padding="16,8" Margin="0,0,8,0" />
+                                               Padding="16,8" Margin="0,0,8,0" />
                                     <ui:Button Grid.Column="3" Content="取消单实例关联" Appearance="Secondary"
                                                Command="{Binding UnregisterSingleAssociationsCommand}"
-                                               IsEnabled="{Binding CanRegister}" Padding="16,8" />
+                                               Padding="16,8" />
                                 </Grid>
+                                <TextBlock Text="{Binding AssociationStatus, Mode=OneWay}"
+                                           Margin="0,10,0,0" FontSize="12"
+                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
+                                <Border Margin="0,10,0,0" Padding="10,8" CornerRadius="6"
+                                        Visibility="{Binding HasAssociationLog, Converter={StaticResource BoolToVis}}"
+                                        Background="{DynamicResource Wpf.Ui.Brushes.ControlFillColorSecondaryBrush}">
+                                    <ItemsControl ItemsSource="{Binding AssociationLog}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" FontSize="12" Margin="0,2"
+                                                           TextWrapping="Wrap"
+                                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
+                                <ui:InfoBar IsOpen="{Binding AssociationMessage, Converter={StaticResource StringNotEmpty}}"
+                                            Title="{Binding AssociationMessage, Mode=OneWay}"
+                                            Severity="Informational" Margin="0,10,0,0" />
                             </StackPanel>
                         </Border>
                     </StackPanel>

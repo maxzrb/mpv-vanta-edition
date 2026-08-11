@@ -73,9 +73,25 @@ public partial class SettingsViewModel : ObservableObject
         ? ManualBackupPath
         : Path.Combine(InstallDirectory, "backup");
 
-    /// <summary>是否可注册关联（存在 mpv-install.bat）</summary>
-    public bool CanRegister =>
-        IsInstalled && File.Exists(Path.Combine(InstallDirectory, "installer", "mpv-install.bat"));
+    /// <summary>是否可注册多实例关联（检测到有效 mpv.exe）</summary>
+    public bool CanRegisterMulti =>
+        IsInstalled && AssociationService.CanRegister(InstallDirectory, PlaybackMode.MultiInstance);
+
+    /// <summary>是否可注册单实例关联（检测到有效 mpv.exe 与 umpv.exe）</summary>
+    public bool CanRegisterSingle =>
+        IsInstalled && AssociationService.CanRegister(InstallDirectory, PlaybackMode.SingleInstance);
+
+    /// <summary>多实例入口是否已为当前用户注册</summary>
+    public bool IsMultiAssociationRegistered =>
+        AssociationService.IsRegistered(PlaybackMode.MultiInstance);
+
+    /// <summary>单实例入口是否已为当前用户注册</summary>
+    public bool IsSingleAssociationRegistered =>
+        AssociationService.IsRegistered(PlaybackMode.SingleInstance);
+
+    /// <summary>文件关联实时状态</summary>
+    public string AssociationStatus =>
+        $"多实例：{(IsMultiAssociationRegistered ? "已注册" : "未注册")}　　单实例：{(IsSingleAssociationRegistered ? "已注册" : "未注册")}";
 
     // ---- 检查更新 ----
 
@@ -110,6 +126,16 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>操作结果提示</summary>
     [ObservableProperty]
     private string? _operationMessage;
+
+    /// <summary>文件关联卡片内的就地操作结果</summary>
+    [ObservableProperty]
+    private string? _associationMessage;
+
+    /// <summary>本次文件关联操作的阶段日志</summary>
+    public ObservableCollection<string> AssociationLog { get; } = [];
+
+    /// <summary>是否已有文件关联阶段日志</summary>
+    public bool HasAssociationLog => AssociationLog.Count > 0;
 
     // ---- 缓存 ----
 
@@ -172,6 +198,22 @@ public partial class SettingsViewModel : ObservableObject
 
     /// <summary>是否显示 mpv 调节区（需已安装）</summary>
     public bool ShowMpvConfig => IsInstalled;
+
+    // ---- uosc 主题 ----
+
+    /// <summary>从共享 JSON 注册表加载的主题色板。</summary>
+    public ObservableCollection<UoscThemePalette> ThemeOptions { get; } = [];
+
+    /// <summary>主题下拉当前选中项。</summary>
+    [ObservableProperty]
+    private UoscThemePalette? _selectedTheme;
+
+    /// <summary>主题卡片内操作结果。</summary>
+    [ObservableProperty]
+    private string? _themeMessage;
+
+    /// <summary>已安装时显示主题卡片；注册表异常会在卡片内提示。</summary>
+    public bool ShowThemeSettings => IsInstalled;
 
     // ---- 增量包下载（aria2）----
 
@@ -273,6 +315,7 @@ public partial class SettingsViewModel : ObservableObject
 
         RefreshBackups();
         RefreshCacheStats();
+        LoadUoscThemes();
         if (!_mpvLoaded)
         {
             LoadMpvSettings();
@@ -289,8 +332,11 @@ public partial class SettingsViewModel : ObservableObject
         OnPropertyChanged(nameof(HasManualBackupPath));
         OnPropertyChanged(nameof(ShowBackupClear));
         OnPropertyChanged(nameof(BackupDirectory));
-        OnPropertyChanged(nameof(CanRegister));
+        OnPropertyChanged(nameof(CanRegisterMulti));
+        OnPropertyChanged(nameof(CanRegisterSingle));
+        RefreshAssociationState();
         OnPropertyChanged(nameof(ShowMpvConfig));
+        OnPropertyChanged(nameof(ShowThemeSettings));
         OnPropertyChanged(nameof(ManualMpvPath));
         OnPropertyChanged(nameof(HasManualPath));
         OnPropertyChanged(nameof(ShowManualClear));
@@ -349,6 +395,69 @@ public partial class SettingsViewModel : ObservableObject
         }
         _mpvLoaded = true;
         MpvConfigModified = false;
+    }
+
+    /// <summary>加载共享主题注册表和 uosc.conf 当前选择。</summary>
+    private void LoadUoscThemes()
+    {
+        ThemeOptions.Clear();
+        SelectedTheme = null;
+        if (!IsInstalled)
+        {
+            ThemeMessage = null;
+            return;
+        }
+
+        try
+        {
+            var registry = UoscThemeService.LoadRegistry(ConfigDirectory);
+            foreach (var palette in registry.Palettes)
+            {
+                ThemeOptions.Add(palette);
+            }
+
+            var selectedId = UoscThemeService.ReadSelectedTheme(ConfigDirectory, registry.DefaultId);
+            SelectedTheme = ThemeOptions.FirstOrDefault(
+                p => p.Id.Equals(selectedId, StringComparison.OrdinalIgnoreCase))
+                ?? ThemeOptions.FirstOrDefault(
+                    p => p.Id.Equals(registry.DefaultId, StringComparison.OrdinalIgnoreCase));
+            ThemeMessage = SelectedTheme is null
+                ? "主题注册表中没有可用色板。"
+                : $"当前：{SelectedTheme.DisplayName}（{SelectedTheme.AccentDisplay}）";
+        }
+        catch (Exception ex)
+        {
+            ThemeMessage = $"主题加载失败：{ex.Message}";
+        }
+
+        ApplyUoscThemeCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnSelectedThemeChanged(UoscThemePalette? value)
+    {
+        ApplyUoscThemeCommand.NotifyCanExecuteChanged();
+    }
+
+    private bool CanApplySelectedTheme() => IsInstalled && SelectedTheme is not null;
+
+    /// <summary>把选中的主题 ID 写入 uosc.conf；所有色号继续由共享 JSON 提供。</summary>
+    [RelayCommand(CanExecute = nameof(CanApplySelectedTheme))]
+    private void ApplyUoscTheme()
+    {
+        if (SelectedTheme is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var backup = UoscThemeService.ApplyTheme(ConfigDirectory, SelectedTheme.Id);
+            ThemeMessage = $"已应用 {SelectedTheme.DisplayName}（{SelectedTheme.AccentDisplay}），备份：{Path.GetFileName(backup)}；重启 mpv 后生效。";
+        }
+        catch (Exception ex)
+        {
+            ThemeMessage = $"主题应用失败：{ex.Message}";
+        }
     }
 
     /// <summary>更新下载目录默认值（包目录优先）</summary>
@@ -852,81 +961,59 @@ public partial class SettingsViewModel : ObservableObject
 
     // ============ 文件关联 ============
 
-    /// <summary>注册多实例文件关联（指向 mpv.exe，提权调用 mpv-install.bat）</summary>
+    /// <summary>为当前用户注册多实例文件关联（指向 mpv.exe）</summary>
     [RelayCommand]
     private void RegisterMultiAssociations()
     {
-        var bat = AssociationService.InstallBatPath(InstallDirectory, PlaybackMode.MultiInstance);
-        if (bat is null)
-        {
-            OperationMessage = "未找到 mpv-install.bat，请确认已安装完整。";
-            return;
-        }
-        RunBatElevated(bat, "注册多实例文件关联");
+        RunAssociationAction(PlaybackMode.MultiInstance, register: true);
     }
 
-    /// <summary>注册单实例文件关联（指向 umpv.exe，提权调用 single-instance 脚本）</summary>
+    /// <summary>为当前用户注册单实例文件关联（指向 umpv.exe）</summary>
     [RelayCommand]
     private void RegisterSingleAssociations()
     {
-        var bat = AssociationService.InstallBatPath(InstallDirectory, PlaybackMode.SingleInstance);
-        if (bat is null)
-        {
-            OperationMessage = "未找到 mpv-install (single-instance).bat，请确认已安装完整。";
-            return;
-        }
-        RunBatElevated(bat, "注册单实例文件关联");
+        RunAssociationAction(PlaybackMode.SingleInstance, register: true);
     }
 
-    /// <summary>取消多实例文件关联（提权调用 mpv-uninstall.bat）</summary>
+    /// <summary>取消当前用户的多实例文件关联</summary>
     [RelayCommand]
     private void UnregisterMultiAssociations()
     {
-        var bat = AssociationService.UninstallBatPath(InstallDirectory, PlaybackMode.MultiInstance);
-        if (bat is null)
-        {
-            OperationMessage = "未找到 mpv-uninstall.bat，请确认已安装完整。";
-            return;
-        }
-        RunBatElevated(bat, "取消多实例文件关联");
+        RunAssociationAction(PlaybackMode.MultiInstance, register: false);
     }
 
-    /// <summary>取消单实例文件关联（提权调用 single-instance 卸载脚本）</summary>
+    /// <summary>取消当前用户的单实例文件关联</summary>
     [RelayCommand]
     private void UnregisterSingleAssociations()
     {
-        var bat = AssociationService.UninstallBatPath(InstallDirectory, PlaybackMode.SingleInstance);
-        if (bat is null)
-        {
-            OperationMessage = "未找到 mpv-uninstall (single-instance).bat，请确认已安装完整。";
-            return;
-        }
-        RunBatElevated(bat, "取消单实例文件关联");
+        RunAssociationAction(PlaybackMode.SingleInstance, register: false);
     }
 
-    private void RunBatElevated(string? batPath, string actionName)
+    private void RunAssociationAction(PlaybackMode mode, bool register)
     {
-        if (string.IsNullOrEmpty(batPath) || !File.Exists(batPath))
+        AssociationMessage = null;
+        AssociationLog.Clear();
+        OnPropertyChanged(nameof(HasAssociationLog));
+
+        void AddAssociationStage(string message)
         {
-            OperationMessage = $"未找到 {batPath}";
-            return;
+            AssociationLog.Add($"{AssociationLog.Count + 1}. {message}");
+            OnPropertyChanged(nameof(HasAssociationLog));
         }
 
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = "cmd.exe",
-                Arguments = $"/c \"\"{batPath}\"\"",
-                WorkingDirectory = InstallDirectory,
-                UseShellExecute = true,
-                Verb = "runas",
-            });
-        }
-        catch (Exception ex)
-        {
-            OperationMessage = $"{actionName}失败：{ex.Message}";
-        }
+        var result = register
+            ? AssociationService.Register(InstallDirectory, mode, AddAssociationStage)
+            : AssociationService.Unregister(mode, AddAssociationStage);
+        AssociationMessage = result.Message;
+        OperationMessage = result.Message;
+        RefreshAssociationState();
+    }
+
+    private void RefreshAssociationState()
+    {
+        OnPropertyChanged(nameof(IsMultiAssociationRegistered));
+        OnPropertyChanged(nameof(IsSingleAssociationRegistered));
+        OnPropertyChanged(nameof(AssociationStatus));
     }
 
     // ============ 配置备份 / 恢复 ============

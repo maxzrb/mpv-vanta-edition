@@ -83,7 +83,7 @@
                                        Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
                             <CheckBox Content="备份 portable_config 配置（推荐）"
                                       IsChecked="{Binding BackupConfig}" Margin="0,14,0,0" />
-                            <CheckBox Content="同时清理注册表文件关联（需要管理员权限，弹 UAC）"
+                            <CheckBox Content="同时清理当前用户的文件关联（无需管理员权限）"
                                       IsChecked="{Binding CleanupAssociations}" Margin="0,10,0,0" />
                         </StackPanel>
                     </ui:Card>

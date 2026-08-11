@@ -27,7 +27,7 @@ local MediaFormatInfo = load_media_format_info()
 local MediaInfo = class(Element)
 
 -- 与参考版一致的胶囊几何参数（逻辑像素，随 uosc/DPI 缩放）
-local MEDIA_INFO_FONT_SIZE = 16
+local MEDIA_INFO_FONT_SIZE = 14
 local MEDIA_INFO_CAPSULE_HEIGHT = 27
 local MEDIA_INFO_TIMELINE_OFFSET = 30
 local MEDIA_INFO_PICTURE_INSET = 10
@@ -329,7 +329,7 @@ local function render_segments(ass, x, y, segments, visibility, max_width)
 
 		cursor_x = cursor_x + capsule_width
 	end
-	return click_hits
+	return click_hits, math.max(0, cursor_x - x)
 end
 
 function MediaInfo:new() return Class.new(self) --[[@as MediaInfo]] end
@@ -338,6 +338,8 @@ function MediaInfo:init()
 	Element.init(self, 'media_info', {render_order = 5.5, anchor_id = 'controls'})
 	-- 码率显示模式：'live' 实时码率 / 'avg' 平均码率，点击胶囊文本循环切换
 	self.bitrate_mode = 'live'
+	-- 记录本帧实际绘制的胶囊范围，供速度滑块做碰撞检测
+	self.layout_x, self.layout_y, self.layout_width = 0, 0, 0
 	-- 实时码率平滑滤波器状态：value=内部跟踪值，display=实际显示值，mean=短期平均
 	self.bitrate_filter = { value = 0, time = 0, display = 0, mean = 0 }
 	local function refresh() request_render() end
@@ -363,7 +365,7 @@ function MediaInfo:on_display() request_render() end
 function MediaInfo:on_options() request_render() end
 
 -- 鼠标 Y 轴靠近进度条时与速度滑块同步渐隐（避免遮挡悬停信息），
--- 鼠标位于胶囊自身区域内保持可见，不影响点击切换码率等交互
+-- 鼠标位于胶囊或双行后的速度滑块区域内保持可见，不影响交互
 function MediaInfo:get_visibility()
 	local base = Element.get_visibility(self)
 	local timeline = Elements.timeline
@@ -376,6 +378,11 @@ function MediaInfo:get_visibility()
 		top = center_y - height / 2 - pad
 		bottom = center_y + height / 2 + pad
 	end
+	local speed = Elements.speed
+	local mouse_in_speed = speed and speed.enabled
+		and cursor.x >= speed.ax and cursor.x <= speed.bx
+		and cursor.y >= speed.ay and cursor.y <= speed.by
+	if mouse_in_speed then return base end
 	local fade, mouse_in_element = get_timeline_hover_fade(timeline, top, bottom)
 	if mouse_in_element then return base end
 	if fade <= 0 then return base end
@@ -386,6 +393,23 @@ end
 -- 供速度滑块等元素对齐胶囊高度
 function MediaInfo:get_height()
 	return round(MEDIA_INFO_CAPSULE_HEIGHT * state.scale)
+end
+
+-- 返回本帧媒体信息胶囊的实际布局范围；未绘制时返回 nil
+function MediaInfo:get_layout_rect()
+	if not self.layout_width or self.layout_width <= 0 then return nil end
+	local height = self:get_height()
+	return {
+		ax = self.layout_x,
+		ay = self.layout_y - height / 2,
+		bx = self.layout_x + self.layout_width,
+		by = self.layout_y + height / 2,
+	}
+end
+
+-- 暴露信箱黑边对应的画面纵向范围，供速度滑块的双行布局复用
+function MediaInfo:get_picture_bounds()
+	return get_video_display_vertical_bounds()
 end
 
 -- 供速度滑块等元素对齐胶囊字号
@@ -415,18 +439,30 @@ function MediaInfo:get_center_y()
 end
 
 function MediaInfo:render()
-	if not state.is_video or state.is_idle then return end
+	if not state.is_video or state.is_idle then
+		self.layout_width = 0
+		return
+	end
 	local visibility = self:get_visibility()
-	if visibility <= 0 then return end
+	if visibility <= 0 then
+		self.layout_width = 0
+		return
+	end
 	local segments = build_segments(self.bitrate_mode, self.bitrate_filter)
-	if #segments == 0 then return end
+	if #segments == 0 then
+		self.layout_width = 0
+		return
+	end
 
 	local scale = state.scale
 	local ass = assdraw.ass_new()
 
 	-- 与参考版一致：胶囊悬在时间轴上方约 45px，而不是贴进底部面板
 	local timeline = Elements.timeline
-	if not (timeline and timeline.enabled and timeline.size > 0) then return ass end
+	if not (timeline and timeline.enabled and timeline.size > 0) then
+		self.layout_width = 0
+		return ass
+	end
 	local bar_height = math.max(3, round(4 * scale))
 	local hit_bay = timeline.by - timeline.size - timeline.top_border
 	local bay = hit_bay + (timeline.size - bar_height) / 2
@@ -443,7 +479,10 @@ function MediaInfo:render()
 		if min_y <= max_y then mi_y = clamp(min_y, mi_y, max_y) end
 	end
 
-	local click_hits = render_segments(ass, mi_x, mi_y, segments, visibility, timeline.bx - mi_x)
+	local click_hits, layout_width = render_segments(
+		ass, mi_x, mi_y, segments, visibility, timeline.bx - mi_x
+	)
+	self.layout_x, self.layout_y, self.layout_width = mi_x, mi_y, layout_width
 
 	-- 码率胶囊点击：实时码率 / 平均码率 循环切换
 	local bitrate_hit = click_hits and click_hits.bitrate
