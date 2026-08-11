@@ -2047,3 +2047,14 @@ c:\Program portable\mpv2\
 - **应保留固定物理像素**：Timeline 的 0.5px 像素中心采样、部分 `+1` 防空矩形判断、真正的 1px 发丝边框、`min_width_px` 显式像素模式和鼠标历史时间阈值；这些不是 DPI 漏适配。
 - **建议顺序**：先建立共享的 `controls_scale` 与 effective proximity 接口，再修 Timeline 章节/进度/A-B/缩略图，最后统一菜单与 Speed 的装饰常量；分两步实机验证 100%/150%/200% DPI，避免一次性放大所有细线导致界面变粗。
 - **状态**：本轮仅报告，未构建、未打包、未发布；工作树仍含今日整批未提交修改。
+
+### 2026-08-11 21:28 会话：提交基线并完成 uosc DPI 适配
+
+- **基线提交**：将此前安装关联、VantaInstaller、发布脚本、主题、字体及 uosc 交互等已验证改动提交为 `0721fb6 feat: 完善安装关联、发布构建与 uosc 交互`；明确排除 `portable_config/backup/` 与 `portable_config/script-opts/backup/`。
+- **共享缩放接口**：`lib/utils.lua` 新增底栏专用 `get_controls_scale()`，统一叠加 `display-hidpi-scale`、uosc scale/fullscreen scale 与窄窗口 compact scale；构造阶段无真实 OSD 尺寸时回退 `state.scale`。新增 `get_effective_proximity_distances()`，由 Element 与 TopBar 共同复用，避免渲染渐隐和点击命中采用不同距离。
+- **时间轴 DPI 修复**：Timeline 的控件尺寸、边距和侧边距复用底栏缩放；细进度、闪现最小进度、章节双三角、A-B 柄宽、热力图高度/裁切、缩略图拖动阈值均按 DPI 缩放。修复缩略图边框对已缩放 `state.radius` 再乘一次 DPI 的问题（当前 border_radius=7 时 200% 从错误约 14px 回到 7px）。
+- **次级组件**：菜单提示字号差、拖动阈值、滚动槽/滑块最小高度、标题与搜索框内缩改为逻辑像素；速度滑块无 media info 时的高度兜底复用底栏缩放；BufferingIndicator 的 30px 基准按 DPI 缩放。保留 Timeline 半像素中心、Speed 刻度、搜索光标偏移及 ASS 1px 发丝线等物理像素语义。
+- **配置注释**：`uosc.conf` 明确 UI 配置值为逻辑像素并自动乘 `display-hidpi-scale`；章节标记说明由过时的“暗夜蓝”改为主题色。用户指定的 `window_size_position.conf size=1080x720` 保持不变。
+- **DeepSeek 复核**：使用 DeepSeek v4 Flash 子代理只读复核固定像素、重复缩放、共享接口加载顺序和风险；确认接口加载顺序安全、旧 proximity 局部函数无残留，并据此完成全部 P0 项及一致性 follow-up。
+- **验证**：独立 uosc 在 scale=1/1.5/2 下分别实跑，均退出 0、无 Lua/stack/script-opts 错误；数值矩阵覆盖 1920×1080@100%、2880×1620@150%、3840×2160@200% 与 1920×1080@200% 小窗，断言全部通过；UTF-8 无 BOM、LF 与 `git diff --check` 通过。未构建、未打包、未发布。
+- **测试注意**：一次完整配置测试的通用进程清理误关闭了当时存在的 mpv 主实例及 thumbfast；随后测试全部改为 `--no-config`、`--player-operation-mode=cplayer` 并按测试 PID 回收，避免再次影响用户进程。

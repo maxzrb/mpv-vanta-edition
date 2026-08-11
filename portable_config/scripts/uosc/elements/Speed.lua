@@ -54,7 +54,7 @@ function Speed:update_position()
 
 	-- 与左侧媒体信息胶囊同高，保持底部视觉统一
 	local height = Elements:maybe('media_info', 'get_height')
-		or round(options.controls_size * state.scale)
+		or round(options.controls_size * get_controls_scale())
 	local width = self.width
 	if height <= 0 or width <= 0 then return false end
 	local ax = round((display.width - width) / 2)

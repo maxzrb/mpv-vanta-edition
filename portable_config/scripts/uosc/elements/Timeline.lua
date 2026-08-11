@@ -17,6 +17,7 @@ function Timeline:init()
 	self.obstructed = false
 	self.size = 0
 	self.progress_size = 0
+	self.progress_scale = state.scale
 	self.min_progress_size = 0 -- used for `flash-progress`
 	self.font_size = 0
 	self.top_border = 0
@@ -105,12 +106,13 @@ function Timeline:update_dimensions()
 	self.progress_line_width = round(options.progress_line_width * state.scale)
 	self.font_size = math.floor(math.min((self.size + 60 * state.scale) * 0.2, self.size * 0.96) * options.font_scale)
 	local window_border_size = Elements:v('window_border', 'size', 0)
-	local controls_size = round(options.controls_size * state.scale)
-	local controls_margin = round(options.controls_margin * state.scale)
+	local controls_scale = get_controls_scale()
+	local controls_size = round(options.controls_size * controls_scale)
+	local controls_margin = round(options.controls_margin * controls_scale)
 	-- 进度条向两端按钮的视觉中心收拢，而不是拉满整个窗口宽度
-	local side_margin = round(math.max(24, options.controls_margin * 2) * state.scale)
+	local side_margin = round(math.max(24, options.controls_margin * 2) * controls_scale)
 	local fullscreen_timeline_gap = state.fullormaxed
-		and round(options.controls_size * state.scale * 0.18)
+		and round(controls_size * 0.18)
 		or 0
 	self.ax = window_border_size + side_margin
 	self.ay = display.height - window_border_size - controls_size - controls_margin * 2
@@ -119,12 +121,12 @@ function Timeline:update_dimensions()
 	self.by = self.ay + self.size
 	self.width = self.bx - self.ax
 	self.panel_top = self.ay - round(8 * state.scale)
-	self.chapter_size = math.max((self.by - self.ay) / 10, 3)
+	self.chapter_size = math.max((self.by - self.ay) / 10, 3 * state.scale)
 	self.chapter_size_hover = self.chapter_size * 2
 
 	-- Disable if not enough space
 	local available_space = display.height - window_border_size * 2 - Elements:v('top_bar', 'size', 0)
-	self.obstructed = available_space < self.size + 10
+	self.obstructed = available_space < self.size + round(10 * state.scale)
 	self:decide_enabled()
 end
 
@@ -132,12 +134,14 @@ function Timeline:decide_progress_size()
 	local show = options.progress == 'always'
 		or (options.progress == 'fullscreen' and state.fullormaxed)
 		or (options.progress == 'windowed' and not state.fullormaxed)
-	self.progress_size = show and options.progress_size or 0
+	self.progress_size = show and round(options.progress_size * state.scale) or 0
+	self.progress_scale = state.scale
 end
 
 function Timeline:toggle_progress()
 	local current = self.progress_size
-	self:tween_property('progress_size', current, current > 0 and 0 or options.progress_size)
+	self:tween_property('progress_size', current,
+		current > 0 and 0 or round(options.progress_size * state.scale))
 	request_render()
 end
 
@@ -145,13 +149,13 @@ function Timeline:flash_progress()
 	if self.enabled and options.flash_duration > 0 then
 		if not self._flash_progress_timer then
 			self._flash_progress_timer = mp.add_timeout(options.flash_duration / 1000, function()
-				self:tween_property('min_progress_size', options.progress_size, 0)
+				self:tween_property('min_progress_size', round(options.progress_size * state.scale), 0)
 			end)
 			self._flash_progress_timer:kill()
 		end
 
 		self:tween_stop()
-		self.min_progress_size = options.progress_size
+		self.min_progress_size = round(options.progress_size * state.scale)
 		request_render()
 		self._flash_progress_timer.timeout = options.flash_duration / 1000
 		self._flash_progress_timer:kill()
@@ -208,7 +212,19 @@ function Timeline:on_prop_fullormaxed()
 	self:decide_progress_size()
 	self:update_dimensions()
 end
-function Timeline:on_display() self:update_dimensions() end
+function Timeline:on_display()
+	-- 普通窗口缩放只更新几何，不应把用户手动 toggle 的细进度条恢复为配置默认值。
+	-- 仅在跨显示器等导致 DPI 比例变化时，按比例换算当前动画/切换状态。
+	local previous_scale = math.max(0.01, self.progress_scale or state.scale)
+	if previous_scale ~= state.scale then
+		self:tween_stop()
+		local scale_ratio = state.scale / previous_scale
+		self.progress_size = round(self.progress_size * scale_ratio)
+		self.min_progress_size = round(self.min_progress_size * scale_ratio)
+		self.progress_scale = state.scale
+	end
+	self:update_dimensions()
+end
 function Timeline:on_options()
 	self:decide_progress_size()
 	self:update_dimensions()
@@ -428,11 +444,12 @@ function Timeline:render()
 	local function draw_heatmap()
 		if options.timeline_heatmap ~= 'no' and self.heatmap and config.opacity.heatmap > 0 and visibility > 0 then
 			local is_above = options.timeline_heatmap == 'above'
-			local height = math.min(40, size / self.size * 40)
+			local heatmap_height = round(40 * state.scale)
+			local height = math.min(heatmap_height, size / self.size * heatmap_height)
 			local ax, ay = bax, is_above and (bay - height) or (bay + self.top_border)
 			local bx, by = bbx, is_above and bay or bby
 			local opts = {color = config.color.heatmap, opacity = config.opacity.heatmap * visibility}
-			local clip_ay = is_above and (ay - 10) or ay
+			local clip_ay = is_above and (ay - round(10 * state.scale)) or ay
 			opts.clip = string.format('\\clip(%d,%d,%d,%d)', ax, clip_ay, bx, by)
 			ass:smooth_curve(ax, ay, bx, by, self.heatmap, opts)
 		end
@@ -498,9 +515,9 @@ function Timeline:render()
 		-- 章节颜色统一复用当前主题 accent；实心色块不加深色描边，避免边缘显脏。
 		local CHAPTER_COLOR = config.color.chapter or config.color.accent or config.color.match
 		local chapter_marker_border = math.max(0, options.chapter_marker_border or 0) * state.scale
-		local chapter_border = options.timeline_border and math.max(options.timeline_border, 1) or 1
-		local triangle_half_width = math.max(2, round(self.chapter_size * 0.9))
-		local triangle_height = math.max(2, round(self.chapter_size * 1.5))
+		local chapter_border = math.max(1, options.timeline_border or 0) * state.scale
+		local triangle_half_width = math.max(round(2 * state.scale), round(self.chapter_size * 0.9))
+		local triangle_height = math.max(round(2 * state.scale), round(self.chapter_size * 1.5))
 		local triangle_radius = math.max(triangle_half_width, triangle_height)
 		local triangle_radius_hovered = triangle_radius * 2
 
@@ -575,7 +592,8 @@ function Timeline:render()
 
 			-- A-B loop indicators
 			local has_a, has_b = state.ab_loop_a and state.ab_loop_a >= 0, state.ab_loop_b and state.ab_loop_b > 0
-			local ab_radius = round(math.min(math.max(8, foreground_size * 0.25), foreground_size))
+			local ab_radius = round(math.min(math.max(8 * state.scale, foreground_size * 0.25), foreground_size))
+			local ab_tip_inset = round(3 * state.scale)
 
 			---@param time number
 			---@param kind 'a'|'b'
@@ -588,10 +606,10 @@ function Timeline:render()
 				))
 				ass:draw_start()
 				ass:move_to(x, fby - ab_radius)
-				if kind == 'b' then ass:line_to(x + 3, fby - ab_radius) end
+				if kind == 'b' then ass:line_to(x + ab_tip_inset, fby - ab_radius) end
 				ass:line_to(x + (kind == 'a' and 0 or ab_radius), fby)
 				ass:line_to(x - (kind == 'b' and 0 or ab_radius), fby)
-				if kind == 'a' then ass:line_to(x - 3, fby - ab_radius) end
+				if kind == 'a' then ass:line_to(x - ab_tip_inset, fby - ab_radius) end
 				ass:draw_stop()
 			end
 
@@ -627,11 +645,12 @@ function Timeline:render()
 
 		-- Thumbnail
 		if not thumbnail.disabled
-			and (not self.pressed or self.pressed.distance < 5)
+			and (not self.pressed or self.pressed.distance < round(5 * state.scale))
 			and thumbnail.width ~= 0
 			and thumbnail.height ~= 0
 		then
-			local border = math.ceil(math.max(2, state.radius / 2) * state.scale)
+			-- state.radius 已包含 DPI 缩放，不能再次乘 state.scale。
+			local border = math.ceil(math.max(2 * state.scale, state.radius / 2))
 			local thumb_x_margin, thumb_y_margin = border + tooltip_gap + bax, border + tooltip_gap
 			local thumb_width, thumb_height = thumbnail.width, thumbnail.height
 			local thumb_x = round(clamp(

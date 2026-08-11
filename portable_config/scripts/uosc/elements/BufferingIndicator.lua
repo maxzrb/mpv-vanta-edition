@@ -30,7 +30,7 @@ function BufferingIndicator:on_prop_cache_underrun() self:decide_enabled() end
 function BufferingIndicator:render()
 	local ass = assdraw.ass_new()
 	ass:rect(0, 0, display.width, display.height, {color = bg, opacity = config.opacity.buffering_indicator})
-	local size = round(30 + math.min(display.width, display.height) / 10)
+	local size = round(30 * state.scale + math.min(display.width, display.height) / 10)
 	local opacity = (Elements.menu and Elements.menu:is_alive()) and 0.3 or 0.8
 	ass:spinner(display.width / 2, display.height / 2, size, {color = fg, opacity = opacity})
 	return ass

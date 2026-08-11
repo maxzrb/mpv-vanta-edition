@@ -455,7 +455,7 @@ function Menu:update_content_dimensions()
 		round(8 * state.scale),
 		round(self.item_height * 0.5 * options.font_scale) - round(1 * state.scale)
 	)
-	self.font_size_hint = self.font_size - 1
+	self.font_size_hint = self.font_size - round(1 * state.scale)
 	self.font = options.menu_font ~= '' and options.menu_font or config.font
 	self.item_padding = round((self.item_height - self.font_size) * 0.6)
 	self.scroll_step = self.item_height + self.item_spacing
@@ -987,7 +987,8 @@ function Menu:on_global_mouse_move()
 	-- wheel fling. Until then, keep the row that opened the cascade stable.
 	for _, menu in ipairs(self.all) do menu.hover_suppressed_until = 0 end
 	if self.drag_last_y then
-		self.is_dragging = self.is_dragging or math.abs(cursor.y - self.drag_last_y) >= 10
+		self.is_dragging = self.is_dragging
+			or math.abs(cursor.y - self.drag_last_y) >= round(10 * state.scale)
 		if self.is_dragging then
 			self:show_scrollbar()
 			local distance = self.drag_last_y - cursor.y
@@ -1897,9 +1898,14 @@ function Menu:render()
 			or now < (menu.scrollbar_visible_until or 0)
 			or get_point_to_rectangle_proximity(cursor, scrollbar_hover_rect) <= 0
 		if menu.scroll_height > 0 and show_scrollbar then
-			local groove_height = menu.height - 2
-			local thumb_height = math.max((menu.height / (menu.scroll_height + menu.height)) * groove_height, 40)
-			local thumb_y = content_rect.ay + 1 + ((menu.scroll_y / menu.scroll_height) * (groove_height - thumb_height))
+			local groove_inset = round(1 * state.scale)
+			local groove_height = menu.height - groove_inset * 2
+			local thumb_height = math.min(groove_height, math.max(
+				(menu.height / (menu.scroll_height + menu.height)) * groove_height,
+				round(40 * state.scale)
+			))
+			local thumb_y = content_rect.ay + groove_inset
+				+ ((menu.scroll_y / menu.scroll_height) * (groove_height - thumb_height))
 			local sax = content_rect.bx - round(self.scrollbar_size / 2)
 			local sbx = sax + self.scrollbar_size
 			ass:rect(sax, thumb_y, sbx, thumb_y + thumb_height, {
@@ -2356,7 +2362,7 @@ function Menu:render()
 
 		-- Menu title
 		if draw_title then
-			local title_height = self.item_height + self.padding - 3
+			local title_height = self.item_height + self.padding - round(3 * state.scale)
 			local requires_submit = menu.search_debounce == 'submit'
 			local rect = {
 				ax = content_rect.ax,
@@ -2392,16 +2398,23 @@ function Menu:render()
 
 			-- Background
 			if menu.search then
-				ass:rect(content_rect.ax + 3, rect.ay + 3, content_rect.bx - 3, rect.ay + title_height - 1, {
+				local inset = round(3 * state.scale)
+				ass:rect(content_rect.ax + inset, rect.ay + inset, content_rect.bx - inset,
+					rect.ay + title_height - round(1 * state.scale), {
 					color = fg .. '\\1a&HFF', opacity = menu_opacity * 0.1,
 					radius = state.radius > 0 and state.radius + self.padding or 0,
 					border = 1, border_color = fg, border_opacity = menu_opacity * 0.8
 				})
-				ass:texture(content_rect.ax + 3, rect.ay + 3, content_rect.bx - 3, rect.ay + title_height - 1, 'n', {
-					size = 80, color = bg, opacity = menu_opacity * 0.1, anchor_x = content_rect.ax + 2, anchor_y = rect.ay + 2,
+				ass:texture(content_rect.ax + inset, rect.ay + inset, content_rect.bx - inset,
+					rect.ay + title_height - round(1 * state.scale), 'n', {
+					size = 80, color = bg, opacity = menu_opacity * 0.1,
+					anchor_x = content_rect.ax + round(2 * state.scale),
+					anchor_y = rect.ay + round(2 * state.scale),
 				})
 			else
-				ass:rect(content_rect.ax + 2, rect.ay + 2, content_rect.bx - 2, rect.ay + title_height, {
+				local inset = round(2 * state.scale)
+				ass:rect(content_rect.ax + inset, rect.ay + inset, content_rect.bx - inset,
+					rect.ay + title_height, {
 					color = menu_title, opacity = menu_opacity * 0.58,
 					radius = state.radius > 0 and state.radius + self.padding or 0,
 				})

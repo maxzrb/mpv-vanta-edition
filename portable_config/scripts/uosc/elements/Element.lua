@@ -61,21 +61,6 @@ end
 
 function Element:reset_proximity() self.proximity, self.proximity_raw = 0, math.huge end
 
--- 将 proximity_in/out 视为 1920×1080 全屏时的基准距离。
--- 同时按窗口宽、高归一化比例中的较小值缩放，可兼顾高分屏、小窗口、超宽和竖屏。
-local function get_proximity_distances()
-	local scale = 1
-	if options.proximity_adaptive and display.initialized then
-		local min_scale = math.max(0.05, options.proximity_scale_min)
-		local max_scale = math.max(min_scale, options.proximity_scale_max)
-		local window_scale = math.min(display.width / 1920, display.height / 1080)
-		scale = clamp(min_scale, window_scale, max_scale)
-	end
-	local proximity_in = options.proximity_in * scale
-	local proximity_out = math.max(options.proximity_out * scale, proximity_in + 1)
-	return proximity_in, proximity_out
-end
-
 ---@param ax number
 ---@param ay number
 ---@param bx number
@@ -90,7 +75,7 @@ function Element:update_proximity()
 	if cursor.hidden then
 		self:reset_proximity()
 	else
-		local proximity_in, proximity_out = get_proximity_distances()
+		local proximity_in, proximity_out = get_effective_proximity_distances()
 		local range = proximity_out - proximity_in
 		self.proximity_raw = get_point_to_rectangle_proximity(cursor, self)
 		self.proximity = 1 - (clamp(0, self.proximity_raw - proximity_in, range) / range)

@@ -147,6 +147,36 @@ function get_point_to_point_proximity(point_a, point_b)
 	return math.sqrt(dx * dx + dy * dy)
 end
 
+-- 底栏控件的实际缩放：基础 DPI/全屏缩放再叠加窄窗口紧凑比例。
+-- Timeline 等依赖底栏几何的组件必须复用此接口，避免各自重新计算后错位。
+function get_controls_scale()
+	-- 构造阶段尚无真实 OSD 尺寸，先只使用 DPI/全屏缩放；首次 display 事件会重算。
+	if not display.initialized then return state.scale end
+	local hidpi_scale = math.max(0.1, state.hidpi_scale or 1)
+	local compact_scale = 1
+	if options.controls_compact_threshold > 0 then
+		local logical_width = display.width / hidpi_scale
+		local compact_min_scale = clamp(0.1, options.controls_compact_min_scale, 1)
+		compact_scale = clamp(compact_min_scale,
+			logical_width / options.controls_compact_threshold, 1)
+	end
+	return state.scale * compact_scale
+end
+
+-- proximity_in/out 是 1920×1080 全屏下的基准距离；返回当前窗口中的实际 OSD 像素值。
+function get_effective_proximity_distances()
+	local scale = 1
+	if options.proximity_adaptive and display.initialized then
+		local min_scale = math.max(0.05, options.proximity_scale_min)
+		local max_scale = math.max(min_scale, options.proximity_scale_max)
+		local window_scale = math.min(display.width / 1920, display.height / 1080)
+		scale = clamp(min_scale, window_scale, max_scale)
+	end
+	local proximity_in = options.proximity_in * scale
+	local proximity_out = math.max(options.proximity_out * scale, proximity_in + 1)
+	return proximity_in, proximity_out
+end
+
 -- 进度条悬停渐隐：鼠标 Y 轴靠近进度条（上下对称）时返回渐隐系数 0→1
 -- （0=保持可见，1=完全隐藏），并返回鼠标是否位于元素自身交互区内。
 -- 元素调用方在鼠标位于交互区时保持可见（不应用渐隐），离开后按位置平滑过渡，
@@ -159,7 +189,9 @@ end
 function get_timeline_hover_fade(timeline, element_top, element_bottom)
 	if not (timeline and timeline.enabled and timeline.size > 0) then return 0, false end
 	-- 鼠标不在进度条水平范围内时不处理，避免误伤窗口边缘移动
-	if cursor.x < timeline.ax - 24 or cursor.x > timeline.bx + 24 then return 0, false end
+	local horizontal_tolerance = round(24 * state.scale)
+	if cursor.x < timeline.ax - horizontal_tolerance
+		or cursor.x > timeline.bx + horizontal_tolerance then return 0, false end
 	local y = cursor.y
 	local mouse_in_element = element_top and element_bottom
 		and y >= element_top and y <= element_bottom

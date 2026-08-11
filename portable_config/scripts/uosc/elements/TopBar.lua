@@ -167,7 +167,8 @@ function TopBar:update_dimensions()
 	self.ay = window_border_size
 	self.bx = display.width - window_border_size
 	-- We extend the hitbox so that people with low proximity options can still click on chapter button
-	self.by = math.max(self.size + window_border_size, min_hitbox_height - options.proximity_in)
+	local proximity_in = get_effective_proximity_distances()
+	self.by = math.max(self.size + window_border_size, min_hitbox_height - proximity_in)
 end
 
 function TopBar:toggle_title()

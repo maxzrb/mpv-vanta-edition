@@ -361,15 +361,7 @@ function Controls:update_dimensions()
 	local window_border = Elements:v('window_border', 'size', 0)
 	-- 控件基准尺寸是逻辑像素。窗口窄于阈值时按逻辑宽度平滑缩小，
 	-- 同时保留 HiDPI 与全屏缩放，避免小窗口仍维持桌面级绝对尺寸。
-	local hidpi_scale = state.hidpi_scale or 1
-	local logical_width = display.width / hidpi_scale
-	local compact_threshold = options.controls_compact_threshold
-	local compact_scale = 1
-	if compact_threshold > 0 then
-		local compact_min_scale = clamp(0.1, options.controls_compact_min_scale, 1)
-		compact_scale = clamp(compact_min_scale, logical_width / compact_threshold, 1)
-	end
-	local controls_scale = state.scale * compact_scale
+	local controls_scale = get_controls_scale()
 	local size = round(options.controls_size * controls_scale)
 	local spacing = round(options.controls_spacing * controls_scale)
 	local margin = round(options.controls_margin * controls_scale)
@@ -377,7 +369,7 @@ function Controls:update_dimensions()
 	-- Disable when not enough space
 	local available_space = display.height - window_border * 2 - Elements:v('top_bar', 'size', 0)
 		- Elements:v('timeline', 'size', 0)
-	self.enabled = available_space > size + 10
+	self.enabled = available_space > size + round(10 * state.scale)
 
 	-- Reset hide/enabled flags
 	for c, control in ipairs(self.layout) do
