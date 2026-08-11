@@ -165,7 +165,7 @@ Copy-IfExists "yt-dlp.exe" $BaseBuild
 # Runtime DLLs
 Write-Host "       Copying runtime DLLs..." -ForegroundColor Gray
 $runtimeDlls = @(
-    "lua51.dll", "vulkan-1.dll",
+    "lua51.dll", "d3dcompiler_43.dll",
     "sqlite3.dll", "libcrypto-3.dll", "libssl-3.dll", "libffi-8.dll",
     "concrt140.dll", "msvcp140.dll", "msvcp140_1.dll", "msvcp140_2.dll",
     "msvcp140_atomic_wait.dll", "msvcp140_codecvt_ids.dll",
