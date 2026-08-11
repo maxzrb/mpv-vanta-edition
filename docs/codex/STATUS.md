@@ -2067,3 +2067,11 @@ c:\Program portable\mpv2\
 - **边界保留**：MediaInfo 文字描边与 Speed 文字描边继续按 `state.scale`，与底栏按钮一致，避免小窗口把描边压得过细；时间轴 bar height 继续复用 Timeline 的 `state.scale` 公式，物理发丝线未修改。
 - **验证**：独立 uosc 在 960×540 窗口、scale=1/1.5/2 下均退出 0 且无 Lua/stack/script-opts 错误；数值矩阵覆盖 1080 默认窗口、100%/150%/200% 全屏、200% 小窗口和 60% compact 下限，全部断言通过。未构建、未打包、未发布。
 - **工作树边界**：用户自行修改的 `uosc.conf`（`proximity_scale_min=0.8` 及其说明文字）保持未暂存、未改写；两个 backup 目录继续不跟踪。
+
+### 2026-08-11 22:49 会话：统一窄窗口缩放下限为 75%
+
+- **用户决定**：底栏、MediaInfo 与 Speed 不拆分下限，继续共用 `controls_compact_min_scale`；默认值与实际配置由 0.6 统一提升为 0.75。
+- **实际曲线**：≥1280 逻辑像素为 100%；1080px 为 84.375%；≤960px 固定为 75%。最低状态下 controls 36→27px、MediaInfo 字号 14→11px、胶囊高度 27→20px，避免原 60% 下的 8px/16px 过小显示。
+- **文件**：同步更新 `portable_config/scripts/uosc/main.lua` 内置默认值和 `portable_config/script-opts/uosc.conf` 实际配置，不新增 MediaInfo/Speed 私有选项。
+- **验证**：尺寸矩阵覆盖 1280/1080/960/800/640px 与 200% DPI 小窗口，断言 compact 不低于 0.75；独立 uosc 在 800×450、scale=1/2 下退出 0、无 Lua/stack/script-opts 错误。未构建、未打包、未发布。
+- **工作树边界**：用户写入 `uosc.conf` 的 `proximity_scale_min=0.8` 说明文字继续保留为未提交修改；backup 目录不跟踪。
