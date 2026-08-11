@@ -5,12 +5,12 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master`（领先 `origin/master` 1 个提交，功能提交已本地化） |
-| **最新发布提交** | `909dede`（tag: `v1.4.1`） |
-| **工作区** | shinchiro 核心、文件关联重构均已完成；uosc 已加入共享 SU7 灵感十色主题、VantaInstaller 选择入口、media info/速度滑块碰撞检测双行布局，以及内置 HarmonyOS Sans SC 字体；功能与记录未提交 |
+| **分支** | `master`（领先 `origin/master` 9 个提交：3 个发布前提交 + 6 个 DPI/徽章功能提交） |
+| **最新发布提交** | 待创建 `v1.5.0` 标签（构建记录提交后） |
+| **工作区** | v1.5.0 已构建并验证（01~05 + 私包 + VantaInstaller v0.3.0），构建记录/版本记录已更新；待提交构建记录、打标签、创建 Release |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.4.3（已发布） |
-| **上次操作** | 只读审计 uosc DPI/像素适配：主体尺寸已缩放，待修重点集中在 Timeline、TopBar 自适应距离调用方及菜单细节 |
+| **项目版本** | v1.5.0（构建完成，待发布） |
+| **上次操作** | v1.5.0 构建 + 全量验证：7z t 全过、SHA-256 已记录、门禁/内容核验通过、.vanta-version 逐字节核验、VantaInstaller v0.3.0 启动验证；准备提交构建记录并发布 |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -93,6 +93,15 @@ c:\Program portable\mpv2\
 ---
 
 ## 会话日志
+### 2026-08-11 会话：v1.5.0 发布构建（主版本提升 + VantaInstaller v0.3.0）
+
+- **前置检查**：Git 同步（fetch 后无远端新改动）；138 个 Lua 脚本语法全过；完整配置 idle 启动无 error；缺漏文件核验发现唯一缺漏——01 运行时清单 vulkan-1.dll（dyphire 残留、根目录不存在）缺 shinchiro 必需 d3dcompiler_43.dll（已批准修复）。
+- **提交**：`d9e76e2` build-01 Base 运行时 DLL 适配 shinchiro（d3dcompiler_43.dll）；`307950b` uosc 渐隐下限注释补充（值保持 0.8）；`f141442` 发布流程强化全功能包校验条款 + README VantaInstaller v0.3.0 + 本文件前置检查记录。
+- **构建**：`build-all-packages.ps1 -Version 1.5.0 -IncludePrivate` 一次通过，01~05 + 私包共 7 个归档（约 8.17GB，私包 4204MB）；私包合并 01→05 + 完整 Lossless Scaling，不受构建脚本拆分影响。
+- **验证**：7z t 全部 Ok；SHA-256 全部写入版本迭代记录；门禁扫描无顶层 release/build/tmp/.git、无 .pyc/.log/.pdb/.tmp/.bak/__pycache__；01 含 script-assets/fonts/d3dcompiler_43.dll/mpv.exe、不含 vulkan-1.dll/window_state.conf、`.vanta-version` 逐字节=1.5.0（无 BOM/换行/v）；05 不含 .vanta-version/script-assets/window_state.conf/fonts；04 仅 LSFG Layer + Lossless.dll + GPL 源码；根目录 `.vanta-version` 已同步 1.5.0。
+- **VantaInstaller v0.3.0**：csproj=0.3.0，源码最新修改 19:34 早于产物 20:03，沿用现成构建；启动验证通过；SHA-256 `575D341555B990B3FCF7A1BE9F43030AB046AD04EC333F8FB0760CEBC2C32DF7`。
+- **待办**：提交构建记录（含 .vanta-version=1.5.0）→ 标签 v1.5.0 → 推送 → 创建 Release 上传 01~05 + VantaInstaller v0.3.0 → 发布后收尾。
+
 ---
 
 ## 会话日志
