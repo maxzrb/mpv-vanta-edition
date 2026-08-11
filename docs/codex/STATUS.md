@@ -69,6 +69,30 @@ c:\Program portable\mpv2\
 - [x] 将第 04 包改为零 Steam 文件的公开扩展包，仅要求用户自备 `Lossless.dll`
 - [x] 统一生成 v1.2.0 四类公开包和个人私用全量包，并完成内容、交叉和完整性审计
 
+## v1.5.0 发布前置检查清单（2026-08-11）
+
+### 3.1 工作区与 Git 状态
+- [x] `git status --short --branch`：`master` 领先 `origin/master` 6 个提交（0721fb6 / 5335a39 / d40c3dd / 36e7738 / c0e3742 / 5e8486e）；`git fetch origin` 后无远端新改动。
+- [x] 未提交改动：`portable_config/script-opts/uosc.conf`（注释更新 + proximity_scale_min=0.8 行尾随空格）、`发布流程.md`（第 3 条警告语强化）；`portable_config/backup/`、`portable_config/script-opts/backup/` 未跟踪（打包脚本会排除，不提交）。
+- [ ] 待提交整理：uosc.conf 尾随空格清理后提交；发布流程.md 强化条款是否纳入提交待用户确认。
+
+### 3.2 发布内容影响评估（大改动 Gate）
+- 命中 Gate 项：mpv 核心切换（dyphire → shinchiro 20260811）、构建脚本重构（build-01~05 + build-all-packages.ps1）、安装/关联方式变化、内置 HarmonyOS Sans SC 字体（01 携带）、VantaInstaller 0.3.0。以上均为用户此前明确要求并已批准/测试的既定内容。
+- **新发现（需用户决策）**：`build-01-base.ps1` 运行时 DLL 清单仍为 dyphire 时代，包含 `vulkan-1.dll`（根目录不存在，被静默跳过）、不含 shinchiro 必需 `d3dcompiler_43.dll`（根目录已有 4.48MB）→ 01 包将缺 D3D11 编译依赖，需在脚本清单补入该文件（构建脚本修改，命中 Gate，待用户确认）。
+- VantaInstaller 0.2.0 → 0.3.0：附属工具版本迭代，不触发 Gate；csproj 已是 0.3.0，publish 已有 v0.3.0.exe，源码无改动可沿用。
+
+### 3.3 文档与记录检查
+- [ ] STATUS.md 本清单；[ ] version/工作进度.md 待追加；[ ] version/版本迭代记录.md 待更新 v1.4.3 → v1.5.0；[ ] README.MD 待更新 VantaInstaller v0.2.0 → v0.3.0。
+
+### 3.4 功能验证
+- [x] 完整配置 idle 启动 6 秒：无 [e]/[f]/error，uosc、uosc_danmaku、startup-format-logos、webui、stats、lsfg_control 等全部正常加载。
+- [x] Lua 语法检查：portable_config/scripts + script-modules 共 138 个脚本 loadfile 全部通过（FAIL 0）。
+- [x] `git diff --check`：通过（仅 发布流程.md CRLF warning，无尾随空格错误）。
+- [x] 脚本配置与 script-opts 一致，UTF-8 无 BOM、LF 换行（uosc.conf 行尾空格待清理）。
+
+---
+
+## 会话日志
 ---
 
 ## 会话日志
