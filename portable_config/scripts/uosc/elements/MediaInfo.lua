@@ -26,7 +26,7 @@ local MediaFormatInfo = load_media_format_info()
 ---@class MediaInfo : Element
 local MediaInfo = class(Element)
 
--- 与参考版一致的胶囊几何参数（逻辑像素，随 uosc/DPI 缩放）
+-- 与参考版一致的胶囊几何参数（逻辑像素，随底栏 DPI/窄窗口比例统一缩放）
 local MEDIA_INFO_FONT_SIZE = 14
 local MEDIA_INFO_CAPSULE_HEIGHT = 27
 local MEDIA_INFO_TIMELINE_OFFSET = 30
@@ -208,8 +208,7 @@ local function build_segments(mode, filter)
 end
 
 -- 参考版胶囊渲染：按视觉分组（硬解+画面归 picture），hero/primary/muted 三档配色
-local function render_segments(ass, x, y, segments, visibility, max_width)
-	local scale = state.scale
+local function render_segments(ass, x, y, segments, visibility, max_width, scale)
 	local size = round(MEDIA_INFO_FONT_SIZE * scale)
 	local item_gap = round(12 * scale)
 	local compact_gap = round(5 * scale)
@@ -223,7 +222,8 @@ local function render_segments(ass, x, y, segments, visibility, max_width)
 		size = size,
 		color = config.color.menu_text or config.color.time_current or bgt,
 		opacity = visibility * 0.98,
-		border = math.max(1, options.text_border * scale),
+		-- 描边保持与底栏按钮相同的 DPI 线宽，不叠加窄窗口压缩。
+		border = math.max(1, options.text_border * state.scale),
 		border_color = bg,
 		shadow = 0,
 		bold = false,
@@ -374,7 +374,7 @@ function MediaInfo:get_visibility()
 	local height = self:get_height()
 	local top, bottom = nil, nil
 	if center_y and height and height > 0 then
-		local pad = round(2 * state.scale)
+		local pad = round(2 * get_controls_scale())
 		top = center_y - height / 2 - pad
 		bottom = center_y + height / 2 + pad
 	end
@@ -392,7 +392,7 @@ end
 
 -- 供速度滑块等元素对齐胶囊高度
 function MediaInfo:get_height()
-	return round(MEDIA_INFO_CAPSULE_HEIGHT * state.scale)
+	return round(MEDIA_INFO_CAPSULE_HEIGHT * get_controls_scale())
 end
 
 -- 返回本帧媒体信息胶囊的实际布局范围；未绘制时返回 nil
@@ -414,15 +414,16 @@ end
 
 -- 供速度滑块等元素对齐胶囊字号
 function MediaInfo:get_font_size()
-	return round(MEDIA_INFO_FONT_SIZE * state.scale)
+	return round(MEDIA_INFO_FONT_SIZE * get_controls_scale())
 end
 
 -- 供速度滑块等元素对齐胶囊中心（与 render 中 mi_y 同一计算）
 function MediaInfo:get_center_y()
 	local timeline = Elements.timeline
 	if not (timeline and timeline.enabled and timeline.size > 0) then return nil end
-	local scale = state.scale
-	local bar_height = math.max(3, round(4 * scale))
+	local scale = get_controls_scale()
+	-- 时间轴厚度本身不做 compact，必须与 Timeline 的实际绘制公式一致。
+	local bar_height = math.max(3, round(4 * state.scale))
 	local hit_bay = timeline.by - timeline.size - timeline.top_border
 	local bay = hit_bay + (timeline.size - bar_height) / 2
 	local mi_y = bay - round(MEDIA_INFO_TIMELINE_OFFSET * scale)
@@ -454,7 +455,7 @@ function MediaInfo:render()
 		return
 	end
 
-	local scale = state.scale
+	local scale = get_controls_scale()
 	local ass = assdraw.ass_new()
 
 	-- 与参考版一致：胶囊悬在时间轴上方约 45px，而不是贴进底部面板
@@ -463,7 +464,7 @@ function MediaInfo:render()
 		self.layout_width = 0
 		return ass
 	end
-	local bar_height = math.max(3, round(4 * scale))
+	local bar_height = math.max(3, round(4 * state.scale))
 	local hit_bay = timeline.by - timeline.size - timeline.top_border
 	local bay = hit_bay + (timeline.size - bar_height) / 2
 	local mi_x = timeline.ax
@@ -480,7 +481,7 @@ function MediaInfo:render()
 	end
 
 	local click_hits, layout_width = render_segments(
-		ass, mi_x, mi_y, segments, visibility, timeline.bx - mi_x
+		ass, mi_x, mi_y, segments, visibility, timeline.bx - mi_x, scale
 	)
 	self.layout_x, self.layout_y, self.layout_width = mi_x, mi_y, layout_width
 

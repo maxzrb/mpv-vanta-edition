@@ -2058,3 +2058,12 @@ c:\Program portable\mpv2\
 - **DeepSeek 复核**：使用 DeepSeek v4 Flash 子代理只读复核固定像素、重复缩放、共享接口加载顺序和风险；确认接口加载顺序安全、旧 proximity 局部函数无残留，并据此完成全部 P0 项及一致性 follow-up。
 - **验证**：独立 uosc 在 scale=1/1.5/2 下分别实跑，均退出 0、无 Lua/stack/script-opts 错误；数值矩阵覆盖 1920×1080@100%、2880×1620@150%、3840×2160@200% 与 1920×1080@200% 小窗，断言全部通过；UTF-8 无 BOM、LF 与 `git diff --check` 通过。未构建、未打包、未发布。
 - **测试注意**：一次完整配置测试的通用进程清理误关闭了当时存在的 mpv 主实例及 thumbfast；随后测试全部改为 `--no-config`、`--player-operation-mode=cplayer` 并按测试 PID 回收，避免再次影响用户进程。
+
+### 2026-08-11 22:22 会话：Media Info 与速度滑块统一底栏窄窗口缩放
+
+- **目标**：此前 MediaInfo 的字体、胶囊高度、间距和垂直偏移只使用 `state.scale`，窗口低于 1280 逻辑像素时仍保持全尺寸；Speed 虽由 Controls 获得紧凑宽度，但随后又用未 compact 的 MediaInfo 高度/字号覆盖，导致两者与底栏缩放不一致。
+- **MediaInfo**：渲染几何统一改用 `get_controls_scale()`；覆盖字体、胶囊高度/圆角/内边距、分组间距、字距、时间轴偏移、画面内缩及渐隐命中 padding。`get_height()`、`get_font_size()`、`get_center_y()` 与实际 render 复用相同比例，保证 Speed 碰撞检测拿到真实尺寸。
+- **Speed**：字号增量、无胶囊兜底高度、时间轴备用间距、双行碰撞间距、刻度内缩和速度文字偏移统一改用 controls scale；速度宽度继续由 Controls 的 floating 尺寸提供，因此宽高都会跟随同一 compact 比例。
+- **边界保留**：MediaInfo 文字描边与 Speed 文字描边继续按 `state.scale`，与底栏按钮一致，避免小窗口把描边压得过细；时间轴 bar height 继续复用 Timeline 的 `state.scale` 公式，物理发丝线未修改。
+- **验证**：独立 uosc 在 960×540 窗口、scale=1/1.5/2 下均退出 0 且无 Lua/stack/script-opts 错误；数值矩阵覆盖 1080 默认窗口、100%/150%/200% 全屏、200% 小窗口和 60% compact 下限，全部断言通过。未构建、未打包、未发布。
+- **工作树边界**：用户自行修改的 `uosc.conf`（`proximity_scale_min=0.8` 及其说明文字）保持未暂存、未改写；两个 backup 目录继续不跟踪。

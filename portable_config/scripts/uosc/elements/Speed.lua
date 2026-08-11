@@ -39,9 +39,10 @@ function Speed:on_coordinates()
 	self.height, self.width = self.by - self.ay, self.bx - self.ax
 	self.notch_spacing = self.width / (self.notches + 1)
 	-- 速度数字字号比左侧媒体信息胶囊大 4px
+	local controls_scale = get_controls_scale()
 	local media_font = Elements:maybe('media_info', 'get_font_size')
 		or round(self.height * 0.48 * options.font_scale)
-	self.font_size = media_font + round(4 * state.scale)
+	self.font_size = media_font + round(4 * controls_scale)
 end
 function Speed:on_options() self:on_coordinates() end
 
@@ -51,10 +52,11 @@ function Speed:on_options() self:on_coordinates() end
 function Speed:update_position()
 	local timeline = Elements.timeline
 	if not (timeline and timeline.enabled and timeline.size > 0) then return false end
+	local controls_scale = get_controls_scale()
 
 	-- 与左侧媒体信息胶囊同高，保持底部视觉统一
 	local height = Elements:maybe('media_info', 'get_height')
-		or round(options.controls_size * get_controls_scale())
+		or round(options.controls_size * controls_scale)
 	local width = self.width
 	if height <= 0 or width <= 0 then return false end
 	local ax = round((display.width - width) / 2)
@@ -64,7 +66,7 @@ function Speed:update_position()
 	if center_y then
 		ay = round(center_y - height / 2)
 	else
-		ay = timeline.ay - height - round(SPEED_LAYOUT_GAP * state.scale)
+		ay = timeline.ay - height - round(SPEED_LAYOUT_GAP * controls_scale)
 	end
 
 	-- 小窗口下媒体信息可能从左侧伸到速度滑块，碰撞时将速度滑块上移一行。
@@ -72,7 +74,7 @@ function Speed:update_position()
 	local normal_rect = {ax = ax, ay = ay, bx = ax + width, by = ay + height}
 	local media_rect = Elements:maybe('media_info', 'get_layout_rect')
 	if rects_overlap(media_rect, normal_rect) then
-		local gap = round(SPEED_LAYOUT_GAP * state.scale)
+		local gap = round(SPEED_LAYOUT_GAP * controls_scale)
 		local above_ay = media_rect.ay - gap - height
 		local below_ay = media_rect.by + gap
 		local picture_top, picture_bottom = Elements:maybe('media_info', 'get_picture_bounds')
@@ -169,6 +171,7 @@ function Speed:handle_wheel_down() mp.set_property_native('speed', self:speed_st
 
 function Speed:render()
 	if not self:update_position() then return end
+	local controls_scale = get_controls_scale()
 	local visibility = self:get_visibility()
 	local opacity = visibility
 
@@ -210,7 +213,7 @@ function Speed:render()
 	local guide_size = math.floor(self.height / 7.5)
 	local notch_by = by - guide_size
 	-- 数字已移到视觉范围上方，刻度从顶部开始铺满整个滑块范围
-	local notch_padding = math.max(1, round(2 * state.scale))
+	local notch_padding = math.max(1, round(2 * controls_scale))
 	local notch_ay_big = ay + notch_padding
 	local notch_ay_medium = notch_ay_big + ((notch_by - notch_ay_big) * 0.2)
 	local notch_ay_small = notch_ay_big + ((notch_by - notch_ay_big) * 0.4)
@@ -253,7 +256,7 @@ function Speed:render()
 
 	-- Speed value：居中显示在滑块视觉范围上方
 	local speed_text = (round(state.speed * 100) / 100) .. ' x'
-	local text_y = ay - round(4 * state.scale) - self.font_size / 2
+	local text_y = ay - round(4 * controls_scale) - self.font_size / 2
 	ass:txt(half_x, text_y, 5, speed_text, {
 		size = self.font_size,
 		color = config.color.time_current or bgt,
