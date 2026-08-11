@@ -5,12 +5,12 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master`（领先 `origin/master` 9 个提交：3 个发布前提交 + 6 个 DPI/徽章功能提交） |
-| **最新发布提交** | 待创建 `v1.5.0` 标签（构建记录提交后） |
-| **工作区** | v1.5.0 已构建并验证（01~05 + 私包 + VantaInstaller v0.3.0），构建记录/版本记录已更新；待提交构建记录、打标签、创建 Release |
+| **分支** | `master` 与 `origin/master` 同步（v1.5.0 已发布） |
+| **最新发布提交** | `70fe59d`（tag: `v1.5.0`，已推送） |
+| **工作区** | v1.5.0 已发布（7 个公开资产上传核对完成，私包仅本地）；工作树干净 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.0（构建完成，待发布） |
-| **上次操作** | v1.5.0 构建 + 全量验证：7z t 全过、SHA-256 已记录、门禁/内容核验通过、.vanta-version 逐字节核验、VantaInstaller v0.3.0 启动验证；准备提交构建记录并发布 |
+| **项目版本** | v1.5.0（已发布） |
+| **上次操作** | v1.5.0 发布收尾：Release 资产补齐上传（关机中断后恢复）、远端 7 资产 SHA-256 核对一致、无重复资产、无私包；更新版本记录/工作进度/本文件 |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -93,6 +93,14 @@ c:\Program portable\mpv2\
 ---
 
 ## 会话日志
+### 2026-08-12 会话：v1.5.0 发布结果（关机中断恢复）
+
+- 2026-08-11 晚 `gh release create v1.5.0`（正式）成功；上传公开资产时意外关机，关机前完成 01/04/05/VantaInstaller-v0.3.0 四资产。
+- 2026-08-12 恢复：`gh release upload` 补齐 02 分卷与 03 FW 包（约 12 分钟）。
+- 最终核对：远端 7 个公开资产全部 `uploaded`，SHA-256 与本地逐字节一致（01 204B98DCC… / 02.001 220B18209… / 02.002 E252F55C0… / 03 2C38210A4… / 04 3F0BD15C2… / 05 7CA8AF172… / VantaInstaller 575D34155…），无重复资产，无私包；`mpv-full-private-v1.5.0.7z` 仅本地。
+- Release：https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.5.0
+- 收尾：版本迭代记录补充发布结果、工作进度追加、本文件快照更新；随后提交 `docs: record v1.5.0 release results` 并推送。
+
 ### 2026-08-11 会话：v1.5.0 发布构建（主版本提升 + VantaInstaller v0.3.0）
 
 - **前置检查**：Git 同步（fetch 后无远端新改动）；138 个 Lua 脚本语法全过；完整配置 idle 启动无 error；缺漏文件核验发现唯一缺漏——01 运行时清单 vulkan-1.dll（dyphire 残留、根目录不存在）缺 shinchiro 必需 d3dcompiler_43.dll（已批准修复）。
