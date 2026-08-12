@@ -7,10 +7,10 @@
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master` 与 `origin/master` 同步（杳知 8.12 跟进与后瞻检测优化共 16 个提交已推送） |
 | **最新发布提交** | `70fe59d`（tag: `v1.5.0`，已推送） |
-| **工作区** | 干净；两个 backup 目录继续不跟踪 |
+| **工作区** | v1.5.1 发布前置检查完成；STATUS TODO 清理待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.0（已发布） |
-| **上次操作** | 收尾：后瞻单路/双路 16 提交推送、README/发布流程补 ffmpeg 说明、文档同步 |
+| **项目版本** | v1.5.0（已发布）；**v1.5.1 发布中（Z+1 小功能修复）** |
+| **上次操作** | v1.5.1 发布前置检查（git 同步/Lua 130 全过/idle 无 error/ffmpeg 核验） |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -38,7 +38,7 @@ c:\Program portable\mpv2\
 ## TODO
 
 - [x] `settings.xml` 已加入 `.gitignore`
-- [ ] 根据个人需求定制 mpv.conf
+- [x] 根据个人需求定制 mpv.conf
 - [x] 安装官方 yt-dlp 2026.07.04，并纳入公开 Base 包
 - [x] 升级 Python 3.14.3 → 3.14.6，并验证 SSL、SQLite、pip 与现有 VapourSynth R73
 - [x] 为 VapourSynth R78 设计无需全局环境变量、兼容直接双击 `mpv.exe` 的便携加载方案（已放弃：R73 为明确支持 Win7 的最后版本，暂不升级，R78 试验文件已清理）
@@ -74,7 +74,7 @@ c:\Program portable\mpv2\
 ### 3.1 工作区与 Git 状态
 - [x] `git status --short --branch`：`master` 领先 `origin/master` 6 个提交（0721fb6 / 5335a39 / d40c3dd / 36e7738 / c0e3742 / 5e8486e）；`git fetch origin` 后无远端新改动。
 - [x] 未提交改动：`portable_config/script-opts/uosc.conf`（注释更新 + proximity_scale_min=0.8 行尾随空格）、`发布流程.md`（第 3 条警告语强化）；`portable_config/backup/`、`portable_config/script-opts/backup/` 未跟踪（打包脚本会排除，不提交）。
-- [ ] 待提交整理：uosc.conf 尾随空格清理后提交；发布流程.md 强化条款是否纳入提交待用户确认。
+- [x] 待提交整理：uosc.conf 尾随空格清理后提交（当前 0 行尾随空格）；发布流程.md 强化条款已纳入提交（f141442）。
 
 ### 3.2 发布内容影响评估（大改动 Gate）
 - 命中 Gate 项：mpv 核心切换（dyphire → shinchiro 20260811）、构建脚本重构（build-01~05 + build-all-packages.ps1）、安装/关联方式变化、内置 HarmonyOS Sans SC 字体（01 携带）、VantaInstaller 0.3.0。以上均为用户此前明确要求并已批准/测试的既定内容。
@@ -82,7 +82,7 @@ c:\Program portable\mpv2\
 - VantaInstaller 0.2.0 → 0.3.0：附属工具版本迭代，不触发 Gate；csproj 已是 0.3.0，publish 已有 v0.3.0.exe，源码无改动可沿用。
 
 ### 3.3 文档与记录检查
-- [ ] STATUS.md 本清单；[ ] version/工作进度.md 待追加；[ ] version/版本迭代记录.md 待更新 v1.4.3 → v1.5.0；[ ] README.MD 待更新 VantaInstaller v0.2.0 → v0.3.0。
+- [x] STATUS.md 本清单已更新；[x] version/工作进度.md 已追加；[x] version/版本迭代记录.md 已更新 v1.4.3 → v1.5.0；[x] README.MD 已更新 VantaInstaller v0.3.0。
 
 ### 3.4 功能验证
 - [x] 完整配置 idle 启动 6 秒：无 [e]/[f]/error，uosc、uosc_danmaku、startup-format-logos、webui、stats、lsfg_control 等全部正常加载。
@@ -93,6 +93,15 @@ c:\Program portable\mpv2\
 ---
 
 ## 会话日志
+### 2026-08-12 v1.5.1 发布前置检查（流程 3.1~3.4）
+
+- **版本号**：用户指定 v1.5.1（Z+1，小功能修复补足；杳知 8.12 跟进与后瞻检测优化）。
+- **3.1 Git 状态**：`master` 与 `origin/master` 同步（0/0）；仅 `docs/codex/STATUS.md` TODO 清理未提交；backup 目录继续不跟踪。
+- **3.2 大改动 Gate 评估**：本次发布内容 = 后瞻单路/双路统一、40s 快速深探针、第二确认窗、采样分辨率提升、随包 ffmpeg（均为 8/12 已提交并推送的功能/脚本改动）。**01 包首次携带 ffmpeg（约 +26MB 压缩）属"大型资源增删/包体积变化"**，但为用户 8/12 明确要求并亲自提供文件、且本次指令再次确认（"看一下 ffmpeg 有没有进入 01 包的打包脚本，然后执行发布流程"），视为用户已批准的既定内容；包结构 01~05 不变、构建脚本无新改动。其余项（VantaInstaller 0.3.0 沿用、README/发布流程为文档同步）不触发 Gate。
+- **3.3 文档检查**：STATUS/工作进度/版本迭代/README 将在发布各阶段同步更新（本记录即 3.3 前置项）。
+- **3.4 功能验证**：Lua 130/130 语法通过；完整配置 idle 启动无 `[e]/[f]/error`（auto_profiles 条件评估为 v 级正常提示）；`git diff --check` 通过；ffmpeg 已确认在 `build-01-base.ps1`（`Invoke-CopyTo @("ffmpeg")`，根目录 `ffmpeg/ffmpeg.exe` 98.3MB 存在）。
+- **状态**：前置检查通过，准备构建。
+
 ### 2026-08-12 15:08 会话：杳知 8.12 跟进收尾（提交+推送+文档）
 
 - **提交**：起播 Logo 后瞻单路/双路统一、40 秒快速深探针、第二确认窗、随包 ffmpeg 等共 16 个提交（`1259500`→`549468a`）已提交并推送 `origin/master`，工作区干净（backup 目录继续不跟踪）。
