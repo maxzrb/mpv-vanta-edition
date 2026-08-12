@@ -10,6 +10,9 @@ local logo_bounds = dofile(mp.command_native({
 
 local o = {
     enabled = true,
+    -- 黑边检测模式：current=当前方案(实验性，画幅优先+后瞻+冻结) /
+    -- yaozhi=杳知视觉方案(纯视觉，显示后复检可重定位) / none=不检测(右上角直接显示)
+    mode = 'current',
     show_video = true,
     show_audio = true,
     show_sdr = true,
@@ -56,7 +59,21 @@ local function normalize_style(value)
     return tostring(value or ''):lower() == 'white' and 'white' or 'color'
 end
 
+local function normalize_mode(value)
+    local mode = tostring(value or ''):lower()
+    if mode == 'yaozhi' then return 'yaozhi' end
+    if mode == 'none' or mode == 'off' or mode == 'no' then return 'none' end
+    return 'current'
+end
+
 o.style = normalize_style(o.style)
+o.mode = normalize_mode(o.mode)
+
+-- none 模式：不检测编码黑边，等效 detect_encoded_bars=no
+local function effective_detect_encoded_bars()
+    if o.mode == 'none' then return false end
+    return o.detect_encoded_bars == true
+end
 
 local state = {
     loaded = false,
@@ -223,6 +240,7 @@ end
 local function publish_state()
     local current = state.current or {}
     mp.set_property_bool('user-data/startup-format-logos/enabled', o.enabled == true)
+    mp.set_property('user-data/startup-format-logos/mode', o.mode)
     mp.set_property('user-data/startup-format-logos/style', o.style)
     mp.set_property('user-data/startup-format-logos/video', current.video or '')
     mp.set_property('user-data/startup-format-logos/audio', current.audio or '')
@@ -1091,6 +1109,73 @@ local function has_video_geometry()
         and tonumber(dimensions.h) > 0
 end
 
+-- 杳知 8.12 视觉方案复检：稀疏开场先显示默认位，随后复检出现黑边时
+-- 直接更新锚点并重渲染（显示后可移动），不等待、不延迟起播。
+local function start_yaozhi_bar_followup(file_generation)
+    local remaining = clamp(
+        math.floor(tonumber(o.encoded_bar_followup_samples) or 3),
+        0,
+        5
+    )
+    if remaining <= 0 then return end
+    local interval = clamp(
+        tonumber(o.encoded_bar_followup_interval) or 1.5,
+        0.5,
+        4.0
+    )
+
+    local function request_sample()
+        -- 已有黑边结果即停止（杳知原版）
+        if file_generation ~= state.file_generation or not state.loaded
+            or state.content_insets ~= nil or remaining <= 0 then
+            return
+        end
+        remaining = remaining - 1
+        local ok, request = pcall(mp.command_native_async, {
+            name = 'screenshot-raw', flags = 'video', format = 'bgr0',
+        }, function(success, frame)
+            state.bar_request = nil
+            if file_generation ~= state.file_generation or not state.loaded then return end
+            if success then
+                -- 杳知视觉方案：纯像素检测，不做画幅白名单与偏黑门槛
+                local insets = logo_bounds.detect(
+                    frame, o.encoded_bar_threshold, 0
+                )
+                if insets then
+                    state.content_insets = insets
+                    msg.debug(string.format(
+                        'yaozhi followup: left=%.4f top=%.4f right=%.4f bottom=%.4f',
+                        tonumber(insets.left) or 0,
+                        tonumber(insets.top) or 0,
+                        tonumber(insets.right) or 0,
+                        tonumber(insets.bottom) or 0
+                    ))
+                    -- 已显示则重定位，未显示则正常显示
+                    if state.visible and state.opacity_index > 0 then
+                        render_level(state.opacity_index)
+                    else
+                        schedule_detection('yaozhi-followup', tonumber(o.delay) or 0.45)
+                    end
+                    return
+                end
+            end
+            if remaining > 0 then schedule('bar-followup', interval, request_sample) end
+        end)
+        if ok then
+            state.bar_request = request
+        elseif remaining > 0 then
+            schedule('bar-followup', interval, request_sample)
+        end
+    end
+
+    schedule(
+        'bar-followup',
+        clamp(tonumber(o.encoded_bar_followup_delay) or 2.5, 0.5, 8.0),
+        request_sample
+    )
+end
+
+
 -- 全黑开场、片头 Logo 等稀疏画面无法可靠锁定徽章锚点：徽标暂不显示，
 -- 在正常播放中安排少量廉价复检（不 seek、不延迟起播），一旦出现可信内容
 -- 画面（检测到黑边，或覆盖率足够且确认无黑边）就一次性显示到位并冻结锚点；
@@ -1251,6 +1336,8 @@ end
 --   画幅匹配黑边 → 任一黑边 → 任一内容充分的亮画面（确认无黑边）；
 -- 全部不可信则回退常规复检。返回 true 表示已启动异步检测。
 local function start_bar_lookahead(file_generation)
+    -- 后瞻仅当前方案(current)启用；杳知视觉方案与不检测模式不依赖 ffmpeg
+    if o.mode ~= 'current' then return false end
     local offsets = parse_lookahead_offsets(o.encoded_bar_lookahead)
     if #offsets == 0 then return false end
     if state.badge_displayed or state.lookahead_busy then return false end
@@ -1378,8 +1465,9 @@ local function prepare_display_after_frame(reason)
     local file_generation = state.file_generation
     local function continue_detection(insets, suffix, followup, matched, show_now)
         if file_generation ~= state.file_generation or not state.loaded then return end
-        -- 锚点只在徽标显示前确定；显示后冻结，避免黑屏→亮屏时徽标跳位
-        if not state.badge_displayed then
+        local yz_mode = o.mode == 'yaozhi'
+        -- 锚点：current 模式显示后冻结；yaozhi 模式始终允许更新（杳知视觉方案可重定位）
+        if yz_mode or not state.badge_displayed then
             state.content_insets = insets
             state.content_insets_matched = type(insets) == 'table' and matched == true or nil
             if type(insets) == 'table' then
@@ -1394,17 +1482,29 @@ local function prepare_display_after_frame(reason)
         end
         state.bar_request = nil
         stop_timer('bar-detect-timeout')
-        -- 仅在未显示且本次结果可展示时显示（黑屏/稀疏开场交给复检等待更可信结果）
-        if not state.badge_displayed and show_now then
+        if yz_mode then
+            -- 杳知视觉方案：无论有无黑边都显示（默认位或黑边锚点），复检另行重定位
+            state.badge_displayed = true
+            schedule_detection(reason .. (suffix or ''), tonumber(o.delay) or 0.45)
+        elseif not state.badge_displayed and show_now then
+            -- current：仅在未显示且本次结果可展示时显示（黑屏/稀疏开场交给复检）
             state.badge_displayed = true
             schedule_detection(reason .. (suffix or ''), tonumber(o.delay) or 0.45)
         end
-        if followup and not start_bar_lookahead(file_generation) then
-            start_ambiguous_bar_followup(file_generation)
+        if followup then
+            if start_bar_lookahead(file_generation) then
+                return
+            end
+            -- 杳知视觉方案用可重定位复检，current 用冻结+兜底复检
+            if yz_mode then
+                start_yaozhi_bar_followup(file_generation)
+            else
+                start_ambiguous_bar_followup(file_generation)
+            end
         end
     end
 
-    if not has_real_video_track() or not o.anchor_to_video or not o.detect_encoded_bars then
+    if not has_real_video_track() or not o.anchor_to_video or not effective_detect_encoded_bars() then
         continue_detection(nil, '', false, false, true)
         return
     end
@@ -1419,9 +1519,10 @@ local function prepare_display_after_frame(reason)
         local sample_count = clamp(math.floor(tonumber(o.encoded_bar_samples) or 3), 1, 5)
         local sample_interval = clamp(tonumber(o.encoded_bar_sample_interval) or 0.22, 0.05, 0.75)
 
-        -- 画幅匹配优先：命中白名单的样本合并；白名单外画幅退化为纯视觉兜底合并。
+        -- 画幅匹配优先（current）：命中白名单的样本合并；白名单外退化为纯视觉兜底。
+        -- 杳知视觉方案（yaozhi）：全部样本合并，不做画幅白名单。
         local function merge_probes()
-            if matched_count > 0 then
+            if o.mode ~= 'yaozhi' and matched_count > 0 then
                 local matched_probes = {}
                 for index, probe in ipairs(probes) do
                     if probes_matched[index] then matched_probes[#matched_probes + 1] = probe end
@@ -1434,11 +1535,15 @@ local function prepare_display_after_frame(reason)
         local function finish(insets, suffix, used_matched)
             if completed then return end
             completed = true
+            local yz_mode = o.mode == 'yaozhi'
             -- 可展示：检测到黑边，或画面内容充分（覆盖率达标）
             local displayable = insets ~= nil or max_coverage >= 0.28
-            -- 黑屏/稀疏开场（无黑边且覆盖率低）→ 暂不显示，交给复检等待更可信结果
-            local followup = not displayable
-            continue_detection(insets, suffix, followup, used_matched, displayable)
+            -- 杳知视觉方案：仅"无黑边且覆盖率低"时复检；始终显示（默认位/黑边锚点）
+            -- current：黑屏/稀疏开场（无黑边且覆盖率低）暂不显示，交给复检
+            local followup = yz_mode
+                and (insets == nil and max_coverage < 0.28)
+                or (not displayable)
+            continue_detection(insets, suffix, followup, used_matched, yz_mode or displayable)
         end
         schedule('bar-detect-timeout', 1.4 + sample_count * sample_interval, function()
             local insets, used_matched = merge_probes()
@@ -1455,7 +1560,7 @@ local function prepare_display_after_frame(reason)
                     local insets, _, coverage, matched = logo_bounds.detect(
                         frame,
                         o.encoded_bar_threshold,
-                        o.encoded_bar_min_coverage
+                        o.mode == 'yaozhi' and 0 or o.encoded_bar_min_coverage
                     )
                     max_coverage = math.max(max_coverage, tonumber(coverage) or 0)
                     if insets then
@@ -1660,6 +1765,27 @@ local function set_style_message(value)
 end
 
 
+local function set_mode_message(value)
+    local mode = normalize_mode(value)
+    if mode == o.mode then return end
+    o.mode = mode
+    persist_option('mode', mode)
+    -- 切换模式后重新走一遍黑边检测与显示（prepare 会按新 mode 决定检测方式）
+    cancel_display(true)
+    state.badge_displayed = false
+    state.lookahead_busy = false
+    if state.loaded and state.frame_ready then
+        prepare_display_after_frame('mode-change')
+    else
+        state.waiting_for_frame = true
+    end
+    publish_state()
+    local label = mode == 'current' and '当前方案（实验性）'
+        or (mode == 'yaozhi' and '杳知视觉方案' or '不检测（右上角直接显示）')
+    mp.osd_message('起播 Logo 检测模式：' .. label, 2)
+end
+
+
 if overlay_base < 0 or overlay_base > 61 then
     msg.warn('overlay_id must leave room for three IDs; falling back to 50')
     overlay_base = 50
@@ -1689,6 +1815,7 @@ mp.register_script_message('startup-format-logos-preview', preview_message)
 mp.register_script_message('startup-format-logos-hide', function() cancel_display(true) end)
 mp.register_script_message('startup-format-logos-toggle', toggle_message)
 mp.register_script_message('startup-format-logos-set-style', set_style_message)
+mp.register_script_message('startup-format-logos-set-mode', set_mode_message)
 
 publish_state()
 msg.info('script loaded')
