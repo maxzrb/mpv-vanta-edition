@@ -7,10 +7,10 @@
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master` 与 `origin/master` 同步（杳知 8.12 跟进与后瞻检测优化共 16 个提交已推送） |
 | **最新发布提交** | `70fe59d`（tag: `v1.5.0`，已推送） |
-| **工作区** | v1.5.1 发布前置检查完成；STATUS TODO 清理待提交 |
+| **工作区** | v1.5.1 构建完成、验证通过；待打标签/推送/上传 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.0（已发布）；**v1.5.1 发布中（Z+1 小功能修复）** |
-| **上次操作** | v1.5.1 发布前置检查（git 同步/Lua 130 全过/idle 无 error/ffmpeg 核验） |
+| **上次操作** | v1.5.1 构建完成（21.6 分钟）；7z t 全过、SHA-256 已写入、门禁通过 |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
