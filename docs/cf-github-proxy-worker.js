@@ -81,7 +81,8 @@ const LANDING_HTML = `<!DOCTYPE html>
   .asset:last-child { border-bottom: none; }
   .asset:hover { background: rgba(14,156,181,.06); }
   .ic { flex: 0 0 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
-        font-size: 17px; background: #eef2f8; border: 1px solid var(--line); }
+        font-size: 11px; font-weight: 700; letter-spacing: .5px; color: var(--brand-deep);
+        background: var(--brand-dim); border: 1px solid rgba(14,156,181,.25); }
   .asset .meta { flex: 1; min-width: 0; }
   .asset .name { font-size: 13.5px; font-weight: 500; word-break: break-all; }
   .asset .size { color: var(--muted); font-size: 12px; margin-top: 2px; }
@@ -179,15 +180,16 @@ const LANDING_HTML = `<!DOCTYPE html>
     if (b >= 1024) return (b / 1024).toFixed(0) + ' KB';
     return b + ' B';
   };
-  var iconFor = function (name) {
+  var badgeFor = function (name) {
     var n = name.toLowerCase();
-    if (n.indexOf('installer') >= 0 || n.indexOf('setup') >= 0 || n.endsWith('.exe')) return '🛠';
-    if (n.indexOf('lsfg') >= 0 || n.indexOf('补帧') >= 0) return '⚡';
-    if (n.indexOf('whisper') >= 0 || n.indexOf('字幕') >= 0) return '🎙';
-    if (n.indexOf('config') >= 0 || n.indexOf('配置') >= 0) return '⚙';
-    if (n.indexOf('base') >= 0 || n.indexOf('核心') >= 0) return '▶';
-    if (n.indexOf('.7z') >= 0) return '📦';
-    return '📄';
+    if (n.indexOf('installer') >= 0 || n.endsWith('.exe')) return 'EXE';
+    if (n.indexOf('lsfg') >= 0) return 'LSF';
+    if (n.indexOf('whisper') >= 0) return 'AI';
+    if (n.indexOf('config') >= 0) return 'CFG';
+    if (n.indexOf('base') >= 0) return 'APP';
+    var m = n.match(/\.([a-z0-9]{1,4})$/);
+    if (m) return m[1].toUpperCase();
+    return 'FILE';
   };
   var tagFor = function (name) {
     var n = name.toLowerCase();
@@ -229,7 +231,7 @@ const LANDING_HTML = `<!DOCTYPE html>
       var row = document.createElement('div');
       row.className = 'asset';
       row.innerHTML =
-        '<div class="ic">' + iconFor(a.name) + '</div>' +
+        '<div class="ic">' + badgeFor(a.name) + '</div>' +
         '<div class="meta"><div class="name">' + esc(a.name) + tagFor(a.name) + '</div>' +
         '<div class="size">' + fmtSize(a.size) + '</div></div>' +
         '<div class="actions">' +
