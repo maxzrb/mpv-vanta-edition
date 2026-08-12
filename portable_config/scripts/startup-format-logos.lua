@@ -29,9 +29,12 @@ local o = {
     encoded_bar_sample_interval = 0.22,
     -- 偏黑/稀疏画面（内容覆盖率低于该值）不采用黑边锚点，避免暗部被误判成黑边
     encoded_bar_min_coverage = 0.3,
-    -- 后瞻：起播黑屏/稀疏画面时，解码当前时间 + 各偏移处的一帧来定黑边锚点
-    -- （逗号分隔多个偏移，任一帧可信即用；0/空=关闭，找不到 ffmpeg 自动回退复检）
-    encoded_bar_lookahead = '1,3,5',
+    -- 后瞻：起播黑屏/稀疏画面时，在 0~encoded_bar_lookahead 秒窗口内随机采样
+    -- encoded_bar_lookahead_samples 处（任意两处间隔 >= encoded_bar_lookahead_gap 秒），
+    -- 并行解码对应帧，任一帧可信即用；0=关闭，找不到 ffmpeg 自动回退复检
+    encoded_bar_lookahead = 7,
+    encoded_bar_lookahead_samples = 3,
+    encoded_bar_lookahead_gap = 2,
     encoded_bar_followup_delay = 2.5,
     encoded_bar_followup_interval = 1.5,
     encoded_bar_followup_samples = 3,
@@ -1319,13 +1322,28 @@ end
 -- 返回 true 表示已启动异步检测（由回调决定显示或回退复检）；false 表示
 -- 未启动（关闭、找不到 ffmpeg、无路径等），由调用方走常规复检。
 -- 解析后瞻偏移列表："1,3,5" → {1,3,5}；单个数字 "5" → {5}；0/空 → {}（关闭）
-local function parse_lookahead_offsets(value)
+-- 在 0~window 秒窗口内随机采样 count 个偏移，任意两处间隔 >= gap 秒。
+-- 算法：在可滑动范围内取 count 个均匀随机点，排序后逐个累加 (i-1)*gap，
+-- 保证最小间隔且不超窗口。窗口放不下 count 个点时退化为从 0 起均匀铺开。
+local random_seeded = false
+local function random_lookahead_offsets(window, count, gap)
     local result = {}
-    local text = tostring(value or ''):gsub('%s', '')
-    if text == '' or text == '0' then return result end
-    for token in text:gmatch('[^,]+') do
-        local n = tonumber(token)
-        if n and n > 0 and n <= 60 then result[#result + 1] = n end
+    window = clamp(math.floor(tonumber(window) or 0), 0, 120)
+    count = clamp(math.floor(tonumber(count) or 3), 1, 6)
+    gap = clamp(math.floor(tonumber(gap) or 2), 0, math.max(1, window))
+    if window <= 0 then return result end
+    if not random_seeded then
+        math.randomseed(math.floor(os.time() + mp.get_time() * 1000))
+        random_seeded = true
+    end
+    if gap * (count - 1) > window then
+        -- 放不下：从 0 起按最小间隔铺开，超出窗口截断
+        for i = 1, count do result[#result + 1] = math.min(window, (i - 1) * gap) end
+    else
+        local spread = window - gap * (count - 1)
+        for i = 1, count do result[#result + 1] = math.random() * spread end
+        table.sort(result)
+        for i = 1, count do result[i] = result[i] + (i - 1) * gap end
     end
     table.sort(result)
     return result
@@ -1336,9 +1354,11 @@ end
 --   画幅匹配黑边 → 任一黑边 → 任一内容充分的亮画面（确认无黑边）；
 -- 全部不可信则回退常规复检。返回 true 表示已启动异步检测。
 local function start_bar_lookahead(file_generation)
-    -- 后瞻(1/3/5s 预取)仅后瞻方案(current)启用；杳知视觉方案与不检测模式不依赖 ffmpeg
+    -- 后瞻(0~7s 随机采样)仅后瞻方案(current)启用；杳知视觉方案与不检测模式不依赖 ffmpeg
     if o.mode ~= 'current' then return false end
-    local offsets = parse_lookahead_offsets(o.encoded_bar_lookahead)
+    local offsets = random_lookahead_offsets(
+        o.encoded_bar_lookahead, o.encoded_bar_lookahead_samples, o.encoded_bar_lookahead_gap
+    )
     if #offsets == 0 then return false end
     if state.badge_displayed or state.lookahead_busy then return false end
     local ffmpeg = find_ffmpeg()
