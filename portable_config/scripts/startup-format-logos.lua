@@ -1101,6 +1101,17 @@ local function start_ambiguous_bar_followup(file_generation)
         4.0
     )
 
+    -- 复检耗尽仍未出现可信内容画面：兜底显示（避免中心文字、长时间黑屏等
+    -- 低覆盖开场导致徽标永久缺失）。所有剩余次数用尽后必然走到这里。
+    local function fallback_show()
+        if file_generation ~= state.file_generation or not state.loaded
+            or state.badge_displayed then
+            return
+        end
+        state.badge_displayed = true
+        schedule_detection('sparse-timeout', tonumber(o.delay) or 0.45)
+    end
+
     local function request_sample()
         -- 徽标已显示或文件已切换：停止（已显示的徽标绝不移动）
         if file_generation ~= state.file_generation or not state.loaded
@@ -1108,9 +1119,7 @@ local function start_ambiguous_bar_followup(file_generation)
             return
         end
         if remaining <= 0 then
-            -- 复检耗尽仍未出现可信内容画面：兜底显示，避免徽标缺失
-            state.badge_displayed = true
-            schedule_detection('sparse-timeout', tonumber(o.delay) or 0.45)
+            fallback_show()
             return
         end
         remaining = remaining - 1
@@ -1143,12 +1152,19 @@ local function start_ambiguous_bar_followup(file_generation)
                     return
                 end
             end
-            if remaining > 0 then schedule('bar-followup', interval, request_sample) end
+            -- 次数用尽仍未等到可信内容：兜底显示；否则继续复检
+            if remaining > 0 then
+                schedule('bar-followup', interval, request_sample)
+            else
+                fallback_show()
+            end
         end)
         if ok then
             state.bar_request = request
         elseif remaining > 0 then
             schedule('bar-followup', interval, request_sample)
+        else
+            fallback_show()
         end
     end
 
