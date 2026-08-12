@@ -24,6 +24,8 @@ local o = {
     encoded_bar_delay = 0.18,
     encoded_bar_samples = 3,
     encoded_bar_sample_interval = 0.22,
+    -- 偏黑/稀疏画面（内容覆盖率低于该值）不采用黑边锚点，避免暗部被误判成黑边
+    encoded_bar_min_coverage = 0.3,
     encoded_bar_followup_delay = 2.5,
     encoded_bar_followup_interval = 1.5,
     encoded_bar_followup_samples = 3,
@@ -1132,7 +1134,9 @@ local function start_ambiguous_bar_followup(file_generation)
                 return
             end
             if success then
-                local insets, _, coverage, matched = logo_bounds.detect(frame, o.encoded_bar_threshold)
+                local insets, _, coverage, matched = logo_bounds.detect(
+                    frame, o.encoded_bar_threshold, o.encoded_bar_min_coverage
+                )
                 -- 出现可信结果（黑边，或内容画面且确认无黑边）→ 一次性显示并冻结
                 local displayable = insets ~= nil or (coverage or 0) >= 0.28
                 if displayable then
@@ -1253,7 +1257,8 @@ local function prepare_display_after_frame(reason)
                 if success then
                     local insets, _, coverage, matched = logo_bounds.detect(
                         frame,
-                        o.encoded_bar_threshold
+                        o.encoded_bar_threshold,
+                        o.encoded_bar_min_coverage
                     )
                     max_coverage = math.max(max_coverage, tonumber(coverage) or 0)
                     if insets then

@@ -42,11 +42,13 @@ end
 ---Detect symmetric encoded letterbox/pillarbox bars in a BGR0 frame.
 ---@param frame table
 ---@param threshold number
+---@param min_coverage number|nil 画面内容充分性下限；低于该值的偏黑/稀疏画面
+---  视为"不足以信任黑边检测"，不返回 insets（避免暗部内容被误判成黑边）
 ---@return table|nil insets
 ---@return boolean meaningful 画面是否具有足够内容（非全黑/稀疏开场）
 ---@return number coverage 16×9 网格亮像素覆盖率 0~1
 ---@return boolean matched 内容画幅是否命中白名单（画幅匹配优先，false=纯视觉兜底候选）
-function M.detect(frame, threshold)
+function M.detect(frame, threshold, min_coverage)
     if type(frame) ~= 'table' or frame.format ~= 'bgr0'
         or type(frame.data) ~= 'string' then return nil end
     local width = tonumber(frame.w) or 0
@@ -56,8 +58,10 @@ function M.detect(frame, threshold)
 
     local data = frame.data
     threshold = clamp(math.floor(tonumber(threshold) or 16), 0, 48)
+    min_coverage = clamp(math.floor((tonumber(min_coverage) or 0.3) * 100) / 100, 0, 1)
     local samples = 64
-    local max_bright = math.floor(samples * 0.12)
+    -- 黑线判定容错收紧：真黑边整行几乎全暗，偏黑暗部（少量亮点）不应被当成黑边
+    local max_bright = math.max(1, math.floor(samples * 0.04))
 
     local function pixel_is_bright(x, y)
         local offset = y * stride + x * 4 + 1
@@ -122,7 +126,12 @@ function M.detect(frame, threshold)
     local coverage = bright_points / (grid_columns * grid_rows)
     local meaningful = coverage >= 0.06
 
-    if symmetric(top, bottom, height)
+    -- 画面内容不充分（偏黑/稀疏）时，即使扫描出对称暗区也不当黑边：
+    -- 电影暗部场景的"暗边"与真黑边在像素上无法区分，低覆盖本身说明
+    -- 内容不足，锁定错误锚点会让徽标被乱推。仅内容充分时黑边才可信。
+    local content_ok = coverage >= min_coverage
+    if content_ok
+        and symmetric(top, bottom, height)
         and not row_is_black(math.min(height - 1, top + math.max(2, math.floor(height * 0.004))))
         and not row_is_black(math.max(0, height - 1 - bottom - math.max(2, math.floor(height * 0.004)))) then
         insets.top, insets.bottom = top / height, bottom / height
@@ -130,7 +139,8 @@ function M.detect(frame, threshold)
         local content_height = height - top - bottom
         if aspect_matches(width / content_height, source_aspect) then matched = true end
     end
-    if symmetric(left, right, width)
+    if content_ok
+        and symmetric(left, right, width)
         and not column_is_black(math.min(width - 1, left + math.max(2, math.floor(width * 0.004))))
         and not column_is_black(math.max(0, width - 1 - right - math.max(2, math.floor(width * 0.004)))) then
         insets.left, insets.right = left / width, right / width
