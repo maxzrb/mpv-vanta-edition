@@ -1368,7 +1368,8 @@ local function random_lookahead_offsets(window, count, gap, min_first)
 end
 
 -- 后瞻检测：起播黑屏/稀疏画面时，并行解码「当前时间 + 各偏移」处的一帧
--- （缩小到 320×180 的 BGR0），复用黑边检测。聚合优先级：
+-- （640×360 BGR0，flags=neighbor 不做插值，黑边保持纯黑，避免缩小混叠漏掉小黑边），
+-- 复用黑边检测。聚合优先级：
 --   画幅匹配黑边 → 任一黑边 → 任一内容充分的亮画面（确认无黑边）；
 -- 全部不可信则回退常规复检。返回 true 表示已启动异步检测。
 local function start_bar_lookahead(file_generation)
@@ -1454,7 +1455,7 @@ local function start_bar_lookahead(file_generation)
             '-i', path,
             '-map', '0:v:0',
             '-frames:v', '1',
-            '-vf', 'scale=320:180',
+            '-vf', 'scale=640:360:flags=neighbor',
             '-f', 'rawvideo',
             '-pix_fmt', 'bgr0',
             '-y', tmp_file,
@@ -1469,12 +1470,12 @@ local function start_bar_lookahead(file_generation)
             if success and result and result.status == 0 then
                 content = read_text_file(tmp_file)
             end
-            if content and #content == 320 * 180 * 4 then
+            if content and #content == 640 * 360 * 4 then
                 local frame = {
                     format = 'bgr0',
-                    w = 320,
-                    h = 180,
-                    stride = 320 * 4,
+                    w = 640,
+                    h = 360,
+                    stride = 640 * 4,
                     data = content,
                 }
                 local insets, _, coverage, matched = logo_bounds.detect(
