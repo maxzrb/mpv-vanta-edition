@@ -45,18 +45,18 @@ const LANDING_HTML = `<!DOCTYPE html>
 <title>AerithDream的下载加速</title>
 <style>
   :root {
-    --bg0: #0a0f1e; --bg1: #0f1728; --card: rgba(19,28,46,0.72);
-    --line: #1f2a44; --line2: #2c3a5c;
-    --brand: #56e5f1; --brand-dim: rgba(86,229,241,0.14);
-    --text: #e6edf7; --muted: #8fa0bd; --accent: #ffb347;
-    --danger: #ff6b81; --ok: #2fd08f;
-    --radius: 14px; --shadow: 0 10px 40px rgba(0,0,0,.35);
+    --bg0: #f4f7fb; --bg1: #eef2f8; --card: #ffffff;
+    --line: #e3e9f2; --line2: #d3dce8;
+    --brand: #56e5f1; --brand-deep: #0e9cb5; --brand-dim: rgba(14,156,181,0.08);
+    --text: #1d2937; --muted: #64748b; --accent: #d97706;
+    --danger: #dc2626; --ok: #16a34a;
+    --radius: 14px; --shadow: 0 10px 30px rgba(35,55,90,.08);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
-    background: radial-gradient(1200px 600px at 15% -10%, #16233f 0%, transparent 55%),
-                radial-gradient(900px 500px at 110% 0%, #10222e 0%, transparent 50%), var(--bg0);
+    background: radial-gradient(1200px 600px at 15% -10%, #e1f4f8 0%, transparent 55%),
+                radial-gradient(900px 500px at 110% 0%, #e8f1f8 0%, transparent 50%), var(--bg0);
     color: var(--text); line-height: 1.6; min-height: 100vh;
   }
   .wrap { max-width: 900px; margin: 0 auto; padding: 28px 20px 60px; }
@@ -65,33 +65,33 @@ const LANDING_HTML = `<!DOCTYPE html>
   .logo .dot { width: 12px; height: 12px; border-radius: 4px; background: var(--brand); box-shadow: 0 0 14px var(--brand); }
   .logo small { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 2px; }
   .gh-link { color: var(--muted); text-decoration: none; font-size: 13px; border: 1px solid var(--line); padding: 7px 12px; border-radius: 999px; transition: .2s; }
-  .gh-link:hover { color: var(--brand); border-color: var(--brand); }
+  .gh-link:hover { color: var(--brand-deep); border-color: var(--brand-deep); }
   .hero { margin-bottom: 30px; }
   .hero h1 { font-size: 30px; font-weight: 700; letter-spacing: .5px; }
-  .hero h1 em { font-style: normal; color: var(--brand); }
+  .hero h1 em { font-style: normal; color: var(--brand-deep); }
   .hero p { color: var(--muted); margin-top: 8px; font-size: 14px; max-width: 620px; }
-  .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--brand-dim); color: var(--brand);
-           border: 1px solid rgba(86,229,241,.35); border-radius: 999px; padding: 3px 12px; font-size: 12px; margin-top: 14px; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--brand-dim); color: var(--brand-deep);
+           border: 1px solid rgba(14,156,181,.35); border-radius: 999px; padding: 3px 12px; font-size: 12px; margin-top: 14px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
   .card-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; gap: 8px; }
   .card-head .title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-  .card-head .title .v { color: var(--brand); }
+  .card-head .title .v { color: var(--brand-deep); }
   .card-head .date { color: var(--muted); font-size: 12px; }
-  .asset { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid rgba(44,58,92,.5); transition: background .15s; }
+  .asset { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid rgba(227,233,242,.9); transition: background .15s; }
   .asset:last-child { border-bottom: none; }
-  .asset:hover { background: rgba(86,229,241,.04); }
+  .asset:hover { background: rgba(14,156,181,.06); }
   .ic { flex: 0 0 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
-        font-size: 17px; background: #182238; border: 1px solid var(--line); }
+        font-size: 17px; background: #eef2f8; border: 1px solid var(--line); }
   .asset .meta { flex: 1; min-width: 0; }
   .asset .name { font-size: 13.5px; font-weight: 500; word-break: break-all; }
   .asset .size { color: var(--muted); font-size: 12px; margin-top: 2px; }
   .asset .actions { display: flex; gap: 8px; flex: 0 0 auto; }
   .btn { border: 0; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
          text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: .15s; font-family: inherit; }
-  .btn-primary { background: var(--brand); color: #062a2e; }
+  .btn-primary { background: var(--brand); color: #06323a; }
   .btn-primary:hover { filter: brightness(1.08); box-shadow: 0 0 18px rgba(86,229,241,.4); }
   .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--line2); }
-  .btn-ghost:hover { color: var(--brand); border-color: var(--brand); }
+  .btn-ghost:hover { color: var(--brand-deep); border-color: var(--brand-deep); }
   .tag { font-size: 10px; border-radius: 6px; padding: 2px 7px; margin-left: 8px; vertical-align: 1px; font-weight: 600; }
   .tag-inst { background: rgba(255,179,71,.15); color: var(--accent); border: 1px solid rgba(255,179,71,.4); }
   .tag-opt { background: rgba(47,208,143,.12); color: var(--ok); border: 1px solid rgba(47,208,143,.35); }
@@ -106,10 +106,10 @@ const LANDING_HTML = `<!DOCTYPE html>
   .order b { color: var(--text); font-weight: 600; white-space: nowrap; }
   .order .req { color: var(--accent); font-size: 11px; }
   .note { font-size: 12.5px; color: var(--muted); margin-top: 10px; line-height: 1.8; }
-  .note code { background: #182238; border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; font-size: 11.5px; word-break: break-all; color: var(--brand); }
-  footer { margin-top: 36px; text-align: center; color: #5a6b88; font-size: 12px; }
-  footer a { color: #7d8fae; text-decoration: none; }
-  footer a:hover { color: var(--brand); }
+  .note code { background: #eef3f8; border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; font-size: 11.5px; word-break: break-all; color: var(--brand-deep); }
+  footer { margin-top: 36px; text-align: center; color: #94a3b8; font-size: 12px; }
+  footer a { color: #64748b; text-decoration: none; }
+  footer a:hover { color: var(--brand-deep); }
   @media (max-width: 640px) {
     .hero h1 { font-size: 24px; }
     .asset { flex-wrap: wrap; }
@@ -212,7 +212,7 @@ const LANDING_HTML = `<!DOCTYPE html>
   var footerVer = document.getElementById('footerVer');
 
   function render(release) {
-    badge.innerHTML = '最新版本 <b style="color:var(--brand)">' + esc(release.tag_name) + '</b>';
+    badge.innerHTML = '最新版本 <b style="color:var(--brand-deep)">' + esc(release.tag_name) + '</b>';
     title.innerHTML = '最新 Release <span class="v">' + esc(release.tag_name) + '</span>';
     if (release.published_at) {
       var d = new Date(release.published_at);
@@ -265,7 +265,7 @@ const LANDING_HTML = `<!DOCTYPE html>
     .catch(function (e) {
       badge.innerHTML = '版本获取失败';
       body.innerHTML = '<span class="err">暂时无法连接 GitHub API（可能限流）。请直接访问 ' +
-        '<a style="color:var(--brand)" href="' + esc(LIST_REPO_URL) + '/releases" target="_blank">GitHub Releases</a> 页面获取下载链接。</span>';
+        '<a style="color:var(--brand-deep)" href="' + esc(LIST_REPO_URL) + '/releases" target="_blank">GitHub Releases</a> 页面获取下载链接。</span>';
     });
 })();
 </script>
