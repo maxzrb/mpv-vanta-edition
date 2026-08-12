@@ -26,9 +26,9 @@ local o = {
     encoded_bar_sample_interval = 0.22,
     -- 偏黑/稀疏画面（内容覆盖率低于该值）不采用黑边锚点，避免暗部被误判成黑边
     encoded_bar_min_coverage = 0.3,
-    -- 后瞻：起播黑屏/稀疏画面时，解码当前时间 + 该秒数处的一帧来定黑边锚点
-    -- （需 PATH 或常见路径中存在 ffmpeg；0=关闭，找不到 ffmpeg 自动回退复检）
-    encoded_bar_lookahead = 5,
+    -- 后瞻：起播黑屏/稀疏画面时，解码当前时间 + 各偏移处的一帧来定黑边锚点
+    -- （逗号分隔多个偏移，任一帧可信即用；0/空=关闭，找不到 ffmpeg 自动回退复检）
+    encoded_bar_lookahead = '1,3,5',
     encoded_bar_followup_delay = 2.5,
     encoded_bar_followup_interval = 1.5,
     encoded_bar_followup_samples = 3,
@@ -1233,8 +1233,26 @@ end
 -- 的一帧（缩小到 320×180 的 BGR0），复用黑边检测得到可信锚点后直接显示。
 -- 返回 true 表示已启动异步检测（由回调决定显示或回退复检）；false 表示
 -- 未启动（关闭、找不到 ffmpeg、无路径等），由调用方走常规复检。
+-- 解析后瞻偏移列表："1,3,5" → {1,3,5}；单个数字 "5" → {5}；0/空 → {}（关闭）
+local function parse_lookahead_offsets(value)
+    local result = {}
+    local text = tostring(value or ''):gsub('%s', '')
+    if text == '' or text == '0' then return result end
+    for token in text:gmatch('[^,]+') do
+        local n = tonumber(token)
+        if n and n > 0 and n <= 60 then result[#result + 1] = n end
+    end
+    table.sort(result)
+    return result
+end
+
+-- 后瞻检测：起播黑屏/稀疏画面时，并行解码「当前时间 + 各偏移」处的一帧
+-- （缩小到 320×180 的 BGR0），复用黑边检测。聚合优先级：
+--   画幅匹配黑边 → 任一黑边 → 任一内容充分的亮画面（确认无黑边）；
+-- 全部不可信则回退常规复检。返回 true 表示已启动异步检测。
 local function start_bar_lookahead(file_generation)
-    if not o.encoded_bar_lookahead or o.encoded_bar_lookahead <= 0 then return false end
+    local offsets = parse_lookahead_offsets(o.encoded_bar_lookahead)
+    if #offsets == 0 then return false end
     if state.badge_displayed or state.lookahead_busy then return false end
     local ffmpeg = find_ffmpeg()
     if not ffmpeg then
@@ -1246,42 +1264,85 @@ local function start_bar_lookahead(file_generation)
 
     state.lookahead_busy = true
     local now = math.max(0, tonumber(mp.get_property_number('time-pos', 0)) or 0)
-    local target = now + tonumber(o.encoded_bar_lookahead)
     local tmp_dir = os.getenv('TEMP') or os.getenv('TMP') or '/tmp'
-    local tmp_file = join_path(tmp_dir, 'vanta-lookahead-' .. tostring(mp.get_time()) .. '.raw')
-    -- args[0] 必须是可执行文件路径（mpv subprocess 按此启动进程）
-    local args = {
-        ffmpeg,
-        '-hide_banner', '-loglevel', 'error',
-        '-ss', string.format('%.3f', target),
-        '-i', path,
-        '-map', '0:v:0',
-        '-frames:v', '1',
-        '-vf', 'scale=320:180',
-        '-f', 'rawvideo',
-        '-pix_fmt', 'bgr0',
-        '-y', tmp_file,
-    }
-    local function cleanup()
-        pcall(os.remove, tmp_file)
-    end
-    local ok, request = pcall(mp.command_native_async, {
-        name = 'subprocess',
-        args = args,
-        capture_stderr = true,
-    }, function(success, result)
+    local stamp = tostring(mp.get_time())
+    local results = {}    -- index -> {insets, coverage, matched}
+    local tmp_files = {}  -- 所有临时文件，结算后统一清理
+    local pending = #offsets
+    local settled = false
+
+    local function settle()
+        if settled then return end
+        settled = true
+        for _, f in ipairs(tmp_files) do pcall(os.remove, f) end
         state.lookahead_busy = false
         if file_generation ~= state.file_generation or not state.loaded
             or state.badge_displayed then
-            cleanup()
             return
         end
-        local content = nil
-        if success and result and result.status == 0 then
-            content = read_text_file(tmp_file)
+        -- 聚合：优先画幅匹配黑边，其次任一黑边，再次任一内容充分的亮画面
+        local pick
+        for _, r in ipairs(results) do
+            if r and r.insets and r.matched then pick = r break end
         end
-        cleanup()
-        if content and #content == 320 * 180 * 4 then
+        if not pick then
+            for _, r in ipairs(results) do
+                if r and r.insets then pick = r break end
+            end
+        end
+        if not pick then
+            for _, r in ipairs(results) do
+                if r and not r.insets and (r.coverage or 0) >= 0.28 then pick = r break end
+            end
+        end
+        if pick then
+            local insets = pick.insets
+            state.content_insets = insets
+            state.content_insets_matched = type(insets) == 'table' and pick.matched == true or nil
+            state.badge_displayed = true
+            msg.debug(string.format(
+                'bar lookahead resolved (t+%.1fs): left=%.4f top=%.4f right=%.4f bottom=%.4f cov=%.3f',
+                pick.offset or 0,
+                type(insets) == 'table' and (tonumber(insets.left) or 0) or 0,
+                type(insets) == 'table' and (tonumber(insets.top) or 0) or 0,
+                type(insets) == 'table' and (tonumber(insets.right) or 0) or 0,
+                type(insets) == 'table' and (tonumber(insets.bottom) or 0) or 0,
+                pick.coverage or 0
+            ))
+            schedule_detection('lookahead', tonumber(o.delay) or 0.45)
+            return
+        end
+        -- 所有偏移都不可信（黑屏/稀疏）：回退常规复检
+        start_ambiguous_bar_followup(file_generation)
+    end
+
+    for index, offset in ipairs(offsets) do
+        local target = now + offset
+        local tmp_file = join_path(tmp_dir, 'vanta-la-' .. stamp .. '-' .. tostring(index) .. '.raw')
+        tmp_files[#tmp_files + 1] = tmp_file
+        -- args[0] 必须是可执行文件路径（mpv subprocess 按此启动进程）
+        local args = {
+            ffmpeg,
+            '-hide_banner', '-loglevel', 'error',
+            '-ss', string.format('%.3f', target),
+            '-i', path,
+            '-map', '0:v:0',
+            '-frames:v', '1',
+            '-vf', 'scale=320:180',
+            '-f', 'rawvideo',
+            '-pix_fmt', 'bgr0',
+            '-y', tmp_file,
+        }
+        local ok, request = pcall(mp.command_native_async, {
+            name = 'subprocess',
+            args = args,
+            capture_stderr = true,
+        }, function(success, result)
+            if settled then return end
+            local content = nil
+            if success and result and result.status == 0 then
+                content = read_text_file(tmp_file)
+            end
             if content and #content == 320 * 180 * 4 then
                 local frame = {
                     format = 'bgr0',
@@ -1293,34 +1354,22 @@ local function start_bar_lookahead(file_generation)
                 local insets, _, coverage, matched = logo_bounds.detect(
                     frame, o.encoded_bar_threshold, o.encoded_bar_min_coverage
                 )
-                local displayable = insets ~= nil or (coverage or 0) >= 0.28
-                if displayable then
-                    state.content_insets = insets
-                    state.content_insets_matched = type(insets) == 'table' and matched == true or nil
-                    state.badge_displayed = true
-                    msg.debug(string.format(
-                        'bar lookahead resolved (t+%.1fs): left=%.4f top=%.4f right=%.4f bottom=%.4f cov=%.3f',
-                        tonumber(o.encoded_bar_lookahead) or 0,
-                        type(insets) == 'table' and (tonumber(insets.left) or 0) or 0,
-                        type(insets) == 'table' and (tonumber(insets.top) or 0) or 0,
-                        type(insets) == 'table' and (tonumber(insets.right) or 0) or 0,
-                        type(insets) == 'table' and (tonumber(insets.bottom) or 0) or 0,
-                        coverage or 0
-                    ))
-                    schedule_detection('lookahead', tonumber(o.delay) or 0.45)
-                    return
-                end
+                results[index] = {
+                    offset = offset,
+                    insets = insets,
+                    coverage = coverage or 0,
+                    matched = matched == true,
+                }
+            else
+                results[index] = { offset = offset, insets = nil, coverage = 0, matched = false }
             end
+            pending = pending - 1
+            if pending <= 0 then settle() end
+        end)
+        if not ok then
+            pending = pending - 1
+            if pending <= 0 then settle() end
         end
-        -- 后瞻无结果（黑边不可信或文件太短等）：回退常规复检
-        if not state.badge_displayed then
-            start_ambiguous_bar_followup(file_generation)
-        end
-    end)
-    if not ok then
-        state.lookahead_busy = false
-        cleanup()
-        return false
     end
     return true
 end
