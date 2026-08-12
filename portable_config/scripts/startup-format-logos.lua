@@ -66,6 +66,8 @@ local state = {
     frame_ready = false,
     waiting_for_frame = false,
     content_insets = nil,
+    -- 当前 content_insets 是否命中画幅白名单；false=纯视觉兜底，nil=无结果
+    content_insets_matched = nil,
     bar_request = nil,
     overlay_error_logged = false,
 }
@@ -1096,8 +1098,10 @@ local function start_ambiguous_bar_followup(file_generation)
     )
 
     local function request_sample()
+        -- 已有画幅匹配结果即停止复检；纯视觉兜底结果继续复检，等待更可信的画幅匹配覆盖。
         if file_generation ~= state.file_generation or not state.loaded
-            or state.content_insets ~= nil or remaining <= 0 then
+            or (state.content_insets ~= nil and state.content_insets_matched ~= false)
+            or remaining <= 0 then
             return
         end
         remaining = remaining - 1
@@ -1107,9 +1111,11 @@ local function start_ambiguous_bar_followup(file_generation)
             state.bar_request = nil
             if file_generation ~= state.file_generation or not state.loaded then return end
             if success then
-                local insets = logo_bounds.detect(frame, o.encoded_bar_threshold)
-                if insets then
+                local insets, _, _, matched = logo_bounds.detect(frame, o.encoded_bar_threshold)
+                -- 画幅匹配结果随时覆盖；纯视觉兜底仅在没有结果时采纳
+                if insets and (matched == true or state.content_insets == nil) then
                     state.content_insets = insets
+                    state.content_insets_matched = matched == true
                     msg.debug(string.format(
                         'encoded bars updated after sparse opening: left=%.4f top=%.4f right=%.4f bottom=%.4f',
                         tonumber(insets.left) or 0,
@@ -1141,9 +1147,10 @@ end
 
 local function prepare_display_after_frame(reason)
     local file_generation = state.file_generation
-    local function continue_detection(insets, suffix, followup)
+    local function continue_detection(insets, suffix, followup, matched)
         if file_generation ~= state.file_generation or not state.loaded then return end
         state.content_insets = insets
+        state.content_insets_matched = type(insets) == 'table' and matched == true or nil
         if type(insets) == 'table' then
             msg.debug(string.format(
                 'encoded bars: left=%.4f top=%.4f right=%.4f bottom=%.4f',
@@ -1168,21 +1175,35 @@ local function prepare_display_after_frame(reason)
         if file_generation ~= state.file_generation or not state.loaded then return end
         local completed = false
         local probes = {}
+        local probes_matched = {}
+        local matched_count = 0
         local max_coverage = 0
         local sample_count = clamp(math.floor(tonumber(o.encoded_bar_samples) or 3), 1, 5)
         local sample_interval = clamp(tonumber(o.encoded_bar_sample_interval) or 0.22, 0.05, 0.75)
-        local function finish(insets, suffix)
+
+        -- 画幅匹配优先：命中白名单的样本合并；白名单外画幅退化为纯视觉兜底合并。
+        local function merge_probes()
+            if matched_count > 0 then
+                local matched_probes = {}
+                for index, probe in ipairs(probes) do
+                    if probes_matched[index] then matched_probes[#matched_probes + 1] = probe end
+                end
+                return logo_bounds.merge(matched_probes), true
+            end
+            return logo_bounds.merge(probes), false
+        end
+
+        local function finish(insets, suffix, used_matched)
             if completed then return end
             completed = true
-            continue_detection(
-                insets,
-                suffix,
-                insets == nil and max_coverage < 0.28
-            )
+            -- 复检触发：无结果且覆盖率过低（稀疏开场），或仅拿到纯视觉兜底（期待画幅匹配覆盖）
+            local followup = (insets == nil and max_coverage < 0.28)
+                or (insets ~= nil and not used_matched)
+            continue_detection(insets, suffix, followup, used_matched)
         end
         schedule('bar-detect-timeout', 1.4 + sample_count * sample_interval, function()
-            local insets = logo_bounds.merge(probes)
-            finish(insets, insets and '-encoded-bars-timeout' or '-bar-timeout')
+            local insets, used_matched = merge_probes()
+            finish(insets, insets and '-encoded-bars-timeout' or '-bar-timeout', used_matched)
         end)
 
         local function request_sample(index)
@@ -1192,16 +1213,20 @@ local function prepare_display_after_frame(reason)
             }, function(success, frame)
                 if completed then return end
                 if success then
-                    local insets, _, coverage = logo_bounds.detect(
+                    local insets, _, coverage, matched = logo_bounds.detect(
                         frame,
                         o.encoded_bar_threshold
                     )
                     max_coverage = math.max(max_coverage, tonumber(coverage) or 0)
-                    if insets then probes[#probes + 1] = insets end
+                    if insets then
+                        probes[#probes + 1] = insets
+                        probes_matched[#probes_matched + 1] = matched == true
+                        if matched == true then matched_count = matched_count + 1 end
+                    end
                 end
                 if index >= sample_count then
-                    local insets = logo_bounds.merge(probes)
-                    finish(insets, insets and '-encoded-bars' or '-frame-bounds')
+                    local insets, used_matched = merge_probes()
+                    finish(insets, insets and '-encoded-bars' or '-frame-bounds', used_matched)
                 else
                     schedule('bar-detect-sample', sample_interval, function()
                         request_sample(index + 1)
@@ -1210,8 +1235,8 @@ local function prepare_display_after_frame(reason)
             end)
             if not ok then
                 if index >= sample_count then
-                    local insets = logo_bounds.merge(probes)
-                    finish(insets, insets and '-encoded-bars' or '-bar-unavailable')
+                    local insets, used_matched = merge_probes()
+                    finish(insets, insets and '-encoded-bars' or '-bar-unavailable', used_matched)
                 else
                     schedule('bar-detect-sample', sample_interval, function()
                         request_sample(index + 1)
@@ -1251,6 +1276,7 @@ local function on_file_loaded()
     state.frame_ready = false
     state.waiting_for_frame = true
     state.content_insets = nil
+    state.content_insets_matched = nil
     state.last_aid = mp.get_property_native('aid')
     state.overlay_error_logged = false
     cancel_display(true)
@@ -1307,6 +1333,7 @@ local function on_end_file()
     state.frame_ready = false
     state.waiting_for_frame = false
     state.content_insets = nil
+    state.content_insets_matched = nil
     state.last_aid = nil
     stop_timer('frame-wait')
     stop_timer('bar-detect')

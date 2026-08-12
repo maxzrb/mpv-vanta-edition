@@ -2,10 +2,11 @@
   * startup-logo-bounds.lua
   * 起播格式徽章专用：检测视频帧中实际编码的对称上下/左右黑边，并合并多帧结果。
   * 来源：杳知 mpv 整合包（Yaozhil/mpv-Yaozhi，MIT License）8.11/8.12「特殊画幅与黑边起播徽章优化」。
-  * 相比旧版单帧 + 画幅白名单方案，本模块直接按像素检测黑边，去掉固定画幅白名单，
-  * 通过多帧中位数合并降低全黑首帧、片头渐变与瞬时画面造成的误判；
-  * 8.12 起额外返回 16×9 网格画面覆盖率，供调用方判断"全黑/片头 Logo 等低覆盖开场"
-  * 并安排少量延迟复检，避免把稀疏开场误锁成徽章锚点。
+  * 策略：像素扫描对称黑边后，先做画幅白名单匹配（2.76~1.25 等标准电影/电视画幅）——
+  * 命中即高置信采用；白名单外画幅（特殊超宽、竖屏、方形等）仍返回纯视觉结果作为兜底，
+  * 由调用方配合覆盖率与延迟复检决定是否采纳，避免纯视觉误判。
+  * 多帧中位数合并降低全黑首帧、片头渐变与瞬时画面造成的误判；
+  * 16×9 网格画面覆盖率供调用方判断"全黑/片头 Logo 等低覆盖开场"。
 ]]
 
 local M = {}
@@ -22,12 +23,29 @@ local function median(values)
     return (values[count / 2] + values[count / 2 + 1]) / 2
 end
 
+-- 标准电影/电视画幅白名单（含像素纵横比），命中即判定为可信黑边。
+local KNOWN_ASPECTS = {2.76, 2.55, 2.40, 2.39, 2.35, 2.20, 2.10, 2.00, 1.90, 1.85, 16 / 9, 4 / 3, 1.25}
+
+---内容画幅是否命中白名单（且与源画幅明显不同，排除无黑边场景）。
+---@param aspect number 内容区宽高比
+---@param source_aspect number 完整帧宽高比
+---@return boolean
+local function aspect_matches(aspect, source_aspect)
+    if type(aspect) ~= 'number' or aspect <= 0 then return false end
+    if math.abs(aspect - source_aspect) < 0.06 then return false end
+    for _, known in ipairs(KNOWN_ASPECTS) do
+        if math.abs(aspect - known) <= 0.065 then return true end
+    end
+    return false
+end
+
 ---Detect symmetric encoded letterbox/pillarbox bars in a BGR0 frame.
 ---@param frame table
 ---@param threshold number
 ---@return table|nil insets
 ---@return boolean meaningful 画面是否具有足够内容（非全黑/稀疏开场）
 ---@return number coverage 16×9 网格亮像素覆盖率 0~1
+---@return boolean matched 内容画幅是否命中白名单（画幅匹配优先，false=纯视觉兜底候选）
 function M.detect(frame, threshold)
     if type(frame) ~= 'table' or frame.format ~= 'bgr0'
         or type(frame.data) ~= 'string' then return nil end
@@ -87,6 +105,8 @@ function M.detect(frame, threshold)
     local left, right = scan_edges(width, column_is_black)
     local insets = {left = 0, top = 0, right = 0, bottom = 0}
     local found = false
+    local matched = false
+    local source_aspect = width / height
 
     -- 全黑开场、片头 Logo 等稀疏画面不足以锁定徽章位置：把采样画面覆盖率
     -- 返回给调用方，让它安排少量廉价复检，而不是延迟普通全帧内容的起播。
@@ -107,15 +127,19 @@ function M.detect(frame, threshold)
         and not row_is_black(math.max(0, height - 1 - bottom - math.max(2, math.floor(height * 0.004)))) then
         insets.top, insets.bottom = top / height, bottom / height
         found = true
+        local content_height = height - top - bottom
+        if aspect_matches(width / content_height, source_aspect) then matched = true end
     end
     if symmetric(left, right, width)
         and not column_is_black(math.min(width - 1, left + math.max(2, math.floor(width * 0.004))))
         and not column_is_black(math.max(0, width - 1 - right - math.max(2, math.floor(width * 0.004)))) then
         insets.left, insets.right = left / width, right / width
         found = true
+        local content_width = width - left - right
+        if aspect_matches(content_width / height, source_aspect) then matched = true end
     end
 
-    return found and insets or nil, meaningful, coverage
+    return found and insets or nil, meaningful, coverage, matched
 end
 
 ---Merge several successful probes without letting a single fade frame win.
