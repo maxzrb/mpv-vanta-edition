@@ -68,6 +68,8 @@ local state = {
     content_insets = nil,
     -- 当前 content_insets 是否命中画幅白名单；false=纯视觉兜底，nil=无结果
     content_insets_matched = nil,
+    -- 徽标是否已显示；一旦显示，锚点冻结不再移动（避免黑屏→亮屏时徽标跳位）
+    badge_displayed = false,
     bar_request = nil,
     overlay_error_logged = false,
 }
@@ -1082,8 +1084,10 @@ local function has_video_geometry()
         and tonumber(dimensions.h) > 0
 end
 
--- 全黑开场、片头 Logo 等稀疏画面无法可靠锁定徽章锚点：在正常播放中
--- 安排少量廉价复检（不 seek、不延迟起播），一旦出现稳定的对称黑边就重新锚定。
+-- 全黑开场、片头 Logo 等稀疏画面无法可靠锁定徽章锚点：徽标暂不显示，
+-- 在正常播放中安排少量廉价复检（不 seek、不延迟起播），一旦出现可信内容
+-- 画面（检测到黑边，或覆盖率足够且确认无黑边）就一次性显示到位并冻结锚点；
+-- 复检次数耗尽仍未出现可信画面时兜底显示，避免徽标缺失。
 local function start_ambiguous_bar_followup(file_generation)
     local remaining = clamp(
         math.floor(tonumber(o.encoded_bar_followup_samples) or 3),
@@ -1098,10 +1102,15 @@ local function start_ambiguous_bar_followup(file_generation)
     )
 
     local function request_sample()
-        -- 已有画幅匹配结果即停止复检；纯视觉兜底结果继续复检，等待更可信的画幅匹配覆盖。
+        -- 徽标已显示或文件已切换：停止（已显示的徽标绝不移动）
         if file_generation ~= state.file_generation or not state.loaded
-            or (state.content_insets ~= nil and state.content_insets_matched ~= false)
-            or remaining <= 0 then
+            or state.badge_displayed then
+            return
+        end
+        if remaining <= 0 then
+            -- 复检耗尽仍未出现可信内容画面：兜底显示，避免徽标缺失
+            state.badge_displayed = true
+            schedule_detection('sparse-timeout', tonumber(o.delay) or 0.45)
             return
         end
         remaining = remaining - 1
@@ -1109,23 +1118,28 @@ local function start_ambiguous_bar_followup(file_generation)
             name = 'screenshot-raw', flags = 'video', format = 'bgr0',
         }, function(success, frame)
             state.bar_request = nil
-            if file_generation ~= state.file_generation or not state.loaded then return end
+            if file_generation ~= state.file_generation or not state.loaded
+                or state.badge_displayed then
+                return
+            end
             if success then
-                local insets, _, _, matched = logo_bounds.detect(frame, o.encoded_bar_threshold)
-                -- 画幅匹配结果随时覆盖；纯视觉兜底仅在没有结果时采纳
-                if insets and (matched == true or state.content_insets == nil) then
+                local insets, _, coverage, matched = logo_bounds.detect(frame, o.encoded_bar_threshold)
+                -- 出现可信结果（黑边，或内容画面且确认无黑边）→ 一次性显示并冻结
+                local displayable = insets ~= nil or (coverage or 0) >= 0.28
+                if displayable then
                     state.content_insets = insets
-                    state.content_insets_matched = matched == true
-                    msg.debug(string.format(
-                        'encoded bars updated after sparse opening: left=%.4f top=%.4f right=%.4f bottom=%.4f',
-                        tonumber(insets.left) or 0,
-                        tonumber(insets.top) or 0,
-                        tonumber(insets.right) or 0,
-                        tonumber(insets.bottom) or 0
-                    ))
-                    if state.visible and state.opacity_index > 0 then
-                        render_level(state.opacity_index)
+                    state.content_insets_matched = type(insets) == 'table' and matched == true or nil
+                    if type(insets) == 'table' then
+                        msg.debug(string.format(
+                            'encoded bars confirmed after sparse opening: left=%.4f top=%.4f right=%.4f bottom=%.4f',
+                            tonumber(insets.left) or 0,
+                            tonumber(insets.top) or 0,
+                            tonumber(insets.right) or 0,
+                            tonumber(insets.bottom) or 0
+                        ))
                     end
+                    state.badge_displayed = true
+                    schedule_detection('sparse-resolved', tonumber(o.delay) or 0.45)
                     return
                 end
             end
@@ -1147,27 +1161,34 @@ end
 
 local function prepare_display_after_frame(reason)
     local file_generation = state.file_generation
-    local function continue_detection(insets, suffix, followup, matched)
+    local function continue_detection(insets, suffix, followup, matched, show_now)
         if file_generation ~= state.file_generation or not state.loaded then return end
-        state.content_insets = insets
-        state.content_insets_matched = type(insets) == 'table' and matched == true or nil
-        if type(insets) == 'table' then
-            msg.debug(string.format(
-                'encoded bars: left=%.4f top=%.4f right=%.4f bottom=%.4f',
-                tonumber(insets.left) or 0,
-                tonumber(insets.top) or 0,
-                tonumber(insets.right) or 0,
-                tonumber(insets.bottom) or 0
-            ))
+        -- 锚点只在徽标显示前确定；显示后冻结，避免黑屏→亮屏时徽标跳位
+        if not state.badge_displayed then
+            state.content_insets = insets
+            state.content_insets_matched = type(insets) == 'table' and matched == true or nil
+            if type(insets) == 'table' then
+                msg.debug(string.format(
+                    'encoded bars: left=%.4f top=%.4f right=%.4f bottom=%.4f',
+                    tonumber(insets.left) or 0,
+                    tonumber(insets.top) or 0,
+                    tonumber(insets.right) or 0,
+                    tonumber(insets.bottom) or 0
+                ))
+            end
         end
         state.bar_request = nil
         stop_timer('bar-detect-timeout')
-        schedule_detection(reason .. (suffix or ''), tonumber(o.delay) or 0.45)
+        -- 仅在未显示且本次结果可展示时显示（黑屏/稀疏开场交给复检等待更可信结果）
+        if not state.badge_displayed and show_now then
+            state.badge_displayed = true
+            schedule_detection(reason .. (suffix or ''), tonumber(o.delay) or 0.45)
+        end
         if followup then start_ambiguous_bar_followup(file_generation) end
     end
 
     if not has_real_video_track() or not o.anchor_to_video or not o.detect_encoded_bars then
-        continue_detection(nil, '', false)
+        continue_detection(nil, '', false, false, true)
         return
     end
 
@@ -1196,10 +1217,11 @@ local function prepare_display_after_frame(reason)
         local function finish(insets, suffix, used_matched)
             if completed then return end
             completed = true
-            -- 复检触发：无结果且覆盖率过低（稀疏开场），或仅拿到纯视觉兜底（期待画幅匹配覆盖）
-            local followup = (insets == nil and max_coverage < 0.28)
-                or (insets ~= nil and not used_matched)
-            continue_detection(insets, suffix, followup, used_matched)
+            -- 可展示：检测到黑边，或画面内容充分（覆盖率达标）
+            local displayable = insets ~= nil or max_coverage >= 0.28
+            -- 黑屏/稀疏开场（无黑边且覆盖率低）→ 暂不显示，交给复检等待更可信结果
+            local followup = not displayable
+            continue_detection(insets, suffix, followup, used_matched, displayable)
         end
         schedule('bar-detect-timeout', 1.4 + sample_count * sample_interval, function()
             local insets, used_matched = merge_probes()
@@ -1277,6 +1299,7 @@ local function on_file_loaded()
     state.waiting_for_frame = true
     state.content_insets = nil
     state.content_insets_matched = nil
+    state.badge_displayed = false
     state.last_aid = mp.get_property_native('aid')
     state.overlay_error_logged = false
     cancel_display(true)
@@ -1334,6 +1357,7 @@ local function on_end_file()
     state.waiting_for_frame = false
     state.content_insets = nil
     state.content_insets_matched = nil
+    state.badge_displayed = false
     state.last_aid = nil
     stop_timer('frame-wait')
     stop_timer('bar-detect')
