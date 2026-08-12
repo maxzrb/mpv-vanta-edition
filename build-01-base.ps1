@@ -159,6 +159,10 @@ Write-Host "       Copying mpv core..." -ForegroundColor Gray
 Copy-IfExists "mpv.exe" $BaseBuild
 Copy-IfExists "mpv.com" $BaseBuild
 
+# 随包自带的检测专用 ffmpeg（起播徽章后瞻用；gyan.dev essentials_build 全解码精简版）
+Write-Host "       Copying bundled ffmpeg (lookahead detection)..." -ForegroundColor Gray
+Invoke-CopyTo $BaseBuild @("ffmpeg")
+
 # 在线视频解析器（与 mpv.exe 同目录时由 ytdl_hook 自动发现）
 Copy-IfExists "yt-dlp.exe" $BaseBuild
 

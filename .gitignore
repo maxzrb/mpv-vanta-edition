@@ -12,6 +12,7 @@
 /*.lib
 /*.dll.a
 /*.exe
+/ffmpeg/
 
 # --- Python 运行环境 ---
 /Lib/

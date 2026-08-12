@@ -1191,6 +1191,20 @@ local function find_ffmpeg()
     if ffmpeg_path ~= nil then return ffmpeg_path end
     local names = { 'ffmpeg.exe', 'ffmpeg' }
     local candidates = {}
+    -- 优先随包自带的检测专用 ffmpeg：mpv 根目录 ffmpeg/ffmpeg.exe
+    -- （01 Base 随包分发，解压即用，不依赖 PATH 或系统安装）。
+    -- 本脚本位于 portable_config/scripts/，向上两级即 mpv 根目录。
+    -- 用脚本自身绝对路径定位 mpv 根目录（mp.get_script_directory 在此构建可能为空）。
+    -- 本脚本位于 portable_config/scripts/，剥掉该尾部即 mpv 根目录。
+    local source = debug.getinfo(1, 'S').source:gsub('^@', '')
+    if source ~= '' then
+        local script_dir = select(1, utils.split_path(source))
+        local mpv_root = (script_dir:gsub('[/\\]$', ''))
+            :gsub('[/\\][Pp]ortable_config[/\\][Ss]cripts$', '')
+        candidates[#candidates + 1] = join_path(join_path(mpv_root, 'ffmpeg'), 'ffmpeg.exe')
+        candidates[#candidates + 1] = join_path(join_path(mpv_root, 'tools'), 'ffmpeg')
+        candidates[#candidates + 1] = join_path(mpv_root, 'ffmpeg')
+    end
     for dir in (os.getenv('PATH') or ''):gmatch('[^;]+') do
         for _, name in ipairs(names) do
             candidates[#candidates + 1] = join_path(dir, name)
