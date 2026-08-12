@@ -10,7 +10,7 @@ local logo_bounds = dofile(mp.command_native({
 
 local o = {
     enabled = true,
-    -- 黑边检测模式：current=画幅匹配(实验性，画幅优先+后瞻+冻结) /
+    -- 黑边检测模式：current=后瞻方案(实验性，画幅优先+后瞻+冻结) /
     -- yaozhi=杳知视觉方案(纯视觉，显示后复检可重定位) / none=不检测(右上角直接显示)
     mode = 'current',
     show_video = true,
@@ -1336,7 +1336,7 @@ end
 --   画幅匹配黑边 → 任一黑边 → 任一内容充分的亮画面（确认无黑边）；
 -- 全部不可信则回退常规复检。返回 true 表示已启动异步检测。
 local function start_bar_lookahead(file_generation)
-    -- 后瞻仅画幅匹配方案(current)启用；杳知视觉方案与不检测模式不依赖 ffmpeg
+    -- 后瞻(1/3/5s 预取)仅后瞻方案(current)启用；杳知视觉方案与不检测模式不依赖 ffmpeg
     if o.mode ~= 'current' then return false end
     local offsets = parse_lookahead_offsets(o.encoded_bar_lookahead)
     if #offsets == 0 then return false end
@@ -1780,7 +1780,7 @@ local function set_mode_message(value)
         state.waiting_for_frame = true
     end
     publish_state()
-    local label = mode == 'current' and '画幅匹配（实验性）'
+    local label = mode == 'current' and '后瞻方案（实验性）'
         or (mode == 'yaozhi' and '杳知视觉方案' or '不检测（右上角直接显示）')
     mp.osd_message('起播 Logo 检测模式：' .. label, 2)
 end
