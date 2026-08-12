@@ -29,12 +29,14 @@ local o = {
     encoded_bar_sample_interval = 0.22,
     -- 偏黑/稀疏画面（内容覆盖率低于该值）不采用黑边锚点，避免暗部被误判成黑边
     encoded_bar_min_coverage = 0.3,
-    -- 后瞻：起播黑屏/稀疏画面时，在 0~encoded_bar_lookahead 秒窗口内随机采样
-    -- encoded_bar_lookahead_samples 处（任意两处间隔 >= encoded_bar_lookahead_gap 秒），
-    -- 并行解码对应帧，任一帧可信即用；0=关闭，找不到 ffmpeg 自动回退复检
+    -- 后瞻：起播黑屏/稀疏画面时，在 encoded_bar_lookahead_min ~ encoded_bar_lookahead 秒
+    -- 窗口内随机采样 encoded_bar_lookahead_samples 处（第一处落在下限~下限+1s，
+    -- 任意两处间隔 >= encoded_bar_lookahead_gap 秒），并行解码对应帧，任一帧可信即用；
+    -- 0=关闭，找不到 ffmpeg 自动回退复检
     encoded_bar_lookahead = 10,
+    encoded_bar_lookahead_min = 3,
     encoded_bar_lookahead_samples = 3,
-    encoded_bar_lookahead_gap = 3,
+    encoded_bar_lookahead_gap = 2,
     encoded_bar_followup_delay = 2.5,
     encoded_bar_followup_interval = 1.5,
     encoded_bar_followup_samples = 3,
@@ -1326,25 +1328,41 @@ end
 -- 算法：在可滑动范围内取 count 个均匀随机点，排序后逐个累加 (i-1)*gap，
 -- 保证最小间隔且不超窗口。窗口放不下 count 个点时退化为从 0 起均匀铺开。
 local random_seeded = false
-local function random_lookahead_offsets(window, count, gap)
+-- 在 [min_first, window] 秒窗口内随机采样 count 个偏移：
+--   第一处落在 [min_first, min_first+1]；其余在第一处之后，任意两处间隔 >= gap 且不超窗口。
+local function random_lookahead_offsets(window, count, gap, min_first)
     local result = {}
     window = clamp(math.floor(tonumber(window) or 0), 0, 120)
     count = clamp(math.floor(tonumber(count) or 3), 1, 6)
     gap = clamp(math.floor(tonumber(gap) or 2), 0, math.max(1, window))
+    min_first = clamp(math.floor(tonumber(min_first) or 0), 0, math.max(0, window - 1))
     if window <= 0 then return result end
     if not random_seeded then
         math.randomseed(math.floor(os.time() + mp.get_time() * 1000))
         random_seeded = true
     end
-    if gap * (count - 1) > window then
-        -- 放不下：从 0 起按最小间隔铺开，超出窗口截断
-        for i = 1, count do result[#result + 1] = math.min(window, (i - 1) * gap) end
-    else
-        local spread = window - gap * (count - 1)
-        for i = 1, count do result[#result + 1] = math.random() * spread end
-        table.sort(result)
-        for i = 1, count do result[i] = result[i] + (i - 1) * gap end
+
+    -- 第一处落在 [min_first, min_first+1]
+    local first = min_first + math.random()
+    result[1] = first
+
+    -- 其余 count-1 处：first 之后，间隔 >= gap，且 <= window
+    local remaining = count - 1
+    if remaining > 0 then
+        local tail = window - first - gap * remaining
+        if tail < 0 then
+            -- 放不下：从 first 起按最小间隔铺开，超出窗口截断
+            for i = 2, count do result[i] = math.min(window, first + (i - 1) * gap) end
+        else
+            local points = {}
+            for i = 1, remaining do points[i] = math.random() * tail end
+            table.sort(points)
+            for i = 1, remaining do
+                result[i + 1] = first + i * gap + points[i]
+            end
+        end
     end
+
     table.sort(result)
     return result
 end
@@ -1357,7 +1375,8 @@ local function start_bar_lookahead(file_generation)
     -- 后瞻(0~7s 随机采样)仅后瞻方案(current)启用；杳知视觉方案与不检测模式不依赖 ffmpeg
     if o.mode ~= 'current' then return false end
     local offsets = random_lookahead_offsets(
-        o.encoded_bar_lookahead, o.encoded_bar_lookahead_samples, o.encoded_bar_lookahead_gap
+        o.encoded_bar_lookahead, o.encoded_bar_lookahead_samples,
+        o.encoded_bar_lookahead_gap, o.encoded_bar_lookahead_min
     )
     if #offsets == 0 then return false end
     if state.badge_displayed or state.lookahead_busy then return false end
