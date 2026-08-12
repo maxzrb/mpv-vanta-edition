@@ -6,11 +6,11 @@
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master` 与 `origin/master` 同步（杳知 8.12 跟进与后瞻检测优化共 16 个提交已推送） |
-| **最新发布提交** | `70fe59d`（tag: `v1.5.0`，已推送） |
-| **工作区** | v1.5.1 构建完成、验证通过；待打标签/推送/上传 |
+| **最新发布提交** | `327728b`（tag: `v1.5.1`，已推送） |
+| **工作区** | v1.5.1 已发布；工作树干净 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.0（已发布）；**v1.5.1 发布中（Z+1 小功能修复）** |
-| **上次操作** | v1.5.1 构建完成（21.6 分钟）；7z t 全过、SHA-256 已写入、门禁通过 |
+| **项目版本** | v1.5.1（已发布） |
+| **上次操作** | v1.5.1 发布完成：7 公开资产上传核对一致、标签推送 |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -93,6 +93,14 @@ c:\Program portable\mpv2\
 ---
 
 ## 会话日志
+### 2026-08-12 v1.5.1 发布完成（流程 6~8）
+
+- **构建**：`build-all-packages.ps1 -Version 1.5.1 -IncludePrivate` 一次通过，耗时约 21.6 分钟；01 包首次携带 `ffmpeg/ffmpeg.exe`（98.3MB，7z 后 129.9MB）。
+- **验证**：7z t 全过；SHA-256 全部写入版本迭代记录；门禁扫描通过（01 含 script-assets/fonts/ffmpeg/.vanta-version=1.5.1；05 全部排除；04 仅 Lossless.dll + GPL 源码）；根目录 `.vanta-version` 已同步 1.5.1；VantaInstaller v0.3.0 沿用（SHA-256 与 v1.5.0 一致）。
+- **提交**：`b2511ca`（发布前置记录）、`327728b`（构建记录/校验和）→ 标签 `v1.5.1` → 推送 master+tags。
+- **Release**：https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.5.1 （正式，非草稿/预发布）；7 个公开资产上传完毕，大小与本地 SHA-256 逐字节一致、无重复资产、无私包。
+- **状态**：发布完成；master 与 origin 同步、工作树干净。
+
 ### 2026-08-12 v1.5.1 发布前置检查（流程 3.1~3.4）
 
 - **版本号**：用户指定 v1.5.1（Z+1，小功能修复补足；杳知 8.12 跟进与后瞻检测优化）。
