@@ -79,6 +79,7 @@ local function read_snapshot()
         media_title = mp.get_property('media-title', ''),
         path = mp.get_property('path', ''),
         video_params = mp.get_property_native('video-params', {}),
+        video_frame_info = mp.get_property_native('video-frame-info', {}),
         audio_params = mp.get_property_native('audio-params', {}),
         video_track = read_selected_track('video'),
         audio_track = read_selected_track('audio'),
@@ -139,6 +140,14 @@ local function detect_dynamic_range(snapshot, context)
     local dv = dolby_vision_label(snapshot, context)
     if dv then return dv end
 
+    -- HDR Vivid（CUV-HDR）优先于普通 PQ/HLG 判断
+    if params['hdr-vivid'] == true
+        or track['hdr-vivid'] == true
+        or contains(context, 'hdrvivid')
+        or contains(context, 'cuvahdr') then
+        return 'HDR Vivid'
+    end
+
     local gamma = lower(params.gamma or params.transfer)
     local pq = gamma == 'pq' or gamma == 'smpte2084'
     if pq and has_hdr10_plus(track, params, context) then return 'HDR10+' end
@@ -187,6 +196,10 @@ local function detect_audio_codec(snapshot, raw, context, codec_context)
         return 'Dolby Atmos'
     end
     if contains(context, 'dtsx') then return 'DTS:X' end
+    if contains(codec_context, 'av3a') or contains(context, 'audiovivid')
+        or contains(context, 'avs3audio') then
+        return 'Audio Vivid'
+    end
     if contains(context, 'dtshdmasteraudio') or contains(context, 'dtshdmaster')
         or contains(context, 'dtshdma') or contains(context, 'dtsma') then
         return 'DTS-HD MA'
@@ -209,6 +222,11 @@ local function detect_audio_codec(snapshot, raw, context, codec_context)
     if contains(codec_context, 'dca') or contains(codec_context, 'dts')
         or raw:match('%f[%w]dts%f[%W]') then
         return 'DTS'
+    end
+    if contains(codec_context, 'ac4') then return 'Dolby AC-4' end
+    if contains(codec_context, 'mpegh') or contains(codec_context, 'mhm1')
+        or contains(codec_context, 'mha1') then
+        return 'MPEG-H Audio'
     end
     if contains(context, 'heaacv2') or contains(context, 'heaac2')
         or contains(context, 'sbrps') then
@@ -294,15 +312,23 @@ local function detect_audio_layout(snapshot)
     return count > 0 and (tostring(count) .. 'ch') or ''
 end
 
-local function resolution_labels(width, height)
+-- 1080 及以下按扫描方式区分逐行/隔行（1080P/1080i、720P/720i），
+-- 4K/8K/1440P 等名称保持不变；interlaced 来自 video-frame-info 属性。
+local function resolution_labels(width, height, interlaced)
     if width <= 0 and height <= 0 then return '', '' end
     if width >= 7600 or height >= 4300 then return '8K', '8K UHD' end
     if width >= 3800 or height >= 2100 then return '4K', '4K UHD' end
     if width >= 2500 or height >= 1400 then return '1440P', '1440P QHD' end
-    if width >= 1900 or height >= 1000 then return '1080P', '1080P' end
-    if width >= 1200 or height >= 700 then return '720P', '720P' end
+    if width >= 1900 or height >= 1000 then
+        local label = interlaced and '1080i' or '1080P'
+        return label, label
+    end
+    if width >= 1200 or height >= 700 then
+        local label = interlaced and '720i' or '720P'
+        return label, label
+    end
     if height > 0 then
-        local label = tostring(math.floor(height + 0.5)) .. 'P'
+        local label = tostring(math.floor(height + 0.5)) .. (interlaced and 'i' or 'P')
         return label, label
     end
     return '', ''
@@ -320,6 +346,8 @@ end
 function M.from_snapshot(snapshot)
     snapshot = type(snapshot) == 'table' and snapshot or {}
     local params = type(snapshot.video_params) == 'table' and snapshot.video_params or {}
+    local frame_info = type(snapshot.video_frame_info) == 'table'
+        and snapshot.video_frame_info or {}
     local width = tonumber(params.w or params.dw or params.width) or 0
     local height = tonumber(params.h or params.dh or params.height) or 0
     local video_raw, video_context = build_context(
@@ -331,7 +359,8 @@ function M.from_snapshot(snapshot)
     local _, audio_codec_context = build_context(
         snapshot, snapshot.audio_track, snapshot.audio_codec, false
     )
-    local resolution, resolution_long = resolution_labels(width, height)
+    local interlaced = frame_info.interlaced == true or snapshot.interlaced == true
+    local resolution, resolution_long = resolution_labels(width, height, interlaced)
     local fps = tonumber(snapshot.fps) or 0
     if fps <= 0 then fps = tonumber(snapshot.container_fps) or 0 end
 
@@ -339,6 +368,7 @@ function M.from_snapshot(snapshot)
         video_present = width > 0 or height > 0,
         resolution = resolution,
         resolution_long = resolution_long,
+        interlaced = interlaced,
         video_codec = detect_video_codec(video_context),
         dynamic_range = detect_dynamic_range(snapshot, video_context),
         fps = fps,

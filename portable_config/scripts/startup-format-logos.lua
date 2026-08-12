@@ -24,6 +24,9 @@ local o = {
     encoded_bar_delay = 0.18,
     encoded_bar_samples = 3,
     encoded_bar_sample_interval = 0.22,
+    encoded_bar_followup_delay = 2.5,
+    encoded_bar_followup_interval = 1.5,
+    encoded_bar_followup_samples = 3,
     scale = 1.0,
     portrait_scale = 1.18,
     margin_x = 60,
@@ -756,7 +759,9 @@ local function get_video_bounds(osd_width, osd_height)
 
     -- osd-dimensions only describes bars added by mpv. Blu-ray/ISO video often
     -- carries black bars inside the decoded 16:9 frame, so apply the normalized
-    -- one-shot pixel probe as an additional safe area. If another script has
+    -- pixel probe as an additional safe area. Sparse opening frames receive a
+    -- few follow-up probes, so a later stable letterbox can safely re-anchor
+    -- the badge without seeking or delaying playback. If another script has
     -- already cropped the video, ignore these insets to avoid double-cropping.
     local insets = state.content_insets
     local video_crop = mp.get_property('video-crop', '')
@@ -1074,9 +1079,69 @@ local function has_video_geometry()
         and tonumber(dimensions.w) > 0
         and tonumber(dimensions.h) > 0
 end
+
+-- 全黑开场、片头 Logo 等稀疏画面无法可靠锁定徽章锚点：在正常播放中
+-- 安排少量廉价复检（不 seek、不延迟起播），一旦出现稳定的对称黑边就重新锚定。
+local function start_ambiguous_bar_followup(file_generation)
+    local remaining = clamp(
+        math.floor(tonumber(o.encoded_bar_followup_samples) or 3),
+        0,
+        5
+    )
+    if remaining <= 0 then return end
+    local interval = clamp(
+        tonumber(o.encoded_bar_followup_interval) or 1.5,
+        0.5,
+        4.0
+    )
+
+    local function request_sample()
+        if file_generation ~= state.file_generation or not state.loaded
+            or state.content_insets ~= nil or remaining <= 0 then
+            return
+        end
+        remaining = remaining - 1
+        local ok, request = pcall(mp.command_native_async, {
+            name = 'screenshot-raw', flags = 'video', format = 'bgr0',
+        }, function(success, frame)
+            state.bar_request = nil
+            if file_generation ~= state.file_generation or not state.loaded then return end
+            if success then
+                local insets = logo_bounds.detect(frame, o.encoded_bar_threshold)
+                if insets then
+                    state.content_insets = insets
+                    msg.debug(string.format(
+                        'encoded bars updated after sparse opening: left=%.4f top=%.4f right=%.4f bottom=%.4f',
+                        tonumber(insets.left) or 0,
+                        tonumber(insets.top) or 0,
+                        tonumber(insets.right) or 0,
+                        tonumber(insets.bottom) or 0
+                    ))
+                    if state.visible and state.opacity_index > 0 then
+                        render_level(state.opacity_index)
+                    end
+                    return
+                end
+            end
+            if remaining > 0 then schedule('bar-followup', interval, request_sample) end
+        end)
+        if ok then
+            state.bar_request = request
+        elseif remaining > 0 then
+            schedule('bar-followup', interval, request_sample)
+        end
+    end
+
+    schedule(
+        'bar-followup',
+        clamp(tonumber(o.encoded_bar_followup_delay) or 2.5, 0.5, 8.0),
+        request_sample
+    )
+end
+
 local function prepare_display_after_frame(reason)
     local file_generation = state.file_generation
-    local function continue_detection(insets, suffix)
+    local function continue_detection(insets, suffix, followup)
         if file_generation ~= state.file_generation or not state.loaded then return end
         state.content_insets = insets
         if type(insets) == 'table' then
@@ -1091,10 +1156,11 @@ local function prepare_display_after_frame(reason)
         state.bar_request = nil
         stop_timer('bar-detect-timeout')
         schedule_detection(reason .. (suffix or ''), tonumber(o.delay) or 0.45)
+        if followup then start_ambiguous_bar_followup(file_generation) end
     end
 
     if not has_real_video_track() or not o.anchor_to_video or not o.detect_encoded_bars then
-        continue_detection(nil, '')
+        continue_detection(nil, '', false)
         return
     end
 
@@ -1102,12 +1168,17 @@ local function prepare_display_after_frame(reason)
         if file_generation ~= state.file_generation or not state.loaded then return end
         local completed = false
         local probes = {}
+        local max_coverage = 0
         local sample_count = clamp(math.floor(tonumber(o.encoded_bar_samples) or 3), 1, 5)
         local sample_interval = clamp(tonumber(o.encoded_bar_sample_interval) or 0.22, 0.05, 0.75)
         local function finish(insets, suffix)
             if completed then return end
             completed = true
-            continue_detection(insets, suffix)
+            continue_detection(
+                insets,
+                suffix,
+                insets == nil and max_coverage < 0.28
+            )
         end
         schedule('bar-detect-timeout', 1.4 + sample_count * sample_interval, function()
             local insets = logo_bounds.merge(probes)
@@ -1121,7 +1192,11 @@ local function prepare_display_after_frame(reason)
             }, function(success, frame)
                 if completed then return end
                 if success then
-                    local insets = logo_bounds.detect(frame, o.encoded_bar_threshold)
+                    local insets, _, coverage = logo_bounds.detect(
+                        frame,
+                        o.encoded_bar_threshold
+                    )
+                    max_coverage = math.max(max_coverage, tonumber(coverage) or 0)
                     if insets then probes[#probes + 1] = insets end
                 end
                 if index >= sample_count then
@@ -1180,6 +1255,7 @@ local function on_file_loaded()
     state.overlay_error_logged = false
     cancel_display(true)
     stop_timer('frame-wait')
+    stop_timer('bar-followup')
 
     if not has_real_video_track() then
         if o.require_video then
@@ -1235,6 +1311,7 @@ local function on_end_file()
     stop_timer('frame-wait')
     stop_timer('bar-detect')
     stop_timer('bar-detect-timeout')
+    stop_timer('bar-followup')
     if state.bar_request then
         pcall(mp.abort_async_command, state.bar_request)
         state.bar_request = nil

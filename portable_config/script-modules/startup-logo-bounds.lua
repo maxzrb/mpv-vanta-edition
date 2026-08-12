@@ -1,9 +1,11 @@
 --[[
   * startup-logo-bounds.lua
   * 起播格式徽章专用：检测视频帧中实际编码的对称上下/左右黑边，并合并多帧结果。
-  * 来源：杳知 mpv 整合包（Yaozhil/mpv-Yaozhi，MIT License）8.11「特殊画幅与黑边起播徽章优化」。
+  * 来源：杳知 mpv 整合包（Yaozhil/mpv-Yaozhi，MIT License）8.11/8.12「特殊画幅与黑边起播徽章优化」。
   * 相比旧版单帧 + 画幅白名单方案，本模块直接按像素检测黑边，去掉固定画幅白名单，
-  * 并通过多帧中位数合并降低全黑首帧、片头渐变与瞬时画面造成的误判。
+  * 通过多帧中位数合并降低全黑首帧、片头渐变与瞬时画面造成的误判；
+  * 8.12 起额外返回 16×9 网格画面覆盖率，供调用方判断"全黑/片头 Logo 等低覆盖开场"
+  * 并安排少量延迟复检，避免把稀疏开场误锁成徽章锚点。
 ]]
 
 local M = {}
@@ -23,7 +25,9 @@ end
 ---Detect symmetric encoded letterbox/pillarbox bars in a BGR0 frame.
 ---@param frame table
 ---@param threshold number
----@return table|nil
+---@return table|nil insets
+---@return boolean meaningful 画面是否具有足够内容（非全黑/稀疏开场）
+---@return number coverage 16×9 网格亮像素覆盖率 0~1
 function M.detect(frame, threshold)
     if type(frame) ~= 'table' or frame.format ~= 'bgr0'
         or type(frame.data) ~= 'string' then return nil end
@@ -84,6 +88,20 @@ function M.detect(frame, threshold)
     local insets = {left = 0, top = 0, right = 0, bottom = 0}
     local found = false
 
+    -- 全黑开场、片头 Logo 等稀疏画面不足以锁定徽章位置：把采样画面覆盖率
+    -- 返回给调用方，让它安排少量廉价复检，而不是延迟普通全帧内容的起播。
+    local grid_columns, grid_rows = 16, 9
+    local bright_points = 0
+    for row = 0, grid_rows - 1 do
+        local y = math.min(height - 1, math.floor((row + 0.5) * height / grid_rows))
+        for column = 0, grid_columns - 1 do
+            local x = math.min(width - 1, math.floor((column + 0.5) * width / grid_columns))
+            if pixel_is_bright(x, y) then bright_points = bright_points + 1 end
+        end
+    end
+    local coverage = bright_points / (grid_columns * grid_rows)
+    local meaningful = coverage >= 0.06
+
     if symmetric(top, bottom, height)
         and not row_is_black(math.min(height - 1, top + math.max(2, math.floor(height * 0.004))))
         and not row_is_black(math.max(0, height - 1 - bottom - math.max(2, math.floor(height * 0.004)))) then
@@ -97,7 +115,7 @@ function M.detect(frame, threshold)
         found = true
     end
 
-    return found and insets or nil
+    return found and insets or nil, meaningful, coverage
 end
 
 ---Merge several successful probes without letting a single fade frame win.
