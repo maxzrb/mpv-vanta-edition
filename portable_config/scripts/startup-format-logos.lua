@@ -10,7 +10,7 @@ local logo_bounds = dofile(mp.command_native({
 
 local o = {
     enabled = true,
-    -- 黑边检测模式：current=后瞻方案(实验性，画幅优先+后瞻+冻结) /
+    -- 黑边检测模式：current=后瞻单路 / parallel=后瞻双路并发 /
     -- yaozhi=杳知视觉方案(纯视觉，显示后复检可重定位) / none=不检测(右上角直接显示)
     mode = 'current',
     show_video = true,
@@ -37,6 +37,18 @@ local o = {
     encoded_bar_lookahead_min = 3,
     encoded_bar_lookahead_samples = 3,
     encoded_bar_lookahead_gap = 2,
+    -- 首窗只得到“无黑边”时，扩大到该时间点做第二窗确认；避免片头全幅 Logo
+    -- 先于正片窄黑边出现时，过早把徽章锁到右上角。<= lookahead 可关闭确认窗。
+    encoded_bar_confirm_min = 30,
+    encoded_bar_confirm_lookahead = 75,
+    encoded_bar_confirm_samples = 3,
+    -- 双路模式首个快速深探针；优先跨过发行方片头，并避免随机落到 AV1 慢 GOP。
+    encoded_bar_fast_probe = 40,
+    -- 旧键兼容：>= 0 时覆盖 encoded_bar_fast_probe；新配置不要再使用。
+    encoded_bar_parallel_fast_probe = -1,
+    -- 后瞻 ffmpeg 解码线程数。4 在 4K HEVC 上能明显降低起播 CPU 峰值，
+    -- 同时只比自动线程略慢；设为 0 交给 ffmpeg 自动决定。
+    encoded_bar_ffmpeg_threads = 4,
     encoded_bar_followup_delay = 2.5,
     encoded_bar_followup_interval = 1.5,
     encoded_bar_followup_samples = 3,
@@ -66,6 +78,7 @@ end
 
 local function normalize_mode(value)
     local mode = tostring(value or ''):lower()
+    if mode == 'parallel' then return 'parallel' end
     if mode == 'yaozhi' then return 'yaozhi' end
     if mode == 'none' or mode == 'off' or mode == 'no' then return 'none' end
     return 'current'
@@ -99,6 +112,7 @@ local state = {
     badge_displayed = false,
     -- 后瞻 ffmpeg 解码是否进行中（防重入）
     lookahead_busy = false,
+    lookahead_requests = {},
     bar_request = nil,
     overlay_error_logged = false,
 }
@@ -114,6 +128,15 @@ local config_path = mp.command_native({
 
 local function clamp(value, low, high)
     return math.max(low, math.min(high, value))
+end
+
+
+local function cancel_lookahead_requests()
+    for request in pairs(state.lookahead_requests) do
+        pcall(mp.abort_async_command, request)
+    end
+    state.lookahead_requests = {}
+    state.lookahead_busy = false
 end
 
 
@@ -1319,14 +1342,8 @@ local function find_ffmpeg()
     return false
 end
 
--- 后瞻检测：起播黑屏/稀疏画面时，解码「当前时间 + encoded_bar_lookahead」处
--- 的一帧（缩小到 320×180 的 BGR0），复用黑边检测得到可信锚点后直接显示。
--- 返回 true 表示已启动异步检测（由回调决定显示或回退复检）；false 表示
--- 未启动（关闭、找不到 ffmpeg、无路径等），由调用方走常规复检。
--- 解析后瞻偏移列表："1,3,5" → {1,3,5}；单个数字 "5" → {5}；0/空 → {}（关闭）
--- 在 0~window 秒窗口内随机采样 count 个偏移，任意两处间隔 >= gap 秒。
--- 算法：在可滑动范围内取 count 个均匀随机点，排序后逐个累加 (i-1)*gap，
--- 保证最小间隔且不超窗口。窗口放不下 count 个点时退化为从 0 起均匀铺开。
+-- 后瞻检测用的首窗随机采样：在指定时间窗取多个偏移，随后由第二确认窗
+-- 处理“全幅片头先于正片黑边出现”的歧义。
 local random_seeded = false
 -- 在 [min_first, window] 秒窗口内随机采样 count 个偏移：
 --   第一处落在 [min_first, min_first+1]；其余在第一处之后，任意两处间隔 >= gap 且不超窗口。
@@ -1367,14 +1384,35 @@ local function random_lookahead_offsets(window, count, gap, min_first)
     return result
 end
 
+-- 在 [start_time, end_time] 内分层随机采样：每个等分时间段取一处，避免普通随机
+-- 点全挤在片头同一段转场。采样限制在各段中部 60%，相邻点天然保持一定距离。
+local function stratified_lookahead_offsets(start_time, end_time, count)
+    local result = {}
+    start_time = math.max(0, tonumber(start_time) or 0)
+    end_time = math.max(start_time, tonumber(end_time) or start_time)
+    count = clamp(math.floor(tonumber(count) or 3), 1, 6)
+    local span = end_time - start_time
+    if span < 0.5 then return result end
+    if not random_seeded then
+        math.randomseed(math.floor(os.time() + mp.get_time() * 1000))
+        random_seeded = true
+    end
+    local segment = span / count
+    for index = 0, count - 1 do
+        local segment_start = start_time + index * segment
+        result[#result + 1] = segment_start + segment * (0.20 + math.random() * 0.60)
+    end
+    return result
+end
+
 -- 后瞻检测：起播黑屏/稀疏画面时，并行解码「当前时间 + 各偏移」处的一帧
 -- （640×360 BGR0，flags=neighbor 不做插值，黑边保持纯黑，避免缩小混叠漏掉小黑边），
--- 复用黑边检测。聚合优先级：
---   画幅匹配黑边 → 任一黑边 → 任一内容充分的亮画面（确认无黑边）；
--- 全部不可信则回退常规复检。返回 true 表示已启动异步检测。
+-- 复用黑边检测。首窗与后续确认窗交错串行采样：先看 3~4 秒，再立即看确认窗
+-- 前段，避免必须耗尽三个近端黑屏样本后才寻找正片。任一可信黑边立即采用；
+-- 确认窗仍无黑边才确认右上角；全部不可信则回退常规复检。
 local function start_bar_lookahead(file_generation)
-    -- 后瞻(0~7s 随机采样)仅后瞻方案(current)启用；杳知视觉方案与不检测模式不依赖 ffmpeg
-    if o.mode ~= 'current' then return false end
+    -- 后瞻仅两种后瞻模式启用；杳知视觉方案与不检测模式不依赖 ffmpeg
+    if o.mode ~= 'current' and o.mode ~= 'parallel' then return false end
     local offsets = random_lookahead_offsets(
         o.encoded_bar_lookahead, o.encoded_bar_lookahead_samples,
         o.encoded_bar_lookahead_gap, o.encoded_bar_lookahead_min
@@ -1393,34 +1431,40 @@ local function start_bar_lookahead(file_generation)
     local now = math.max(0, tonumber(mp.get_property_number('time-pos', 0)) or 0)
     local tmp_dir = os.getenv('TEMP') or os.getenv('TMP') or '/tmp'
     local stamp = tostring(mp.get_time())
-    local results = {}    -- index -> {insets, coverage, matched}
+    local initial_results = {}
+    local confirm_results = {}
     local tmp_files = {}  -- 所有临时文件，结算后统一清理
-    local pending = #offsets
     local settled = false
 
-    local function settle()
+    local function pick_bars(results)
+        for _, r in ipairs(results) do
+            if r and r.insets and r.matched then return r end
+        end
+        for _, r in ipairs(results) do
+            if r and r.insets then return r end
+        end
+    end
+
+    local function pick_no_bars(results, minimum_count)
+        local first
+        local count = 0
+        for _, r in ipairs(results) do
+            if r and not r.insets and (r.coverage or 0) >= 0.28 then
+                first = first or r
+                count = count + 1
+            end
+        end
+        return count >= (minimum_count or 1) and first or nil
+    end
+
+    local function settle(pick)
         if settled then return end
         settled = true
+        cancel_lookahead_requests()
         for _, f in ipairs(tmp_files) do pcall(os.remove, f) end
-        state.lookahead_busy = false
         if file_generation ~= state.file_generation or not state.loaded
             or state.badge_displayed then
             return
-        end
-        -- 聚合：优先画幅匹配黑边，其次任一黑边，再次任一内容充分的亮画面
-        local pick
-        for _, r in ipairs(results) do
-            if r and r.insets and r.matched then pick = r break end
-        end
-        if not pick then
-            for _, r in ipairs(results) do
-                if r and r.insets then pick = r break end
-            end
-        end
-        if not pick then
-            for _, r in ipairs(results) do
-                if r and not r.insets and (r.coverage or 0) >= 0.28 then pick = r break end
-            end
         end
         if pick then
             local insets = pick.insets
@@ -1443,61 +1487,208 @@ local function start_bar_lookahead(file_generation)
         start_ambiguous_bar_followup(file_generation)
     end
 
-    for index, offset in ipairs(offsets) do
-        local target = now + offset
-        local tmp_file = join_path(tmp_dir, 'vanta-la-' .. stamp .. '-' .. tostring(index) .. '.raw')
-        tmp_files[#tmp_files + 1] = tmp_file
-        -- args[0] 必须是可执行文件路径（mpv subprocess 按此启动进程）
-        local args = {
-            ffmpeg,
-            '-hide_banner', '-loglevel', 'error',
-            '-ss', string.format('%.3f', target),
-            '-i', path,
-            '-map', '0:v:0',
-            '-frames:v', '1',
-            '-vf', 'scale=640:360:flags=neighbor',
-            '-f', 'rawvideo',
-            '-pix_fmt', 'bgr0',
-            '-y', tmp_file,
-        }
-        local ok, request = pcall(mp.command_native_async, {
-            name = 'subprocess',
-            args = args,
-            capture_stderr = true,
-        }, function(success, result)
-            if settled then return end
-            local content = nil
-            if success and result and result.status == 0 then
-                content = read_text_file(tmp_file)
-            end
-            if content and #content == 640 * 360 * 4 then
-                local frame = {
-                    format = 'bgr0',
-                    w = 640,
-                    h = 360,
-                    stride = 640 * 4,
-                    data = content,
-                }
-                local insets, _, coverage, matched = logo_bounds.detect(
-                    frame, o.encoded_bar_threshold, o.encoded_bar_min_coverage
-                )
-                results[index] = {
-                    offset = offset,
-                    insets = insets,
-                    coverage = coverage or 0,
-                    matched = matched == true,
-                }
-            else
-                results[index] = { offset = offset, insets = nil, coverage = 0, matched = false }
-            end
-            pending = pending - 1
-            if pending <= 0 then settle() end
-        end)
-        if not ok then
-            pending = pending - 1
-            if pending <= 0 then settle() end
+    local first_window_end = tonumber(o.encoded_bar_lookahead) or 10
+    local confirm_start = math.max(
+        first_window_end, tonumber(o.encoded_bar_confirm_min) or 30
+    )
+    local confirm_end = tonumber(o.encoded_bar_confirm_lookahead) or 75
+    local duration = tonumber(mp.get_property_number('duration', 0)) or 0
+    if duration > 0 then
+        confirm_end = math.min(confirm_end, math.max(0, duration - now - 0.1))
+    end
+    local confirm_offsets = stratified_lookahead_offsets(
+        confirm_start, confirm_end, o.encoded_bar_confirm_samples
+    )
+
+    -- 近端与远端交错：I1,C1,I2,C2,I3,C3。复杂黑屏片头通常在 C1
+    -- 就能命中正片黑边，同时仍保留近端样本对短片头的快速响应。
+    local plan = {}
+    local plan_size = math.max(#offsets, #confirm_offsets)
+    for index = 1, plan_size do
+        if offsets[index] then
+            plan[#plan + 1] = {offset = offsets[index], results = initial_results, index = index}
+        end
+        if confirm_offsets[index] then
+            plan[#plan + 1] = {offset = confirm_offsets[index], results = confirm_results, index = index}
         end
     end
+    if #confirm_offsets > 0 then
+        msg.debug(string.format(
+            'bar lookahead: interleaving %.1f-%.1fs confirmation window (%d+%d samples)',
+            confirm_start, confirm_end, #offsets, #confirm_offsets
+        ))
+    end
+
+    local function launch_probe(item, serial, completed)
+            if settled then return end
+            local offset = item.offset
+            local target = now + offset
+            local tmp_file = join_path(tmp_dir, string.format(
+                'vanta-la-%s-%d.raw', stamp, serial
+            ))
+            tmp_files[#tmp_files + 1] = tmp_file
+            -- args[0] 必须是可执行文件路径（mpv subprocess 按此启动进程）
+            local args = {
+                ffmpeg,
+                '-hide_banner', '-loglevel', 'error',
+                '-threads', tostring(clamp(
+                    math.floor(tonumber(o.encoded_bar_ffmpeg_threads) or 4), 0, 16
+                )),
+                '-ss', string.format('%.3f', target),
+                '-i', path,
+                '-map', '0:v:0',
+                '-frames:v', '1',
+                '-vf', 'scale=640:360:flags=neighbor',
+                '-f', 'rawvideo',
+                '-pix_fmt', 'bgr0',
+                '-y', tmp_file,
+            }
+            local request
+            local ok
+            ok, request = pcall(mp.command_native_async, {
+                name = 'subprocess',
+                args = args,
+                capture_stderr = true,
+            }, function(success, result)
+                if request then state.lookahead_requests[request] = nil end
+                if settled then
+                    pcall(os.remove, tmp_file)
+                    return
+                end
+                local content = nil
+                if success and result and result.status == 0 then
+                    content = read_text_file(tmp_file)
+                end
+                if content and #content == 640 * 360 * 4 then
+                    local frame = {
+                        format = 'bgr0',
+                        w = 640,
+                        h = 360,
+                        stride = 640 * 4,
+                        data = content,
+                    }
+                    local insets, _, coverage, matched = logo_bounds.detect(
+                        frame, o.encoded_bar_threshold, o.encoded_bar_min_coverage
+                    )
+                    item.results[item.index] = {
+                        offset = offset,
+                        insets = insets,
+                        coverage = coverage or 0,
+                        matched = matched == true,
+                    }
+                else
+                    item.results[item.index] = {
+                        offset = offset, insets = nil, coverage = 0, matched = false,
+                    }
+                end
+                local probe = item.results[item.index]
+                msg.debug(string.format(
+                    'bar lookahead sample (t+%.1fs): %s cov=%.3f matched=%s',
+                    offset,
+                    probe.insets and 'bars' or ((probe.coverage or 0) >= 0.28 and 'no-bars' or 'uncertain'),
+                    probe.coverage or 0,
+                    tostring(probe.matched == true)
+                ))
+                -- 可信黑边的置信度高于无黑边，命中后无需继续剩余采样。
+                completed(probe)
+            end)
+            if ok and request then
+                state.lookahead_requests[request] = true
+            else
+                item.results[item.index] = {
+                    offset = offset, insets = nil, coverage = 0, matched = false,
+                }
+                completed(item.results[item.index])
+            end
+    end
+
+    local function finish_plan()
+        if settled then return end
+        local bars = pick_bars(initial_results) or pick_bars(confirm_results)
+        if bars then settle(bars) return end
+        if #confirm_offsets == 0 then
+            settle(pick_no_bars(initial_results))
+            return
+        end
+        -- “有黑边”任一可信样本即可成立；“无黑边”至少需要两帧远端共识。
+        settle(pick_no_bars(confirm_results, 2))
+    end
+
+    local function pick_early_no_bars()
+        -- 一帧近端亮画面 + 一帧深后瞻亮画面即可确认无黑边；深后瞻已跨过
+        -- 常见发行方片头。若任一帧有黑边，外层仍优先立即采用黑边。
+        return pick_no_bars(initial_results, 1) and pick_no_bars(confirm_results, 1)
+            and pick_no_bars(confirm_results, 1) or nil
+    end
+
+    local function get_fast_probe()
+        local legacy = tonumber(o.encoded_bar_parallel_fast_probe) or -1
+        local fast_probe = clamp(
+            legacy >= 0 and legacy or (tonumber(o.encoded_bar_fast_probe) or 40),
+            confirm_start, confirm_end
+        )
+        if duration > 0 then
+            fast_probe = math.min(fast_probe, math.max(0, duration - now - 0.1))
+        end
+        return fast_probe > first_window_end and fast_probe or confirm_offsets[1]
+    end
+
+    local function run_common_plan(concurrency)
+        -- 单路/双路共用完全相同的采样顺序、判定门槛与回退；唯一差异是
+        -- 困难场景每批启动 1 个还是 2 个 ffmpeg。
+        local first_deep = get_fast_probe()
+        local function evaluate_results()
+            local bars = pick_bars(initial_results) or pick_bars(confirm_results)
+            if bars then return bars end
+            return pick_early_no_bars() or pick_no_bars(confirm_results, 2)
+        end
+
+        local function run_fallback()
+            local next_index = 1
+            local serial = 10
+            local function run_batch()
+                if settled then return end
+                local batch = {}
+                for _ = 1, concurrency do
+                    if plan[next_index] then
+                        batch[#batch + 1] = plan[next_index]
+                        next_index = next_index + 1
+                    end
+                end
+                if #batch == 0 then finish_plan() return end
+                local pending = #batch
+                local function on_probe(probe)
+                    if settled then return end
+                    if probe.insets then settle(probe) return end
+                    pending = pending - 1
+                    local decision = evaluate_results()
+                    if decision then
+                        settle(decision)
+                    elseif pending <= 0 then
+                        run_batch()
+                    end
+                end
+                for _, item in ipairs(batch) do
+                    serial = serial + 1
+                    launch_probe(item, serial, on_probe)
+                end
+            end
+            run_batch()
+        end
+
+        if not first_deep then run_fallback() return end
+        launch_probe({
+            offset = first_deep, results = confirm_results, index = 1,
+        }, 1, function(probe)
+            if probe.insets or (probe.coverage or 0) >= 0.28 then
+                settle(probe)
+            else
+                run_fallback()
+            end
+        end)
+    end
+
+    run_common_plan(o.mode == 'parallel' and 2 or 1)
     return true
 end
 
@@ -1506,7 +1697,7 @@ local function prepare_display_after_frame(reason)
     local function continue_detection(insets, suffix, followup, matched, show_now)
         if file_generation ~= state.file_generation or not state.loaded then return end
         local yz_mode = o.mode == 'yaozhi'
-        -- 锚点：current 模式显示后冻结；yaozhi 模式始终允许更新（杳知视觉方案可重定位）
+        -- 锚点：两种后瞻模式显示后冻结；yaozhi 模式始终允许更新（可重定位）
         if yz_mode or not state.badge_displayed then
             state.content_insets = insets
             state.content_insets_matched = type(insets) == 'table' and matched == true or nil
@@ -1527,14 +1718,17 @@ local function prepare_display_after_frame(reason)
             state.badge_displayed = true
             schedule_detection(reason .. (suffix or ''), tonumber(o.delay) or 0.45)
         elseif not state.badge_displayed and show_now then
-            -- current：仅在未显示且本次结果可展示时显示（黑屏/稀疏开场交给复检）
+            -- 两种后瞻模式：仅在未显示且本次结果可展示时显示。
             state.badge_displayed = true
+            cancel_lookahead_requests()
             schedule_detection(reason .. (suffix or ''), tonumber(o.delay) or 0.45)
         end
         if followup then
             if start_bar_lookahead(file_generation) then
                 return
             end
+            -- 双路模式可能已在当前帧检测前预启动后瞻，不重复进入视觉复检。
+            if state.lookahead_busy then return end
             -- 杳知视觉方案用可重定位复检，current 用冻结+兜底复检
             if yz_mode then
                 start_yaozhi_bar_followup(file_generation)
@@ -1547,6 +1741,12 @@ local function prepare_display_after_frame(reason)
     if not has_real_video_track() or not o.anchor_to_video or not effective_detect_encoded_bars() then
         continue_detection(nil, '', false, false, true)
         return
+    end
+
+    -- 两种后瞻模式都在首帧稳定后立即预启动固定深探针，不再等待三次
+    -- screenshot-raw 判断片头是否稀疏。困难场景的补测并发度仍由模式决定。
+    if o.mode == 'current' or o.mode == 'parallel' then
+        start_bar_lookahead(file_generation)
     end
 
     schedule('bar-detect', math.max(0, tonumber(o.encoded_bar_delay) or 0.18), function()
@@ -1583,7 +1783,12 @@ local function prepare_display_after_frame(reason)
             local followup = yz_mode
                 and (insets == nil and max_coverage < 0.28)
                 or (not displayable)
-            continue_detection(insets, suffix, followup, used_matched, yz_mode or displayable)
+            local wait_for_lookahead = (o.mode == 'current' or o.mode == 'parallel')
+                and state.lookahead_busy and insets == nil
+            continue_detection(
+                insets, suffix, followup, used_matched,
+                yz_mode or (displayable and not wait_for_lookahead)
+            )
         end
         schedule('bar-detect-timeout', 1.4 + sample_count * sample_interval, function()
             local insets, used_matched = merge_probes()
@@ -1663,7 +1868,7 @@ local function on_file_loaded()
     state.content_insets = nil
     state.content_insets_matched = nil
     state.badge_displayed = false
-    state.lookahead_busy = false
+    cancel_lookahead_requests()
     state.last_aid = mp.get_property_native('aid')
     state.overlay_error_logged = false
     cancel_display(true)
@@ -1731,6 +1936,7 @@ local function on_end_file()
         pcall(mp.abort_async_command, state.bar_request)
         state.bar_request = nil
     end
+    cancel_lookahead_requests()
     stop_timer('retry')
     stop_timer('audio-change')
     cancel_display(true)
@@ -1813,14 +2019,15 @@ local function set_mode_message(value)
     -- 切换模式后重新走一遍黑边检测与显示（prepare 会按新 mode 决定检测方式）
     cancel_display(true)
     state.badge_displayed = false
-    state.lookahead_busy = false
+    cancel_lookahead_requests()
     if state.loaded and state.frame_ready then
         prepare_display_after_frame('mode-change')
     else
         state.waiting_for_frame = true
     end
     publish_state()
-    local label = mode == 'current' and '后瞻方案（实验性）'
+    local label = mode == 'current' and '后瞻方案·单路检测（实验性）'
+        or (mode == 'parallel' and '后瞻方案·双路检测（实验性）')
         or (mode == 'yaozhi' and '杳知视觉方案' or '不检测（右上角直接显示）')
     mp.osd_message('起播 Logo 检测模式：' .. label, 2)
 end
