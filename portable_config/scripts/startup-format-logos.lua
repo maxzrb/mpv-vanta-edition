@@ -26,6 +26,9 @@ local o = {
     encoded_bar_sample_interval = 0.22,
     -- 偏黑/稀疏画面（内容覆盖率低于该值）不采用黑边锚点，避免暗部被误判成黑边
     encoded_bar_min_coverage = 0.3,
+    -- 后瞻：起播黑屏/稀疏画面时，解码当前时间 + 该秒数处的一帧来定黑边锚点
+    -- （需 PATH 或常见路径中存在 ffmpeg；0=关闭，找不到 ffmpeg 自动回退复检）
+    encoded_bar_lookahead = 5,
     encoded_bar_followup_delay = 2.5,
     encoded_bar_followup_interval = 1.5,
     encoded_bar_followup_samples = 3,
@@ -72,6 +75,8 @@ local state = {
     content_insets_matched = nil,
     -- 徽标是否已显示；一旦显示，锚点冻结不再移动（避免黑屏→亮屏时徽标跳位）
     badge_displayed = false,
+    -- 后瞻 ffmpeg 解码是否进行中（防重入）
+    lookahead_busy = false,
     bar_request = nil,
     overlay_error_logged = false,
 }
@@ -1179,6 +1184,133 @@ local function start_ambiguous_bar_followup(file_generation)
     )
 end
 
+
+-- ffmpeg 可执行文件探测（PATH + 常见安装路径），结果缓存。
+local ffmpeg_path = nil
+local function find_ffmpeg()
+    if ffmpeg_path ~= nil then return ffmpeg_path end
+    local names = { 'ffmpeg.exe', 'ffmpeg' }
+    local candidates = {}
+    for dir in (os.getenv('PATH') or ''):gmatch('[^;]+') do
+        for _, name in ipairs(names) do
+            candidates[#candidates + 1] = join_path(dir, name)
+        end
+    end
+    for _, extra in ipairs({
+        'C:\\ffmpeg\\bin\\ffmpeg.exe',
+        'C:\\Program Files\\ffmpeg\\bin\\ffmpeg.exe',
+        'C:\\Program Files (x86)\\ffmpeg\\bin\\ffmpeg.exe',
+    }) do
+        candidates[#candidates + 1] = extra
+    end
+    for _, candidate in ipairs(candidates) do
+        local handle = io.open(candidate, 'r')
+        if handle then
+            handle:close()
+            ffmpeg_path = candidate
+            return candidate
+        end
+    end
+    ffmpeg_path = false
+    return false
+end
+
+-- 后瞻检测：起播黑屏/稀疏画面时，解码「当前时间 + encoded_bar_lookahead」处
+-- 的一帧（缩小到 320×180 的 BGR0），复用黑边检测得到可信锚点后直接显示。
+-- 返回 true 表示已启动异步检测（由回调决定显示或回退复检）；false 表示
+-- 未启动（关闭、找不到 ffmpeg、无路径等），由调用方走常规复检。
+local function start_bar_lookahead(file_generation)
+    if not o.encoded_bar_lookahead or o.encoded_bar_lookahead <= 0 then return false end
+    if state.badge_displayed or state.lookahead_busy then return false end
+    local ffmpeg = find_ffmpeg()
+    if not ffmpeg then
+        msg.debug('bar lookahead disabled: ffmpeg not found')
+        return false
+    end
+    local path = mp.get_property('path', '')
+    if not path or path == '' then return false end
+
+    state.lookahead_busy = true
+    local now = math.max(0, tonumber(mp.get_property_number('time-pos', 0)) or 0)
+    local target = now + tonumber(o.encoded_bar_lookahead)
+    local tmp_dir = os.getenv('TEMP') or os.getenv('TMP') or '/tmp'
+    local tmp_file = join_path(tmp_dir, 'vanta-lookahead-' .. tostring(mp.get_time()) .. '.raw')
+    -- args[0] 必须是可执行文件路径（mpv subprocess 按此启动进程）
+    local args = {
+        ffmpeg,
+        '-hide_banner', '-loglevel', 'error',
+        '-ss', string.format('%.3f', target),
+        '-i', path,
+        '-map', '0:v:0',
+        '-frames:v', '1',
+        '-vf', 'scale=320:180',
+        '-f', 'rawvideo',
+        '-pix_fmt', 'bgr0',
+        '-y', tmp_file,
+    }
+    local function cleanup()
+        pcall(os.remove, tmp_file)
+    end
+    local ok, request = pcall(mp.command_native_async, {
+        name = 'subprocess',
+        args = args,
+        capture_stderr = true,
+    }, function(success, result)
+        state.lookahead_busy = false
+        if file_generation ~= state.file_generation or not state.loaded
+            or state.badge_displayed then
+            cleanup()
+            return
+        end
+        local content = nil
+        if success and result and result.status == 0 then
+            content = read_text_file(tmp_file)
+        end
+        cleanup()
+        if content and #content == 320 * 180 * 4 then
+            if content and #content == 320 * 180 * 4 then
+                local frame = {
+                    format = 'bgr0',
+                    w = 320,
+                    h = 180,
+                    stride = 320 * 4,
+                    data = content,
+                }
+                local insets, _, coverage, matched = logo_bounds.detect(
+                    frame, o.encoded_bar_threshold, o.encoded_bar_min_coverage
+                )
+                local displayable = insets ~= nil or (coverage or 0) >= 0.28
+                if displayable then
+                    state.content_insets = insets
+                    state.content_insets_matched = type(insets) == 'table' and matched == true or nil
+                    state.badge_displayed = true
+                    msg.debug(string.format(
+                        'bar lookahead resolved (t+%.1fs): left=%.4f top=%.4f right=%.4f bottom=%.4f cov=%.3f',
+                        tonumber(o.encoded_bar_lookahead) or 0,
+                        type(insets) == 'table' and (tonumber(insets.left) or 0) or 0,
+                        type(insets) == 'table' and (tonumber(insets.top) or 0) or 0,
+                        type(insets) == 'table' and (tonumber(insets.right) or 0) or 0,
+                        type(insets) == 'table' and (tonumber(insets.bottom) or 0) or 0,
+                        coverage or 0
+                    ))
+                    schedule_detection('lookahead', tonumber(o.delay) or 0.45)
+                    return
+                end
+            end
+        end
+        -- 后瞻无结果（黑边不可信或文件太短等）：回退常规复检
+        if not state.badge_displayed then
+            start_ambiguous_bar_followup(file_generation)
+        end
+    end)
+    if not ok then
+        state.lookahead_busy = false
+        cleanup()
+        return false
+    end
+    return true
+end
+
 local function prepare_display_after_frame(reason)
     local file_generation = state.file_generation
     local function continue_detection(insets, suffix, followup, matched, show_now)
@@ -1204,7 +1336,9 @@ local function prepare_display_after_frame(reason)
             state.badge_displayed = true
             schedule_detection(reason .. (suffix or ''), tonumber(o.delay) or 0.45)
         end
-        if followup then start_ambiguous_bar_followup(file_generation) end
+        if followup and not start_bar_lookahead(file_generation) then
+            start_ambiguous_bar_followup(file_generation)
+        end
     end
 
     if not has_real_video_track() or not o.anchor_to_video or not o.detect_encoded_bars then
@@ -1321,6 +1455,7 @@ local function on_file_loaded()
     state.content_insets = nil
     state.content_insets_matched = nil
     state.badge_displayed = false
+    state.lookahead_busy = false
     state.last_aid = mp.get_property_native('aid')
     state.overlay_error_logged = false
     cancel_display(true)
