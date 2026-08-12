@@ -32,9 +32,9 @@ local o = {
     -- 后瞻：起播黑屏/稀疏画面时，在 0~encoded_bar_lookahead 秒窗口内随机采样
     -- encoded_bar_lookahead_samples 处（任意两处间隔 >= encoded_bar_lookahead_gap 秒），
     -- 并行解码对应帧，任一帧可信即用；0=关闭，找不到 ffmpeg 自动回退复检
-    encoded_bar_lookahead = 7,
+    encoded_bar_lookahead = 10,
     encoded_bar_lookahead_samples = 3,
-    encoded_bar_lookahead_gap = 2,
+    encoded_bar_lookahead_gap = 3,
     encoded_bar_followup_delay = 2.5,
     encoded_bar_followup_interval = 1.5,
     encoded_bar_followup_samples = 3,
