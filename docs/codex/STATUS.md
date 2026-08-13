@@ -6,11 +6,11 @@
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master` 与 `origin/master` 同步（v1.5.2 已发布并推送） |
-| **最新发布提交** | `23ddb2a`（tag: `v1.5.2`，已推送） |
-| **工作区** | 01/05 README 构建加固 + evafast 方向键快进选项 + VantaInstaller 新卡片；改动待提交 |
+| **最新发布提交** | `3a82d18`（tag: `v1.5.2`，已推送；资产已重传） |
+| **工作区** | v1.5.2 资产重传完成（evafast + README 加固随发布生效）；文档待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.2（已发布） |
-| **上次操作** | 01/05 README 加固 + VantaInstaller 方向键快进设置（未发布） |
+| **上次操作** | v1.5.2 资产重传：evafast 可调设置 + README 加固随发布生效 |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -117,6 +117,12 @@ c:\Program portable\mpv2\
 ---
 
 ## 会话日志
+### 2026-08-13 v1.5.2 资产重传（evafast 可调 + README 加固随发布生效）
+
+- 提交 `57b1be1`（feat）+ `3a82d18`（docs）推送；01/05 重建 + VantaInstaller v0.3.2 重建。
+- `gh release upload v1.5.2 --clobber` 覆盖上传 01、05、exe；远端 7 资产大小与本地一致、无重复、无私包；02/03/04 未变。
+- 新校验和：01 `7B7F0AE9`、05 `0E3743B0`、exe `6AB6645C`，已写入版本迭代记录"补充重传"节。
+
 ### 2026-08-13 v1.5.2 之后：01/05 README 加固 + evafast 方向键快进选项（未发布）
 
 - **README 核实纠正**：此前"01/05 包从不携带根级 README"为解析误判（`7z -ba` 正则漏匹配 5 字段行）；`7z l -slt` 确认 v1.5.1/v1.5.2 包一直含根级 README.MD。构建脚本加固（显式复制 + 打包前校验 + 归档内验证），本地重建 01/05（含最新安装说明）。
