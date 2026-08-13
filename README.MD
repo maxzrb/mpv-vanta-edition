@@ -83,38 +83,37 @@ Lossless Scaling 为商业软件，尚未购买正版授权的用户请自行决
 
 ## 下载与安装
 
-### 方案一：完整安装（推荐）
+### 方案一：使用 VantaInstaller（推荐）
 
-从 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 下载：
+下载 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 中的
+`VantaInstaller-win-x64-v0.3.2.exe`，双击运行，在「安装」向导中选择
+包含 01~05 增量包的目录（或直接勾选「下载并安装」），它会自动完成：
 
-1. 下载 `01-mpv-base-vX.Y.Z.7z`
-2. 下载 `03-mpv-extras-vX.Y.Z.7z.001` 和 `.002`（两个分卷都需要）
-3. 解压 Base 包到你想要的位置
-4. 解压 Extras 包到**同一目录**（用 7-Zip 打开 `.001` 即可）
-5. 运行 `mpv.exe`
+- 安装前对每个包做 SHA-256 校验（有风险会提醒，默认取消）
+- 按 `01 Base → 02 Extras → 03 FW → 04 LSFG → 05 Config` 顺序解压覆盖到同一目录
+- 可选：安装完成后自动注册文件关联（多实例/单实例，默认勾选多实例）
+- 覆盖升级前自动备份 `portable_config`
 
-```
-最终目录结构：
-mpv-vanta-edition/
-├── mpv.exe
-├── portable_config/    ← Config 包的完整内容
-│   ├── mpv.conf
-│   ├── scripts/        ← 所有 Lua 脚本
-│   ├── shaders/        ← Extras 包的着色器
-│   └── vs/             ← Extras 包的 VapourSynth 脚本
-├── vs-plugins/         ← Extras 包的 VS 插件
-├── lua51.dll, vulkan-1.dll, ...
-└── ...
-```
+### 方案二：手动解压（备选）
 
-### 方案二：只用配置
+不安装 VantaInstaller 时，从 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 下载全部包，按顺序解压到**同一目录**：
+
+1. `01-mpv-base-vX.Y.Z.7z`（核心 + 运行时 + 基础配置 + 随包检测 ffmpeg，必须）
+2. `02-mpv-extras-vX.Y.Z.7z.001` 和 `.002`（着色器 + VapourSynth + Python；两个分卷放同目录，用 7-Zip 打开 `.001` 即可）
+3. `03-mpv-fasterwhisper-addon-vX.Y.Z.7z`（可选，AI 字幕）
+4. `04-mpv-lsfg-addon-vX.Y.Z.7z`（可选，补帧扩展）
+5. `05-mpv-config-vX.Y.Z.7z`（个人配置覆盖层，最后解压）
+
+解压完成后运行 `mpv.exe` 即可。
+
+### 方案三：只用配置
 
 已有 mpv 播放器，只想用这套配置：
 
 1. 下载 `05-mpv-config-vX.Y.Z.7z`
 2. 解压到 mpv 的配置目录（覆盖 `portable_config/`）
 
-### 方案三：手动组装
+### 方案四：手动组装
 
 1. 下载任意标准 mpv Windows 构建
 2. 下载 `05-mpv-config-vX.Y.Z.7z`，解压到 mpv 目录
