@@ -143,3 +143,8 @@ $RECYCLE.BIN/
 
 /VantaInstaller/**/publish/
 /backup/
+
+# --- 本地运行/备份产物（个人窗口状态、主题应用备份、Worker 手动备份）---
+/portable_config/backup/
+/portable_config/script-opts/backup/
+/docs/worker*备份*.js

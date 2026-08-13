@@ -51,7 +51,7 @@ $Definitions = @{
         RegisteredApplicationName = 'MPV Vanta Edition'
         ClientKeyName = 'MPV Vanta Edition'
         ProgId = 'MPV.Vanta.Multi.File'
-        FriendlyName = 'mpv'
+        FriendlyName = 'MPV Vanta Edition'
         Description = 'MPV Vanta Edition multi-instance player'
     }
     single = @{
@@ -59,7 +59,7 @@ $Definitions = @{
         RegisteredApplicationName = 'MPV Vanta Edition (Single Instance)'
         ClientKeyName = 'MPV Vanta Edition Single Instance'
         ProgId = 'MPV.Vanta.Single.File'
-        FriendlyName = 'mpv-single'
+        FriendlyName = 'MPV Vanta Edition (Single Instance)'
         Description = 'MPV Vanta Edition single-instance player'
     }
 }

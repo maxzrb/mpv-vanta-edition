@@ -44,7 +44,7 @@ call :reg add "%app_paths_key%" /v "UseUrl" /t REG_DWORD /d 1 /f
 :: when mpv is used from the "Open with" menu
 set classes_root_key=HKLM\SOFTWARE\Classes
 set app_key=%classes_root_key%\Applications\umpv.exe
-call :reg add "%app_key%" /v "FriendlyAppName" /d "mpv-single" /f
+call :reg add "%app_key%" /v "FriendlyAppName" /d "MPV Vanta Edition (Single Instance)" /f
 call :add_verbs "%app_key%"
 
 :: Add mpv to the "Open with" list for all video and audio file types
@@ -75,7 +75,7 @@ call :reg add "%autoplay_key%\EventHandlers\PlayBluRayOnArrival" /v "MpvPlayBluR
 :: Add a capabilities key for mpv, which is registered later on for use in the
 :: "Default Programs" control panel
 set capabilities_key=HKLM\SOFTWARE\Clients\Media\mpv\Capabilities
-call :reg add "%capabilities_key%" /v "ApplicationName" /d "mpv" /f
+call :reg add "%capabilities_key%" /v "ApplicationName" /d "MPV Vanta Edition" /f
 call :reg add "%capabilities_key%" /v "ApplicationDescription" /d "mpv media player" /f
 
 :: Add file types

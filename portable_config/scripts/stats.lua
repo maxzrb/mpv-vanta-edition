@@ -949,7 +949,7 @@ local function add_video_out(s)
     append_property(s, "display-names", {prefix_sep="", prefix="(", suffix=")",
                     no_prefix_markup=true, nl="", indent=" "}, nil, true)
     append(s, mp.get_property_native("current-gpu-context"),
-           {prefix="图形接口:", nl="", indent=o.prefix_sep .. o.prefix_sep})
+           {prefix="渲染接口:", nl="", indent=o.prefix_sep .. o.prefix_sep})
     append_property(s, "avsync", {prefix="音视频差:"})
     append_fps(s, "display-fps", "estimated-display-fps")
     if append_property(s, "decoder-frame-drop-count",
@@ -1005,16 +1005,27 @@ local function add_video(s)
     local track = mp.get_property_native("current-tracks/video")
     local track_type = (track and track.image) and "图像:" or "视频:"
     append(s, "", {prefix=track_type, nl=o.nl .. o.nl, indent=""})
-    if track and append(s, track["codec-desc"], {prefix_sep="", nl="", indent=""}) then
-        append(s, track["codec-profile"], {prefix="[", nl="", indent=" ", prefix_sep="",
-               no_prefix_markup=true, suffix="]"})
-        if track["codec"] ~= track["decoder"] then
-            append(s, track["decoder"], {prefix="[", nl="", indent=" ", prefix_sep="",
+    if track then
+        if append(s, track["codec-desc"], {prefix_sep="", nl="", indent=""}) then
+            append(s, track["codec-profile"], {prefix="[", nl="", indent=" ", prefix_sep="",
                    no_prefix_markup=true, suffix="]"})
+            if track["codec"] ~= track["decoder"] then
+                append(s, track["decoder"], {prefix="[", nl="", indent=" ", prefix_sep="",
+                       no_prefix_markup=true, suffix="]"})
+            end
         end
-        append_property(s, "hwdec-current", {prefix="硬件解码:", nl="",
-                        indent=o.prefix_sep .. o.prefix_sep,
-                        no_prefix_markup=false, suffix=""}, {no=true, [""]=true}, true)
+
+        -- hwdec-current 才是当前实际使用的解码路径；gpu-api/current-gpu-context 只代表渲染接口。
+        -- 旧逻辑过滤了值 no，导致软解时整行消失，容易把图形接口误认为硬解状态。
+        local hwdec = mp.get_property_native("hwdec-current")
+        local decode_mode = "未知（解码器尚未初始化）"
+        if hwdec == "no" then
+            decode_mode = "软件解码"
+        elseif hwdec and hwdec ~= "" then
+            decode_mode = "硬件解码（" .. hwdec .. "）"
+        end
+        append(s, decode_mode, {prefix="解码方式:", nl="",
+               indent=o.prefix_sep .. o.prefix_sep})
     end
     local has_prefix = false
     if o.show_frame_info then

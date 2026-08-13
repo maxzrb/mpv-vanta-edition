@@ -1,3 +1,4 @@
+-- 维护者专用：只读检查脚本/着色器上游差异。普通用户不要运行，不负责产品更新。
 local msg = require 'mp.msg'
 
 local running = false
@@ -21,21 +22,21 @@ local function show_result(success, result)
     end
 
     if success and status == 0 then
-        mp.osd_message('安全更新完成，请查看控制台或更新报告', 5)
+        mp.osd_message('维护者只读审计完成，请查看控制台', 5)
     else
-        mp.osd_message('安全更新未完成，请查看控制台错误', 6)
-        msg.error('manager update failed, exit status:', status)
+        mp.osd_message('维护者只读审计失败，请查看控制台', 6)
+        msg.error('maintainer upstream audit failed, exit status:', status)
     end
 end
 
-local function update_all()
+local function audit_upstreams()
     if running then
-        mp.osd_message('更新任务正在运行', 3)
+        mp.osd_message('维护者审计正在运行', 3)
         return
     end
 
     local config_dir = expand_path('~~/')
-    local helper = expand_path('~~/script-modules/manager-update.ps1')
+    local helper = expand_path('~~/script-modules/MAINTAINER-ONLY-WARNING-upstream-audit.ps1')
     local args = {
         'powershell.exe',
         '-NoLogo',
@@ -47,11 +48,12 @@ local function update_all()
         helper,
         '-ConfigDir',
         config_dir,
+        '-DryRun',
     }
 
     running = true
-    mp.osd_message('正在安全检查更新，不会直接覆盖个性化修改…', 4)
-    msg.info('starting safe component update')
+    mp.osd_message('维护者只读审计：不会修改脚本或着色器…', 4)
+    msg.info('starting maintainer-only read-only upstream audit')
 
     local command = {
         name = 'subprocess',
@@ -69,5 +71,5 @@ local function update_all()
     end
 end
 
-mp.register_script_message('manager-update-all', update_all)
-mp.add_key_binding(nil, 'manager-update-all', update_all)
+-- 不注册按键，也不进入普通用户菜单；仅供维护者从控制台显式调用。
+mp.register_script_message('maintainer-audit-upstreams-read-only', audit_upstreams)

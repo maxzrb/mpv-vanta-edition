@@ -16,7 +16,7 @@ mpv/
 │   ├── profiles.conf      # Configuration profiles
 │   ├── mpv.conf           # Main MPV configuration
 │   ├── input.conf         # Key bindings
-│   └── manager.json       # Script manager sources
+│   └── MAINTAINER-ONLY-WARNING-upstream-sources.json # 维护者上游审计源，普通用户勿运行
 ├── lua/                   # Lua runtime libraries
 └── doc/                   # Documentation
 ```
@@ -164,7 +164,7 @@ return M
 2. **Path Expansion**: Use `~~/` for mpv config directory
 3. **Script Messages**: lowercase with hyphens (`message-name`)
 4. **Key Bindings**: descriptive names (`browse-files`)
-5. **External Scripts**: `manager.json` defines git sources
+5. **External Scripts**: `MAINTAINER-ONLY-WARNING-upstream-sources.json` 仅定义维护者上游审计源，不是用户更新入口
 6. **Shader paths in input.conf**: Use `~~/shaders/<category>/<name>.glsl`
 
 ## Common Pitfalls

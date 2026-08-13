@@ -1,11 +1,22 @@
+# MAINTAINER ONLY: upstream audit/merge tool. End users must not run this script.
+# Read-only by default. Only -ApplyReviewedChanges can write baselines or apply reviewed changes.
+# 只读审计：powershell -File .\MAINTAINER-ONLY-WARNING-upstream-audit.ps1 -ConfigDir <portable_config>
+# 审阅报告后应用：在同一命令末尾显式追加 -ApplyReviewedChanges
 param(
     [Parameter(Mandatory = $true)]
     [string]$ConfigDir,
 
     [switch]$DryRun,
 
+    [switch]$ApplyReviewedChanges,
+
     [string]$OnlySource = ''
 )
+
+if ($DryRun -and $ApplyReviewedChanges) {
+    throw '-DryRun and -ApplyReviewedChanges cannot be used together.'
+}
+$DryRun = -not $ApplyReviewedChanges
 
 $ErrorActionPreference = 'Stop'
 $OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
@@ -307,12 +318,12 @@ function Add-Report {
 }
 
 $config_root = [IO.Path]::GetFullPath($ConfigDir).TrimEnd('\', '/')
-$manager_file = Join-Path $config_root 'manager.json'
+$manager_file = Join-Path $config_root 'MAINTAINER-ONLY-WARNING-upstream-sources.json'
 if (-not (Test-Path -LiteralPath $manager_file -PathType Leaf)) {
     throw "Update source configuration not found: $manager_file"
 }
 
-$cache_root = Join-Path $config_root 'cache\manager'
+$cache_root = Join-Path $config_root 'cache\MAINTAINER-ONLY-upstream-audit'
 $state_file = Join-Path $cache_root 'state.json'
 $bases_root = Join-Path $cache_root 'bases'
 $reports_root = Join-Path $cache_root 'reports'
@@ -357,7 +368,7 @@ $counts = @{
     ERROR = 0
 }
 $report_lines = New-Object System.Collections.Generic.List[string]
-[void]$report_lines.Add("MPV safe update report")
+[void]$report_lines.Add("MAINTAINER ONLY - MPV upstream audit report")
 [void]$report_lines.Add("Run time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')")
 [void]$report_lines.Add("Config directory: $config_root")
 [void]$report_lines.Add("Mode: $(if ($DryRun) { 'dry run' } else { 'safe update' })")
@@ -751,7 +762,7 @@ catch {
     Write-Warning "Failed to clean staging directory: $($_.Exception.Message)"
 }
 
-$summary = "Safe update complete: installed $($counts.INSTALLED), updated $($counts.UPDATED), merged $($counts.MERGED), protected $($counts.PROTECTED), errors $($counts.ERROR)"
+$summary = "Maintainer upstream audit complete: installed $($counts.INSTALLED), updated $($counts.UPDATED), merged $($counts.MERGED), protected $($counts.PROTECTED), errors $($counts.ERROR)"
 Write-Output $summary
 $important_lines = @($report_lines | Where-Object {
     $_ -match '^\[(INSTALLED|UPDATED|MERGED|PROTECTED|REMOVED|ERROR)\]'
@@ -765,5 +776,19 @@ if (-not $DryRun) {
 
 if ($counts.ERROR -gt 0) {
     exit 2
+}
+
+if ($DryRun -and (Test-Path -LiteralPath $cache_root -PathType Container)) {
+    $staging_parent = Split-Path -Parent $staging_root
+    if (Test-Path -LiteralPath $staging_parent -PathType Container) {
+        $staging_entries = @(Get-ChildItem -LiteralPath $staging_parent -Force)
+        if ($staging_entries.Count -eq 0) {
+            Remove-Item -LiteralPath $staging_parent -Force
+        }
+    }
+    $cache_entries = @(Get-ChildItem -LiteralPath $cache_root -Force)
+    if ($cache_entries.Count -eq 0) {
+        Remove-Item -LiteralPath $cache_root -Force
+    }
 }
 exit 0

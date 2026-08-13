@@ -22,7 +22,7 @@ mpv/
 │   ├── files/             # Runtime data (recent.json, danmaku-history.json)
 │   ├── mpv.conf           # Main MPV configuration
 │   ├── input.conf         # Key bindings and uosc context menu
-│   └── manager.json       # Script manager git sources
+│   └── MAINTAINER-ONLY-WARNING-upstream-sources.json # Maintainer-only upstream audit sources
 ├── lua/                   # Lua runtime libraries (socket, ltn12, mime)
 ├── portable.vs            # VapourSynth script
 └── vs-scripts/            # VapourSynth Python scripts
@@ -113,7 +113,7 @@ mp.commandv('script-message-to', 'uosc', 'flash-elements', 'timeline,speed')
 alt+s  script-binding uosc/load-subtitles  #! Subtitles > Load
 ```
 
-### External Scripts (manager.json)
+### Maintainer-only upstream audit (`MAINTAINER-ONLY-WARNING-upstream-sources.json`)
 
 Scripts are fetched from GitHub using whitelist/blacklist patterns:
 
