@@ -6,11 +6,11 @@
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master` 与 `origin/master` 同步（v1.5.2 已发布并推送） |
-| **最新发布提交** | `c3ac48e`（tag: `v1.5.2`，已推送；VantaInstaller 已重传） |
-| **工作区** | VantaInstaller 启动自检更新 + 下载徽标已完成；文档待提交 |
+| **最新发布提交** | `c3ac48e`（tag: `v1.5.2`，已推送） |
+| **工作区** | 私包内置 VantaInstaller + 发布流程统一候选目录；改动待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.2（已发布） |
-| **上次操作** | VantaInstaller 启动自动检查自身更新并显示下载徽标（已重传 v0.3.2） |
+| **上次操作** | 私用全量包内置最新 VantaInstaller；发布流程统一候选目录到 release |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -117,6 +117,13 @@ c:\Program portable\mpv2\
 ---
 
 ## 会话日志
+### 2026-08-13 私用全量包内置 VantaInstaller + 发布流程统一候选目录
+
+- `build-full-private.ps1`：从 `release/` 按版本号取最新 VantaInstaller 打包到私包根级（无候选告警跳过），私包 README 同步。
+- 《发布流程.md》（用户授权）：VantaInstaller 候选先移入 `release/` 再统一上传；4.1/4.2/5/7 更新。
+- 私包重建 `mpv-full-private-v1.5.2.7z`：根级含 v0.3.2 exe（SHA-256 与 `release/` 候选一致 `52A186D9...`），新 SHA-256 `D444AE10...1766`；7z t 通过；仅本地保留。
+- 最新 v0.3.2 候选已放入 `release/`（与远端一致）。
+
 ### 2026-08-13 VantaInstaller 启动自动检查自身更新 + 下载徽标
 
 - `UpdateService.CheckInstallerUpdateAsync`（找 VantaInstaller-win-x64-v*.exe 资产、解析版本、比较）；MainViewModel 启动异步检查 + `OpenInstallerUpdateCommand`；MainWindow 左下角版本号右侧徽标按钮。
