@@ -6,11 +6,11 @@
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master` 与 `origin/master` 同步（v1.5.2 已发布并推送） |
-| **最新发布提交** | `3a82d18`（tag: `v1.5.2`，已推送；资产已重传） |
-| **工作区** | v1.5.2 资产重传完成（evafast + README 加固随发布生效）；文档待提交 |
+| **最新发布提交** | `c3ac48e`（tag: `v1.5.2`，已推送；VantaInstaller 已重传） |
+| **工作区** | VantaInstaller 启动自检更新 + 下载徽标已完成；文档待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.2（已发布） |
-| **上次操作** | v1.5.2 资产重传：evafast 可调设置 + README 加固随发布生效 |
+| **上次操作** | VantaInstaller 启动自动检查自身更新并显示下载徽标（已重传 v0.3.2） |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -117,6 +117,11 @@ c:\Program portable\mpv2\
 ---
 
 ## 会话日志
+### 2026-08-13 VantaInstaller 启动自动检查自身更新 + 下载徽标
+
+- `UpdateService.CheckInstallerUpdateAsync`（找 VantaInstaller-win-x64-v*.exe 资产、解析版本、比较）；MainViewModel 启动异步检查 + `OpenInstallerUpdateCommand`；MainWindow 左下角版本号右侧徽标按钮。
+- 验证：版本解析/比较 5 用例全过；Debug/Release 启动探针存活；提交 `c3ac48e` 推送；重建 v0.3.2 并 `--clobber` 上传（SHA-256 `52A186D9...7D7C8A`，与远端一致）。当前最新即 v0.3.2，徽标不自我提示。
+
 ### 2026-08-13 v1.5.2 资产重传（evafast 可调 + README 加固随发布生效）
 
 - 提交 `57b1be1`（feat）+ `3a82d18`（docs）推送；01/05 重建 + VantaInstaller v0.3.2 重建。
