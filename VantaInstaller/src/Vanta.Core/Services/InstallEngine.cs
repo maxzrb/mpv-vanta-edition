@@ -60,14 +60,7 @@ public sealed class InstallEngine
                 ? $"检测到个人全量包 v{scan.FullPackage!.Version}（解压即用一体包），将跳过增量包安装"
                 : $"识别到 {scan.Packages.Count} 个增量包（统一版本 v{scan.UnifiedVersion}）");
 
-            // 3. 目标目录状态
-            result.IsUpgrade = File.Exists(Path.Combine(options.InstallDirectory, "mpv.exe"));
-            AddLog(result.IsUpgrade
-                ? $"目标目录已有旧版，进入覆盖升级模式：{options.InstallDirectory}"
-                : $"全新安装：{options.InstallDirectory}");
-
-            // 4. 磁盘空间预检
-            Directory.CreateDirectory(options.InstallDirectory);
+            // 3. 选出本次要安装的包
             List<VantaPackage> selected;
             if (wantFull)
             {
@@ -93,6 +86,57 @@ public sealed class InstallEngine
                 return result;
             }
 
+            // 4. 安装前逐文件 SHA-256 校验。所有入口都必须执行；有风险时由 UI 明确询问用户。
+            var integrityVersion = wantFull ? scan.FullPackage!.Version : scan.UnifiedVersion!;
+            AddLog($"开始校验 {selected.Sum(package => package.Files.Count)} 个安装包文件的 SHA-256…");
+            var integrityProgress = new Progress<PackageIntegrityProgress>(p =>
+            {
+                GlobalProgress?.Invoke(Math.Clamp(p.Percent / 10, 0, 10));
+                progress?.Report(new InstallProgress(
+                    Math.Clamp(p.Percent / 10, 0, 10),
+                    $"正在校验 {p.FileName}（{p.Percent}%）"));
+            });
+            var integrity = await PackageIntegrityService.VerifyAsync(
+                selected,
+                integrityVersion,
+                integrityProgress,
+                ct);
+            if (!string.IsNullOrWhiteSpace(integrity.ReferenceError))
+            {
+                AddLog($"[校验警告] {integrity.ReferenceError}");
+            }
+            foreach (var item in integrity.Items)
+            {
+                AddLog(FormatIntegrityLog(item));
+            }
+
+            if (integrity.HasRisks)
+            {
+                progress?.Report(new InstallProgress(10, "安装包校验发现风险，等待确认"));
+                var accepted = options.ConfirmIntegrityRisksAsync is not null
+                    && await options.ConfirmIntegrityRisksAsync(integrity);
+                if (!accepted)
+                {
+                    result.Success = false;
+                    result.Error = "安装包哈希校验未通过或缺少可信哈希，安装已取消。";
+                    AddLog("[拦截] 用户未接受校验风险，未开始备份或解压。");
+                    return result;
+                }
+                AddLog("[高风险继续] 用户已明确忽略哈希校验风险，继续安装。");
+            }
+            else
+            {
+                AddLog($"SHA-256 校验通过：{integrity.PassedCount} 个文件。");
+            }
+
+            // 5. 目标目录状态
+            result.IsUpgrade = File.Exists(Path.Combine(options.InstallDirectory, "mpv.exe"));
+            AddLog(result.IsUpgrade
+                ? $"目标目录已有旧版，进入覆盖升级模式：{options.InstallDirectory}"
+                : $"全新安装：{options.InstallDirectory}");
+
+            // 6. 磁盘空间预检
+            Directory.CreateDirectory(options.InstallDirectory);
             var needed = selected.Sum(p => p.TotalSize);
             var root = Path.GetPathRoot(Path.GetFullPath(options.InstallDirectory)) ?? "C:\\";
             var drive = new DriveInfo(root);
@@ -104,7 +148,7 @@ public sealed class InstallEngine
             }
             AddLog($"磁盘空间充足：需要 {VantaPackage.FormatSize(needed)}");
 
-            // 5. 覆盖升级前备份
+            // 7. 覆盖升级前备份
             if (result.IsUpgrade && options.BackupBeforeUpgrade)
             {
                 var backupRoot = Path.Combine(options.InstallDirectory, "backup");
@@ -117,7 +161,7 @@ public sealed class InstallEngine
                     : $"已备份配置到：{result.BackupPath}");
             }
 
-            // 6. 按序解压
+            // 8. 按序解压
             AddLog($"将安装 {selected.Count} 个包：{string.Join(" → ", selected.Select(p => p.Id))}");
             progress?.Report(new InstallProgress(0, "开始安装"));
 
@@ -127,11 +171,11 @@ public sealed class InstallEngine
                 var pkg = selected[i];
                 AddLog($"[{pkg.Id}] 开始解压 {pkg.EntryFile} …");
 
-                // 包级进度 → 整体进度（当前包占 90%，跨包滚动）
+                // 包级进度 → 整体进度（哈希校验占前 10%，解压阶段占后 90%）
                 void OnProgress(int pct)
                 {
                     PackageProgress?.Invoke(pkg.EntryFile, pct);
-                    var overall = (int)((i * 100.0 + pct * 0.9) / selected.Count);
+                    var overall = 10 + (int)((i + pct / 100.0) * 90 / selected.Count);
                     GlobalProgress?.Invoke(overall);
                     progress?.Report(new InstallProgress(overall, $"正在解压 {pkg.DisplayName}"));
                 }
@@ -154,10 +198,10 @@ public sealed class InstallEngine
                 }
 
                 AddLog($"[{pkg.Id}] 完成");
-                progress?.Report(new InstallProgress((int)((i + 1) * 100.0 / selected.Count), $"{pkg.DisplayName} 完成"));
+                progress?.Report(new InstallProgress(10 + (int)((i + 1) * 90.0 / selected.Count), $"{pkg.DisplayName} 完成"));
             }
 
-            // 7. 自检
+            // 9. 自检
             var mpvExe = Path.Combine(options.InstallDirectory, "mpv.exe");
             result.MpvExists = File.Exists(mpvExe);
             if (result.MpvExists)
@@ -170,7 +214,7 @@ public sealed class InstallEngine
                 AddLog("警告：安装后未找到 mpv.exe，请检查是否选择了 01 号包。");
             }
 
-            // 8. 写入版本标记（供检查更新识别当前包版本）；全量包模式用全量包版本
+            // 10. 写入版本标记（供检查更新识别当前包版本）；全量包模式用全量包版本
             var installVersion = wantFull ? scan.FullPackage!.Version : scan.UnifiedVersion;
             if (!string.IsNullOrWhiteSpace(installVersion))
             {
@@ -230,6 +274,16 @@ public sealed class InstallEngine
             return result;
         }
     }
+
+    private static string FormatIntegrityLog(PackageIntegrityItem item) => item.Status switch
+    {
+        PackageIntegrityStatus.Passed => $"[校验通过] {item.FileName}",
+        PackageIntegrityStatus.Mismatch => $"[校验失败] {item.FileName} SHA-256 不一致（预期 {item.ExpectedSha256}，实际 {item.ActualSha256}）",
+        PackageIntegrityStatus.MissingReference => $"[校验警告] {item.FileName} 没有可信的 Release SHA-256",
+        PackageIntegrityStatus.MissingFile => $"[校验失败] {item.FileName} 不存在",
+        PackageIntegrityStatus.ReadError => $"[校验失败] {item.FileName} 无法读取：{item.Error}",
+        _ => $"[校验失败] {item.FileName} 状态未知",
+    };
 
     private static async Task<string?> TryGetMpvVersionAsync(string mpvExe)
     {

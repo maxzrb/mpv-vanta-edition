@@ -12,8 +12,12 @@ public static class MirrorProbeService
     /// <summary>测速采样窗口（毫秒）：固定时长测吞吐</summary>
     private const int ProbeWindowMs = 2000;
 
-    /// <summary>测速最大拉取字节数（8MB，防超快链路无限拉取）</summary>
-    private const long MaxProbeBytes = 8 * 1024 * 1024;
+    /// <summary>
+    /// 测速最大拉取字节数（32MB）。
+    /// 需明显大于样本包触发 EOF 的阈值，且覆盖 2 秒采样窗口内的高速链路
+    /// （32MB/2s ≈ 128MB/s），避免采样时间被截短导致吞吐估算失真。
+    /// </summary>
+    private const long MaxProbeBytes = 32 * 1024 * 1024;
 
     /// <summary>预热字节数（8KB，覆盖连接/TLS/首字节，不计入测速）</summary>
     private const long WarmupBytes = 8 * 1024;
@@ -95,7 +99,7 @@ public static class MirrorProbeService
             {
                 Timeout = TimeSpan.FromSeconds(15),
             };
-            http.DefaultRequestHeaders.UserAgent.ParseAdd("VantaInstaller/0.2");
+            http.DefaultRequestHeaders.UserAgent.ParseAdd("VantaInstaller/0.3.2");
             http.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(0, MaxProbeBytes - 1);
 
             using var response = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);

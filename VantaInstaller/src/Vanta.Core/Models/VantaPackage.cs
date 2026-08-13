@@ -18,7 +18,7 @@ public sealed class VantaPackage
     public string EntryFile { get; set; } = string.Empty;
 
     /// <summary>分卷文件名列表（含入口，单文件包只有一项）</summary>
-    public required IReadOnlyList<string> Files { get; init; }
+    public required IReadOnlyList<string> Files { get; set; }
 
     /// <summary>是否为必选包</summary>
     public required bool Required { get; init; }

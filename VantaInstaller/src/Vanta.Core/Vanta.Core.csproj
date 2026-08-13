@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Aria2 Next v2.5.5 Windows x64：安装器下载引擎，运行时释放到本地缓存。 -->
+    <EmbeddedResource Include="Assets\aria2-next.exe" LogicalName="Vanta.Core.Assets.aria2-next.exe" />
+    <EmbeddedResource Include="Assets\aria2-next-COPYING.txt" LogicalName="Vanta.Core.Assets.aria2-next-COPYING.txt" />
+  </ItemGroup>
+
 </Project>

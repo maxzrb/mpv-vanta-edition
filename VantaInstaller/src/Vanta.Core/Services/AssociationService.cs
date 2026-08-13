@@ -65,7 +65,7 @@ public static class AssociationService
         "MPV Vanta Edition",
         "MPV Vanta Edition",
         "MPV.Vanta.Multi.File",
-        "mpv",
+        "MPV Vanta Edition",
         "MPV Vanta Edition multi-instance player");
 
     private static readonly AssociationDefinition SingleInstance = new(
@@ -74,7 +74,7 @@ public static class AssociationService
         "MPV Vanta Edition (Single Instance)",
         "MPV Vanta Edition Single Instance",
         "MPV.Vanta.Single.File",
-        "mpv-single",
+        "MPV Vanta Edition (Single Instance)",
         "MPV Vanta Edition single-instance player");
 
     /// <summary>目标入口是否具备注册条件。</summary>

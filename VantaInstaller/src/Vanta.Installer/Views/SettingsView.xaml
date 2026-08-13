@@ -393,6 +393,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <ProgressBar Grid.Column="0" Minimum="0" Maximum="100"
                                          Value="{Binding DownloadPercent, Mode=OneWay}" Height="10"
@@ -400,6 +401,10 @@
                             <TextBlock Grid.Column="1" Margin="12,0,0,0" FontSize="13" FontWeight="SemiBold"
                                        Text="{Binding DownloadPercent, Mode=OneWay, StringFormat={}{0}%}"
                                        VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Margin="12,0,0,0" FontSize="12"
+                                       Text="{Binding DownloadSpeedText, Mode=OneWay}"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
                         </Grid>
 
                         <!-- 资产列表 -->
@@ -412,10 +417,11 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}"
                                                   VerticalAlignment="Center"
-                                                  IsEnabled="{Binding Exists, Converter={StaticResource InverseBool}}" />
+                                                  IsEnabled="{Binding CanSelect}" />
                                         <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="10,0,0,0"
                                                    VerticalAlignment="Center" FontSize="12"
                                                    TextTrimming="CharacterEllipsis"
@@ -423,8 +429,11 @@
                                         <TextBlock Grid.Column="2" Text="{Binding SizeText}" Margin="10,0,0,0"
                                                    VerticalAlignment="Center" FontSize="11"
                                                    Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
-                                        <TextBlock Grid.Column="3" Text="{Binding Status}" Margin="10,0,0,0"
-                                                   VerticalAlignment="Center" FontSize="11" Width="90" TextAlignment="Right"
+                                        <TextBlock Grid.Column="3" Text="{Binding SpeedText, Mode=OneWay}" Margin="10,0,0,0"
+                                                   VerticalAlignment="Center" FontSize="11" Width="78" TextAlignment="Right"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                                        <TextBlock Grid.Column="4" Text="{Binding Status}" Margin="10,0,0,0"
+                                                   VerticalAlignment="Center" FontSize="11" Width="100" TextAlignment="Right"
                                                    Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
                                     </Grid>
                                 </DataTemplate>
@@ -448,7 +457,6 @@
                                 <ui:Button Content="开始下载" Appearance="Primary"
                                            Command="{Binding StartDownloadCommand}"
                                            IsEnabled="{Binding CanDownload}"
-                                           Visibility="{Binding IsDownloading, Converter={StaticResource InverseVis}}"
                                            Padding="16,7" />
                                 <ui:Button Content="停止" Appearance="Secondary"
                                            Command="{Binding StopDownloadCommand}"

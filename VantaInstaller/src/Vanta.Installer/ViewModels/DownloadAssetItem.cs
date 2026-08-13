@@ -23,7 +23,31 @@ public partial class DownloadAssetItem : ObservableObject
     [ObservableProperty]
     private bool _exists;
 
-    /// <summary>状态文本（等待/下载中 xx% /完成/跳过）</summary>
+    /// <summary>是否已经加入当前下载队列</summary>
+    [ObservableProperty]
+    private bool _isQueued;
+
+    /// <summary>当前是否正在执行下载</summary>
+    [ObservableProperty]
+    private bool _isActive;
+
+    /// <summary>复选框是否可操作；正在传输的当前项不能切换。</summary>
+    public bool CanSelect => !Exists && !IsActive;
+
+    /// <summary>实时下载速度（字节/秒）</summary>
+    [ObservableProperty]
+    private double _speedBytesPerSecond;
+
+    /// <summary>显示用实时速度</summary>
+    public string SpeedText => Aria2Service.FormatSpeed(SpeedBytesPerSecond);
+
+    partial void OnSpeedBytesPerSecondChanged(double value) => OnPropertyChanged(nameof(SpeedText));
+
+    partial void OnExistsChanged(bool value) => OnPropertyChanged(nameof(CanSelect));
+
+    partial void OnIsActiveChanged(bool value) => OnPropertyChanged(nameof(CanSelect));
+
+    /// <summary>状态文本（等待/排队中/下载中 xx% /完成/跳过）</summary>
     [ObservableProperty]
     private string _status = "等待";
 

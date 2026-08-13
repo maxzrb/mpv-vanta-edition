@@ -112,6 +112,7 @@ public partial class InstallViewModel : ObservableObject
                 InstallDirectory = _session.InstallDirectory!,
                 SelectedPackageIds = _session.SelectedPackageIds,
                 RegisterAssociations = _session.RegisterAssociations,
+                ConfirmIntegrityRisksAsync = ConfirmIntegrityRisksAsync,
             };
 
             var progress = new Progress<InstallProgress>(p =>
@@ -145,6 +146,44 @@ public partial class InstallViewModel : ObservableObject
             IsRunning = false;
             OnPropertyChanged(nameof(CanProceed));
         }
+    }
+
+    /// <summary>校验风险软拦截：默认取消，用户明确选择后才允许继续。</summary>
+    private static Task<bool> ConfirmIntegrityRisksAsync(PackageIntegrityResult integrity)
+    {
+        var lines = new List<string>
+        {
+            "安装包完整性校验发现风险。文件可能下载损坏、被替换，或当前无法取得可信哈希。",
+            "",
+        };
+        if (!string.IsNullOrWhiteSpace(integrity.ReferenceError))
+        {
+            lines.Add($"校验源：{integrity.ReferenceError}");
+            lines.Add(string.Empty);
+        }
+
+        foreach (var item in integrity.Items.Where(item => item.IsRisk))
+        {
+            var reason = item.Status switch
+            {
+                PackageIntegrityStatus.Mismatch => "SHA-256 不一致",
+                PackageIntegrityStatus.MissingReference => "缺少可信 SHA-256",
+                PackageIntegrityStatus.MissingFile => "文件不存在",
+                PackageIntegrityStatus.ReadError => $"读取失败：{item.Error}",
+                _ => "未知校验风险",
+            };
+            lines.Add($"• {item.FileName}：{reason}");
+        }
+
+        lines.Add(string.Empty);
+        lines.Add("建议选择“否”，重新下载风险文件。仍要忽略风险并继续安装吗？");
+        var choice = MessageBox.Show(
+            string.Join(Environment.NewLine, lines),
+            "安装包完整性风险",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning,
+            MessageBoxResult.No);
+        return Task.FromResult(choice == MessageBoxResult.Yes);
     }
 
     /// <summary>把缓冲日志一次性追加到 LogText（UI 线程）</summary>

@@ -232,11 +232,23 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private int _downloadPercent;
 
+    /// <summary>当前下载总速度（字节/秒）</summary>
+    [ObservableProperty]
+    private double _downloadSpeedBytesPerSecond;
+
+    /// <summary>当前下载总速度文本</summary>
+    public string DownloadSpeedText => Aria2Service.FormatSpeed(DownloadSpeedBytesPerSecond);
+
+    private int _downloadTotalCount;
+    private int _downloadCompletedCount;
+    private int _downloadFailureCount;
+    private UpdateService.UpdateInfo? _latestReleaseInfo;
+
     /// <summary>是否有可下载项</summary>
     public bool HasDownloadItems => DownloadItems.Count > 0;
 
     /// <summary>是否有选中项</summary>
-    public bool CanDownload => DownloadItems.Any(d => d.IsSelected && !d.Exists) && !IsDownloading;
+    public bool CanDownload => DownloadItems.Any(d => d.IsSelected && !d.Exists && !d.IsQueued);
 
     /// <summary>下载是否可停止</summary>
     public bool CanStop => IsDownloading;
@@ -275,7 +287,7 @@ public partial class SettingsViewModel : ObservableObject
     public string DownloadSummary =>
         DownloadItems.Count == 0
             ? "点击“检查更新”后可列出可下载的增量包。"
-            : $"共 {DownloadItems.Count} 个资产，选中 {DownloadItems.Count(d => d.IsSelected && !d.Exists)} 个待下载 · 保存到 {DownloadDirectory}";
+            : $"共 {DownloadItems.Count} 个资产，选中 {DownloadItems.Count(d => d.IsSelected && !d.Exists)} 个待下载，队列 {DownloadItems.Count(d => d.IsQueued)} · 保存到 {DownloadDirectory}";
 
     private List<MpvOption> _mpvAllOptions = [];
     private string? _mpvInitialContent;
@@ -476,19 +488,22 @@ public partial class SettingsViewModel : ObservableObject
     private void PopulateDownloadItems(UpdateService.UpdateInfo info)
     {
         EnsureDownloadDirectory();
+        _latestReleaseInfo = info;
         DownloadItems.Clear();
 
         foreach (var asset in info.Assets.OrderBy(a => a.Name))
         {
             var full = Path.Combine(DownloadDirectory, asset.Name);
             var exists = File.Exists(full) && new FileInfo(full).Length == asset.Size;
-            DownloadItems.Add(new DownloadAssetItem
+            var item = new DownloadAssetItem
             {
                 Asset = asset,
                 Exists = exists,
                 Status = exists ? "已存在" : "等待",
                 IsSelected = !exists,
-            });
+            };
+            item.PropertyChanged += OnDownloadItemPropertyChanged;
+            DownloadItems.Add(item);
         }
 
         OnPropertyChanged(nameof(HasDownloadItems));
@@ -513,6 +528,60 @@ public partial class SettingsViewModel : ObservableObject
         }
     }
 
+    /// <summary>切换保存目录后重新评估各下载项的存在状态。</summary>
+    partial void OnDownloadDirectoryChanged(string value)
+    {
+        RefreshDownloadItemStates();
+    }
+
+    /// <summary>
+    /// 按当前 DownloadDirectory 重新核对每个下载项：
+    /// 旧目录里已下载完成的包在新目录下不存在时恢复为“等待 / 可勾选”，
+    /// 新目录里已存在完整文件的包标记为“已存在”并取消勾选，
+    /// 避免“换保存目录后旧目录的完成状态残留、无法再次下载”的问题。
+    /// </summary>
+    private void RefreshDownloadItemStates()
+    {
+        foreach (var item in DownloadItems)
+        {
+            // 正在传输中的项不打断（保存按钮在下载期间已禁用，正常不会出现）
+            if (item.IsActive)
+            {
+                continue;
+            }
+
+            var full = Path.Combine(DownloadDirectory, item.Name);
+            var exists = File.Exists(full) && new FileInfo(full).Length == item.Asset.Size;
+            if (exists == item.Exists)
+            {
+                continue;
+            }
+
+            item.Exists = exists;
+            if (exists)
+            {
+                // 新目录已有完整文件：标记已存在并取消勾选
+                item.Status = "已存在";
+                item.Progress = 100;
+                item.IsQueued = false;
+                item.IsSelected = false;
+                item.SpeedBytesPerSecond = 0;
+            }
+            else
+            {
+                // 旧目录的完成状态失效：恢复为等待并重新勾选，允许再次下载
+                item.Status = "等待";
+                item.Progress = -1;
+                item.IsQueued = false;
+                item.IsSelected = true;
+                item.SpeedBytesPerSecond = 0;
+            }
+        }
+
+        OnPropertyChanged(nameof(CanDownload));
+        OnPropertyChanged(nameof(DownloadSummary));
+    }
+
     /// <summary>镜像可用性检测</summary>
     [RelayCommand]
     private async Task ProbeMirrorsAsync()
@@ -522,18 +591,21 @@ public partial class SettingsViewModel : ObservableObject
             return;
         }
 
-        // 用第一个待下载资产做探测 URL
-        var asset = DownloadItems.FirstOrDefault(d => !d.Exists)?.Asset;
-        if (asset is null)
-        {
-            MirrorStatus = "没有待下载资产，无法检测。";
-            return;
-        }
-
         IsProbingMirrors = true;
-        MirrorStatus = "正在测试连通性与下载速度…";
         try
         {
+            // 始终用最新正式 Release 的大体积包（优先 01 base）测速，
+            // 避免小样本在采样窗口内提前 EOF、以及被当前勾选项或旧版本包影响。
+            var latest = await UpdateService.CheckLatestAsync();
+            _latestReleaseInfo = latest;
+            var asset = latest is null ? null : UpdateService.FindProbeAsset(latest);
+            if (asset is null)
+            {
+                MirrorStatus = "最新 Release 没有找到可用的测速样本包，无法检测。";
+                return;
+            }
+
+            MirrorStatus = $"正在拉取最新 {asset.Name} 测试连通性与下载速度…";
             var results = await MirrorProbeService.ProbeAsync(
                 asset.Url,
                 onProgress: msg => DispatcherInvoke(() => MirrorStatus = msg));
@@ -564,6 +636,32 @@ public partial class SettingsViewModel : ObservableObject
         }
     }
 
+    /// <summary>下载项选择变化时立即刷新开始按钮，使下载中追加任务可用。</summary>
+    private void OnDownloadItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not DownloadAssetItem item)
+        {
+            return;
+        }
+
+        if (e.PropertyName == nameof(DownloadAssetItem.IsSelected))
+        {
+            // 已排队但尚未开始的项目取消勾选时，从队列移出；当前正在传输的项目不受影响。
+            if (!item.IsSelected && item.IsQueued && !item.IsActive)
+            {
+                item.IsQueued = false;
+                item.Status = "等待";
+                item.Progress = -1;
+                item.SpeedBytesPerSecond = 0;
+            }
+
+            OnPropertyChanged(nameof(CanDownload));
+            OnPropertyChanged(nameof(DownloadSummary));
+        }
+    }
+
+    partial void OnDownloadSpeedBytesPerSecondChanged(double value) => OnPropertyChanged(nameof(DownloadSpeedText));
+
     /// <summary>IsDownloading 变化时刷新相关按钮状态</summary>
     partial void OnIsDownloadingChanged(bool value)
     {
@@ -572,24 +670,71 @@ public partial class SettingsViewModel : ObservableObject
         OnPropertyChanged(nameof(DownloadSummary));
     }
 
-    /// <summary>开始下载选中资产（顺序下载，aria2 多线程）</summary>
-    [RelayCommand]
-    private async Task StartDownloadAsync()
+    /// <summary>把当前勾选项加入下载队列。</summary>
+    private int QueueSelectedDownloads()
     {
-        if (IsDownloading)
+        if (!IsDownloading)
         {
+            _downloadTotalCount = 0;
+            _downloadCompletedCount = 0;
+            _downloadFailureCount = 0;
+            DownloadSpeedBytesPerSecond = 0;
+            DownloadPercent = 0;
+        }
+
+        var added = 0;
+        foreach (var item in DownloadItems.Where(d => d.IsSelected && !d.Exists && !d.IsQueued))
+        {
+            item.IsQueued = true;
+            item.Status = "排队中";
+            item.Progress = 0;
+            item.SpeedBytesPerSecond = 0;
+            _downloadTotalCount++;
+            added++;
+        }
+
+        OnPropertyChanged(nameof(CanDownload));
+        OnPropertyChanged(nameof(DownloadSummary));
+        return added;
+    }
+
+    /// <summary>刷新队列总体进度。</summary>
+    private void RefreshDownloadPercent(DownloadAssetItem? active = null, int activePercent = 0)
+    {
+        if (_downloadTotalCount <= 0)
+        {
+            DownloadPercent = 0;
             return;
         }
 
-        var targets = DownloadItems.Where(d => d.IsSelected && !d.Exists).ToList();
-        if (targets.Count == 0)
+        var activePart = active is null ? 0d : Math.Clamp(activePercent, 0, 100) / 100d;
+        DownloadPercent = (int)Math.Clamp(
+            (_downloadCompletedCount + activePart) * 100 / _downloadTotalCount,
+            0,
+            100);
+    }
+
+    /// <summary>开始下载当前队列；下载中再次点击会把新勾选项追加到队列。</summary>
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task StartDownloadAsync()
+    {
+        var added = QueueSelectedDownloads();
+        if (IsDownloading)
+        {
+            if (added > 0)
+            {
+                OperationMessage = $"已加入 {added} 个下载任务，当前任务完成后继续。";
+            }
+            return;
+        }
+
+        if (added == 0)
         {
             return;
         }
 
         IsDownloading = true;
         OperationMessage = null;
-        DownloadPercent = 0;
         OnPropertyChanged(nameof(CanStop));
         OnPropertyChanged(nameof(CanDownload));
 
@@ -616,20 +761,20 @@ public partial class SettingsViewModel : ObservableObject
                 chosenMirror = SelectedMirror ?? MirrorRegistry.Find("official")!;
             }
 
-            OperationMessage = $"将使用镜像：{chosenMirror.Name}。";
+            OperationMessage = $"下载引擎：Aria2 Next {Aria2Service.EngineVersion}；镜像：{chosenMirror.Name}。";
             OnPropertyChanged(nameof(DownloadSummary));
 
-            for (int i = 0; i < targets.Count; i++)
+            while (true)
             {
-                var item = targets[i];
-                if (!item.IsSelected || item.Exists)
+                var item = DownloadItems.FirstOrDefault(d => d.IsQueued && !d.Exists && !d.IsActive);
+                if (item is null)
                 {
-                    continue;
+                    break;
                 }
 
+                item.IsActive = true;
                 item.Status = "下载中 0%";
                 item.Progress = 0;
-                OnPropertyChanged(nameof(CanDownload));
 
                 void OnProgress(string _, int pct)
                 {
@@ -637,12 +782,21 @@ public partial class SettingsViewModel : ObservableObject
                     {
                         item.Status = $"下载中 {pct}%";
                         item.Progress = pct;
-                        DownloadPercent = (int)((i + pct / 100.0) * 100 / targets.Count);
-                        OnPropertyChanged(nameof(DownloadPercent));
+                        RefreshDownloadPercent(item, pct);
+                    });
+                }
+
+                void OnSpeed(string _, double speed)
+                {
+                    DispatcherInvoke(() =>
+                    {
+                        item.SpeedBytesPerSecond = speed;
+                        DownloadSpeedBytesPerSecond = speed;
                     });
                 }
 
                 aria2.ProgressChanged += OnProgress;
+                aria2.SpeedChanged += OnSpeed;
                 try
                 {
                     await aria2.DownloadWithMirrorAsync(
@@ -654,26 +808,38 @@ public partial class SettingsViewModel : ObservableObject
                     item.Exists = true;
                     item.Status = "完成";
                     item.Progress = 100;
+                    item.SpeedBytesPerSecond = 0;
+                    _downloadCompletedCount++;
+                    RefreshDownloadPercent();
                 }
                 catch (OperationCanceledException)
                 {
                     // 用户停止：当前项标记"已停止"，其余不再继续
                     item.Status = "已停止";
-                    OnPropertyChanged(nameof(DownloadPercent));
-                    return;
+                    throw;
                 }
                 catch (Exception ex)
                 {
                     item.Status = $"失败：{ex.Message}";
+                    item.SpeedBytesPerSecond = 0;
+                    _downloadFailureCount++;
+                    _downloadCompletedCount++;
+                    RefreshDownloadPercent();
                 }
                 finally
                 {
                     aria2.ProgressChanged -= OnProgress;
+                    aria2.SpeedChanged -= OnSpeed;
+                    item.IsActive = false;
+                    item.IsQueued = false;
+                    item.SpeedBytesPerSecond = 0;
                 }
             }
 
-            DownloadPercent = 100;
-            OperationMessage = $"下载完成（镜像：{chosenMirror.Name}）。";
+            DownloadPercent = _downloadTotalCount > 0 ? 100 : 0;
+            OperationMessage = _downloadFailureCount == 0
+                ? $"下载队列完成（镜像：{chosenMirror.Name}）。"
+                : $"下载队列完成，但有 {_downloadFailureCount} 个任务失败（镜像：{chosenMirror.Name}）。";
         }
         catch (OperationCanceledException)
         {
@@ -685,7 +851,19 @@ public partial class SettingsViewModel : ObservableObject
         }
         finally
         {
+            foreach (var item in DownloadItems.Where(d => d.IsQueued && !d.IsActive && !d.Exists))
+            {
+                item.IsQueued = false;
+                if (item.Status == "排队中")
+                {
+                    item.Status = "等待";
+                }
+            }
+
+            DownloadSpeedBytesPerSecond = 0;
             IsDownloading = false;
+            _downloadCts?.Dispose();
+            _downloadCts = null;
             OnPropertyChanged(nameof(CanDownload));
             OnPropertyChanged(nameof(CanStop));
         }
@@ -707,12 +885,17 @@ public partial class SettingsViewModel : ObservableObject
         _downloadCts = null;
 
         // 删除未完成选中项的部分文件与 .aria2 控制文件（真正停止，避免残留被误判为完整）
-        foreach (var d in DownloadItems.Where(d => d.IsSelected && !d.Exists))
+        foreach (var d in DownloadItems.Where(d => (d.IsSelected || d.IsQueued || d.IsActive) && !d.Exists))
         {
             TryDelete(Path.Combine(DownloadDirectory, d.Name));
             TryDelete(Path.Combine(DownloadDirectory, d.Name + ".aria2"));
-            d.Status = "等待";
+            if (!d.IsActive)
+            {
+                d.IsQueued = false;
+                d.Status = "等待";
+            }
             d.Progress = -1;
+            d.SpeedBytesPerSecond = 0;
         }
 
         DownloadPercent = 0;
@@ -1097,6 +1280,7 @@ public partial class SettingsViewModel : ObservableObject
             LatestVersion = info.LatestVersion;
             ReleaseUrl = info.ReleaseUrl;
             HasUpdate = info.HasNewer(CurrentVersion);
+            _latestReleaseInfo = info;
 
             UpdateStatus = HasUpdate
                 ? $"发现新版本：{info.LatestVersion}（当前 {CurrentVersion}）"

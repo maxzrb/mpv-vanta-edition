@@ -29,4 +29,10 @@ public sealed class InstallOptions
     /// 可同时注册并在 Windows「打开方式」里自行选择。
     /// </summary>
     public IReadOnlyCollection<PlaybackMode>? RegisterAssociations { get; init; }
+
+    /// <summary>
+    /// 哈希校验发现风险时请求用户确认。返回 true 表示用户明确接受风险并继续；
+    /// 未提供回调时默认拒绝继续，确保所有安装入口都不会静默忽略校验风险。
+    /// </summary>
+    public Func<PackageIntegrityResult, Task<bool>>? ConfirmIntegrityRisksAsync { get; init; }
 }

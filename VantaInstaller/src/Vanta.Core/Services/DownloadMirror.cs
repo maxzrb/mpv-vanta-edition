@@ -26,19 +26,18 @@ public sealed record DownloadMirror(string Id, string Name, string? BaseUrl)
 }
 
 /// <summary>
-/// 内置镜像注册表（官方 + 常用 GitHub 加速镜像）。
+/// 内置镜像注册表（官方 + 已复测可用的 GitHub 加速镜像）。
 /// </summary>
 public static class MirrorRegistry
 {
-    /// <summary>全部镜像（官方直连排第一，其余按可用性排序）</summary>
+    /// <summary>全部镜像（官方直连排第一，自建镜像固定放在列表末尾）</summary>
     public static IReadOnlyList<DownloadMirror> All { get; } =
     [
         new DownloadMirror("official", "官方直连（GitHub）", null),
         new DownloadMirror("gh-proxy.com", "gh-proxy.com", "https://gh-proxy.com/"),
         new DownloadMirror("ghproxy.net", "ghproxy.net", "https://ghproxy.net/"),
-        new DownloadMirror("ghfast.top", "ghfast.top", "https://ghfast.top/"),
-        new DownloadMirror("mirror.ghproxy.com", "mirror.ghproxy.com", "https://mirror.ghproxy.com/"),
-        new DownloadMirror("ghproxy.homeboyc.cn", "ghproxy.homeboyc.cn", "https://ghproxy.homeboyc.cn/"),
+        new DownloadMirror("gh.xxooo.cf", "gh.xxooo.cf", "https://gh.xxooo.cf/"),
+        new DownloadMirror("dl-loliland", "AerithDream 下载加速（自建）", "https://dl.loliland.cn/"),
     ];
 
     /// <summary>按 Id 查找镜像</summary>

@@ -45,6 +45,16 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private object _currentPage = null!;
 
+    /// <summary>应用版本号（左下角显示，跟随程序集版本自动更新）</summary>
+    public string VersionText
+    {
+        get
+        {
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            return version is null ? string.Empty : $"v{version.Major}.{version.Minor}.{version.Build}";
+        }
+    }
+
     /// <summary>当前安装步骤索引</summary>
     [ObservableProperty]
     private int _currentStep;

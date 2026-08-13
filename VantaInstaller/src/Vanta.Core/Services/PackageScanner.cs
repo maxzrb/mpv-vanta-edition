@@ -148,7 +148,7 @@ public static partial class PackageScanner
                 // 入口文件 = 去掉 .NNN 的主名（7z 解压分卷时指定 .001 即可）
                 var entryName = entry.Name;
                 pkg.EntryFile = entryName;
-                var fileList = new List<string> { entryName };
+                var fileList = new List<string>();
 
                 var expected = 1;
                 var missing = new List<string>();
@@ -171,6 +171,7 @@ public static partial class PackageScanner
 
                 pkg.IsComplete = missing.Count == 0;
                 pkg.MissingParts = missing;
+                pkg.Files = fileList;
                 pkg.TotalSize = ordered.Sum(p => new FileInfo(Path.Combine(directory, p.Name)).Length);
             }
 

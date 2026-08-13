@@ -1,14 +1,21 @@
 using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Vanta.Core.Services;
 
 /// <summary>
-/// aria2c 下载服务：定位可执行文件、多线程下载、进度解析、断点续传。
+/// Aria2 Next 下载服务：释放内置引擎、多线程下载、进度解析、断点续传。
 /// </summary>
 public sealed partial class Aria2Service
 {
+    public const string EngineVersion = "2.5.5";
+    private const string EngineResourceName = "Vanta.Core.Assets.aria2-next.exe";
+    private const string LicenseResourceName = "Vanta.Core.Assets.aria2-next-COPYING.txt";
+    private const string EngineSha256 = "554F2F81CA53731DC9E01710CFB16081A34759F3276FF16EB4B12656C1B6E5B9";
     private readonly string? _explicitPath;
     private string? _resolvedPath;
 
@@ -17,6 +24,9 @@ public sealed partial class Aria2Service
 
     /// <summary>下载进度（文件名，0~100）</summary>
     public event Action<string, int>? ProgressChanged;
+
+    /// <summary>实时下载速度（文件名，字节/秒）</summary>
+    public event Action<string, double>? SpeedChanged;
 
     public Aria2Service(string? explicitPath = null) => _explicitPath = explicitPath;
 
@@ -27,7 +37,7 @@ public sealed partial class Aria2Service
     public bool IsReady => _resolvedPath is not null;
 
     /// <summary>
-    /// 定位 aria2c：显式路径 → PATH → 仓库自带 aria2\aria2c.exe → 下载兜底。
+    /// 定位 Aria2 Next：显式路径优先，否则从安装器内置资源释放到版本化缓存。
     /// </summary>
     public async Task<string> LocateAsync()
     {
@@ -42,45 +52,55 @@ public sealed partial class Aria2Service
             return _resolvedPath = _explicitPath;
         }
 
-        // 2. PATH
-        var fromPath = FindInPath("aria2c.exe");
-        if (fromPath is not null)
-        {
-            return _resolvedPath = fromPath;
-        }
-
-        // 3. 仓库自带 aria2\aria2c.exe（向上查找）
-        var bundled = FindUpwards("aria2", "aria2c.exe", 5);
-        if (bundled is not null)
-        {
-            return _resolvedPath = bundled;
-        }
-
-        // 4. 下载 aria2c 兜底（官方 Windows 构建 1.37.0）
-        var dir = Path.Combine(Path.GetTempPath(), "vanta-aria2");
+        var dir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "VantaInstaller",
+            "engines",
+            $"aria2-next-{EngineVersion}");
         Directory.CreateDirectory(dir);
-        var fallback = Path.Combine(dir, "aria2c.exe");
-        if (!File.Exists(fallback))
+        var enginePath = Path.Combine(dir, "aria2-next.exe");
+        if (!File.Exists(enginePath) || !HasExpectedHash(enginePath))
         {
-            OutputReceived?.Invoke("未找到 aria2c，正在下载 aria2 1.37.0 …");
-            var url = "https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip";
-            using var http = new HttpClient();
-            var zipBytes = await http.GetByteArrayAsync(url);
-            var zipPath = Path.Combine(dir, "aria2.zip");
-            await File.WriteAllBytesAsync(zipPath, zipBytes);
-
-            // 解压出 aria2c.exe
-            var sevenZip = new SevenZipService();
-            await sevenZip.LocateAsync();
-            // 用 7z 解压 zip
-            await ExtractZipAsync(zipPath, dir);
+            OutputReceived?.Invoke($"正在准备 Aria2 Next {EngineVersion} 下载引擎…");
+            await ExtractResourceAsync(EngineResourceName, enginePath);
         }
 
-        if (!File.Exists(fallback))
+        if (!File.Exists(enginePath) || !HasExpectedHash(enginePath))
         {
-            throw new InvalidOperationException("aria2c 下载失败，无法定位。");
+            throw new InvalidOperationException("Aria2 Next 下载引擎释放或校验失败。");
         }
-        return _resolvedPath = fallback;
+
+        var licensePath = Path.Combine(dir, "COPYING.txt");
+        if (!File.Exists(licensePath))
+        {
+            await ExtractResourceAsync(LicenseResourceName, licensePath);
+        }
+        return _resolvedPath = enginePath;
+    }
+
+    private static async Task ExtractResourceAsync(string resourceName, string destination)
+    {
+        await using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)
+            ?? throw new InvalidOperationException($"安装器内缺少资源：{resourceName}");
+        var temporary = $"{destination}.{Environment.ProcessId}.tmp";
+        await using (var output = new FileStream(temporary, FileMode.Create, FileAccess.Write, FileShare.None))
+        {
+            await resource.CopyToAsync(output);
+        }
+        File.Move(temporary, destination, overwrite: true);
+    }
+
+    private static bool HasExpectedHash(string path)
+    {
+        try
+        {
+            using var stream = File.OpenRead(path);
+            return Convert.ToHexString(SHA256.HashData(stream)) == EngineSha256;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -94,7 +114,7 @@ public sealed partial class Aria2Service
         string url,
         string outputDirectory,
         string? fileName = null,
-        int connections = 16,
+        int connections = 64,
         CancellationToken ct = default)
         => await DownloadWithMirrorsAsync(url, outputDirectory, null, fileName, connections, ct);
 
@@ -106,7 +126,7 @@ public sealed partial class Aria2Service
         string url,
         string outputDirectory,
         string? fileName = null,
-        int connections = 16,
+        int connections = 64,
         CancellationToken ct = default)
     {
         var exe = await LocateAsync();
@@ -145,7 +165,7 @@ public sealed partial class Aria2Service
         string outputDirectory,
         IReadOnlyList<DownloadMirror>? mirrors,
         string? fileName = null,
-        int connections = 16,
+        int connections = 64,
         CancellationToken ct = default,
         Action<DownloadMirror>? onMirrorSwitched = null)
     {
@@ -212,9 +232,6 @@ public sealed partial class Aria2Service
         var psi = new ProcessStartInfo
         {
             FileName = exe,
-            // 注意：目录以反斜杠结尾时，紧贴闭合引号会变成 \" 转义引号，导致整条命令解析错乱。
-            // 因此去掉结尾反斜杠（--dir 不依赖尾斜杠）。
-            Arguments = $"-x {connections} -s {connections} -k 1M -c --dir=\"{outputDirectory.TrimEnd('\\')}\" --out=\"{outName}\" --summary-interval=1 --console-log-level=warn --file-allocation=none --auto-file-renaming=false \"{resolvedUrl}\"",
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardOutput = true,
@@ -223,8 +240,41 @@ public sealed partial class Aria2Service
             StandardErrorEncoding = Encoding.UTF8,
         };
 
+        // 对齐 Motrix Next 的 64 分片/64 单服务器连接默认值。ArgumentList 避免空格、引号和 URL
+        // 特殊字符再次经过命令行字符串解析，修复安装目录或资产名较复杂时的启动失败。
+        string[] arguments =
+        [
+            "--no-conf",
+            $"--max-connection-per-server={connections}",
+            $"--split={connections}",
+            "--min-split-size=1M",
+            "--continue=true",
+            "--allow-piece-length-change=true",
+            "--enable-http-keep-alive=true",
+            "--max-tries=5",
+            "--retry-wait=2",
+            "--connect-timeout=10",
+            "--timeout=30",
+            // Motrix Next 默认使用 trunc；Windows 下创建大文件开销低于预分配，也比 none 更稳定。
+            "--file-allocation=trunc",
+            "--auto-file-renaming=false",
+            $"--dir={outputDirectory.TrimEnd('\\')}",
+            $"--out={outName}",
+            "--summary-interval=1",
+            "--console-log-level=notice",
+            "--show-console-readout=true",
+            "--enable-color=false",
+            "--human-readable=true",
+            "--download-result=hide",
+            resolvedUrl,
+        ];
+        foreach (var argument in arguments)
+        {
+            psi.ArgumentList.Add(argument);
+        }
+
         using var proc = Process.Start(psi)
-            ?? throw new InvalidOperationException("无法启动 aria2c。");
+            ?? throw new InvalidOperationException("无法启动 Aria2 Next。");
 
         // 取消时强制结束 aria2c 进程（保留 .aria2 控制文件，支持断点续传）
         using var cancelReg = ct.Register(() =>
@@ -240,7 +290,14 @@ public sealed partial class Aria2Service
         });
 
         var outputLines = new System.Collections.Concurrent.ConcurrentQueue<string>();
-        void Collect(string line) => outputLines.Enqueue(line);
+        void Collect(string line)
+        {
+            outputLines.Enqueue(line);
+            while (outputLines.Count > 20)
+            {
+                outputLines.TryDequeue(out _);
+            }
+        }
 
         OutputReceived += Collect;
         try
@@ -252,26 +309,18 @@ public sealed partial class Aria2Service
             };
             await Task.WhenAll(readTasks);
             await proc.WaitForExitAsync(ct);
+            SpeedChanged?.Invoke(outName, 0);
         }
         finally
         {
             OutputReceived -= Collect;
         }
 
-        if (proc.ExitCode != 0 && proc.ExitCode != 1)
-        {
-            // aria2c 退出码 1 = 部分完成（如已存在），3 = 未找到元数据等
-            throw new InvalidOperationException($"aria2c 下载失败（退出码 {proc.ExitCode}）：{resolvedUrl}");
-        }
-
-        // 退出码 1：若目标文件缺失/0 字节（例如源已删除或返回异常页），抛错并附 aria2 输出便于诊断
-        var fullPath = Path.Combine(outputDirectory, outName);
-        var hasFile = File.Exists(fullPath) && new FileInfo(fullPath).Length > 0;
-        if (proc.ExitCode == 1 && !hasFile)
+        if (proc.ExitCode != 0)
         {
             var tail = string.Join(Environment.NewLine, outputLines.TakeLast(8));
             throw new InvalidOperationException(
-                $"aria2c 退出码 1 但未产生有效文件：{resolvedUrl}{Environment.NewLine}{tail}");
+                $"Aria2 Next 下载失败（退出码 {proc.ExitCode}）：{resolvedUrl}{Environment.NewLine}{tail}");
         }
     }
 
@@ -292,6 +341,12 @@ public sealed partial class Aria2Service
             {
                 ProgressChanged?.Invoke(fileName, Math.Clamp(pct, 0, 100));
             }
+
+            var speed = ParseSpeed(line);
+            if (speed.HasValue)
+            {
+                SpeedChanged?.Invoke(fileName, speed.Value);
+            }
         }
     }
 
@@ -299,70 +354,67 @@ public sealed partial class Aria2Service
     [GeneratedRegex(@"\((\d{1,3})%\)")]
     private static partial Regex PercentRegex();
 
-    private static string? FindInPath(string exeName)
-    {
-        var pathEnv = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
-        foreach (var dir in pathEnv.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
-        {
-            try
-            {
-                var candidate = Path.Combine(dir.Trim('"'), exeName);
-                if (File.Exists(candidate))
-                {
-                    return candidate;
-                }
-            }
-            catch { }
-        }
-        return null;
-    }
+    /// <summary>匹配 aria2 摘要中的 DL:12MiB 速度字段。</summary>
+    [GeneratedRegex(@"DL:\s*(?<value>\d+(?:[\.,]\d+)?)\s*(?<unit>B|KiB|MiB|GiB|TiB|KB|MB|GB|TB)", RegexOptions.IgnoreCase)]
+    private static partial Regex Aria2SpeedRegex();
 
-    private static string? FindUpwards(string subDir, string fileName, int maxLevels)
-    {
-        var dir = AppContext.BaseDirectory;
-        for (int i = 0; i <= maxLevels; i++)
-        {
-            var candidate = Path.Combine(dir, subDir, fileName);
-            if (File.Exists(candidate))
-            {
-                return candidate;
-            }
-            var parent = Directory.GetParent(dir);
-            if (parent is null)
-            {
-                return null;
-            }
-            dir = parent.FullName;
-        }
-        return null;
-    }
+    /// <summary>匹配部分 aria2 输出中的 12MiB/s 速度字段。</summary>
+    [GeneratedRegex(@"(?<![A-Za-z0-9])(?<value>\d+(?:[\.,]\d+)?)\s*(?<unit>B|KiB|MiB|GiB|TiB|KB|MB|GB|TB)\s*/\s*s", RegexOptions.IgnoreCase)]
+    private static partial Regex ExplicitSpeedRegex();
 
-    /// <summary>用 7z 解压 zip（7z 支持 zip 格式）</summary>
-    private static async Task ExtractZipAsync(string zipPath, string destDir)
+    private static double? ParseSpeed(string line)
     {
-        var sevenZip = new SevenZipService();
-        await sevenZip.LocateAsync();
-        var psi = new ProcessStartInfo
+        var match = Aria2SpeedRegex().Match(line);
+        if (!match.Success)
         {
-            FileName = sevenZip.ResolvedPath!,
-            Arguments = $"x -y -o\"{destDir}\" \"{zipPath}\"",
-            UseShellExecute = false,
-            CreateNoWindow = true,
+            match = ExplicitSpeedRegex().Match(line);
+        }
+
+        if (!match.Success || !double.TryParse(
+                match.Groups["value"].Value.Replace(',', '.'),
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture,
+                out var value))
+        {
+            return null;
+        }
+
+        var unit = match.Groups["unit"].Value.ToUpperInvariant();
+        var multiplier = unit switch
+        {
+            "B" => 1d,
+            "KB" => 1_000d,
+            "MB" => 1_000_000d,
+            "GB" => 1_000_000_000d,
+            "TB" => 1_000_000_000_000d,
+            "KIB" => 1024d,
+            "MIB" => 1024d * 1024d,
+            "GIB" => 1024d * 1024d * 1024d,
+            "TIB" => 1024d * 1024d * 1024d * 1024d,
+            _ => 0d,
         };
-        using var proc = Process.Start(psi);
-        if (proc is not null)
+
+        return multiplier > 0 ? value * multiplier : null;
+    }
+
+    /// <summary>格式化实时下载速度。</summary>
+    public static string FormatSpeed(double bytesPerSecond)
+    {
+        if (bytesPerSecond <= 0)
         {
-            await proc.WaitForExitAsync();
+            return "—";
         }
 
-        // 解压后找 aria2c.exe（可能在子目录）
-        if (!File.Exists(Path.Combine(destDir, "aria2c.exe")))
+        var value = bytesPerSecond;
+        var units = new[] { "B/s", "KiB/s", "MiB/s", "GiB/s", "TiB/s" };
+        var index = 0;
+        while (value >= 1024 && index < units.Length - 1)
         {
-            var found = Directory.EnumerateFiles(destDir, "aria2c.exe", SearchOption.AllDirectories).FirstOrDefault();
-            if (found is not null)
-            {
-                File.Copy(found, Path.Combine(destDir, "aria2c.exe"), overwrite: true);
-            }
+            value /= 1024;
+            index++;
         }
+
+        return index == 0 ? $"{value:0} {units[index]}" : $"{value:0.0} {units[index]}";
     }
+
 }
