@@ -227,8 +227,20 @@
                 </ItemsControl>
 
                 </StackPanel>
-                <TextBlock Grid.Row="1" Text="{Binding VersionText, Mode=OneWay}" Foreground="#FF8A8AA0"
-                           FontSize="11" Margin="0,12,0,0" VerticalAlignment="Bottom" />
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,0"
+                            VerticalAlignment="Bottom">
+                    <TextBlock Text="{Binding VersionText, Mode=OneWay}" Foreground="#FF8A8AA0"
+                               FontSize="11" VerticalAlignment="Center" />
+                    <!-- 自身更新徽标：有新版时显示，点击跳转下载 -->
+                    <ui:Button Command="{Binding OpenInstallerUpdateCommand}"
+                               Visibility="{Binding HasInstallerUpdate, Converter={StaticResource BoolToVis}}"
+                               Appearance="Primary" Padding="8,3" Margin="8,0,0,0" FontSize="10"
+                               AutomationProperties.Name="下载新版 VantaInstaller"
+                               ToolTip="有新版本，点击下载">
+                        <TextBlock Text="{Binding InstallerUpdateVersion, StringFormat={}有新版 {0}}"
+                                   Foreground="White" FontSize="10" />
+                    </ui:Button>
+                </StackPanel>
             </Grid>
         </Border>
 

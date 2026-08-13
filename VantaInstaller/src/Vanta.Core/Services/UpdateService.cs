@@ -23,32 +23,105 @@ public static class UpdateService
         public bool HasNewer(string? currentVersion) =>
             !string.IsNullOrWhiteSpace(currentVersion)
             && !string.Equals(TrimV(currentVersion), TrimV(LatestVersion), StringComparison.OrdinalIgnoreCase)
-            && CompareVersions(TrimV(LatestVersion), TrimV(currentVersion)) > 0;
+            && UpdateService.CompareVersions(TrimV(LatestVersion), TrimV(currentVersion)) > 0;
 
         private static string TrimV(string v) => v.TrimStart('v', 'V');
-
-        /// <summary>简单语义化版本比较：1.4.2 > 1.4.1</summary>
-        private static int CompareVersions(string a, string b)
-        {
-            var pa = a.Split('.', '-').Select(s => int.TryParse(s, out var n) ? n : 0).ToArray();
-            var pb = b.Split('.', '-').Select(s => int.TryParse(s, out var n) ? n : 0).ToArray();
-            for (int i = 0; i < Math.Max(pa.Length, pb.Length); i++)
-            {
-                var x = i < pa.Length ? pa[i] : 0;
-                var y = i < pb.Length ? pb[i] : 0;
-                if (x != y)
-                {
-                    return x.CompareTo(y);
-                }
-            }
-            return 0;
-        }
     }
 
     /// <summary>Release 资产</summary>
     public sealed record ReleaseAsset(string Name, string Url, long Size, string? Sha256)
     {
         public string SizeText => Models.VantaPackage.FormatSize(Size);
+    }
+
+    /// <summary>VantaInstaller 自身更新信息</summary>
+    public sealed record InstallerUpdateInfo(
+        string LatestVersion,
+        string ReleaseUrl,
+        string AssetUrl,
+        long AssetSize);
+
+    /// <summary>
+    /// 检查 VantaInstaller 自身是否有更新：
+    /// 从最新正式 Release 中找 VantaInstaller-win-x64-v*.exe 资产，
+    /// 与当前安装器版本比较；无更新或网络异常返回 null。
+    /// </summary>
+    public static async Task<InstallerUpdateInfo?> CheckInstallerUpdateAsync(
+        string? currentVersion,
+        CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(currentVersion))
+        {
+            return null;
+        }
+
+        var info = await CheckLatestAsync(ct);
+        if (info is null)
+        {
+            return null;
+        }
+
+        var asset = info.Assets.FirstOrDefault(a =>
+            a.Name.StartsWith("VantaInstaller-win-x64-", StringComparison.OrdinalIgnoreCase)
+            && a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+        if (asset is null)
+        {
+            return null;
+        }
+
+        var version = ParseInstallerVersion(asset.Name);
+        if (version is null)
+        {
+            return null;
+        }
+
+        var cur = currentVersion.Trim().TrimStart('v', 'V');
+        if (CompareVersions(version, cur) <= 0)
+        {
+            return null;
+        }
+
+        return new InstallerUpdateInfo(version, info.ReleaseUrl, asset.Url, asset.Size);
+    }
+
+    /// <summary>从资产名解析安装器版本：VantaInstaller-win-x64-v0.3.2.exe → 0.3.2</summary>
+    private static string? ParseInstallerVersion(string assetName)
+    {
+        const string marker = "VantaInstaller-win-x64-v";
+        var idx = assetName.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+        if (idx < 0)
+        {
+            return null;
+        }
+
+        var versionPart = assetName[(idx + marker.Length)..].TrimStart('v', 'V');
+        var exeIdx = versionPart.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
+        if (exeIdx > 0)
+        {
+            versionPart = versionPart[..exeIdx];
+        }
+
+        var parts = versionPart.Split('.');
+        return parts.Length == 3 && parts.All(p => int.TryParse(p, out _))
+            ? versionPart
+            : null;
+    }
+
+    /// <summary>简单语义化版本比较：1.4.2 &gt; 1.4.1</summary>
+    internal static int CompareVersions(string a, string b)
+    {
+        var pa = a.Split('.', '-').Select(s => int.TryParse(s, out var n) ? n : 0).ToArray();
+        var pb = b.Split('.', '-').Select(s => int.TryParse(s, out var n) ? n : 0).ToArray();
+        for (int i = 0; i < Math.Max(pa.Length, pb.Length); i++)
+        {
+            var x = i < pa.Length ? pa[i] : 0;
+            var y = i < pb.Length ? pb[i] : 0;
+            if (x != y)
+            {
+                return x.CompareTo(y);
+            }
+        }
+        return 0;
     }
 
     /// <summary>

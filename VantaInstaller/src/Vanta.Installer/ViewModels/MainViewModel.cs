@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Vanta.Core.Services;
 using Wpf.Ui.Controls;
 
 namespace Vanta.Installer.ViewModels;
@@ -54,6 +56,18 @@ public partial class MainViewModel : ObservableObject
             return version is null ? string.Empty : $"v{version.Major}.{version.Minor}.{version.Build}";
         }
     }
+
+    /// <summary>是否有新的 VantaInstaller 版本可下载（启动时异步检查）</summary>
+    [ObservableProperty]
+    private bool _hasInstallerUpdate;
+
+    /// <summary>可用的最新 VantaInstaller 版本号</summary>
+    [ObservableProperty]
+    private string? _installerUpdateVersion;
+
+    /// <summary>最新安装器下载直链</summary>
+    [ObservableProperty]
+    private string? _installerUpdateUrl;
 
     /// <summary>当前安装步骤索引</summary>
     [ObservableProperty]
@@ -181,6 +195,55 @@ public partial class MainViewModel : ObservableObject
 
         _currentStep = 0;
         _currentPage = _home;
+
+        // 启动后异步检查 VantaInstaller 自身更新（失败静默，不影响启动）
+        _ = CheckInstallerUpdateAsync();
+    }
+
+    /// <summary>启动时检查 VantaInstaller 自身更新；异常静默。</summary>
+    private async Task CheckInstallerUpdateAsync()
+    {
+        try
+        {
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            var current = version is null ? null : $"{version.Major}.{version.Minor}.{version.Build}";
+            var update = await UpdateService.CheckInstallerUpdateAsync(current);
+            if (update is null)
+            {
+                return;
+            }
+
+            InstallerUpdateVersion = update.LatestVersion;
+            InstallerUpdateUrl = update.AssetUrl;
+            HasInstallerUpdate = true;
+        }
+        catch
+        {
+            // 检查失败静默（离线/网络异常不影响启动）
+        }
+    }
+
+    /// <summary>打开最新 VantaInstaller 下载直链。</summary>
+    [RelayCommand]
+    private void OpenInstallerUpdate()
+    {
+        if (string.IsNullOrEmpty(InstallerUpdateUrl))
+        {
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = InstallerUpdateUrl,
+                UseShellExecute = true,
+            });
+        }
+        catch
+        {
+            // 打不开时忽略
+        }
     }
 
     // ============ 模式切换 ============
