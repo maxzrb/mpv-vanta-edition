@@ -34,6 +34,33 @@ if (Test-Path -LiteralPath $Stage) {
 $null = New-Item -ItemType Directory -Force -Path $Stage
 $null = New-Item -ItemType Directory -Force -Path $OutputRoot
 
+function Get-InstallerVersion {
+    param([string]$FileName)
+    # VantaInstaller-win-x64-v0.3.2.exe -> 0.3.2
+    $marker = 'VantaInstaller-win-x64-v'
+    $idx = $FileName.IndexOf($marker, [System.StringComparison]::OrdinalIgnoreCase)
+    if ($idx -lt 0) { return $null }
+    $ver = $FileName.Substring($idx + $marker.Length)
+    $exeIdx = $ver.IndexOf('.exe', [System.StringComparison]::OrdinalIgnoreCase)
+    if ($exeIdx -gt 0) { $ver = $ver.Substring(0, $exeIdx) }
+    $parts = $ver.Split('.')
+    if ($parts.Length -ne 3) { return $null }
+    foreach ($p in $parts) {
+        if (-not ($p -match '^\d+$')) { return $null }
+    }
+    return $ver
+}
+
+function Compare-Version {
+    param([string]$A, [string]$B)
+    $pa = $A.Split('.'); $pb = $B.Split('.')
+    for ($i = 0; $i -lt 3; $i++) {
+        $x = [int]$pa[$i]; $y = [int]$pb[$i]
+        if ($x -ne $y) { return $x.CompareTo($y) }
+    }
+    return 0
+}
+
 function Expand-Package {
     param([string]$ArchivePath)
 
@@ -50,6 +77,24 @@ Expand-Package $ExtrasArchive
 Expand-Package $FwArchive
 Expand-Package $LsfgArchive
 Expand-Package $ConfigArchive
+
+# 打包最新 VantaInstaller（发布时候选已移入 release 目录；按版本号取最大者）
+$InstallerCandidates = @(Get-ChildItem -LiteralPath $OutputRoot -File -Filter 'VantaInstaller-win-x64-v*.exe' `
+    -ErrorAction SilentlyContinue)
+$InstallerExe = $null
+foreach ($candidate in $InstallerCandidates) {
+    $ver = Get-InstallerVersion $candidate.Name
+    if ($null -eq $ver) { continue }
+    if ($null -eq $InstallerExe -or (Compare-Version $ver $InstallerExe.Version) -gt 0) {
+        $InstallerExe = [pscustomobject]@{ Path = $candidate.FullName; Version = $ver; Name = $candidate.Name }
+    }
+}
+if ($null -eq $InstallerExe) {
+    Write-Warning 'release 目录未找到 VantaInstaller-win-x64-v*.exe，个人全量包将不包含安装器。'
+} else {
+    Write-Host "打包 VantaInstaller：$($InstallerExe.Name)" -ForegroundColor Gray
+    Copy-Item -LiteralPath $InstallerExe.Path -Destination (Join-Path $Stage $InstallerExe.Name) -Force
+}
 
 # 全量备份 Lossless Scaling 目录（含 Lossless.dll 及所有语言资源）
 # 04 公开包可能已留有空 Lossless Scaling 占位目录，先移除避免 Copy-Item 嵌套
@@ -73,7 +118,8 @@ MPV 个人私用全量包 v${Version}
   04. 04-mpv-lsfg-addon-v${Version}.7z
   05. 05-mpv-config-v${Version}.7z
 
-并包含完整 Lossless Scaling 目录备份。
+并包含完整 Lossless Scaling 目录备份，
+以及随包携带的最新 VantaInstaller（发布候选）：VantaInstaller-win-x64-v*.exe。
 
 这是五个公开包的完整并集，包含播放器、配置、着色器、VapourSynth、Python、
 Faster-Whisper、工具、LSFG 运行文件、LSFG 研究源码和公开包说明。
