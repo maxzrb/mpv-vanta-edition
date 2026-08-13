@@ -63,6 +63,10 @@ function Invoke-Pack {
         exit 1
     }
 
+    # 归档内验证根级 README.MD 确实进入（精确匹配根级条目，避免误匹配 portable_config\README.md）
+    $readmeIn = (& $7z l -ba "${archivePath}.7z" | Select-String ' README\.MD$' -CaseSensitive)
+    Write-Host "       [verify] archive root README.MD present: $($null -ne $readmeIn)"
+
     $size = (Get-Item "${archivePath}.7z").Length
     $sizeMB = [math]::Round($size / 1MB, 1)
     Write-Host "       Done (${sizeMB} MB)" -ForegroundColor Green
@@ -197,9 +201,14 @@ Copy-IfExists "umpv.conf" $BaseBuild
 # 7z extractor (needed to unpack extras)
 Invoke-CopyTo $BaseBuild @("7z.exe", "7z.dll", "7z")
 
-# Project files
-Copy-IfExists "README.MD" $BaseBuild
-Copy-IfExists ".gitignore" $BaseBuild
+# 项目说明文件：显式目标路径复制（README.MD 必须随 01 包分发）
+Invoke-CopyTo $BaseBuild @("README.MD", ".gitignore")
+
+# 打包前校验 README.MD 已进入构建目录（缺失即终止，避免发布无说明文档的包）
+if (-not (Test-Path (Join-Path $BaseBuild "README.MD"))) {
+    Write-Error "README.MD 未进入 01 构建目录，终止打包。"
+    exit 1
+}
 
 Remove-GeneratedArtifacts $BaseBuild
 Invoke-Pack $BaseName $BaseBuild "Base (core player + runtime + config)"

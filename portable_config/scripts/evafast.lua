@@ -27,6 +27,9 @@ local options = {
     -- Playback speed cap when subtitles are displayed, ignored when equal to speed_cap
     subs_speed_cap = 1.6,
 
+    -- Limit the speed cap when subtitles are displayed (no = always use speed_cap)
+    subs_limit = true,
+
     -- Multiply current speed by modifier before adjustment (exponential speedup)
     -- Use much lower values than default e.g. speed_increase=0.05, speed_decrease=0.025
     multiply_modifier = false,
@@ -208,7 +211,7 @@ local function adjust_speed()
     if speedup then
         target_speed = options.speed_cap
 
-        if has_subtitle and target_speed ~= options.subs_speed_cap then
+        if options.subs_limit and has_subtitle and target_speed ~= options.subs_speed_cap then
             local sub_displayed = mp.get_property("sub-start") ~= nil
 
             if sub_displayed then

@@ -56,10 +56,17 @@ if (Test-Path $assetsPath) { Remove-Item -Recurse -Force $assetsPath }
     $vantaMarker = Join-Path $configDest '.vanta-version'
     if (Test-Path $vantaMarker) { Remove-Item -Force $vantaMarker }
 
-# 项目文件
+# 项目说明文件：显式目标路径复制（README.MD 必须随 05 包分发）
 foreach ($file in @('README.MD', '.gitignore')) {
     $src = Join-Path $Root $file
-    if (Test-Path $src) { Copy-Item $src $Stage }
+    if (Test-Path -LiteralPath $src) {
+        Copy-Item -LiteralPath $src -Destination (Join-Path $Stage $file) -Force
+    }
+}
+
+# 打包前校验 README.MD 已进入构建目录（缺失即终止）
+if (-not (Test-Path -LiteralPath (Join-Path $Stage 'README.MD'))) {
+    throw 'README.MD 未进入 05 构建目录，终止打包。'
 }
 
 # 清理缓存

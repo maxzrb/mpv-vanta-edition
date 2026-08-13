@@ -537,6 +537,96 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
+                        <!-- 方向键快进（evafast）：独立配置文件，单独保存 -->
+                        <StackPanel Margin="0,18,0,0">
+                            <Border Padding="0,0,0,8" BorderThickness="0,0,0,1"
+                                    BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+                                <TextBlock Text="方向键快进" FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                            </Border>
+
+                            <!-- 无字幕倍速上限 -->
+                            <Border BorderThickness="0,0,0,1" Padding="0,10"
+                                    BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+                                        <TextBlock Text="无字幕时快进倍速上限" FontSize="14"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="长按方向键快进时最高可达的倍速。" Margin="0,3,0,0"
+                                                   FontSize="11" TextWrapping="Wrap" LineHeight="16"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Slider Width="140" Minimum="1" Maximum="8" TickFrequency="0.5"
+                                                IsSnapToTickEnabled="True"
+                                                Value="{Binding EvafastSpeedCap, Mode=TwoWay}" />
+                                        <TextBlock Text="{Binding EvafastSpeedCap, StringFormat={}{0:0.0}×}" Width="44"
+                                                   Margin="8,0,0,0" FontSize="12" TextAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- 有字幕倍速上限 -->
+                            <Border BorderThickness="0,0,0,1" Padding="0,10"
+                                    BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+                                        <TextBlock Text="有字幕时快进倍速上限" FontSize="14"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="显示字幕时自动降至此倍速，便于阅读；关闭下方开关后不生效。" Margin="0,3,0,0"
+                                                   FontSize="11" TextWrapping="Wrap" LineHeight="16"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Slider Width="140" Minimum="1" Maximum="8" TickFrequency="0.5"
+                                                IsSnapToTickEnabled="True"
+                                                Value="{Binding EvafastSubsSpeedCap, Mode=TwoWay}" />
+                                        <TextBlock Text="{Binding EvafastSubsSpeedCap, StringFormat={}{0:0.0}×}" Width="44"
+                                                   Margin="8,0,0,0" FontSize="12" TextAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- 字幕限速开关 -->
+                            <Border BorderThickness="0,0,0,1" Padding="0,10"
+                                    BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+                                        <TextBlock Text="显示字幕时自动降低倍速" FontSize="14"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="取消后无论有无字幕都使用无字幕倍速上限。" Margin="0,3,0,0"
+                                                   FontSize="11" TextWrapping="Wrap" LineHeight="16"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding EvafastSubsLimit, Mode=TwoWay}"
+                                              VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+
+                            <TextBlock Text="写入 script-opts\evafast.conf，与上方 mpv 设置一起保存，重启 mpv 后生效。"
+                                       Margin="0,12,0,0" FontSize="11" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                            <ui:InfoBar IsOpen="{Binding EvafastMessage, Converter={StaticResource StringNotEmpty}}"
+                                        Title="{Binding EvafastMessage, Mode=OneWay}"
+                                        Severity="Informational" Margin="0,12,0,0" />
+                        </StackPanel>
+
                         <Grid Margin="0,20,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -544,7 +634,7 @@
                             </Grid.ColumnDefinitions>
                             <ui:Button Grid.Column="0" Content="保存 mpv 设置" Appearance="Primary"
                                        Command="{Binding DataContext.SaveMpvSettingsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                       IsEnabled="{Binding DataContext.MpvConfigModified, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                       IsEnabled="{Binding DataContext.CanSaveMpvSettings, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                        Padding="16,8" Margin="0,0,8,0" />
                             <ui:Button Grid.Column="1" Content="恢复初始设置" Appearance="Secondary"
                                        Command="{Binding DataContext.RestoreMpvDefaultsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"

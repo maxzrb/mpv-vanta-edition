@@ -215,6 +215,54 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>已安装时显示主题卡片；注册表异常会在卡片内提示。</summary>
     public bool ShowThemeSettings => IsInstalled;
 
+    // ---- 方向键快进（evafast）----
+
+    /// <summary>无字幕时的快进倍速上限</summary>
+    [ObservableProperty]
+    private double _evafastSpeedCap = 3;
+
+    /// <summary>有字幕时的快进倍速上限</summary>
+    [ObservableProperty]
+    private double _evafastSubsSpeedCap = 1.5;
+
+    /// <summary>是否启用"显示字幕时降低倍速上限"</summary>
+    [ObservableProperty]
+    private bool _evafastSubsLimit = true;
+
+    /// <summary>加载时的 evafast 初始值（判断是否有未保存修改）</summary>
+    private double _evafastInitialSpeedCap = 3;
+    private double _evafastInitialSubsSpeedCap = 1.5;
+    private bool _evafastInitialSubsLimit = true;
+
+    /// <summary>evafast 设置是否有未保存修改</summary>
+    public bool EvafastModified =>
+        !EvafastConfigService.SameValues(
+            EvafastSpeedCap, EvafastSubsSpeedCap, EvafastSubsLimit,
+            _evafastInitialSpeedCap, _evafastInitialSubsSpeedCap, _evafastInitialSubsLimit);
+
+    /// <summary>保存按钮可用：mpv.conf 或 evafast 任一有修改</summary>
+    public bool CanSaveMpvSettings => MpvConfigModified || EvafastModified;
+
+    /// <summary>evafast 设置是否已加载（避免重复读盘）</summary>
+    private bool _evafastLoaded;
+
+    /// <summary>evafast 设置操作结果。</summary>
+    [ObservableProperty]
+    private string? _evafastMessage;
+
+    partial void OnEvafastSpeedCapChanged(double value) => RefreshEvafastModified();
+
+    partial void OnEvafastSubsSpeedCapChanged(double value) => RefreshEvafastModified();
+
+    partial void OnEvafastSubsLimitChanged(bool value) => RefreshEvafastModified();
+
+    /// <summary>刷新 evafast 修改状态与保存按钮可用性</summary>
+    private void RefreshEvafastModified()
+    {
+        OnPropertyChanged(nameof(EvafastModified));
+        OnPropertyChanged(nameof(CanSaveMpvSettings));
+    }
+
     // ---- 增量包下载（aria2）----
 
     /// <summary>可下载资产列表</summary>
@@ -328,6 +376,7 @@ public partial class SettingsViewModel : ObservableObject
         RefreshBackups();
         RefreshCacheStats();
         LoadUoscThemes();
+        LoadEvafastSettings();
         if (!_mpvLoaded)
         {
             LoadMpvSettings();
@@ -469,6 +518,33 @@ public partial class SettingsViewModel : ObservableObject
         catch (Exception ex)
         {
             ThemeMessage = $"主题应用失败：{ex.Message}";
+        }
+    }
+
+    /// <summary>加载 evafast（方向键快进）设置，仅首次/未加载时读取。</summary>
+    private void LoadEvafastSettings()
+    {
+        if (_evafastLoaded || !IsInstalled)
+        {
+            return;
+        }
+
+        try
+        {
+            var settings = EvafastConfigService.Load(ConfigDirectory);
+            // 先记录初始值，再赋值（赋值触发的 OnXxxChanged 会据此判断未修改）
+            _evafastInitialSpeedCap = settings.SpeedCap;
+            _evafastInitialSubsSpeedCap = settings.SubsSpeedCap;
+            _evafastInitialSubsLimit = settings.SubsLimit;
+            EvafastSpeedCap = settings.SpeedCap;
+            EvafastSubsSpeedCap = settings.SubsSpeedCap;
+            EvafastSubsLimit = settings.SubsLimit;
+            _evafastLoaded = true;
+            RefreshEvafastModified();
+        }
+        catch (Exception ex)
+        {
+            EvafastMessage = $"方向键快进设置加载失败：{ex.Message}";
         }
     }
 
@@ -923,6 +999,7 @@ public partial class SettingsViewModel : ObservableObject
         if (e.PropertyName is nameof(MpvOptionItem.CurrentValue) or nameof(MpvOptionItem.IsModified))
         {
             MpvConfigModified = MpvGroups.SelectMany(g => g.Options).Any(o => o.IsModified);
+            OnPropertyChanged(nameof(CanSaveMpvSettings));
         }
     }
 
@@ -979,10 +1056,31 @@ public partial class SettingsViewModel : ObservableObject
         try
         {
             MpvConfigService.Apply(conf, _mpvAllOptions, forceCommented, forceActive);
-            OperationMessage = backup is null
-                ? "已保存 mpv.conf，重启 mpv 后生效。"
-                : $"已保存 mpv.conf（备份 {Path.GetFileName(backup)}），重启 mpv 后生效。";
+
+            // 方向键快进（evafast.conf）有修改时一并保存
+            var savedParts = new List<string>();
+            if (EvafastModified)
+            {
+                EvafastConfigService.Save(ConfigDirectory, new EvafastSettings
+                {
+                    SpeedCap = EvafastSpeedCap,
+                    SubsSpeedCap = EvafastSubsSpeedCap,
+                    SubsLimit = EvafastSubsLimit,
+                });
+                _evafastInitialSpeedCap = EvafastSpeedCap;
+                _evafastInitialSubsSpeedCap = EvafastSubsSpeedCap;
+                _evafastInitialSubsLimit = EvafastSubsLimit;
+                savedParts.Add("方向键快进设置");
+            }
+
+            var baseMsg = backup is null
+                ? "已保存 mpv.conf"
+                : $"已保存 mpv.conf（备份 {Path.GetFileName(backup)}）";
+            OperationMessage = savedParts.Count > 0
+                ? $"{baseMsg} 与 {string.Join("、", savedParts)}，重启 mpv 后生效。"
+                : $"{baseMsg}，重启 mpv 后生效。";
             MpvConfigModified = false;
+            RefreshEvafastModified();
         }
         catch (Exception ex)
         {
