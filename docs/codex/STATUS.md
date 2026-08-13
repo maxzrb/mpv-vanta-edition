@@ -6,11 +6,11 @@
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master` 与 `origin/master` 同步（v1.5.2 已发布并推送） |
-| **最新发布提交** | `52a82fd`（tag: `v1.5.2`，已推送） |
-| **工作区** | v1.5.2 发布完成，工作树干净 |
+| **最新发布提交** | `23ddb2a`（tag: `v1.5.2`，已推送） |
+| **工作区** | 01/05 README 构建加固 + evafast 方向键快进选项 + VantaInstaller 新卡片；改动待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.2（已发布） |
-| **上次操作** | v1.5.2 发布完成：安装说明与时俱进（VantaInstaller 升为推荐安装方式） |
+| **上次操作** | 01/05 README 加固 + VantaInstaller 方向键快进设置（未发布） |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -117,6 +117,13 @@ c:\Program portable\mpv2\
 ---
 
 ## 会话日志
+### 2026-08-13 v1.5.2 之后：01/05 README 加固 + evafast 方向键快进选项（未发布）
+
+- **README 核实纠正**：此前"01/05 包从不携带根级 README"为解析误判（`7z -ba` 正则漏匹配 5 字段行）；`7z l -slt` 确认 v1.5.1/v1.5.2 包一直含根级 README.MD。构建脚本加固（显式复制 + 打包前校验 + 归档内验证），本地重建 01/05（含最新安装说明）。
+- **evafast 可调**：`evafast.lua` 新增 `subs_limit`；VantaInstaller 新增 EvafastConfigService，「mpv 调节」卡片内新增「方向键快进」分组（无字幕/有字幕倍速滑条 + 字幕限速开关），保存并入「保存 mpv 设置」按钮。
+- **验证**：VantaInstaller Debug 构建 0 警告 0 错误；evafast.lua LuaJIT 通过；01/05 根级 README 确认存在且最新。
+- **状态**：未构建全套、未上传；本地重建 01/05 新校验和已记录（6A4D.../1A34...），待用户决定重新发布或并入下一版本。
+
 ### 2026-08-13 v1.5.2 发布完成（流程 6~8）
 
 - **构建**：`build-all-packages.ps1 -Version 1.5.2 -IncludePrivate` 一次通过（约 25.7 分钟）；VantaInstaller v0.3.2 Release 重建（最新源码，SHA-256 `7307B41147B4FFE30B47E2E107391F5169BAD8CD7723EF6BDA4915094B734808`，启动探针 4 秒存活）。
