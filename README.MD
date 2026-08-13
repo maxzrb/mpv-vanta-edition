@@ -51,7 +51,7 @@ Lossless Scaling 为商业软件，尚未购买正版授权的用户请自行决
 
 > 三合一辅助工具：安装 / 卸载 / 设置，单文件自包含、免 .NET 运行时，随 Release 附装。
 
-从 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 下载 `VantaInstaller-win-x64-v0.3.0.exe`，双击即用。
+从 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 下载 `VantaInstaller-win-x64-v0.3.2.exe`，双击即用。
 
 - **安装**：扫描 01~05 增量包（或个人全量包），自动校验完整性，支持覆盖升级与配置备份；可选安装完成后自动注册文件关联。
 - **卸载**：默认备份 `portable_config` 到 `文档\MPV Vanta Edition\uninstall-backups`，删除明细日志，可选清理文件关联。
@@ -64,8 +64,8 @@ Lossless Scaling 为商业软件，尚未购买正版授权的用户请自行决
 
 | 入口 | 显示名 | 行为 |
 |------|--------|------|
-| 多实例 | **mpv** | 每次双击经 `mpv.exe` 新开窗口 |
-| 单实例 | **mpv-single** | 经 `umpv.exe` 通过 IPC 复用已运行的 mpv 窗口（保持 mpv 常驻时生效） |
+| 多实例 | **MPV Vanta Edition** | 每次双击经 `mpv.exe` 新开窗口 |
+| 单实例 | **MPV Vanta Edition (Single Instance)** | 经 `umpv.exe` 通过 IPC 复用已运行的 mpv 窗口（保持 mpv 常驻时生效） |
 
 - 设置中心「文件关联」卡片提供「注册/取消多实例关联」「注册/取消单实例关联」四个按钮，可分别注册；关联写入当前用户，无需管理员权限或 UAC。
 - 安装向导「选择组件」页可同时勾选两种入口，安装完成后自动注册；两套应用身份与 ProgID 完全独立，注册或取消其中一个不会影响另一个。

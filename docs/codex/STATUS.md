@@ -5,12 +5,12 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master` 与 `origin/master` 同步（杳知 8.12 跟进与后瞻检测优化共 16 个提交已推送） |
-| **最新发布提交** | `327728b`（tag: `v1.5.1`，已推送） |
-| **工作区** | v1.5.1 已发布；工作树干净 |
+| **分支** | `master` 与 `origin/master` 同步（v1.5.1 已发布并推送） |
+| **最新发布提交** | `327728b`（tag: `v1.5.1`，已推送）；当前正在发布 v1.5.2 |
+| **工作区** | v1.5.2 发布前置检查进行中；VantaInstaller v0.3.2 源码与关联显示名、默认注册、下载站 KV 兜底等改动待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.1（已发布） |
-| **上次操作** | v1.5.1 发布完成：7 公开资产上传核对一致、标签推送 |
+| **项目版本** | v1.5.2（发布中） |
+| **上次操作** | v1.5.2 发布前置：关联显示名同步、VantaInstaller 0.3.2 源码、下载站 KV 自动快照 |
 | **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -68,6 +68,30 @@ c:\Program portable\mpv2\
 - [x] 将五类安装包按 01 Base → 02 Config → 03 Extras → 04 FW → 05 LSFG 编号并写明覆盖顺序
 - [x] 将第 04 包改为零 Steam 文件的公开扩展包，仅要求用户自备 `Lossless.dll`
 - [x] 统一生成 v1.2.0 四类公开包和个人私用全量包，并完成内容、交叉和完整性审计
+
+## v1.5.2 发布前置检查清单（2026-08-13）
+
+### 3.1 工作区与 Git 状态
+- [x] `git status --short --branch`：`master` 与 `origin/master` 同步（0 领先/0 落后）；`git fetch origin` 后无远端新改动。
+- [x] 未提交改动（按逻辑整理中）：VantaInstaller v0.3.2 系列源码（Aria2 Next 下载核心、安装前 SHA-256 校验、测速样本、下载目录刷新、版本号动态化、默认注册多实例、关联显示名）、`installer/associations` 三个关联脚本显示名、`portable_config`（一键更新撤下 + 维护者审计工具降级 + stats 解码方式）、`docs/cf-github-proxy-worker.js` 与 `tools/`（下载站 KV 自动快照）、AGENTS/CLAUDE/.gitignore、STATUS/工作进度/版本迭代/README。
+- [x] 未跟踪临时文件：`docs/worker代码备份.js`、`portable_config/backup/`、`portable_config/script-opts/backup/` → 已加入 .gitignore（不提交）；`VantaInstaller/src/Vanta.Core/Assets/`（aria2-next.exe + COPYING）与 `THIRD-PARTY-NOTICES.md` 为需提交的授权文件。
+
+### 3.2 发布内容影响评估（大改动 Gate）
+- 本次发布内容 = mpv 版本 Z+1 至 v1.5.2；VantaInstaller 附属工具 v0.3.2（功能/界面/版本迭代，流程明确不触发 Gate）；关联脚本显示名文本；下载站 Worker（独立 Cloudflare 部署，不进 01~05 包）。
+- 公开包数量/编号/命名/覆盖顺序：**不变**（01~05）。构建脚本 `build-*.ps1`：**无改动**。mpv 核心/运行时：**无升级**。大型资源增删：**无**。安装/启动方式结构：**无变化**（仅 FriendlyAppName 显示名文本）。VantaInstaller 构建方式/产物形态：不变（单文件自包含 publish）。分卷规则：不变。
+- 第三方版权边界：Aria2 Next 2.5.5（GPL-2.0-or-later）随 VantaInstaller 内置，已新增 THIRD-PARTY-NOTICES.md 与 COPYING.txt 资源；不进 01~05 公开包，不属公开包 Gate。
+- 结论：**不触发大改动 Gate**，走标准流程。
+
+### 3.3 文档与记录检查
+- [x] STATUS.md 本清单已更新；[x] version/工作进度.md 已追加发布准备条目；[x] version/版本迭代记录.md 已建立 v1.5.2 当前版本并归档 v1.5.1；[x] README.MD 已更新 VantaInstaller v0.3.2 与关联显示名。
+
+### 3.4 功能验证
+- [x] 完整配置播放测试视频：无 [e]/[f] 错误行；uosc、dyn_menu、startup_format_logos、gpu-next 等正常加载（startup_format_logos 的 "Subprocess failed: killed" 为 2 帧测试截断，非真实错误）。
+- [x] Lua 语法检查：portable_config/scripts + script-modules 共 138 个脚本 loadfile 全部通过（FAIL 0）。
+- [x] `git diff --check`：通过（仅 CRLF warning，无尾随空格错误）。
+- [x] 脚本配置与 script-opts 一致，UTF-8 无 BOM、LF 换行。
+
+---
 
 ## v1.5.0 发布前置检查清单（2026-08-11）
 
@@ -2091,6 +2115,7 @@ c:\Program portable\mpv2\
   - 01 包内 README.MD 与 .gitignore 已随根目录最新版复制。
 - **解析注意事项**：7z 26.02 对 solid 归档的表格输出在文件行省略 Compressed 列、且 stdout 为 GBK 编码；审计改用 `7z l -slt` + Python 解析 `Path = ` 行（GBK 解码）最可靠。曾出现的“MISS”均为解析脚本问题，非包内容问题。
 - **状态**：五个公开包已生成到 `tmp\buildtest-9.9.9` 供用户实测；未触碰 `release/`，未构建个人全量包，未发布。正式发布前建议按流程完整跑 `build-all-packages.ps1 -IncludePrivate` 并做 7z t / SHA-256 核验。
+
 - **拆分无损复核（机械对比）**：取回 HEAD 的 `build-release.ps1`，用脚本提取新旧两侧全部“复制源”集合（Copy-IfExists / Invoke-CopyTo / 数组 / foreach / pyd 通配 / 目录整体复制）做差集——01 Base 丢失 0 项、02 Extras 丢失 0 项；helper 函数 `Invoke-CopyTo`、`Copy-IfExists`、`Remove-GeneratedArtifacts` 逐字一致；`Invoke-CopyConfig` 仅多出上轮有意新增的 backup 排除；`Invoke-Pack` 仅移除 `-Split` 开关（01 固定不分卷、02 固定 `-v1900m` 分卷，属设计调整）；EXTRAS-README 文本逐字一致；`.vanta-version` 写入、7z 检查、生成物清理均保留。结论：拆分未丢失任何应打包文件。
 
 ### 2026-08-11 会话：VantaInstaller v0.3.0 Release 构建（未发布）
@@ -2201,3 +2226,67 @@ c:\Program portable\mpv2\
 - **尺寸**：volume_size=40 时，1280px=40、1080px=34、≤960px=30；200% DPI 的 960 逻辑像素小窗为 60px，统一受 75% compact 下限约束。
 - **验证**：尺寸矩阵覆盖 1280/1080/960/800/640px 与 200% DPI 小窗口；独立 uosc 在 800×450、scale=1/2、volume=right 下退出 0，无 Lua/stack/script-opts 错误。未构建、未打包、未发布。
 - **工作树边界**：用户的 `proximity_scale_min=0.8` 说明文字继续保持未提交；backup 目录不跟踪。
+
+### 2026-08-13 00:15 · VantaInstaller v0.3.1 镜像更新收尾
+
+- **修改**：`MirrorRegistry.All` 移除 `ghfast.top`、`mirror.ghproxy.com`、`ghproxy.homeboyc.cn`；补入 `gh.xxooo.cf`；列表末尾固定加入 `dl.loliland.cn`（AerithDream 下载加速，自建）。
+- **验证**：针对 v1.5.1 Release 资产的 Range 测试中，官方、`gh-proxy.com`、`ghproxy.net`、`gh.xxooo.cf`、`dl.loliland.cn` 均返回 `206`、正确 `Content-Range` 与 `Accept-Ranges`；未将 DNS/TLS/403/404 或短窗口吞吐不完整的候选纳入注册表。
+- **安装器**：`VantaInstaller` 版本提升至 v0.3.1，镜像探测与更新请求 User-Agent 同步；Release 单文件构建 0 警告、0 错误，最终产物 SHA-256 为 `04F43D321755F44DA8BC1CF834981FD4BCD74E9EB2A5AFA88C6EC83D2F1902B0`。
+- **发布边界**：mpv v1.5.1 包和公开 Release 未改动；README 仍指向当前公开的 v0.3.0，v0.3.1 仅作为本地待附加安装器产物记录。
+- **Git**：本次源码与记录改动待提交；`portable_config/backup/`、`portable_config/script-opts/backup/` 为既有未跟踪目录，继续排除。
+
+### 2026-08-13 01:35 · VantaInstaller v0.3.2 下载体验与测速样本更新
+
+- **下载队列**：修复下载中开始按钮因异步命令默认禁止并发而灰掉的问题；StartDownloadCommand 允许并发触发，下载进行中勾选新资产并再次点击即可追加队列。排队项可取消勾选，停止只清理当前选中/排队/活动项目的未完成残留。
+- **实时速度**：Aria2Service 解析 aria2 摘要的 DL: 字段并发出速度事件；资产行展示单项速度，进度条右侧展示总速度，完成/失败/停止时清零。
+- **测速样本**：ProbeMirrorsAsync 每次重新查询最新正式 Release，固定选择 05-mpv-config-*.7z；当前 API 样本为 05-mpv-config-v1.5.1.7z。用户最终确认采用最新 Release 的 05 包，不再使用 Base 包样本。
+- **Aria2 调整**：加入 --no-conf、连接数/重试/超时/断点续传/无预分配及稳定输出参数；没有直接将 Aria2 Next 二进制加入包，避免未经确认改变运行时与许可证边界。Motrix Next 官方实现采用 Aria2 Next sidecar、持久会话和 RPC 管理，与当前按资产启动 aria2c 的轻量实现存在架构差异。
+- **验证**：dotnet build -c Release --no-restore 与 dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true 均通过，0 警告、0 错误；启动探针 4 秒存活后按 PID 回收。VantaInstaller-win-x64-v0.3.2.exe 大小 67,652,806 字节，SHA-256 BC9E75147ADDA714193DA0AF24AA261570760BCA458961194A05643D7E2A781D。
+- **发布边界**：未执行 mpv 包构建、未上传 Release；mpv v1.5.1 与公开安装器 v0.3.0 不变。源码/记录待提交；两个 backup 目录继续保持未跟踪。
+
+### 2026-08-13 10:43 · VantaInstaller 下载核心替换为 Aria2 Next
+
+- **故障根因**：复现旧 aria2 1.37.0 在 `--max-connection-per-server=64` 下立即退出；旧核心允许范围仅 1–16，因此此前对齐 Motrix Next 的 64 连接参数反而令所有下载失败。
+- **核心替换**：内置 Aria2 Next 2.5.5 Windows x64 官方资产，首次下载时释放到 `%LOCALAPPDATA%\VantaInstaller\engines\aria2-next-2.5.5`；缓存复用和释放完成后均校验 SHA-256 `554F2F81CA53731DC9E01710CFB16081A34759F3276FF16EB4B12656C1B6E5B9`，不再搜索 PATH、旧 aria2 或在线拉取 1.37.0。
+- **授权边界**：新增 `VantaInstaller/THIRD-PARTY-NOTICES.md`，GPL-2.0-or-later 全文作为资源嵌入并在引擎目录释放为 `COPYING.txt`；官方二进制未修改。
+- **Motrix Next 对照**：采用其当前默认的单文件 64 分片、单服务器 64 连接，并将文件分配改为 `trunc`；保留 HTTP keep-alive。VantaInstaller 继续顺序处理资产队列，避免多个大包各自 64 连接并发争抢带宽；未引入对单文件持续吞吐无实质帮助的常驻 RPC 生命周期。
+- **稳健性**：进程参数改用 `ProcessStartInfo.ArgumentList`，消除目录、文件名或 URL 中空格/特殊字符的二次解析问题；所有非零退出码均判定失败并附最近输出，不再把残留的部分文件误判为成功；诊断队列限制为最近 20 行。
+- **实测**：最新 05 包完整下载成功（5,114,786 字节，退出码 0）；通过服务层下载 04 包到含空格目录/文件名成功（3,197,223 字节，SHA-256 与 Release 记录一致）；01 包 20 秒短测建立 64 连接，速度由约 1.5 MiB/s 上升至峰值约 7.5 MiB/s。
+- **构建**：Release build 与自包含压缩单文件 publish 均为 0 警告、0 错误；启动探针 4 秒存活。最终复构建的 `VantaInstaller-win-x64-v0.3.2.exe` 大小 69,637,539 字节，SHA-256 `E031783BA5A30AA2A965FAB3F04168342917A156E40763A759630224D0B33E8C`。
+- **发布边界**：未构建 mpv 包、未上传 Release、未改 mpv v1.5.1；本次安装器源码、二进制资源和记录待提交，两个 backup 目录继续保持未跟踪。
+
+### 2026-08-13 11:22 · VantaInstaller 安装前 SHA-256 风险校验
+
+- **用户规则**：每次安装必须先校验，但校验风险是软拦截；全部通过时直接继续，哈希不一致、文件不可读、文件缺失或无法取得可信摘要时必须提醒，默认取消，用户仍可明确选择忽略风险继续安装。
+- **可信来源**：`UpdateService` 读取 GitHub Release API 资产的 `digest=sha256:...`，新增按包版本查询对应 tag 的能力；不维护易过时的内置哈希表。网络/API 不可用或旧 Release 无 digest 时记为缺少可信哈希，同样进入风险确认。
+- **校验链路**：`PackageIntegrityService` 使用 4 MiB 顺序异步缓冲逐文件计算 SHA-256；校验位于目标目录创建、升级备份和 7-Zip 解压之前。核心层未提供确认回调时默认拒绝继续，避免命令行或未来入口静默绕过。
+- **分卷修正**：修复 `PackageScanner` 的分卷 `Files` 未回写且入口分卷被临时列表重复加入的问题；02 现在准确列出 `.001/.002`，两卷均独立校验。
+- **界面**：校验占整体进度前 10%，显示当前文件和文件内百分比；风险弹窗列出每个问题文件和原因，并明确建议重新下载，默认按钮为“否”。用户选“是”后日志记录 `[高风险继续]`。
+- **验证**：本地 v1.5.1 的 02 两卷共约 2.6 GiB 均与 GitHub digest 一致，计算约 3.2 秒；字节损坏样本判定 `Mismatch`，无摘要样本判定 `MissingReference`；引擎级拒绝测试得到 2 个风险项，确认目标目录未创建且没有进入解压。
+- **构建**：Release build/publish 均 0 警告、0 错误，最终单文件启动探针 4 秒存活；`VantaInstaller-win-x64-v0.3.2.exe` 大小 69,644,904 字节，SHA-256 `3550985CC380678239F28ACC7EC515E39F57E86D8111D600CCC8F504C8E2485F`。
+- **边界**：此前 evafast 1.5×/3× 跳变只读确认是字幕限速设计，未修改；未构建/发布 mpv 包、未上传 Release，两个 backup 目录继续不跟踪。
+
+### 2026-08-13 11:24 · 一键更新脚本与着色器功能去留评估
+
+- **范围**：只读审计 `manager.lua`、`manager.json`、`manager-update.ps1`、`input.conf` 入口、构建脚本和现有 manager 缓存；未修改功能文件。
+- **安全性**：当前更新器不是直接覆盖器。缺失文件不安装、上游删除不删除本地文件；首次本地/上游不同会保护本地，后续依赖旧上游基线三方合并，覆盖前有备份和冲突候选。uosc、uosc_danmaku、stats、起播 Logo和 Vanta 自定义脚本均不在更新源中。
+- **当前实测**：发布构建明确排除 `portable_config/cache`，当前也无 manager state；DryRun 对 17 个源（15 个启用）得到 `UPDATED=0/MERGED=0/PROTECTED=5/ERROR=0`，保护 hdr-mode、trackselect、sub-fastwhisper 和 webui 两个文件。所有源均 `install_missing=false`。
+- **风险与价值**：自动三方合并只能证明文本无冲突，不能验证高度定制后的语义、配置和菜单引用；着色器目录与 `input.conf` 菜单强耦合，单独更新同名 GLSL 无整体验证。该功能还依赖包外系统 Git，并会绕过 Vanta 的版本化发布、安装前哈希和回归验证，形成同版本不同内容。当前 DryRun 又无任何实际可更新文件，用户入口价值很低。
+- **建议**：不再面向普通用户保留“工具 → 一键更新脚本和着色器”；保留 manager 源码作为维护者上游审计/候选合并工具，默认仅 DryRun，禁用着色器源或拆成独立审计入口。正式脚本/着色器更新只经人工复核后进入 Vanta 版本包。
+
+### 2026-08-13 11:36 · 撤下用户更新入口并降级为维护者审计工具
+
+- **普通入口撤下**：删除 `input.conf` 中 `M` 快捷键及“工具 → 一键更新脚本和着色器”菜单标记；全局检索确认不再存在旧 `manager-update-all` 消息和菜单文本。
+- **退出播放器运行面**：原 `scripts/manager.lua` 移到 `script-modules/MAINTAINER-ONLY-WARNING-upstream-audit.lua`，因此不会被 mpv 自动加载；只保留无按键的 `maintainer-audit-upstreams-read-only` 显式消息供维护者按需加载脚本后调用。
+- **明确警示命名**：原 `manager-update.ps1`、`manager.json` 分别改为 `MAINTAINER-ONLY-WARNING-upstream-audit.ps1`、`MAINTAINER-ONLY-WARNING-upstream-sources.json`；AGENTS/CLAUDE 结构说明同步更新。
+- **默认只读门禁**：PowerShell 无参数时强制 DryRun，不写 state/report/baseline、不合并或覆盖；只有显式 `-ApplyReviewedChanges` 才可应用。`-DryRun` 与应用开关同时使用会报错。DryRun 临时 staging 自动清理，空缓存目录也删除。
+- **验证**：LuaJIT 语法、PowerShell 解析通过；evafast 单源默认调用退出 0、`state_written=false/report_written=false/cache_exists=false`；完整 portable_config 播放两帧退出 0，日志无 dyn_menu/stack/load 错误，维护者 Lua 未自动加载，菜单引用为 0。模拟构建复制确认三个新文件会进入 01/05/全量配置，但旧文件均不存在。
+- **边界**：未运行 `-ApplyReviewedChanges`，没有更新任何脚本/着色器或建立基线；未构建/发布 mpv 包，前序 VantaInstaller 工作树继续保留。
+
+### 2026-08-13 11:40 · TAB 状态页补齐实际解码方式
+
+- **根因**：`stats.lua` 已读取正确的 `hwdec-current`，但旧代码把 `no` 和空值都过滤，因此软解时整行消失，只剩 `current-gpu-context` 的“图形接口”，容易把渲染 API 误认为硬件解码状态。
+- **修复**：视频区始终显示 `解码方式`；`hwdec-current=no` 显示“软件解码”，实际硬解显示“硬件解码（后端）”，初始化前显示“未知（解码器尚未初始化）”。该行不再依赖 codec-desc 是否存在。
+- **消歧**：原“图形接口”改名“渲染接口”，明确它只代表 VO/GPU 上下文，不代表解码路径。
+- **实测**：同一 H.264 文件在 `hwdec=no` 下属性为 `no`，`auto-safe` 为 `d3d11va`，显式 copy 为 `d3d11va-copy`；完整配置以 `d3d11va-copy` 播放通过，stats 无错误。LuaJIT 语法和 `git diff --check` 通过。
+- **边界**：仅修改 `portable_config/scripts/stats.lua` 和记录，未改硬解配置、未构建或发布。
