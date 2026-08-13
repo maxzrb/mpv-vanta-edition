@@ -9,6 +9,7 @@
  *    - 代理 maxzrb 用户名下所有仓库的 Release/Archive 下载（白名单 + 流式透传 + Range 断点续传）
  *    - 自动列表页：/ 渲染暗色下载站前端，JS 拉取 /api/latest 自动列出最新 Release 资产
  *    - /api/latest：后端拉 GitHub API 并缓存 10 分钟（可选 GITHUB_TOKEN 环境变量提升配额）
+ *    - 离线兜底：GitHub API 不可用时，依次回退 KV 自动快照（定时刷新）→ 内置硬编码快照
  * ============================================================
  */
 
@@ -33,6 +34,72 @@ const GITHUB_TOKEN = globalThis.GITHUB_TOKEN || ''
 
 // API 响应缓存 TTL（秒）
 const API_CACHE_TTL = 600
+
+// ==================== KV 自动快照 ====================
+// 发布后无需手动更新：每次 GitHub API 拉取成功会写入 KV，
+// 同时 Cron Trigger 定时刷新 KV（见下方 scheduled 处理器），
+// 保证「最近一次成功获取」的快照始终跟随最新发布。
+// 在 Cloudflare Worker 设置 → 绑定 中创建 KV Namespace 并绑定，
+// 变量名必须为 SNAPSHOT_KV；未绑定时自动退化为纯硬编码兜底。
+const SNAPSHOT_KV = globalThis.SNAPSHOT_KV || null
+// KV 中存储的键名
+const SNAPSHOT_KEY = 'snapshot:latest'
+
+// ==================== 内置快照 ====================
+// 最近一次发布（v1.5.1）的资产清单。
+// 作用：最后一道防线——KV 未初始化或也无法使用时兜底。
+// 正常使用中 KV 自动快照会先于它生效，因此本块无需频繁更新；
+// 如需强制同步（如首次部署或想双保险），可运行 tools/update-worker-snapshot.ps1。
+const FALLBACK_RELEASE = {
+    "tag_name": "v1.5.1",
+    "name": "v1.5.1",
+    "published_at": "2026-08-12T07:44:22Z",
+    "html_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.5.1",
+    "assets": [
+        {
+            "name": "01-mpv-base-v1.5.1.7z",
+            "size": 136245296,
+            "content_type": "application/x-compressed",
+            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/01-mpv-base-v1.5.1.7z"
+        },
+        {
+            "name": "02-mpv-extras-v1.5.1.7z.001",
+            "size": 1992294400,
+            "content_type": "application/octet-stream",
+            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/02-mpv-extras-v1.5.1.7z.001"
+        },
+        {
+            "name": "02-mpv-extras-v1.5.1.7z.002",
+            "size": 781591690,
+            "content_type": "application/octet-stream",
+            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/02-mpv-extras-v1.5.1.7z.002"
+        },
+        {
+            "name": "03-mpv-fasterwhisper-addon-v1.5.1.7z",
+            "size": 1476002022,
+            "content_type": "application/x-compressed",
+            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/03-mpv-fasterwhisper-addon-v1.5.1.7z"
+        },
+        {
+            "name": "04-mpv-lsfg-addon-v1.5.1.7z",
+            "size": 3197223,
+            "content_type": "application/x-compressed",
+            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/04-mpv-lsfg-addon-v1.5.1.7z"
+        },
+        {
+            "name": "05-mpv-config-v1.5.1.7z",
+            "size": 5114786,
+            "content_type": "application/x-compressed",
+            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/05-mpv-config-v1.5.1.7z"
+        },
+        {
+            "name": "VantaInstaller-win-x64-v0.3.0.exe",
+            "size": 67648516,
+            "content_type": "application/x-msdownload",
+            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/VantaInstaller-win-x64-v0.3.0.exe"
+        }
+    ]
+}
 
 // ==================== 前端页面 ====================
 // 注意：页面内联 JS 不使用反引号，避免与外层模板字符串冲突
@@ -72,6 +139,7 @@ const LANDING_HTML = `<!DOCTYPE html>
   .hero p { color: var(--muted); margin-top: 8px; font-size: 14px; max-width: 620px; }
   .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--brand-dim); color: var(--brand-deep);
            border: 1px solid rgba(14,156,181,.35); border-radius: 999px; padding: 3px 12px; font-size: 12px; margin-top: 14px; }
+  .badge .src-tag { display: inline-block; border: 1px solid; border-radius: 999px; padding: 0 8px; font-size: 11px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
   .card-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; gap: 8px; }
   .card-head .title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
@@ -261,14 +329,50 @@ const LANDING_HTML = `<!DOCTYPE html>
     });
   }
 
+  // 数据来源标签：实时（绿）/ 缓存（蓝）/ 自动快照（靛）/ 内置快照（橙）
+  var SOURCE_LABEL = {
+    live: ['实时数据', 'var(--ok)'],
+    cache: ['缓存数据', 'var(--brand-deep)'],
+    kv: ['自动快照', 'var(--brand-deep)'],
+    fallback: ['离线快照', 'var(--accent)']
+  };
+  var renderSource = function (source) {
+    var meta = SOURCE_LABEL[source];
+    if (!meta) return;
+    var el = document.createElement('span');
+    el.className = 'src-tag';
+    el.style.color = meta[1];
+    el.style.borderColor = meta[1];
+    el.textContent = meta[0];
+    badge.appendChild(el);
+    if (source === 'fallback') {
+      var tip = document.createElement('div');
+      tip.style.cssText = 'margin-top:8px;font-size:12px;color:var(--accent)';
+      tip.textContent = '提示：GitHub API 当前不可用，列表为内置快照，可能与最新版本存在滞后。';
+      body.insertBefore(tip, body.firstChild);
+    }
+  };
+  // 二级兜底：Worker 的 /api/latest 不可用时，浏览器直连 GitHub API（GitHub 允许 CORS）
+  var loadFromGithubDirect = function (err) {
+    fetch('https://api.github.com/repos/' + repo + '/releases/latest',
+      { headers: { 'Accept': 'application/vnd.github+json' } })
+      .then(function (r) { if (!r.ok) throw err; return r.json(); })
+      .then(function (data) { render(data); renderSource('live'); })
+      .catch(function () {
+        badge.innerHTML = '版本获取失败';
+        body.innerHTML = '<span class="err">暂时无法连接 GitHub API（可能限流）。请直接访问 ' +
+          '<a style="color:var(--brand-deep)" href="' + esc(LIST_REPO_URL) + '/releases" target="_blank">GitHub Releases</a> 页面获取下载链接。</span>';
+      });
+  };
+
   fetch('/api/latest?repo=' + encodeURIComponent(repo))
-    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(function (data) { render(data); })
-    .catch(function (e) {
-      badge.innerHTML = '版本获取失败';
-      body.innerHTML = '<span class="err">暂时无法连接 GitHub API（可能限流）。请直接访问 ' +
-        '<a style="color:var(--brand-deep)" href="' + esc(LIST_REPO_URL) + '/releases" target="_blank">GitHub Releases</a> 页面获取下载链接。</span>';
-    });
+    .then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      var source = r.headers.get('X-Source') || 'live';
+      return r.json().then(function (data) { return { data: data, source: source }; });
+    })
+    .then(function (res) { render(res.data); renderSource(res.source); })
+    .catch(function (e) { loadFromGithubDirect(e); });
 })();
 </script>
 </body>
@@ -298,6 +402,11 @@ function makeRes(body, status = 200, headers = {}) {
 addEventListener('fetch', e => {
     const ret = fetchHandler(e).catch(err => makeRes('worker error:\n' + err.stack, 502))
     e.respondWith(ret)
+})
+
+// Cron Trigger：定时刷新 KV 自动快照（在 Cloudflare 面板为 Worker 配置 Cron，如每 6 小时）
+addEventListener('scheduled', e => {
+    e.waitUntil(refreshSnapshot())
 })
 
 function isAllowedOwner(target) {
@@ -347,28 +456,17 @@ async function fetchHandler(e) {
     return proxy(req, target)
 }
 
-// 获取最新 Release 精简 JSON（优先缓存）
-async function apiLatest(urlObj) {
-    let repo = urlObj.searchParams.get('repo') || LIST_REPO
-    const cacheKey = 'https://cache.local/api/latest?repo=' + encodeURIComponent(repo.toLowerCase())
-    const cache = caches.default
-
-    const cached = await cache.match(cacheKey)
-    if (cached) {
-        return new Response(cached.body, {
-            headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
-        })
-    }
-
+// 拉取并精简 GitHub 最新 Release；失败时抛错由调用方决定兜底
+async function fetchLatestSlim(repo) {
     const headers = { 'User-Agent': 'vanta-dl', 'Accept': 'application/vnd.github+json' }
     if (GITHUB_TOKEN) headers['Authorization'] = 'Bearer ' + GITHUB_TOKEN
 
     const res = await fetch('https://api.github.com/repos/' + repo + '/releases/latest', { headers })
     if (!res.ok) {
-        return makeRes(JSON.stringify({ error: 'GitHub API ' + res.status }), 502, { 'content-type': 'application/json; charset=utf-8' })
+        throw new Error('GitHub API ' + res.status)
     }
     const data = await res.json()
-    const slim = {
+    return {
         tag_name: data.tag_name || '',
         name: data.name || '',
         published_at: data.published_at || '',
@@ -380,13 +478,98 @@ async function apiLatest(urlObj) {
             browser_download_url: a.browser_download_url,
         })),
     }
-    const body = JSON.stringify(slim)
-    const resp = new Response(body, {
-        headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
+}
+
+// 把快照写入 KV（自动维护；KV 未绑定时静默跳过）
+async function putSnapshot(slim) {
+    if (!SNAPSHOT_KV || !slim) return
+    try {
+        await SNAPSHOT_KV.put(SNAPSHOT_KEY, JSON.stringify(slim), { expirationTtl: 7 * 24 * 3600 })
+    }
+    catch (ex) {
+        // 写入失败不影响响应
+    }
+}
+
+// 定时/手动刷新：拉最新 Release 写入 KV。用于 Cron Trigger 与 live 成功回写。
+async function refreshSnapshot() {
+    try {
+        const slim = await fetchLatestSlim(LIST_REPO)
+        await putSnapshot(slim)
+    }
+    catch (ex) {
+        // 定时刷新失败静默，下次触发或用户访问时再试
+    }
+}
+
+// 生成带 X-Source 来源标记的 JSON 响应（live=实时 / cache=缓存 / fallback=内置快照）
+function jsonWithSource(body, source) {
+    return new Response(body, {
+        headers: {
+            'content-type': 'application/json; charset=utf-8',
+            'cache-control': 'no-store',
+            'x-source': source,
+        },
     })
-    // 缓存 10 分钟（不阻塞响应；fire-and-forget 并兜住异常）
-    cache.put(cacheKey, resp.clone()).catch(function () {})
-    return resp
+}
+
+// 获取最新 Release 精简 JSON：四级兜底 缓存 → GitHub API（实时） → KV 自动快照 → 内置快照
+// 任何情况下都尽量返回可用的资产列表，用户网差/GitHub API 故障时也能展示并下载；
+// KV 自动快照由 Cron Trigger 与 live 成功回写共同维护，发布后无需手动更新。
+async function apiLatest(urlObj) {
+    let repo = urlObj.searchParams.get('repo') || LIST_REPO
+    const cacheKey = 'https://cache.local/api/latest?repo=' + encodeURIComponent(repo.toLowerCase())
+    const cache = caches.default
+
+    // 1) 缓存命中（最多 API_CACHE_TTL 秒旧）
+    const cached = await cache.match(cacheKey)
+    if (cached) {
+        return jsonWithSource(cached.body, 'cache')
+    }
+
+    // 2) 实时 GitHub API
+    try {
+        const slim = await fetchLatestSlim(repo)
+        const body = JSON.stringify(slim)
+        const resp = jsonWithSource(body, 'live')
+        // 缓存 API_CACHE_TTL 秒 + 回写 KV 自动快照（均不阻塞响应）
+        cache.put(cacheKey, resp.clone()).catch(function () {})
+        putSnapshot(slim).catch(function () {})
+        return resp
+    }
+    catch (ex) {
+        // 3) GitHub API 不可用：优先用 KV 自动快照（自动维护，通常是最新发布）
+        if (SNAPSHOT_KV) {
+            try {
+                const kvRaw = await SNAPSHOT_KV.get(SNAPSHOT_KEY)
+                if (kvRaw) {
+                    const kvSlim = JSON.parse(kvRaw)
+                    if (kvSlim && kvSlim.assets && kvSlim.assets.length) {
+                        const body = JSON.stringify(kvSlim)
+                        // 兜底数据也回填缓存，避免每次请求都白打一次 GitHub API / KV
+                        const resp = jsonWithSource(body, 'kv')
+                        cache.put(cacheKey, resp.clone()).catch(function () {})
+                        return resp
+                    }
+                }
+            }
+            catch (kvEx) {
+                // KV 读取失败继续向下
+            }
+        }
+
+        // 4) 最后防线：内置硬编码快照
+        if (FALLBACK_RELEASE && FALLBACK_RELEASE.assets && FALLBACK_RELEASE.assets.length) {
+            const body = JSON.stringify(FALLBACK_RELEASE)
+            const resp = jsonWithSource(body, 'fallback')
+            cache.put(cacheKey, resp.clone()).catch(function () {})
+            return resp
+        }
+        return makeRes(
+            JSON.stringify({ error: 'GitHub API 不可用且无可用快照', detail: String((ex && ex.message) || ex) }),
+            502,
+            { 'content-type': 'application/json; charset=utf-8' })
+    }
 }
 
 async function proxy(req, urlStr) {
