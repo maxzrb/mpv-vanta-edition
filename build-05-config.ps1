@@ -39,23 +39,10 @@ foreach ($exclude in @('fonts', 'licenses')) {
     $exPath = Join-Path $configDest $exclude
     if (Test-Path $exPath) { Remove-Item -Recurse -Force $exPath }
 }
-# 个人测试/主题应用产生的备份目录不进公开包（portable_config/backup 与 script-opts/backup）
-$backupDirs = @(Get-ChildItem -Path $configDest -Recurse -Directory -Filter 'backup' `
-    -ErrorAction SilentlyContinue | Sort-Object FullName -Descending)
-foreach ($dir in $backupDirs) {
-    Remove-Item -LiteralPath $dir.FullName -Recurse -Force
-}
-# 新旧 stats.lua 同时进包：放行 scripts/backup 下的 stats 原版备份（兜底），其它备份仍排除
-$statsBackupSrc = Join-Path $configSrc 'scripts\backup'
-$statsBackupDest = Join-Path $configDest 'scripts\backup'
-if (Test-Path -LiteralPath $statsBackupSrc) {
-    $statsBackups = @(Get-ChildItem -LiteralPath $statsBackupSrc -File -Filter 'stats-original-*.lua' `
-        -ErrorAction SilentlyContinue)
-    foreach ($f in $statsBackups) {
-        $null = New-Item -ItemType Directory -Force -Path $statsBackupDest
-        Copy-Item -LiteralPath $f.FullName -Destination (Join-Path $statsBackupDest $f.Name) -Force
-    }
-}
+# 备份目录两级约定：
+# - 项目根 backup/ = 用户级备份，不进公开包（也不在 portable_config 复制范围内）
+# - portable_config 下各 backup/（如 backup、script-opts/backup、scripts/backup）= 开发级备份，
+#   是开发升级过程中淘汰但曾可用的脚本/配置，体积小，随包保留以便回滚
 # 启动 Logo 素材（启动页/起播格式 Logo）归 01 Base，Config 不重复携带
 $assetsPath = Join-Path $configDest 'script-assets'
 if (Test-Path $assetsPath) { Remove-Item -Recurse -Force $assetsPath }

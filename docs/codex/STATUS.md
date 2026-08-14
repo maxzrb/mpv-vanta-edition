@@ -10,7 +10,7 @@
 | **工作区** | 私包内置 VantaInstaller + 发布流程统一候选目录；改动待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.2（已发布） |
-| **上次操作** | 更换 stats.lua 为 yosh-wang 汉化版（自动翻译+CPU/GPU 监控），原版备份至 backup/ |
+| **上次操作** | 确立备份两级约定：根 backup 用户级不进包，portable_config 下 backup 开发级随包保留 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -2349,3 +2349,11 @@ c:\Program portable\mpv2\
 - **打包脚本**：`build-01-base.ps1`（Invoke-CopyConfig）与 `build-05-config.ps1` 在删除全部 backup 目录后，放行 `scripts/backup/stats-original-*.lua` 回构建目录，实现新旧 stats 同时进包；其它备份目录仍排除，不违背发布流程「backup 不进公开包」精神（stats 兜底是用户明确要求）。
 - **实测**：临时 `-Version 9.9.9` 构建 01 与 05 包，`7z l` 均确认包含 `portable_config/scripts/stats.lua`（112,702 字节，新版）与 `portable_config/scripts/backup/stats-original-20260814.lua`（68,978 字节，旧版）；私用全量包为 01~05 合并，自动跟随。构建产物与 build/ 已清理。
 - **边界**：本次仅提交功能/脚本改动与打包放行逻辑；未实际发布（未定新版本号、未建 Release）。
+### 2026-08-14 13:45 · 备份目录两级约定：开发级 backup 随包保留，用户级不进包
+
+- **用户设计**：项目根 `backup/` 为用户级备份（用户设置备份），不进包；`portable_config` 等 config 目录下的 `backup/` 为开发级备份（开发升级过程中淘汰但曾可用的脚本/配置，体积小），随包保留以便回滚。
+- **打包脚本**：`build-01-base.ps1` / `build-05-config.ps1` 移除"删除全部 backup 目录"与"仅放行 stats"逻辑，改为保留 `portable_config` 下所有 backup（`backup/`、`script-opts/backup/`、`scripts/backup/`）进包；根 `backup/` 不在复制范围内，自然不进包。个人运行时状态 `script-opts/window_state.conf` 仍排除。
+- **.gitignore**：取消忽略 `portable_config/backup/` 与 `portable_config/script-opts/backup/`（开发级备份可 git 跟踪、随版本化）；保留 `/backup/`（用户级）与 `/docs/worker*备份*.js` 忽略。
+- **文档**：《发布流程.md》3.2 节新增"备份目录约定（既定发布内容）"说明（开发级进包不触发 Gate）、5 节新增备份约定核验项；AGENTS.md 重要约定新增第 7 条 Backup 两级约定。
+- **实测**：临时 `-Version 9.9.9` 构建 01/05，`7z l` 确认包内包含 `portable_config/backup/mpvconf-*.conf`、`portable_config/script-opts/backup/uosc-theme-*.conf`（12 个）、`portable_config/scripts/backup/stats-original-*.lua`；私用全量包由 01~05 合并自动跟随。产物与 build/ 已清理。
+- **边界**：本次为流程/脚本/约定修改，未实际发布（未定版本号、未建 Release）；《发布流程.md》按用户明确指示修改，仅补充 backup 约定，未改动既有流程规则。

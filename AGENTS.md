@@ -166,6 +166,7 @@ return M
 4. **Key Bindings**: descriptive names (`browse-files`)
 5. **External Scripts**: `MAINTAINER-ONLY-WARNING-upstream-sources.json` 仅定义维护者上游审计源，不是用户更新入口
 6. **Shader paths in input.conf**: Use `~~/shaders/<category>/<name>.glsl`
+7. **Backup 两级约定**: 项目根 `backup/` 为用户级备份，不进包不跟踪；`portable_config` 下各 `backup/`（如 `backup/`、`script-opts/backup/`、`scripts/backup/`）为开发级备份，淘汰但曾可用的脚本/配置随 01/05 公开包保留以便回滚，且不设忽略（可 git 跟踪）。
 
 ## Common Pitfalls
 
