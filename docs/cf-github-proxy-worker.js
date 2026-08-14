@@ -9,7 +9,7 @@
  *    - 代理 maxzrb 用户名下所有仓库的 Release/Archive 下载（白名单 + 流式透传 + Range 断点续传）
  *    - 自动列表页：/ 渲染暗色下载站前端，JS 拉取 /api/latest 自动列出最新 Release 资产
  *    - /api/latest：后端拉 GitHub API 并缓存 10 分钟（可选 GITHUB_TOKEN 环境变量提升配额）
- *    - 离线兜底：GitHub API 不可用时，依次回退 KV 自动快照（定时刷新）→ 内置硬编码快照
+ *    - 离线兜底：GitHub API 不可用时回退 KV 自动快照（Cron 定时刷新 + live 成功回写自动维护）
  * ============================================================
  */
 
@@ -41,54 +41,12 @@ const API_CACHE_TTL = 600
 // 同时 Cron Trigger 定时刷新 KV（见下方 scheduled 处理器），
 // 保证「最近一次成功获取」的快照始终跟随最新发布。
 // 在 Cloudflare Worker 设置 → 绑定 中创建 KV Namespace 并绑定，
-// 变量名必须为 SNAPSHOT_KV；未绑定时自动退化为纯硬编码兜底。
+// 变量名必须为 SNAPSHOT_KV；未绑定时 GitHub API 故障将直接返回 502（无离线兜底）。
 const SNAPSHOT_KV = globalThis.SNAPSHOT_KV || null
 // KV 中存储的键名
 const SNAPSHOT_KEY = 'snapshot:latest'
 
-// ==================== 内置快照 ====================
-// 最近一次发布（v1.5.1）的资产清单。
-// 作用：最后一道防线——KV 未初始化或也无法使用时兜底。
-// 正常使用中 KV 自动快照会先于它生效，因此本块无需频繁更新；
-// 如需强制同步（如首次部署或想双保险），可运行 tools/update-worker-snapshot.ps1。
-const FALLBACK_RELEASE = {
-    "tag_name": "v1.5.1",
-    "name": "v1.5.1",
-    "published_at": "2026-08-12T07:44:22Z",
-    "html_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.5.1",
-    "assets": [
-        {
-            "name": "01-mpv-base-v1.5.1.7z",
-            "size": 136245296,
-            "content_type": "application/x-compressed",
-            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/01-mpv-base-v1.5.1.7z"
-        },
-        {
-            "name": "02-mpv-extras-v1.5.1.7z.001",
-            "size": 1992294400,
-            "content_type": "application/octet-stream",
-            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/02-mpv-extras-v1.5.1.7z.001"
-        },
-        {
-            "name": "02-mpv-extras-v1.5.1.7z.002",
-            "size": 781591690,
-            "content_type": "application/octet-stream",
-            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/02-mpv-extras-v1.5.1.7z.002"
-        },
-        {
-            "name": "03-mpv-fasterwhisper-addon-v1.5.1.7z",
-            "size": 1476002022,
-            "content_type": "application/x-compressed",
-            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/03-mpv-fasterwhisper-addon-v1.5.1.7z"
-        },
-        {
-            "name": "VantaInstaller-win-x64-v0.3.0.exe",
-            "size": 67648516,
-            "content_type": "application/x-msdownload",
-            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/VantaInstaller-win-x64-v0.3.0.exe"
-        }
-    ]
-}
+
 
 // ==================== 前端页面 ====================
 // 注意：页面内联 JS 不使用反引号，避免与外层模板字符串冲突
@@ -316,12 +274,11 @@ const LANDING_HTML = `<!DOCTYPE html>
     });
   }
 
-  // 数据来源标签：实时（绿）/ 缓存（蓝）/ 自动快照（靛）/ 内置快照（橙）
+  // 数据来源标签：实时（绿）/ 缓存（蓝）/ 自动快照（靛）
   var SOURCE_LABEL = {
     live: ['实时数据', 'var(--ok)'],
     cache: ['缓存数据', 'var(--brand-deep)'],
-    kv: ['自动快照', 'var(--brand-deep)'],
-    fallback: ['离线快照', 'var(--accent)']
+    kv: ['自动快照', 'var(--brand-deep)']
   };
   var renderSource = function (source) {
     var meta = SOURCE_LABEL[source];
@@ -332,12 +289,6 @@ const LANDING_HTML = `<!DOCTYPE html>
     el.style.borderColor = meta[1];
     el.textContent = meta[0];
     badge.appendChild(el);
-    if (source === 'fallback') {
-      var tip = document.createElement('div');
-      tip.style.cssText = 'margin-top:8px;font-size:12px;color:var(--accent)';
-      tip.textContent = '提示：GitHub API 当前不可用，列表为内置快照，可能与最新版本存在滞后。';
-      body.insertBefore(tip, body.firstChild);
-    }
   };
   // 二级兜底：Worker 的 /api/latest 不可用时，浏览器直连 GitHub API（GitHub 允许 CORS）
   var loadFromGithubDirect = function (err) {
@@ -489,7 +440,7 @@ async function refreshSnapshot() {
     }
 }
 
-// 生成带 X-Source 来源标记的 JSON 响应（live=实时 / cache=缓存 / fallback=内置快照）
+// 生成带 X-Source 来源标记的 JSON 响应（live=实时 / cache=缓存 / kv=自动快照）
 function jsonWithSource(body, source) {
     return new Response(body, {
         headers: {
@@ -500,7 +451,7 @@ function jsonWithSource(body, source) {
     })
 }
 
-// 获取最新 Release 精简 JSON：四级兜底 缓存 → GitHub API（实时） → KV 自动快照 → 内置快照
+// 获取最新 Release 精简 JSON：三级来源 缓存 → GitHub API（实时） → KV 自动快照
 // 任何情况下都尽量返回可用的资产列表，用户网差/GitHub API 故障时也能展示并下载；
 // KV 自动快照由 Cron Trigger 与 live 成功回写共同维护，发布后无需手动更新。
 async function apiLatest(urlObj) {
@@ -545,13 +496,7 @@ async function apiLatest(urlObj) {
             }
         }
 
-        // 4) 最后防线：内置硬编码快照
-        if (FALLBACK_RELEASE && FALLBACK_RELEASE.assets && FALLBACK_RELEASE.assets.length) {
-            const body = JSON.stringify(FALLBACK_RELEASE)
-            const resp = jsonWithSource(body, 'fallback')
-            cache.put(cacheKey, resp.clone()).catch(function () {})
-            return resp
-        }
+        // 4) 无可用快照：直接返回不可用（不再使用过期的内置硬编码快照）
         return makeRes(
             JSON.stringify({ error: 'GitHub API 不可用且无可用快照', detail: String((ex && ex.message) || ex) }),
             502,
