@@ -16,7 +16,8 @@
 'use strict'
 
 // ==================== 配置区 ====================
-// 允许代理的 GitHub 用户名（小写；该用户名下所有仓库的 Release / Archive 均可代理）
+// 允许代理的 GitHub 所有者（小写）。maxzrb 用户名下所有仓库的 Release / Archive 均可代理；
+// 其它用户或仓库的链接会被拒绝（403），请勿误解为通用代理。
 const ALLOWED_OWNERS = [
     'maxzrb',
 ]
@@ -212,9 +213,9 @@ const LANDING_HTML = `<!DOCTYPE html>
     <div class="panel">
       <h3><span class="bar"></span>加速使用说明</h3>
       <div class="note">
-        任意 GitHub 下载链接前拼上本域名前缀即可加速：<br>
+        仅限 maxzrb 用户名下仓库的 GitHub Release 下载链接，前拼本域名前缀即可加速：<br>
         <code id="sampleLink">https://dl.loliland.cn/https://github.com/…/releases/download/…</code><br>
-        也支持 git clone 与 archive 源码包。
+        仅 maxzrb 名下仓库的 Release / Archive 可加速；其它内容不受理。
       </div>
     </div>
   </div>
