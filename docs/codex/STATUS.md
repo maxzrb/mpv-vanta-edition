@@ -2329,7 +2329,7 @@ c:\Program portable\mpv2\
 - **兼容性核对**：GitHub 版是 mpv 内置 stats.lua（同步上游 de0f2f9，2026-02-10）的「自动翻译模块·全局替换版」，另集成 CPU/GPU 实时占用监控（PowerShell Get-CimInstance / nvidia-smi / typeperf 回退链，全部内置、无额外文件）；binding 名 `stats/display-stats`、`stats/display-stats-toggle`、`stats/display-page-*` 与 input.conf（i/I）及 osc_lazy.lua 底栏按钮联动一致；现有 `script-opts/stats.conf` 选项全部兼容，无未知选项警告。
 - **改动文件**：
   - `portable_config/scripts/stats.lua`：GitHub 汉化版（112,050 字节 / 3002 行，UTF-8 无 BOM，CRLF→LF 对齐仓库规范）。
-  - `portable_config/backup/stats-original-20260814.lua`：原版完整备份（68,978 字节，backup 目录未跟踪）。
+  - `portable_config/scripts/backup/stats-original-20260814.lua`：原版完整备份（68,978 字节，位于脚本目录下相对 backup，随 git 跟踪进包）。
   - `portable_config/mpv.conf` 第 526 行注释补充汉化版来源。
 - **功能移植**：新版缺仓库自定义的 `user-data/stats/toggled` 状态同步（osc 底栏/lsfg_control.lua 依赖），已移植两处：`process_key_binding` 末尾按 `display_timer:is_enabled() and not oneshot` 写真实开关状态；启动时初始化为 false。
 - **验证**：① 隔离加载 `--no-config --script=` 退出 0、无 Lua 错误；② 集成测试（临时 config-dir 含 `load-stats-overlay=no` + 真实 stats.conf）确认以 `stats` 名称加载、读取 stats.conf、无警告；③ bindlist 模式 stdout 输出中文按键页标题「活动按键绑定」；④ IPC 实测 `user-data/stats/toggled` 初始 false → toggle 后 true → 再 toggle 后 false，与 lsfg_control 预期一致。
@@ -2342,3 +2342,10 @@ c:\Program portable\mpv2\
 - **修复**：移植旧版已验证方案——视频区始终显示 `解码方式:`：`hwdec=no` 显示「软件解码」，有值显示「硬件解码（后端）」如 `d3d11va-copy`，未初始化显示「未知（解码器尚未初始化）」；该行不再依赖 codec-desc 存在，从 `if track and append(codec-desc)` 内移入 `if track` 内。
 - **实测**：临时 config-dir + 日志钩子抓取 ASS 输出——软解 `hwdec-current=no` → `解码方式: 软件解码`；`--hwdec=d3d11va-copy` → `解码方式: 硬件解码（d3d11va-copy）`；加载无 Lua 错误。
 - **边界**：仅改 `portable_config/scripts/stats.lua`（并记录），未构建/发布 mpv 包。
+### 2026-08-14 13:30 · 新旧 stats.lua 同时打包 + 备份改放 scripts/backup
+
+- **用户要求**：① 旧版 stats.lua 留在原文件夹（scripts/）内做相对 backup，不挪到项目根 backup；② 打包脚本确保新旧 stats.lua 都进包。
+- **备份位置调整**：`portable_config/backup/stats-original-20260814.lua` → `portable_config/scripts/backup/stats-original-20260814.lua`（未忽略，随 git 跟踪）。
+- **打包脚本**：`build-01-base.ps1`（Invoke-CopyConfig）与 `build-05-config.ps1` 在删除全部 backup 目录后，放行 `scripts/backup/stats-original-*.lua` 回构建目录，实现新旧 stats 同时进包；其它备份目录仍排除，不违背发布流程「backup 不进公开包」精神（stats 兜底是用户明确要求）。
+- **实测**：临时 `-Version 9.9.9` 构建 01 与 05 包，`7z l` 均确认包含 `portable_config/scripts/stats.lua`（112,702 字节，新版）与 `portable_config/scripts/backup/stats-original-20260814.lua`（68,978 字节，旧版）；私用全量包为 01~05 合并，自动跟随。构建产物与 build/ 已清理。
+- **边界**：本次仅提交功能/脚本改动与打包放行逻辑；未实际发布（未定新版本号、未建 Release）。

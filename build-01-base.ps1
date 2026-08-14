@@ -106,6 +106,17 @@ function Invoke-CopyConfig {
     foreach ($dir in $backupDirs) {
         Remove-Item -LiteralPath $dir.FullName -Recurse -Force
     }
+    # 新旧 stats.lua 同时进包：放行 scripts/backup 下的 stats 原版备份（兜底），其它备份仍排除
+    $statsBackupSrc = Join-Path $configSrc 'scripts\backup'
+    $statsBackupDest = Join-Path $configDest 'scripts\backup'
+    if (Test-Path -LiteralPath $statsBackupSrc) {
+        $statsBackups = @(Get-ChildItem -LiteralPath $statsBackupSrc -File -Filter 'stats-original-*.lua' `
+            -ErrorAction SilentlyContinue)
+        foreach ($f in $statsBackups) {
+            $null = New-Item -ItemType Directory -Force -Path $statsBackupDest
+            Copy-Item -LiteralPath $f.FullName -Destination (Join-Path $statsBackupDest $f.Name) -Force
+        }
+    }
     # 个人运行时状态（窗口记忆）不进公开包
     $stateFile = Join-Path $configDest "script-opts/window_state.conf"
     if (Test-Path $stateFile) { Remove-Item -Force $stateFile }

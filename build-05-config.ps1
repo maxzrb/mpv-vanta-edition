@@ -45,6 +45,17 @@ $backupDirs = @(Get-ChildItem -Path $configDest -Recurse -Directory -Filter 'bac
 foreach ($dir in $backupDirs) {
     Remove-Item -LiteralPath $dir.FullName -Recurse -Force
 }
+# 新旧 stats.lua 同时进包：放行 scripts/backup 下的 stats 原版备份（兜底），其它备份仍排除
+$statsBackupSrc = Join-Path $configSrc 'scripts\backup'
+$statsBackupDest = Join-Path $configDest 'scripts\backup'
+if (Test-Path -LiteralPath $statsBackupSrc) {
+    $statsBackups = @(Get-ChildItem -LiteralPath $statsBackupSrc -File -Filter 'stats-original-*.lua' `
+        -ErrorAction SilentlyContinue)
+    foreach ($f in $statsBackups) {
+        $null = New-Item -ItemType Directory -Force -Path $statsBackupDest
+        Copy-Item -LiteralPath $f.FullName -Destination (Join-Path $statsBackupDest $f.Name) -Force
+    }
+}
 # 启动 Logo 素材（启动页/起播格式 Logo）归 01 Base，Config 不重复携带
 $assetsPath = Join-Path $configDest 'script-assets'
 if (Test-Path $assetsPath) { Remove-Item -Recurse -Force $assetsPath }
