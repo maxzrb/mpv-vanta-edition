@@ -10,7 +10,7 @@
 | **工作区** | 私包内置 VantaInstaller + 发布流程统一候选目录；改动待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.2（已发布） |
-| **上次操作** | uosc 新增底部迷你进度线（普通小窗口 1.2px 已播进度）及「其它」菜单开关，默认开启 |
+| **上次操作** | 修复迷你进度线：贴到窗口底部边缘铺满整窗，暂停时保持显示 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -2376,3 +2376,12 @@ c:\Program portable\mpv2\
 - **input.conf**：`其它 > 底部迷你进度线 > 开/关`，快捷键 `CTRL+ALT+b`，带勾选状态。
 - **验证**：luajit 语法通过；隔离环境端到端——初始 `user-data/uosc/mini-progress=yes` → `script-message mini-progress-toggle` 后变 `no` 且 uosc.conf 持久化为 `progress=never`，再 toggle 恢复 `windowed`；完整配置加载无 uosc 错误。测试中发现隔离环境缺 `script-modules/media-format-info.lua` 会导致 uosc 加载失败（测试环境问题，非代码问题）。
 - **边界**：仅配置/脚本改动，未构建/发布 mpv 包；uosc 为仓库定制脚本，改动随包分发。
+### 2026-08-14 15:30 · 修复迷你进度线位置与暂停行为
+
+- **用户反馈**：① 迷你线与进度条同位置，悬浮在画面上而非播放器底部，影响观感；② 暂停时迷你线消失。
+- **根因**：上一版只在 Timeline 收起位置（画面内 self.by，控制栏上方）显示迷你线；且加了暂停/待机/播放结束自动隐藏（用户不需要）。
+- **修复（Timeline.lua）**：
+  - `render` 中 `has_minimized_progress` 时，迷你线横向铺满窗口（bax=window_border, bbx=display.width-window_border），垂直贴到窗口底部（hit_bby=display.height-window_border）；进度几何改用 `bar_width = bbx-bax` 而非 `self.width`，展开时回到控制栏内嵌位置。
+  - `decide_progress_size` 移除 pause/is_idle/eof_reached 隐藏条件，恢复仅按 progress 模式判断；移除 on_prop_is_idle/on_prop_eof_reached 钩子，on_prop_pause 恢复为 request_render。
+- **验证**：隔离环境 + 真实 GPU VO + 渲染日志钩子——迷你线 `bax=1 bbx=1279 bay=717 bby=719`（窗口 1280x720），横向铺满、贴底 1.2px、progress 随播放推进、vis=0；暂停后迷你线仍显示且保持贴底。测试钩子未入库。
+- **边界**：仅改 Timeline.lua，未构建/发布。

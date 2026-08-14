@@ -131,13 +131,12 @@ function Timeline:update_dimensions()
 end
 
 function Timeline:decide_progress_size()
-	-- 迷你进度线显示条件：
-	-- - progress 模式允许（windowed 普通小窗口 / always / fullscreen）
-	-- - 暂停、待机（idle）、播放结束（eof）时自动隐藏，避免长期遮挡画面
-	local show = not (state.pause or state.is_idle or state.eof_reached)
-		and (options.progress == 'always'
-			or (options.progress == 'fullscreen' and state.fullormaxed)
-			or (options.progress == 'windowed' and not state.fullormaxed))
+	-- 迷你进度线显示条件（仅按 progress 模式判断，暂停/待机/播放结束时保持显示）：
+	-- - windowed：普通小窗口显示
+	-- - always / fullscreen：按全屏状态显示
+	local show = options.progress == 'always'
+		or (options.progress == 'fullscreen' and state.fullormaxed)
+		or (options.progress == 'windowed' and not state.fullormaxed)
 	self.progress_size = show and round(options.progress_size * state.scale) or 0
 	self.progress_scale = state.scale
 end
@@ -209,18 +208,7 @@ function Timeline:on_prop_duration() self:decide_enabled() end
 function Timeline:on_prop_time() self:decide_enabled() end
 function Timeline:on_prop_uncached_ranges() request_render() end
 function Timeline:on_prop_cache_duration() request_render() end
-function Timeline:on_prop_pause()
-	self:decide_progress_size()
-	request_render()
-end
-function Timeline:on_prop_is_idle()
-	self:decide_progress_size()
-	request_render()
-end
-function Timeline:on_prop_eof_reached()
-	self:decide_progress_size()
-	request_render()
-end
+function Timeline:on_prop_pause() request_render() end
 function Timeline:on_prop_border() self:update_dimensions() end
 function Timeline:on_prop_title_bar() self:update_dimensions() end
 function Timeline:on_prop_fullormaxed()
@@ -391,14 +379,23 @@ function Timeline:render()
 	local is_line = options.timeline_style == 'line'
 
 	-- 细圆角进度条：视觉上内嵌于面板中，而非悬浮
-	-- 迷你进度线收起时高度跟随 progress_size（1.2px），展开时过渡到正常条高
+	-- 迷你进度线收起时高度跟随 progress_size（1.2px），横向铺满窗口底部（贴底，不含边框），
+	-- 展开时过渡到正常条高并回到控制栏内嵌位置
+	local window_border = Elements:v('window_border', 'size', 0)
 	local bax, hit_bay, bbx, hit_bby = self.ax, self.by - size - self.top_border, self.bx, self.by
+	if has_minimized_progress then
+		bax = window_border
+		bbx = display.width - window_border
+		hit_bby = display.height - window_border
+		hit_bay = hit_bby - size
+	end
 	local collapsed_bar_height = math.max(1, progress_size)
 	local expanded_bar_height = math.max(3, round(4 * state.scale))
 	local bar_height = collapsed_bar_height
 		+ (expanded_bar_height - collapsed_bar_height) * math.min(1, size / self.size)
 	local bay = hit_bay + (size - bar_height) / 2
 	local bby = bay + bar_height
+	local bar_width = bbx - bax
 	local fax, fay, fbx, fby = 0, bay + self.top_border, 0, bby
 
 	local line_width = 0
@@ -407,18 +404,18 @@ function Timeline:render()
 		local minimized_fraction = 1 - math.min((size - progress_size) / ((self.size - progress_size) / 8), 1)
 		local progress_delta = progress_size > 0 and self.progress_line_width - self.line_width or 0
 		line_width = self.line_width + (progress_delta * minimized_fraction)
-		fax = bax + (self.width - line_width) * progress
+		fax = bax + (bar_width - line_width) * progress
 		fbx = fax + line_width
 		line_width = line_width - 1
 	else
-		fax, fbx = bax, bax + self.width * progress
+		fax, fbx = bax, bax + bar_width * progress
 	end
 
 	local foreground_size = fby - fay
 
 	-- time starts 0.5 pixels in
 	local time_ax = bax + 0.5
-	local time_width = self.width - line_width - 1
+	local time_width = bar_width - line_width - 1
 
 	-- time to x: calculates x coordinate so that it never lies inside of the line
 	local function t2x(time)
@@ -441,7 +438,7 @@ function Timeline:render()
 		and type(state.time) == 'number'
 		and loaded_pos - state.time >= loaded_progress_min_ahead
 	then
-		local loaded_x = bax + self.width * (loaded_pos / state.duration)
+		local loaded_x = bax + bar_width * (loaded_pos / state.duration)
 		if loaded_x > bax + 1 then
 			ass:rect(bax, bay, loaded_x, bby, {
 				color = config.color.match,
