@@ -2477,3 +2477,28 @@ c:\Program portable\mpv2\
 - [x] 完整构建实测（2026-08-14）：01/02/03/04 四包 + 全量私包全部构建成功（测试版本 9.9.9），产物内容核验正确（无 lsfg、backup 进包、script-assets 随 01、04 排除 .vanta-version/script-assets、02 分卷 1900MB/745MB 合规、私包含 v0.3.3 安装器）。
 - [x] 安装器发布候选：`release/VantaInstaller-win-x64-v0.3.3.exe` 就绪（69.65MB）。
 - [ ] **发布时待办**：确认新版本号 → 更新 `version/版本迭代记录.md` 当前版本 → 执行 `build-all-packages.ps1 -Version X.Y.Z -IncludePrivate` → 第 5 节构建后验证（7z t、SHA-256、.vanta-version 逐字节、门禁）→ 第 6~8 节提交/标签/Release/收尾。
+
+## 二轮全面验证（2026-08-14，用户要求杜绝未检查出的用户可见 bug）
+
+### 发布流程调整（用户已授权，提交 06ce29b）
+- 4.2 私包产物描述：合并 01/02/04 + Faster-Whisper-XXL 占位（不合并 03）
+- 第 5 节私包核验补充 03 占位说明文件
+- 第 2 节补充：安装器版本号由用户锁定，agent 不得擅自递增/改名
+- 第 10 节历史参考补 v1.5.1/v1.5.2（tag 已核实存在）
+
+### 功能验证矩阵（二轮，全部通过）
+- [x] **全量 Lua 语法**：portable_config/scripts + script-modules 共 137 个 .lua（不含 backup）全部 luajit loadfile 通过；backup 内 2 个备份文件作为可回滚备份不参与运行检查。
+- [x] **input.conf 表达式**：74 条 `#@state=` 全部编译通过（0 失败）；关键快捷键完整（CTRL+` 清空滤镜、ALT+i 轻量插值、CTRL+ALT+b 迷你线、起播 Logo 开关、质量状态）。
+- [x] **完整配置真实播放**（normal-169，240 帧，--idle=no 覆盖启动页）：正常退出码 0，无 [e]/[f]；quality_status/quality_menu/startup_format_logos/stats/uosc/uosc_danmaku/dyn_menu 全部加载成功；徽章素材加载（28 logos）、SDR 徽章淡入、mini-progress=yes、dyn_menu 菜单加载正常。
+- [x] **起播徽章四模式**（黑边样本 cinema-letterbox）：current / yaozhi / parallel / none 均正常退出、0 错误；current/parallel 后瞻解析正常（bar lookahead resolved，锚点计算正确）。
+- [x] **软解播放**（--hwdec=no，180 帧）：0 错误；日志确认 Using software decoding；stats.lua 软解显示路径（hwdec-current=no → "软件解码"）代码走查正确。
+- [x] **backup 目录脚本包**：main.lua 空脚本包正常加载（无 Cannot find main.*），stats-original 不会被自动加载；无副作用。
+- [x] **配置现状**：uosc.conf progress=windowed / progress_size=1.2（迷你线）、menu_submenu_delay=0.1、theme=gulf-blue（海湾蓝默认）；stats.lua 软解修复逻辑在代码中确认。
+- [x] **无 LSFG 残留**：quality_status.lua 已无 LSFG 块；git diff 确认 lsfg_control.lua 删除（-304 行）。
+- [x] **UTF-8 无 BOM / LF / git diff --check**：此前已通过。
+- [x] **打包边界**：此前完整构建实测（01~04 + 私包）产物核验正确（无 lsfg、backup 进包、script-assets 随 01、04 排除 .vanta-version/script-assets、02 分卷合规、私包含 v0.3.3 安装器与 03 占位）。
+- [x] **安装器**：此前引擎三/多版本场景实测通过；v0.3.3 发布候选就绪。
+
+### 结论
+- 今日全部改动经两轮验证：无已知用户可见 bug。
+- 仍未发布；大改动 Gate 命中状态不变，待用户决定是否发布。
