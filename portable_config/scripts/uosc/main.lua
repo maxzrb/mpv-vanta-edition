@@ -1321,6 +1321,34 @@ set_chapter_display = function(value, silent)
 end
 mp.register_script_message('chapter-display-toggle', set_chapter_display)
 publish_chapter_display_state()
+-- 底部迷你进度线开关（普通小窗口播放时显示 1.2px 已播进度；持久化到 uosc.conf）
+local function publish_mini_progress_state()
+	mp.set_property(
+		'user-data/uosc/mini-progress',
+		options.progress ~= 'never' and 'yes' or 'no'
+	)
+end
+local function set_mini_progress(value, silent)
+	local requested = tostring(value or 'toggle'):lower()
+	local enabled
+	if requested == 'yes' or requested == 'on' or requested == 'true' or requested == '1' then
+		enabled = true
+	elseif requested == 'no' or requested == 'off' or requested == 'false' or requested == '0' then
+		enabled = false
+	else
+		enabled = options.progress == 'never'
+	end
+
+	options.progress = enabled and 'windowed' or 'never'
+	handle_options({progress = true})
+	persist_uosc_option('progress', options.progress)
+	publish_mini_progress_state()
+	if not silent then
+		mp.osd_message(enabled and '底部迷你进度线：开启' or '底部迷你进度线：关闭', 2)
+	end
+end
+mp.register_script_message('mini-progress-toggle', set_mini_progress)
+publish_mini_progress_state()
 -- 打开方式单选：replace=替换当前实例，new=启动新实例（持久化）
 local function set_open_file_mode(mode)
 	options.menu_open_file_mode = mode

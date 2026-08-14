@@ -10,7 +10,7 @@
 | **工作区** | 私包内置 VantaInstaller + 发布流程统一候选目录；改动待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.2（已发布） |
-| **上次操作** | VantaInstaller 设置中心新增「菜单交互」：uosc 子菜单弹出延迟可调（默认 0.1s） |
+| **上次操作** | uosc 新增底部迷你进度线（普通小窗口 1.2px 已播进度）及「其它」菜单开关，默认开启 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -2366,3 +2366,13 @@ c:\Program portable\mpv2\
 - **uosc.conf**：`menu_submenu_delay` 0.3 → 0.1（用户实测值，与安装器默认一致）。
 - **验证**：临时控制台单测 11 项全过（读取/替换键保留注释与其它键/0 整数格式/缺失键追加/缺失文件默认/自动建目录/重新加载）；`dotnet build -c Release` 0 警告 0 错误。
 - **边界**：VantaInstaller 附属工具功能改动不触发发布 Gate；未递增安装器版本号、未 publish 重建、未上传。
+### 2026-08-14 15:00 · uosc 底部迷你进度线（普通小窗口 1.2px 已播进度）+ 菜单开关
+
+- **需求**：参考杳知 mpv 整合包 8.14「丝滑 Morph」的迷你进度线——普通小窗口播放时保留 1.2px 已播放进度，只显示主题色已播部分，不绘制未播放轨道/整宽底板；做成「其它」菜单开关，默认开启。
+- **方案**：uosc 5.13 原生支持 `progress=windowed` + `progress_size` 迷你进度条，但仓库版 Timeline.lua 的 progress 绘制乘了 `visibility`（收起时=0 导致迷你线不显示），需移植杳知版的 `bar_visibility`/`track_visibility` 逻辑。
+- **Timeline.lua**：`render` 新增 `has_minimized_progress`/`bar_visibility`/`track_visibility`——迷你进度时 progress 强制可见、轨道/加载条不绘制；`bar_height` 收起时跟随 `progress_size`（1.2px）、展开过渡到正常条高；圆形手柄仍跟随 visibility（迷你时不画圆点）。`decide_progress_size` 增加暂停（pause）、待机（is_idle）、播放结束（eof_reached）自动隐藏；新增 `on_prop_is_idle`/`on_prop_eof_reached` 钩子，`on_prop_pause` 触发重算。
+- **main.lua**：新增 `mini-progress-toggle` script-message（切换 progress=windowed/never，持久化到 uosc.conf，发布 `user-data/uosc/mini-progress` 状态），参照 chapter-display-toggle 模板。
+- **uosc.conf**：`progress=never` → `windowed`，`progress_size=2` → `1.2`（默认开启）。
+- **input.conf**：`其它 > 底部迷你进度线 > 开/关`，快捷键 `CTRL+ALT+b`，带勾选状态。
+- **验证**：luajit 语法通过；隔离环境端到端——初始 `user-data/uosc/mini-progress=yes` → `script-message mini-progress-toggle` 后变 `no` 且 uosc.conf 持久化为 `progress=never`，再 toggle 恢复 `windowed`；完整配置加载无 uosc 错误。测试中发现隔离环境缺 `script-modules/media-format-info.lua` 会导致 uosc 加载失败（测试环境问题，非代码问题）。
+- **边界**：仅配置/脚本改动，未构建/发布 mpv 包；uosc 为仓库定制脚本，改动随包分发。

@@ -131,9 +131,13 @@ function Timeline:update_dimensions()
 end
 
 function Timeline:decide_progress_size()
-	local show = options.progress == 'always'
-		or (options.progress == 'fullscreen' and state.fullormaxed)
-		or (options.progress == 'windowed' and not state.fullormaxed)
+	-- 迷你进度线显示条件：
+	-- - progress 模式允许（windowed 普通小窗口 / always / fullscreen）
+	-- - 暂停、待机（idle）、播放结束（eof）时自动隐藏，避免长期遮挡画面
+	local show = not (state.pause or state.is_idle or state.eof_reached)
+		and (options.progress == 'always'
+			or (options.progress == 'fullscreen' and state.fullormaxed)
+			or (options.progress == 'windowed' and not state.fullormaxed))
 	self.progress_size = show and round(options.progress_size * state.scale) or 0
 	self.progress_scale = state.scale
 end
@@ -205,7 +209,18 @@ function Timeline:on_prop_duration() self:decide_enabled() end
 function Timeline:on_prop_time() self:decide_enabled() end
 function Timeline:on_prop_uncached_ranges() request_render() end
 function Timeline:on_prop_cache_duration() request_render() end
-function Timeline:on_prop_pause() request_render() end
+function Timeline:on_prop_pause()
+	self:decide_progress_size()
+	request_render()
+end
+function Timeline:on_prop_is_idle()
+	self:decide_progress_size()
+	request_render()
+end
+function Timeline:on_prop_eof_reached()
+	self:decide_progress_size()
+	request_render()
+end
 function Timeline:on_prop_border() self:update_dimensions() end
 function Timeline:on_prop_title_bar() self:update_dimensions() end
 function Timeline:on_prop_fullormaxed()
@@ -345,6 +360,11 @@ function Timeline:render()
 
 	local ass = assdraw.ass_new()
 	local progress_size = math.max(self.min_progress_size, self.progress_size)
+	-- 迷你进度线（普通小窗口收起时）：进度部分强制可见，轨道/整宽底板不绘制，
+	-- 只显示主题色已播部分。展开时恢复原可见性逻辑。
+	local has_minimized_progress = progress_size > 0 and visibility <= 0
+	local bar_visibility = has_minimized_progress and 1 or visibility
+	local track_visibility = has_minimized_progress and 0 or visibility
 
 	-- 底部连续面板：进度条与按钮共享同一块半透明背景，消除割裂感
 	local panel_visibility = math.max(visibility, Elements:maybe('controls', 'get_visibility') or 0)
@@ -371,8 +391,12 @@ function Timeline:render()
 	local is_line = options.timeline_style == 'line'
 
 	-- 细圆角进度条：视觉上内嵌于面板中，而非悬浮
+	-- 迷你进度线收起时高度跟随 progress_size（1.2px），展开时过渡到正常条高
 	local bax, hit_bay, bbx, hit_bby = self.ax, self.by - size - self.top_border, self.bx, self.by
-	local bar_height = math.max(3, round(4 * state.scale))
+	local collapsed_bar_height = math.max(1, progress_size)
+	local expanded_bar_height = math.max(3, round(4 * state.scale))
+	local bar_height = collapsed_bar_height
+		+ (expanded_bar_height - collapsed_bar_height) * math.min(1, size / self.size)
 	local bay = hit_bay + (size - bar_height) / 2
 	local bby = bay + bar_height
 	local fax, fay, fbx, fby = 0, bay + self.top_border, 0, bby
@@ -405,7 +429,7 @@ function Timeline:render()
 	-- 安静的轨道底色
 	ass:rect(bax, bay, bbx, bby, {
 		color = config.color.timeline_track or fg,
-		opacity = visibility * config.opacity.timeline,
+		opacity = track_visibility * config.opacity.timeline,
 		radius = bar_height / 2,
 	})
 
@@ -421,7 +445,7 @@ function Timeline:render()
 		if loaded_x > bax + 1 then
 			ass:rect(bax, bay, loaded_x, bby, {
 				color = config.color.match,
-				opacity = visibility * loaded_progress_opacity,
+				opacity = track_visibility * loaded_progress_opacity,
 				radius = bar_height / 2,
 			})
 		end
@@ -431,7 +455,7 @@ function Timeline:render()
 	local function draw_progress()
 		ass:rect(fax, fay, fbx, fby, {
 			color = config.color.match,
-			opacity = visibility * config.opacity.position,
+			opacity = bar_visibility * config.opacity.position,
 			radius = bar_height / 2,
 		})
 		ass:circle(fbx, fay + (fby - fay) / 2, math.max(3, bar_height * 1.2), {
