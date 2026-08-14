@@ -2441,3 +2441,39 @@ c:\Program portable\mpv2\
 - **改动**：build-full-private.ps1 移除 03 required 与解压，改为 Faster-Whisper-XXL 占位目录 + 03包解压后覆盖于此.txt；README 同步。
 - **验证**：语法通过；最小包（无 03）实测构建成功、占位文件在包内；测试产物已清理。
 - **边界**：仅私包脚本改动，公开包不受影响。
+
+## 发布前检查清单（2026-08-14，未发布，等待用户 Gate 决策）
+
+### 3.1 工作区与 Git 状态
+- [x] `git status --short --branch`：`master...origin/master [ahead 16]`，工作区干净（无未提交/未跟踪）。
+- [x] `git fetch origin`：远端无新改动。
+- [x] 未提交改动已全部按逻辑整理为 16 个提交（今天全部功能/构建/文档改动均已提交）。
+- [x] 本地领先 origin 16 个提交，尚未推送（发布前需推送或按流程处理）。
+
+### 3.2 大改动 Gate 评估（命中 → 必须停止发布并汇报）
+- [x] **公开包数量/编号/覆盖顺序变化**：01~05 → 01~04（04 LSFG 废除，05 Config 改为 04）→ **命中**
+- [x] **构建脚本/产物生成方式修改**：build-04-lsfg 废除、build-05→build-04、build-all 改四包、私包跳过 03 → **命中**
+- [x] **修改了发布流程文件本身**（7dc4b5c 改为四包结构、新增 trash 约定）→ **命中**
+- [x] **大型资源增删/包体积变化**：LSFG 相关（Lossless.dll、lsfg-vk、research 183 文件）移入 trash 不再进包；私包不再合并 03（约 -1.4GB）→ 命中
+- [x] **VantaInstaller 附属工具 v0.3.3**：功能/界面/版本迭代，按流程**不触发** Gate（但安装器构建产物形态无变化，沿用 publish 单文件流程）
+- [x] **第三方版权边界**：公开包不再包含 Lossless.dll（商业软件）→ 原"04 内置 Lossless.dll 既定内容"条款已随流程修改移除
+- **结论：命中大改动 Gate，停止发布，需用户决定豁免或调整后继续。**
+
+### 3.3 文档与记录检查
+- [x] `docs/codex/STATUS.md`：本清单即记录（当前）。
+- [x] `version/工作进度.md`：今日 16 次改动均有条目（12:57~20:00）。
+- [ ] `version/版本迭代记录.md`：仍为 v1.5.2 旧结构（01→05、含 LSFG），**新版本发布时须更新当前版本一节**（发布前待办）。
+- [x] `README.MD`：已同步四包结构（四类包关系、安装顺序 01→04、打包脚本说明）。
+- [ ] **`.vanta-version` 根目录本地副本仍为 `1.5.2`**：发布新版本时须由 build-01 按新版本写入（发布时自动更新，本地副本发布后同步）。
+
+### 3.4 功能验证
+- [x] 完整配置真实播放：修复后日志无 `[e]/[f]` 级别错误（此前发现并修复两处：① input.conf 补帧菜单 8 行 `#@state=` 结尾多余右括号；② scripts/backup 缺 main.lua 导致 mpv `Cannot find main.*`）。徽章脚本正常加载（assets loaded 28 logos）、SDR 徽章正常淡入、后瞻 ffmpeg 正常启动。
+- [x] 涉及 Lua 脚本语法检查全部通过：startup-format-logos.lua、startup-logo-bounds.lua、quality_status.lua、stats.lua（luajit loadfile 退出码 0）。
+- [x] 菜单表达式一致性：input.conf 全部 74 条 `#@state=` 表达式经 luajit 编译通过（0 失败）。
+- [x] UTF-8 无 BOM / LF：今日改动脚本/配置全部无 BOM、无 CRLF。
+- [x] `git diff --check` / `--cached --check` 通过。
+
+### 其他核查
+- [x] 完整构建实测（2026-08-14）：01/02/03/04 四包 + 全量私包全部构建成功（测试版本 9.9.9），产物内容核验正确（无 lsfg、backup 进包、script-assets 随 01、04 排除 .vanta-version/script-assets、02 分卷 1900MB/745MB 合规、私包含 v0.3.3 安装器）。
+- [x] 安装器发布候选：`release/VantaInstaller-win-x64-v0.3.3.exe` 就绪（69.65MB）。
+- [ ] **发布时待办**：确认新版本号 → 更新 `version/版本迭代记录.md` 当前版本 → 执行 `build-all-packages.ps1 -Version X.Y.Z -IncludePrivate` → 第 5 节构建后验证（7z t、SHA-256、.vanta-version 逐字节、门禁）→ 第 6~8 节提交/标签/Release/收尾。
