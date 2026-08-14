@@ -2403,3 +2403,11 @@ c:\Program portable\mpv2\
 - **流程/文档**：发布流程.md 改 01~04、移除 Lossless.dll 既定内容条款、新增根 trash 不进包约定；README、下载站 worker、.gitignore、AGENTS.md 同步。
 - **验证**：全部 build 脚本 PowerShell AST 解析通过；quality_status.lua luajit 语法通过；git grep 确认跟踪文件无 lsfg 功能残留（历史记录保留）。
 - **边界**：不构建、不发布；提交分三次（chore 回退/移除、build 打包脚本、docs 流程文档）。
+
+### 2026-08-14 18:00 · 跟进杳知 8.13/8.14 起播徽章（新 SDR 徽章 + 位置稳定性修复）
+
+- **素材**：对比杳知 8.14 包，差异仅 `logo-sdr-*` 24 bgra + manifest.json；替换为 8.13 新版 SDR 徽章（manifest v21→v23，body-only + 7 色彩虹框），旧素材 25 文件备份至 `script-assets/backup/startup-format-logos-sdr-v21-20260814/`。
+- **脚本**：`startup-logo-bounds.lua` 移植 `merge_stable`；`startup-format-logos.lua` yaozhi 模式复检改为多次一致确认 + `bar_anchor_locked` 单文件锁定一次；后瞻稀疏复检吸收多次一致（两次黑边共识/两次无黑边共识，耗尽兜底）。
+- **验证**：luajit 全过；merge_stable 单测通过；完整配置真实播放正常（SDR 徽章淡入、yaozhi 模式黑边样本无错误）；assets loaded 28 logos。
+- **其他评估**：音轨/字幕策略本地已合理；AList 与 ASS 色彩模式不适用/已有。
+- **边界**：仅配置/脚本/素材，未构建未发布。

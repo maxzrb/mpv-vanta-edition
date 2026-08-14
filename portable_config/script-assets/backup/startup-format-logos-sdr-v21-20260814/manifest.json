@@ -1,5 +1,5 @@
 {
-  "version": 23,
+  "version": 21,
   "source_scale": 2,
   "opacity_levels": [
     18,
@@ -447,13 +447,11 @@
       "frame_style": "generated",
       "mark_style": "source-color",
       "palette": [
-        "#F7372C",
-        "#FF8919",
-        "#F8D326",
-        "#4DCF5B",
-        "#16C4D3",
-        "#2085E1",
-        "#9137D2"
+        "#8B5CFF",
+        "#00C9FF",
+        "#2BD67B",
+        "#EBDD45",
+        "#FF8B3D"
       ],
       "files": {
         "18": "logo-sdr-018.bgra",
@@ -2306,5 +2304,5 @@
       }
     }
   },
-  "style": "custom-codec-marks-body-only-spectrum-sdr-line-spaced-optical-ink-balanced-native-resolution-tiered-rainbow-frame-badges"
+  "style": "custom-codec-marks-spectrum-hdr-line-spaced-optical-ink-balanced-native-resolution-tiered-rainbow-frame-badges"
 }

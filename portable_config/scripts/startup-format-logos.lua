@@ -110,6 +110,9 @@ local state = {
     content_insets_matched = nil,
     -- 徽标是否已显示；一旦显示，锚点冻结不再移动（避免黑屏→亮屏时徽标跳位）
     badge_displayed = false,
+    -- 杳知 8.14 视觉方案复检：本次文件内锚点是否已锁定（多次一致确认后锁一次，
+    -- 后续检测不能再让徽章飘动；文件切换/结束/换模式时重置）
+    bar_anchor_locked = false,
     -- 后瞻 ffmpeg 解码是否进行中（防重入）
     lookahead_busy = false,
     lookahead_requests = {},
@@ -1137,25 +1140,63 @@ local function has_video_geometry()
         and tonumber(dimensions.h) > 0
 end
 
--- 杳知 8.12 视觉方案复检：稀疏开场先显示默认位，随后复检出现黑边时
--- 直接更新锚点并重渲染（显示后可移动），不等待、不延迟起播。
+-- 杳知 8.14 视觉方案复检（黑色开场跳位修复）：稀疏开场先显示默认位，
+-- 随后在正常播放中少量复核。单张稀疏/全黑画面不再拥有立即移动徽章的权限；
+-- 真实黑边必须由至少两次一致采样确认，无黑边也需两次共识，本次文件内
+-- 只锁定一次位置，之后不再让徽章飘动（bar_anchor_locked）。不 seek、不延迟起播。
 local function start_yaozhi_bar_followup(file_generation)
     local remaining = clamp(
         math.floor(tonumber(o.encoded_bar_followup_samples) or 3),
         0,
         5
     )
-    if remaining <= 0 then return end
+    if remaining <= 0 then
+        state.bar_anchor_locked = true
+        return
+    end
     local interval = clamp(
         tonumber(o.encoded_bar_followup_interval) or 1.5,
         0.5,
         4.0
     )
+    -- 多次采样结果；只有至少两次一致的采样才能移动/锁定锚点
+    local probes = {}
+    local no_bar_samples = 0
+
+    local function commit(insets, reason)
+        if file_generation ~= state.file_generation or not state.loaded
+            or state.bar_anchor_locked then
+            return
+        end
+        state.content_insets = insets
+        state.content_insets_matched = nil
+        state.bar_anchor_locked = true
+        stop_timer('bar-followup')
+        if type(insets) == 'table' then
+            msg.debug(string.format(
+                'yaozhi followup locked (%s): left=%.4f top=%.4f right=%.4f bottom=%.4f',
+                tostring(reason),
+                tonumber(insets.left) or 0,
+                tonumber(insets.top) or 0,
+                tonumber(insets.right) or 0,
+                tonumber(insets.bottom) or 0
+            ))
+        else
+            msg.debug('yaozhi followup locked (' .. tostring(reason) .. '): frame bounds')
+        end
+        -- 已显示则重定位一次，未显示则正常显示
+        if state.visible and state.opacity_index > 0 then
+            render_level(state.opacity_index)
+        else
+            schedule_detection('yaozhi-followup', tonumber(o.delay) or 0.45)
+        end
+    end
 
     local function request_sample()
-        -- 已有黑边结果即停止（杳知原版）
+        -- 已有黑边结论或锚点已锁定即停止
         if file_generation ~= state.file_generation or not state.loaded
-            or state.content_insets ~= nil or remaining <= 0 then
+            or state.content_insets ~= nil or state.bar_anchor_locked
+            or remaining <= 0 then
             return
         end
         remaining = remaining - 1
@@ -1166,33 +1207,34 @@ local function start_yaozhi_bar_followup(file_generation)
             if file_generation ~= state.file_generation or not state.loaded then return end
             if success then
                 -- 杳知视觉方案：纯像素检测，不做画幅白名单与偏黑门槛
-                local insets = logo_bounds.detect(
+                local insets, meaningful = logo_bounds.detect(
                     frame, o.encoded_bar_threshold, 0
                 )
-                if insets then
-                    state.content_insets = insets
-                    msg.debug(string.format(
-                        'yaozhi followup: left=%.4f top=%.4f right=%.4f bottom=%.4f',
-                        tonumber(insets.left) or 0,
-                        tonumber(insets.top) or 0,
-                        tonumber(insets.right) or 0,
-                        tonumber(insets.bottom) or 0
-                    ))
-                    -- 已显示则重定位，未显示则正常显示
-                    if state.visible and state.opacity_index > 0 then
-                        render_level(state.opacity_index)
+                if meaningful then
+                    if insets then
+                        probes[#probes + 1] = insets
                     else
-                        schedule_detection('yaozhi-followup', tonumber(o.delay) or 0.45)
+                        no_bar_samples = no_bar_samples + 1
                     end
-                    return
                 end
             end
-            if remaining > 0 then schedule('bar-followup', interval, request_sample) end
+            local stable = logo_bounds.merge_stable(probes, 2, 0.012)
+            if stable then
+                commit(stable, 'stable-followup')
+            elseif no_bar_samples >= 2 then
+                commit(nil, 'stable-full-frame-followup')
+            elseif remaining > 0 then
+                schedule('bar-followup', interval, request_sample)
+            else
+                commit(nil, 'ambiguous-followup')
+            end
         end)
         if ok then
             state.bar_request = request
         elseif remaining > 0 then
             schedule('bar-followup', interval, request_sample)
+        else
+            commit(nil, 'followup-unavailable')
         end
     end
 
@@ -1205,9 +1247,10 @@ end
 
 
 -- 全黑开场、片头 Logo 等稀疏画面无法可靠锁定徽章锚点：徽标暂不显示，
--- 在正常播放中安排少量廉价复检（不 seek、不延迟起播），一旦出现可信内容
--- 画面（检测到黑边，或覆盖率足够且确认无黑边）就一次性显示到位并冻结锚点；
--- 复检次数耗尽仍未出现可信画面时兜底显示，避免徽标缺失。
+-- 在正常播放中安排少量廉价复检（不 seek、不延迟起播）。真实黑边须由至少
+-- 两次一致采样确认（merge_stable），无黑边也需两次内容充分的共识；确认后
+-- 一次性显示到位并冻结锚点（已显示的徽标绝不移动）。复检次数耗尽仍未出现
+-- 可信画面时兜底显示，避免徽标缺失。
 local function start_ambiguous_bar_followup(file_generation)
     local remaining = clamp(
         math.floor(tonumber(o.encoded_bar_followup_samples) or 3),
@@ -1232,6 +1275,11 @@ local function start_ambiguous_bar_followup(file_generation)
         schedule_detection('sparse-timeout', tonumber(o.delay) or 0.45)
     end
 
+    -- 多次采样结果：真实黑边需至少两次一致采样确认（杳知 8.14），
+    -- 无黑边也需两次内容充分的共识，避免单帧误判把徽章锁错位置。
+    local probes = {}
+    local no_bar_samples = 0
+
     local function request_sample()
         -- 徽标已显示或文件已切换：停止（已显示的徽标绝不移动）
         if file_generation ~= state.file_generation or not state.loaded
@@ -1252,27 +1300,38 @@ local function start_ambiguous_bar_followup(file_generation)
                 return
             end
             if success then
-                local insets, _, coverage, matched = logo_bounds.detect(
+                local insets, _, coverage = logo_bounds.detect(
                     frame, o.encoded_bar_threshold, o.encoded_bar_min_coverage
                 )
-                -- 出现可信结果（黑边，或内容画面且确认无黑边）→ 一次性显示并冻结
-                local displayable = insets ~= nil or (coverage or 0) >= 0.28
-                if displayable then
-                    state.content_insets = insets
-                    state.content_insets_matched = type(insets) == 'table' and matched == true or nil
-                    if type(insets) == 'table' then
-                        msg.debug(string.format(
-                            'encoded bars confirmed after sparse opening: left=%.4f top=%.4f right=%.4f bottom=%.4f',
-                            tonumber(insets.left) or 0,
-                            tonumber(insets.top) or 0,
-                            tonumber(insets.right) or 0,
-                            tonumber(insets.bottom) or 0
-                        ))
-                    end
-                    state.badge_displayed = true
-                    schedule_detection('sparse-resolved', tonumber(o.delay) or 0.45)
-                    return
+                if insets then
+                    probes[#probes + 1] = insets
+                elseif (coverage or 0) >= 0.28 then
+                    no_bar_samples = no_bar_samples + 1
                 end
+            end
+            -- 至少两次一致采样才一次性显示并冻结（吸收杳知 8.14 多次一致确认）
+            local stable = logo_bounds.merge_stable(probes, 2, 0.012)
+            if stable then
+                state.content_insets = stable
+                state.content_insets_matched = nil
+                msg.debug(string.format(
+                    'encoded bars confirmed after sparse opening: left=%.4f top=%.4f right=%.4f bottom=%.4f',
+                    tonumber(stable.left) or 0,
+                    tonumber(stable.top) or 0,
+                    tonumber(stable.right) or 0,
+                    tonumber(stable.bottom) or 0
+                ))
+                state.badge_displayed = true
+                schedule_detection('sparse-resolved', tonumber(o.delay) or 0.45)
+                return
+            end
+            -- 两次内容充分的共识确认无黑边 → 右上角显示并冻结
+            if no_bar_samples >= 2 then
+                state.content_insets = nil
+                state.content_insets_matched = nil
+                state.badge_displayed = true
+                schedule_detection('sparse-full-frame', tonumber(o.delay) or 0.45)
+                return
             end
             -- 次数用尽仍未等到可信内容：兜底显示；否则继续复检
             if remaining > 0 then
@@ -1868,6 +1927,7 @@ local function on_file_loaded()
     state.content_insets = nil
     state.content_insets_matched = nil
     state.badge_displayed = false
+    state.bar_anchor_locked = false
     cancel_lookahead_requests()
     state.last_aid = mp.get_property_native('aid')
     state.overlay_error_logged = false
@@ -1927,6 +1987,7 @@ local function on_end_file()
     state.content_insets = nil
     state.content_insets_matched = nil
     state.badge_displayed = false
+    state.bar_anchor_locked = false
     state.last_aid = nil
     stop_timer('frame-wait')
     stop_timer('bar-detect')
@@ -2019,6 +2080,7 @@ local function set_mode_message(value)
     -- 切换模式后重新走一遍黑边检测与显示（prepare 会按新 mode 决定检测方式）
     cancel_display(true)
     state.badge_displayed = false
+    state.bar_anchor_locked = false
     cancel_lookahead_requests()
     if state.loaded and state.frame_ready then
         prepare_display_after_frame('mode-change')

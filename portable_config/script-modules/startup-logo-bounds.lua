@@ -171,4 +171,37 @@ function M.merge(probes)
     }
 end
 
+---Return one cluster of mutually consistent probes.
+---A single frame is deliberately insufficient: fades, title cards and sparse
+---logos must not be allowed to move an already visible badge on their own.
+---@param probes table[]
+---@param minimum_matches number|nil
+---@param tolerance number|nil
+---@return table|nil
+function M.merge_stable(probes, minimum_matches, tolerance)
+    if type(probes) ~= 'table' then return nil end
+    minimum_matches = math.max(2, math.floor(tonumber(minimum_matches) or 2))
+    tolerance = math.max(0, tonumber(tolerance) or 0.012)
+
+    local best = nil
+    for _, candidate in ipairs(probes) do
+        local matches = {}
+        for _, probe in ipairs(probes) do
+            local compatible = true
+            for _, side in ipairs({'left', 'top', 'right', 'bottom'}) do
+                if math.abs((tonumber(candidate[side]) or 0) - (tonumber(probe[side]) or 0))
+                    > tolerance then
+                    compatible = false
+                    break
+                end
+            end
+            if compatible then matches[#matches + 1] = probe end
+        end
+        if not best or #matches > #best then best = matches end
+    end
+
+    if not best or #best < minimum_matches then return nil end
+    return M.merge(best)
+end
+
 return M
