@@ -207,7 +207,7 @@ const LANDING_HTML = `<!DOCTYPE html>
   var tagFor = function (name) {
     var n = name.toLowerCase();
     if (n.indexOf('installer') >= 0) return '<span class="tag tag-inst">安装器</span>';
-    if (n.indexOf('fasterwhisper') >= 0) return '<span class="tag tag-opt">可选</span>';
+    if (n.indexOf('fasterwhisper') >= 0 || n.indexOf('extras') >= 0 || n.indexOf('config') >= 0) return '<span class="tag tag-opt">可选</span>';
     return '';
   };
   var sortKey = function (name) {
