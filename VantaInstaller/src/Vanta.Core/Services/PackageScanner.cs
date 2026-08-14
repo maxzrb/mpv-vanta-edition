@@ -4,7 +4,7 @@ using Vanta.Core.Models;
 namespace Vanta.Core.Services;
 
 /// <summary>
-/// 扫描目录中的 Vanta 增量包（01~05），校验分卷完整性与版本一致性。
+/// 扫描目录中的 Vanta 增量包（01~04），校验分卷完整性与版本一致性。
 /// </summary>
 public static partial class PackageScanner
 {
@@ -14,12 +14,11 @@ public static partial class PackageScanner
         ["mpv-base"] = "Base · 核心播放器",
         ["mpv-extras"] = "Extras · 着色器与运行时",
         ["mpv-fasterwhisper-addon"] = "Faster-Whisper · AI 字幕",
-        ["mpv-lsfg-addon"] = "LSFG · 补帧扩展",
         ["mpv-config"] = "Config · 个人设置",
     };
 
     /// <summary>
-    /// 必选包编号：仅 01 Base 为核心，其余（02~05）均为按需可选。
+    /// 必选包编号：仅 01 Base 为核心，其余（02~04）均为按需可选。
     /// 可选包缺失不阻止安装；默认全部勾选，用户可取消。
     /// </summary>
     private static readonly HashSet<string> RequiredIds = ["01"];

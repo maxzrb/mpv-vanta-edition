@@ -75,9 +75,8 @@
 # --- Faster-Whisper 模型 ---
 /Faster-Whisper-XXL/
 
-# --- 本地 LSFG 研究运行时（不进入公开仓库） ---
-/Lossless Scaling/
-/lsfg-vk/
+# --- 废弃文件（trash：停止接入/淘汰的文件，不进入公开仓库与公开包） ---
+/trash/
 
 # --- 运行时缓存和数据 ---
 /portable_config/cache/
