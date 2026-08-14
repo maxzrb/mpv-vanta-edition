@@ -44,7 +44,7 @@
 
 > 三合一辅助工具：安装 / 卸载 / 设置，单文件自包含、免 .NET 运行时，随 Release 附装。
 
-从 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 下载 `VantaInstaller-win-x64-v0.3.2.exe`，双击即用。
+从 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 下载 `VantaInstaller-win-x64-v0.3.3.exe`，双击即用。
 
 - **安装**：扫描 01~04 增量包（或个人全量包），自动校验完整性，支持覆盖升级与配置备份；可选安装完成后自动注册文件关联。
 - **卸载**：默认备份 `portable_config` 到 `文档\MPV Vanta Edition\uninstall-backups`，删除明细日志，可选清理文件关联。
@@ -79,7 +79,7 @@
 ### 方案一：使用 VantaInstaller（推荐）
 
 下载 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 中的
-`VantaInstaller-win-x64-v0.3.2.exe`，双击运行，在「安装」向导中选择
+`VantaInstaller-win-x64-v0.3.3.exe`，双击运行，在「安装」向导中选择
 包含 01~04 增量包的目录（或直接勾选「下载并安装」），它会自动完成：
 
 - 安装前对每个包做 SHA-256 校验（有风险会提醒，默认取消）
