@@ -19,8 +19,10 @@ $ExtrasArchive  = Join-Path $OutputRoot "02-mpv-extras-v${Version}.7z.001"
 $FwArchive      = Join-Path $OutputRoot "03-mpv-fasterwhisper-addon-v${Version}.7z"
 $ConfigArchive  = Join-Path $OutputRoot "04-mpv-config-v${Version}.7z"
 
-foreach ($required in @($SevenZip, $BaseArchive, $ExtrasArchive, $FwArchive,
-                        $ConfigArchive)) {
+# 03 Faster-Whisper 不合并进私包（个人不用 AI 字幕，加快构建并减小体积），
+# 仅保留 Faster-Whisper-XXL 占位目录与说明；需要时用户自行解压 03 覆盖，
+# 因此私包不要求 03 包存在。
+foreach ($required in @($SevenZip, $BaseArchive, $ExtrasArchive, $ConfigArchive)) {
     if (-not (Test-Path -LiteralPath $required)) {
         throw "缺少个人全量包所需文件：$required"
     }
@@ -69,11 +71,28 @@ function Expand-Package {
     }
 }
 
-# 严格按公开四包的覆盖顺序合并。
+# 严格按公开包的覆盖顺序合并（03 Faster-Whisper 不合并，见下方占位说明）。
 Expand-Package $BaseArchive
 Expand-Package $ExtrasArchive
-Expand-Package $FwArchive
 Expand-Package $ConfigArchive
+
+# Faster-Whisper 占位：私包不携带约 1.4GB 的 AI 字幕运行时。
+# 需要时下载 03-mpv-fasterwhisper-addon-v${Version}.7z，解压覆盖到 mpv 根目录即可
+# （03 包解压内容恰好落在 Faster-Whisper-XXL/，与占位目录同名合并）。
+$FwPlaceholder = Join-Path $Stage 'Faster-Whisper-XXL'
+$null = New-Item -ItemType Directory -Force -Path $FwPlaceholder
+$FwNote = Join-Path $FwPlaceholder '03包解压后覆盖于此.txt'
+@"
+本目录为 Faster-Whisper（AI 字幕）占位目录，私包未合并 03 包（加快构建并减小体积）。
+
+需要 AI 字幕时：
+  1. 下载 03-mpv-fasterwhisper-addon-v${Version}.7z（与私包同版本）
+  2. 用 7-Zip 解压到 mpv 根目录（覆盖本目录即可）
+  3. 重启 mpv，字幕菜单即可使用 Faster-Whisper 识别
+
+注意：03 包版本需与私包一致，避免运行时与配置不匹配。
+"@ | Set-Content -LiteralPath $FwNote -Encoding UTF8
+Write-Host "Faster-Whisper 占位：$FwNote" -ForegroundColor DarkGray
 
 # 打包最新 VantaInstaller（发布时候选已移入 release 目录；按版本号取最大者）
 $InstallerCandidates = @(Get-ChildItem -LiteralPath $OutputRoot -File -Filter 'VantaInstaller-win-x64-v*.exe' `
@@ -100,13 +119,15 @@ MPV 个人私用全量包 v${Version}
 本包按以下顺序合并：
   01. 01-mpv-base-v${Version}.7z
   02. 02-mpv-extras-v${Version}.7z.001/.002
-  03. 03-mpv-fasterwhisper-addon-v${Version}.7z
   04. 04-mpv-config-v${Version}.7z
 
 并携带随包最新的 VantaInstaller（发布候选）：VantaInstaller-win-x64-v*.exe。
 
-这是四个公开包的完整并集，包含播放器、配置、着色器、VapourSynth、Python、
-Faster-Whisper、工具和公开包说明。
+Faster-Whisper（AI 字幕）未合并：保留 Faster-Whisper-XXL 占位目录，
+需要时下载 03-mpv-fasterwhisper-addon-vX.Y.Z.7z 解压覆盖到 mpv 根目录即可。
+
+这是公开包的完整并集，包含播放器、配置、着色器、VapourSynth、Python、
+工具和公开包说明；Faster-Whisper 以占位目录形式保留，未携带运行时。
 解压后即可按项目配置使用。
 
 本包含个人运行时状态与工具，只限个人本地备份和使用。
