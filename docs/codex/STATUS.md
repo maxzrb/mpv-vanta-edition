@@ -2385,3 +2385,10 @@ c:\Program portable\mpv2\
   - `decide_progress_size` 移除 pause/is_idle/eof_reached 隐藏条件，恢复仅按 progress 模式判断；移除 on_prop_is_idle/on_prop_eof_reached 钩子，on_prop_pause 恢复为 request_render。
 - **验证**：隔离环境 + 真实 GPU VO + 渲染日志钩子——迷你线 `bax=1 bbx=1279 bay=717 bby=719`（窗口 1280x720），横向铺满、贴底 1.2px、progress 随播放推进、vis=0；暂停后迷你线仍显示且保持贴底。测试钩子未入库。
 - **边界**：仅改 Timeline.lua，未构建/发布。
+### 2026-08-14 16:00 · VantaInstaller 主题切换不再产生备份 + 清理历史堆积
+
+- **问题**：`UoscThemeService.ApplyTheme` 每次应用主题都把整个 uosc.conf（约 18KB）复制到 `script-opts/backup/uosc-theme-<时间戳>.conf`，无数量上限——8/11 调试一次就积了 12 份，会无限增长。
+- **修复**：主题切换只改 `uosc.conf` 的 `theme=xxx` 一行、不碰其它配置，色板注册表 `uosc-themes.json` 本身已版本化可随时换回，因此 **ApplyTheme 改为不再产生备份**（返回 void）；SettingsViewModel 提示文案去掉"备份：xxx"。
+- **清理**：删除历史 13 份 `uosc-theme-*.conf` 残留（约 230KB，git 已跟踪 12 份 + 未跟踪 1 份），`script-opts/backup/` 现为空。
+- **验证**：单测——应用主题前后 backup 文件数 0→0、theme 正确更新、`menu_submenu_delay`/`progress` 等其它行原样保留；Release 构建 0 警告 0 错误。
+- **边界**：仅安装器逻辑与备份清理；mpv.conf 的 `MpvConfigService.Backup`（保存设置才触发、频率低）保持不变。uosc.conf `theme` 已为用户当前值 lava-orange（一并提交）。

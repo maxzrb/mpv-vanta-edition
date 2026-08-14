@@ -542,8 +542,8 @@ public partial class SettingsViewModel : ObservableObject
 
         try
         {
-            var backup = UoscThemeService.ApplyTheme(ConfigDirectory, SelectedTheme.Id);
-            ThemeMessage = $"已应用 {SelectedTheme.DisplayName}（{SelectedTheme.AccentDisplay}），备份：{Path.GetFileName(backup)}；重启 mpv 后生效。";
+            UoscThemeService.ApplyTheme(ConfigDirectory, SelectedTheme.Id);
+            ThemeMessage = $"已应用 {SelectedTheme.DisplayName}（{SelectedTheme.AccentDisplay}）；重启 mpv 后生效。";
         }
         catch (Exception ex)
         {

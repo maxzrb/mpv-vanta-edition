@@ -86,8 +86,11 @@ public static partial class UoscThemeService
         return defaultId;
     }
 
-    /// <summary>验证主题后备份并写入 uosc.conf，返回备份路径。</summary>
-    public static string ApplyTheme(string configDirectory, string themeId)
+    /// <summary>
+    /// 验证主题后写入 uosc.conf。仅替换 theme 一行，不改动其它配置，
+    /// 因此不产生备份（色板注册表 uosc-themes.json 本身已版本化，可随时换回）。
+    /// </summary>
+    public static void ApplyTheme(string configDirectory, string themeId)
     {
         var registry = LoadRegistry(configDirectory);
         if (!registry.Palettes.Any(p => p.Id.Equals(themeId, StringComparison.OrdinalIgnoreCase)))
@@ -100,13 +103,6 @@ public static partial class UoscThemeService
         {
             throw new FileNotFoundException("未找到 uosc.conf。", path);
         }
-
-        var backupDirectory = Path.Combine(Path.GetDirectoryName(path) ?? configDirectory, "backup");
-        Directory.CreateDirectory(backupDirectory);
-        var backupPath = Path.Combine(
-            backupDirectory,
-            $"uosc-theme-{DateTime.Now:yyyyMMdd-HHmmssfff}.conf");
-        File.Copy(path, backupPath, overwrite: false);
 
         var normalized = File.ReadAllText(path, Encoding.UTF8)
             .Replace("\r\n", "\n", StringComparison.Ordinal)
@@ -131,7 +127,6 @@ public static partial class UoscThemeService
         }
 
         File.WriteAllText(path, string.Join('\n', lines), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        return backupPath;
     }
 
     [GeneratedRegex(@"^[a-z0-9][a-z0-9-]*$", RegexOptions.CultureInvariant)]
