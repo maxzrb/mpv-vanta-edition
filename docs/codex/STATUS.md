@@ -10,7 +10,7 @@
 | **工作区** | 私包内置 VantaInstaller + 发布流程统一候选目录；改动待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.2（已发布） |
-| **上次操作** | 确立备份两级约定：根 backup 用户级不进包，portable_config 下 backup 开发级随包保留 |
+| **上次操作** | VantaInstaller 设置中心新增「菜单交互」：uosc 子菜单弹出延迟可调（默认 0.1s） |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
@@ -2357,3 +2357,12 @@ c:\Program portable\mpv2\
 - **文档**：《发布流程.md》3.2 节新增"备份目录约定（既定发布内容）"说明（开发级进包不触发 Gate）、5 节新增备份约定核验项；AGENTS.md 重要约定新增第 7 条 Backup 两级约定。
 - **实测**：临时 `-Version 9.9.9` 构建 01/05，`7z l` 确认包内包含 `portable_config/backup/mpvconf-*.conf`、`portable_config/script-opts/backup/uosc-theme-*.conf`（12 个）、`portable_config/scripts/backup/stats-original-*.lua`；私用全量包由 01~05 合并自动跟随。产物与 build/ 已清理。
 - **边界**：本次为流程/脚本/约定修改，未实际发布（未定版本号、未建 Release）；《发布流程.md》按用户明确指示修改，仅补充 backup 约定，未改动既有流程规则。
+### 2026-08-14 14:10 · VantaInstaller 暴露 uosc 子菜单弹出延迟（menu_submenu_delay）
+
+- **背景**：用户反馈 uosc 菜单交互慢，定位为 `script-opts/uosc.conf` 的 `menu_submenu_delay`（保护性 0.3s 防误弹出）；用户已调至 0.1s，并要求在 VantaInstaller「mpv 调节」中暴露可调。
+- **新增 `UoscConfigService.cs`**（Vanta.Core.Services）：读写 `uosc.conf` 的 `menu_submenu_delay`，保留注释与行序、缺失键追加、UTF-8/LF、目录自动创建；默认值 0.1。
+- **SettingsViewModel.cs**：新增 `UoscMenuSubmenuDelay`（默认 0.1）、`UoscMenuModified`、`LoadUoscMenuSettings`、`RefreshUoscMenuModified`；`CanSaveMpvSettings` 纳入 uosc；`SaveMpvSettings` 一并写回 uosc.conf。
+- **SettingsView.xaml**：mpv 调节卡片新增「菜单交互」分组（子菜单弹出延迟滑块 0~0.5s，步进 0.05s，显示秒数），说明文案：0 更跟手，调大避免快速扫过父菜单时误弹出。
+- **uosc.conf**：`menu_submenu_delay` 0.3 → 0.1（用户实测值，与安装器默认一致）。
+- **验证**：临时控制台单测 11 项全过（读取/替换键保留注释与其它键/0 整数格式/缺失键追加/缺失文件默认/自动建目录/重新加载）；`dotnet build -c Release` 0 警告 0 错误。
+- **边界**：VantaInstaller 附属工具功能改动不触发发布 Gate；未递增安装器版本号、未 publish 重建、未上传。

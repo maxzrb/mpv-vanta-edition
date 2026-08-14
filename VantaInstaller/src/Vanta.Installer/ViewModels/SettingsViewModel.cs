@@ -240,8 +240,8 @@ public partial class SettingsViewModel : ObservableObject
             EvafastSpeedCap, EvafastSubsSpeedCap, EvafastSubsLimit,
             _evafastInitialSpeedCap, _evafastInitialSubsSpeedCap, _evafastInitialSubsLimit);
 
-    /// <summary>保存按钮可用：mpv.conf 或 evafast 任一有修改</summary>
-    public bool CanSaveMpvSettings => MpvConfigModified || EvafastModified;
+    /// <summary>保存按钮可用：mpv.conf、evafast 或 uosc 任一有修改</summary>
+    public bool CanSaveMpvSettings => MpvConfigModified || EvafastModified || UoscMenuModified;
 
     /// <summary>evafast 设置是否已加载（避免重复读盘）</summary>
     private bool _evafastLoaded;
@@ -260,6 +260,35 @@ public partial class SettingsViewModel : ObservableObject
     private void RefreshEvafastModified()
     {
         OnPropertyChanged(nameof(EvafastModified));
+        OnPropertyChanged(nameof(CanSaveMpvSettings));
+    }
+
+    // ---- 菜单交互（uosc）----
+
+    /// <summary>子菜单 hover 延迟展开（秒），0 更跟手，调大避免快速扫过父菜单时误弹出。</summary>
+    [ObservableProperty]
+    private double _uoscMenuSubmenuDelay = UoscConfigService.DefaultMenuSubmenuDelay;
+
+    /// <summary>加载时的 uosc 初始值（判断是否有未保存修改）</summary>
+    private double _uoscInitialMenuSubmenuDelay = UoscConfigService.DefaultMenuSubmenuDelay;
+
+    /// <summary>uosc 菜单设置是否有未保存修改</summary>
+    public bool UoscMenuModified =>
+        Math.Abs(UoscMenuSubmenuDelay - _uoscInitialMenuSubmenuDelay) >= 0.001;
+
+    /// <summary>uosc 菜单设置是否已加载（避免重复读盘）</summary>
+    private bool _uoscMenuLoaded;
+
+    /// <summary>uosc 菜单设置操作结果。</summary>
+    [ObservableProperty]
+    private string? _uoscMenuMessage;
+
+    partial void OnUoscMenuSubmenuDelayChanged(double value) => RefreshUoscMenuModified();
+
+    /// <summary>刷新 uosc 菜单修改状态与保存按钮可用性</summary>
+    private void RefreshUoscMenuModified()
+    {
+        OnPropertyChanged(nameof(UoscMenuModified));
         OnPropertyChanged(nameof(CanSaveMpvSettings));
     }
 
@@ -377,6 +406,7 @@ public partial class SettingsViewModel : ObservableObject
         RefreshCacheStats();
         LoadUoscThemes();
         LoadEvafastSettings();
+        LoadUoscMenuSettings();
         if (!_mpvLoaded)
         {
             LoadMpvSettings();
@@ -545,6 +575,28 @@ public partial class SettingsViewModel : ObservableObject
         catch (Exception ex)
         {
             EvafastMessage = $"方向键快进设置加载失败：{ex.Message}";
+        }
+    }
+
+    /// <summary>加载 uosc（菜单交互）设置，仅首次/未加载时读取。</summary>
+    private void LoadUoscMenuSettings()
+    {
+        if (_uoscMenuLoaded || !IsInstalled)
+        {
+            return;
+        }
+
+        try
+        {
+            // 先记录初始值，再赋值（赋值触发的 OnUoscMenuSubmenuDelayChanged 会据此判断未修改）
+            _uoscInitialMenuSubmenuDelay = UoscConfigService.LoadMenuSubmenuDelay(ConfigDirectory);
+            UoscMenuSubmenuDelay = _uoscInitialMenuSubmenuDelay;
+            _uoscMenuLoaded = true;
+            RefreshUoscMenuModified();
+        }
+        catch (Exception ex)
+        {
+            UoscMenuMessage = $"菜单交互设置加载失败：{ex.Message}";
         }
     }
 
@@ -1073,6 +1125,14 @@ public partial class SettingsViewModel : ObservableObject
                 savedParts.Add("方向键快进设置");
             }
 
+            // 菜单交互（uosc.conf）有修改时一并保存
+            if (UoscMenuModified)
+            {
+                UoscConfigService.SaveMenuSubmenuDelay(ConfigDirectory, UoscMenuSubmenuDelay);
+                _uoscInitialMenuSubmenuDelay = UoscMenuSubmenuDelay;
+                savedParts.Add("菜单交互设置");
+            }
+
             var baseMsg = backup is null
                 ? "已保存 mpv.conf"
                 : $"已保存 mpv.conf（备份 {Path.GetFileName(backup)}）";
@@ -1081,6 +1141,7 @@ public partial class SettingsViewModel : ObservableObject
                 : $"{baseMsg}，重启 mpv 后生效。";
             MpvConfigModified = false;
             RefreshEvafastModified();
+            RefreshUoscMenuModified();
         }
         catch (Exception ex)
         {

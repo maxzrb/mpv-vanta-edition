@@ -627,6 +627,49 @@
                                         Severity="Informational" Margin="0,12,0,0" />
                         </StackPanel>
 
+                        <!-- 菜单交互（uosc）：独立配置文件，单独保存 -->
+                        <StackPanel Margin="0,18,0,0">
+                            <Border Padding="0,0,0,8" BorderThickness="0,0,0,1"
+                                    BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+                                <TextBlock Text="菜单交互" FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                            </Border>
+
+                            <!-- 子菜单 hover 延迟 -->
+                            <Border BorderThickness="0,0,0,1" Padding="0,10"
+                                    BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+                                        <TextBlock Text="子菜单弹出延迟" FontSize="14"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="鼠标停到带子菜单的项上满该时长才展开子菜单。0 更跟手；调大避免快速扫过父菜单时误弹出。" Margin="0,3,0,0"
+                                                   FontSize="11" TextWrapping="Wrap" LineHeight="16"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Slider Width="140" Minimum="0" Maximum="0.5" TickFrequency="0.05"
+                                                IsSnapToTickEnabled="True"
+                                                Value="{Binding UoscMenuSubmenuDelay, Mode=TwoWay}" />
+                                        <TextBlock Text="{Binding UoscMenuSubmenuDelay, StringFormat={}{0:0.00} 秒}" Width="58"
+                                                   Margin="8,0,0,0" FontSize="12" TextAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <TextBlock Text="写入 script-opts\uosc.conf，与上方 mpv 设置一起保存，重启 mpv 后生效。"
+                                       Margin="0,12,0,0" FontSize="11" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                            <ui:InfoBar IsOpen="{Binding UoscMenuMessage, Converter={StaticResource StringNotEmpty}}"
+                                        Title="{Binding UoscMenuMessage, Mode=OneWay}"
+                                        Severity="Informational" Margin="0,12,0,0" />
+                        </StackPanel>
+
                         <Grid Margin="0,20,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
