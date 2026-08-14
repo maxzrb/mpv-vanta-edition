@@ -6,6 +6,11 @@
 -- Please note: not every property is always available and therefore not always
 -- visible.
 
+
+-- ============================================================
+-- 以下是原版文件内容（保持不变）
+-- ============================================================
+
 local mp = require 'mp'
 local utils = require 'mp.utils'
 local input = require 'mp.input'
@@ -53,8 +58,7 @@ local o = {
     plot_bg_border_width = 1.25,
 
     -- Text style
-    -- 统计标题与普通文本默认跟随内置 HarmonyOS Sans SC。
-    font = "HarmonyOS Sans SC",
+    font = "",
     font_mono = "monospace",   -- monospaced digits are sufficient
     font_size = 20,
     font_color = "",
@@ -328,11 +332,11 @@ local function sorted_keys(t, comp_fn)
 end
 
 local function scroll_hint(search)
-    local hint = format("（提示：滚动用 %s/%s", o.key_scroll_up, o.key_scroll_down)
+    local hint = format("(hint: scroll with %s/%s", o.key_scroll_up, o.key_scroll_down)
     if search then
-        hint = hint .. "，搜索用 " .. o.key_search
+        hint = hint .. " and search with " .. o.key_search
     end
-    hint = hint .. "）"
+    hint = hint .. ")"
     if not o.use_ass then return " " .. hint end
     return format(" {\\fs%s}%s{\\fs%s}", font_size * 0.66, hint, font_size)
 end
@@ -386,8 +390,8 @@ local function append_perfdata(header, s, dedicated_page)
     local h = dedicated_page and header or s
     h[#h+1] = format("%s%s%s%s%s%s%s%s",
                      dedicated_page and "" or o.nl, dedicated_page and "" or o.indent,
-                     bold("帧时间:"), o.prefix_sep, font_small,
-                     "(最近/平均/峰值 μs)", font_normal,
+                     bold("Frame Timings:"), o.prefix_sep, font_small,
+                     "(last/average/peak μs)", font_normal,
                      dedicated_page and scroll_hint() or "")
 
     for _,frame in ipairs(sorted_keys(vo_p)) do  -- ensure fixed display order
@@ -418,7 +422,7 @@ local function append_perfdata(header, s, dedicated_page)
             s[#s+1] = format(f, o.nl, o.indent, o.indent,
                              font_mono, pp(last_s[frame]),
                              pp(avg_s[frame]), pp(peak_s[frame]),
-                             o.prefix_sep, bold("总计"), font, "", "", "")
+                             o.prefix_sep, bold("Total"), font, "", "", "")
         else
             -- for the simplified view, we just print the sum of each pass
             s[#s+1] = format(f, o.nl, o.indent, o.indent, font_mono,
@@ -588,18 +592,18 @@ local function append_display_sync(s)
         return
     end
 
-    local vspeed = append_property(s, "video-speed-correction", {prefix="显示同步:"})
+    local vspeed = append_property(s, "video-speed-correction", {prefix="DS:"})
     if vspeed then
         append_property(s, "audio-speed-correction",
                         {prefix="/", nl="", indent=" ", prefix_sep=" ", no_prefix_markup=true})
     else
         append_property(s, "audio-speed-correction",
-                        {prefix="显示同步:" .. o.prefix_sep .. " - / ", prefix_sep=""})
+                        {prefix="DS:" .. o.prefix_sep .. " - / ", prefix_sep=""})
     end
 
-    append_property(s, "mistimed-frame-count", {prefix="时序错误:", nl="",
+    append_property(s, "mistimed-frame-count", {prefix="Mistimed:", nl="",
                                                 indent=o.prefix_sep .. o.prefix_sep})
-    append_property(s, "vo-delayed-frame-count", {prefix="延迟帧:", nl="",
+    append_property(s, "vo-delayed-frame-count", {prefix="Delayed:", nl="",
                                                   indent=o.prefix_sep .. o.prefix_sep})
 
     -- As we need to plot some graphs we print jitter and ratio on their own lines
@@ -614,14 +618,14 @@ local function append_display_sync(s)
             jitter_graph = generate_graph(vsjitter_buf, vsjitter_buf.pos,
                                           vsjitter_buf.len, vsjitter_buf.max, nil, 0.8, 1)
         end
-        append_property(s, "vsync-ratio", {prefix="垂直同步比:",
+        append_property(s, "vsync-ratio", {prefix="VSync Ratio:",
                                            suffix=o.prefix_sep .. ratio_graph})
-        append_property(s, "vsync-jitter", {prefix="垂直同步抖动:",
+        append_property(s, "vsync-jitter", {prefix="VSync Jitter:",
                                             suffix=o.prefix_sep .. jitter_graph})
     else
         -- Since no graph is needed we can print ratio/jitter on the same line and save some space
-        local vr = append_property(s, "vsync-ratio", {prefix="垂直同步比:"})
-        append_property(s, "vsync-jitter", {prefix="垂直同步抖动:",
+        local vr = append_property(s, "vsync-ratio", {prefix="VSync Ratio:"})
+        append_property(s, "vsync-jitter", {prefix="VSync Jitter:",
                             nl=vr and "" or o.nl,
                             indent=vr and o.prefix_sep .. o.prefix_sep})
     end
@@ -635,7 +639,7 @@ local function append_filters(s, prop, prefix)
     for _,f in ipairs(mp.get_property_native(prop, {})) do
         local n = f.name
         if f.enabled ~= nil and not f.enabled then
-            n = n .. "（已禁用）"
+            n = n .. " (disabled)"
         end
 
         if f.label ~= nil then
@@ -675,14 +679,14 @@ end
 
 
 local function add_file(s, print_cache, print_tags)
-    append(s, "", {prefix="文件:", nl="", indent=""})
+    append(s, "", {prefix="File:", nl="", indent=""})
     append_property(s, "filename", {prefix_sep="", nl="", indent=""})
     if mp.get_property_osd("filename") ~= mp.get_property_osd("media-title") then
-        append_property(s, "media-title", {prefix="标题:"})
+        append_property(s, "media-title", {prefix="Title:"})
     end
 
     if print_tags then
-        append_property(s, "duration", {prefix="时长:"})
+        append_property(s, "duration", {prefix="Duration:"})
         local tags = mp.get_property_native("display-tags")
         local tags_displayed = 0
         for _, tag in ipairs(tags) do
@@ -700,7 +704,7 @@ local function add_file(s, print_cache, print_tags)
     local ed_cond = (edition and editions > 1)
     if ed_cond then
         append_property(s, "edition-list/" .. tostring(edition) .. "/title",
-                       {prefix="版本:"})
+                       {prefix="Edition:"})
         append_property(s, "edition-list/count",
                         {prefix="(" .. tostring(edition + 1) .. "/", suffix=")", nl="",
                          indent=" ", prefix_sep=" ", no_prefix_markup=true})
@@ -708,15 +712,15 @@ local function add_file(s, print_cache, print_tags)
 
     local ch_index = mp.get_property_number("chapter")
     if ch_index and ch_index >= 0 then
-        append_property(s, "chapter-list/" .. tostring(ch_index) .. "/title", {prefix="章节:",
+        append_property(s, "chapter-list/" .. tostring(ch_index) .. "/title", {prefix="Chapter:",
                         nl=ed_cond and "" or o.nl})
         append_property(s, "chapter-list/count",
                         {prefix="(" .. tostring(ch_index + 1) .. " /", suffix=")", nl="",
                          indent=" ", prefix_sep=" ", no_prefix_markup=true})
     end
 
-    local fs = append_property(s, "file-size", {prefix="大小:"})
-    append_property(s, "file-format", {prefix="格式/协议:",
+    local fs = append_property(s, "file-size", {prefix="Size:"})
+    append_property(s, "file-format", {prefix="Format/Protocol:",
                                        nl=fs and "" or o.nl,
                                        indent=fs and o.prefix_sep .. o.prefix_sep})
 
@@ -732,8 +736,8 @@ local function add_file(s, print_cache, print_tags)
     end
     local demuxer_secs = mp.get_property_number("demuxer-cache-duration", 0)
     if demuxer_cache + demuxer_secs > 0 then
-        append(s, utils.format_bytes_humanized(demuxer_cache), {prefix="总缓存:"})
-        append(s, format("%.1f", demuxer_secs), {prefix="(", suffix=" 秒)", nl="",
+        append(s, utils.format_bytes_humanized(demuxer_cache), {prefix="Total Cache:"})
+        append(s, format("%.1f", demuxer_secs), {prefix="(", suffix=" sec)", nl="",
                no_prefix_markup=true, prefix_sep="", indent=o.prefix_sep})
     end
 end
@@ -818,7 +822,7 @@ local function append_hdr(s, hdr, video_out)
     end
 
     -- If we are printing video out parameters it is just display, not mastering
-    local display_prefix = video_out and "显示:" or "母版显示:"
+    local display_prefix = video_out and "Display:" or "Mastering display:"
 
     local indent = ""
     local has_dml = has(hdr["min-luma"], 0.203) or has(hdr["max-luma"], 203)
@@ -835,12 +839,12 @@ local function append_hdr(s, hdr, video_out)
             indent = o.prefix_sep .. o.prefix_sep
         end
         if has_cll then
-            append(s, string.format("%.0f", hdr["max-cll"]), {prefix="最大内容亮度:",
+            append(s, string.format("%.0f", hdr["max-cll"]), {prefix="MaxCLL:",
                                     suffix=" cd/m²", nl="", indent=indent})
             indent = o.prefix_sep .. o.prefix_sep
         end
         if has_fall then
-            append(s, hdr["max-fall"], {prefix="最大帧平均亮度:", suffix=" cd/m²", nl="",
+            append(s, hdr["max-fall"], {prefix="MaxFALL:", suffix=" cd/m²", nl="",
                                         indent=indent})
         end
     end
@@ -852,18 +856,18 @@ local function append_hdr(s, hdr, video_out)
         append(s, "", {prefix="HDR10+:"})
         append(s, format("%.1f / %.1f / %.1f", hdr["scene-max-r"] or 0,
                          hdr["scene-max-g"] or 0, hdr["scene-max-b"] or 0),
-               {prefix="最大RGB:", suffix=" cd/m²", nl="", indent=""})
+               {prefix="MaxRGB:", suffix=" cd/m²", nl="", indent=""})
         append(s, format("%.1f", hdr["scene-avg"] or 0),
-               {prefix="平均:", suffix=" cd/m²", nl="", indent=indent})
+               {prefix="Avg:", suffix=" cd/m²", nl="", indent=indent})
     end
 
     if hdr["max-pq-y"] and hdr["avg-pq-y"] then
         append(s, "", {prefix="PQ(Y):"})
         append(s, format("%.2f cd/m² (%.2f%% PQ)", pq_eotf(hdr["max-pq-y"]),
-                         hdr["max-pq-y"] * 100), {prefix="最大:", nl="",
+                         hdr["max-pq-y"] * 100), {prefix="Max:", nl="",
                          indent=""})
         append(s, format("%.2f cd/m² (%.2f%% PQ)", pq_eotf(hdr["avg-pq-y"]),
-                         hdr["avg-pq-y"] * 100), {prefix="平均:", nl="",
+                         hdr["avg-pq-y"] * 100), {prefix="Avg:", nl="",
                          indent=indent})
     end
 end
@@ -874,26 +878,26 @@ local function append_img_params(s, r, ro)
         return
     end
 
-    append_resolution(s, r, "分辨率:", "w", "h", true)
+    append_resolution(s, r, "Resolution:", "w", "h", true)
     if ro and (r["w"] ~= ro["dw"] or r["h"] ~= ro["dh"]) then
         if ro["crop-w"] and (crop_noop(r["w"], r["h"], ro) or crop_equal(r, ro)) then
             ro["crop-w"] = nil
         end
-        append_resolution(s, ro, "输出分辨率:", "dw", "dh")
+        append_resolution(s, ro, "Output Resolution:", "dw", "dh")
     end
 
     local indent = o.prefix_sep .. o.prefix_sep
     r = ro or r
 
     local pixel_format = r["hw-pixelformat"] or r["pixelformat"]
-    append(s, pixel_format, {prefix="像素格式:"})
-    append(s, r["colorlevels"], {prefix="色阶:", nl="", indent=indent})
+    append(s, pixel_format, {prefix="Format:"})
+    append(s, r["colorlevels"], {prefix="Levels:", nl="", indent=indent})
     if r["chroma-location"] and r["chroma-location"] ~= "unknown" then
-        append(s, r["chroma-location"], {prefix="色度位置:", nl="", indent=indent})
+        append(s, r["chroma-location"], {prefix="Chroma Loc:", nl="", indent=indent})
     end
 
     -- Group these together to save vertical space
-    append(s, r["colormatrix"], {prefix="色彩矩阵:"})
+    append(s, r["colormatrix"], {prefix="Colormatrix:"})
     if r["prim-red-x"] or r["prim-red-y"] or
        r["prim-green-x"] or r["prim-green-y"] or
        r["prim-blue-x"] or r["prim-blue-y"] or
@@ -903,13 +907,13 @@ local function append_img_params(s, r, ro)
                                 r["prim-green-x"] or 0, r["prim-green-y"] or 0,
                                 r["prim-blue-x"] or 0, r["prim-blue-y"] or 0,
                                 r["prim-white-x"] or 0, r["prim-white-y"] or 0),
-            {prefix="色彩原色:", nl="", indent=indent})
-        append(s, r["primaries"], {prefix="in", nl="", indent=" ", prefix_sep=" ",
+            {prefix="Primaries:", nl="", indent=indent})
+        append(s, r["primaries"], {prefix="使用", nl="", indent=" ", prefix_sep=" ",
                                    no_prefix_markup=true})
     else
-        append(s, r["primaries"], {prefix="色彩原色:", nl="", indent=indent})
+        append(s, r["primaries"], {prefix="Primaries:", nl="", indent=indent})
     end
-    append(s, r["gamma"], {prefix="传输函数:", nl="", indent=indent})
+    append(s, r["gamma"], {prefix="Transfer:", nl="", indent=indent})
 end
 
 
@@ -918,9 +922,9 @@ local function append_fps(s, prop, eprop)
     local efps = mp.get_property_osd(eprop)
     local single = eprop == "" or (fps ~= "" and efps ~= "" and fps == efps)
     local unit = prop == "display-fps" and " Hz" or " fps"
-    local suffix = single and "" or " (指定)"
-    local esuffix = single and "" or " (估计)"
-    local prefix = prop == "display-fps" and "刷新率:" or "帧率:"
+    local suffix = single and "" or " (specified)"
+    local esuffix = single and "" or " (estimated)"
+    local prefix = prop == "display-fps" and "Refresh Rate:" or "Frame Rate:"
     local nl = o.nl
     local indent = o.indent
 
@@ -943,24 +947,24 @@ local function add_video_out(s)
         return
     end
 
-    append(s, "", {prefix="显示设备:", nl=o.nl .. o.nl, indent=""})
+    append(s, "", {prefix="Display:", nl=o.nl .. o.nl, indent=""})
     append(s, vo, {prefix_sep="", nl="", indent=""})
 
     append_property(s, "display-names", {prefix_sep="", prefix="(", suffix=")",
                     no_prefix_markup=true, nl="", indent=" "}, nil, true)
     append(s, mp.get_property_native("current-gpu-context"),
-           {prefix="渲染接口:", nl="", indent=o.prefix_sep .. o.prefix_sep})
-    append_property(s, "avsync", {prefix="音视频差:"})
+           {prefix="Context:", nl="", indent=o.prefix_sep .. o.prefix_sep})
+    append_property(s, "avsync", {prefix="A-V:"})
     append_fps(s, "display-fps", "estimated-display-fps")
     if append_property(s, "decoder-frame-drop-count",
-                       {prefix="丢帧:", suffix=" (解码器)"}) then
-        append_property(s, "frame-drop-count", {suffix=" (输出)", nl="", indent=""})
+                       {prefix="Dropped Frames:", suffix=" (decoder)"}) then
+        append_property(s, "frame-drop-count", {suffix=" (output)", nl="", indent=""})
     end
     append_display_sync(s)
     append_perfdata(nil, s, false)
 
     if mp.get_property_native("deinterlace-active") then
-        append_property(s, "deinterlace", {prefix="反交错:"})
+        append_property(s, "deinterlace", {prefix="Deinterlacing:"})
     end
 
     local scale = nil
@@ -982,7 +986,7 @@ local function add_video_out(s)
     if not rt then
         r["w"] = r["crop-w"]
         r["h"] = r["crop-h"]
-        append_resolution(s, r, "分辨率:", "w", "h", true)
+        append_resolution(s, r, "Resolution:", "w", "h", true)
         return
     end
 
@@ -1003,7 +1007,7 @@ local function add_video(s)
     end
 
     local track = mp.get_property_native("current-tracks/video")
-    local track_type = (track and track.image) and "图像:" or "视频:"
+    local track_type = (track and track.image) and "Image:" or "Video:"
     append(s, "", {prefix=track_type, nl=o.nl .. o.nl, indent=""})
     if track then
         if append(s, track["codec-desc"], {prefix_sep="", nl="", indent=""}) then
@@ -1016,7 +1020,7 @@ local function add_video(s)
         end
 
         -- hwdec-current 才是当前实际使用的解码路径；gpu-api/current-gpu-context 只代表渲染接口。
-        -- 旧逻辑过滤了值 no，导致软解时整行消失，容易把图形接口误认为硬解状态。
+        -- 上游将 no（软解）与空值过滤，导致软解时解码方式整行消失；这里改为始终显示。
         local hwdec = mp.get_property_native("hwdec-current")
         local decode_mode = "未知（解码器尚未初始化）"
         if hwdec == "no" then
@@ -1029,7 +1033,7 @@ local function add_video(s)
     end
     local has_prefix = false
     if o.show_frame_info then
-        if append_property(s, "estimated-frame-number", {prefix="帧数:"}) then
+        if append_property(s, "estimated-frame-number", {prefix="Frame:"}) then
             append_property(s, "estimated-frame-count", {indent=" / ", nl="",
                                                         prefix_sep=""})
             has_prefix = true
@@ -1038,26 +1042,26 @@ local function add_video(s)
         if frame_info and frame_info["picture-type"] then
             local attrs = has_prefix and {prefix="(", suffix=")", indent=" ", nl="",
                                           prefix_sep="", no_prefix_markup=true}
-                                      or {prefix="图像类型:"}
+                                      or {prefix="Picture Type:"}
             append(s, frame_info["picture-type"], attrs)
             has_prefix = true
         end
         if frame_info and frame_info["interlaced"] then
             local attrs = has_prefix and {indent=" ", nl="", prefix_sep=""}
-                                      or {prefix="图像类型:"}
-            append(s, "隔行扫描", attrs)
+                                      or {prefix="Picture Type:"}
+            append(s, "Interlaced", attrs)
         end
 
         local timecodes = {
             ["gop-timecode"] = "GOP",
             ["smpte-timecode"] = "SMPTE",
-            ["estimated-smpte-timecode"] = "估计 SMPTE",
+            ["estimated-smpte-timecode"] = "Estimated SMPTE",
         }
         for prop, name in pairs(timecodes) do
             if frame_info and frame_info[prop] then
-                local attrs = has_prefix and {prefix=name .. " 时间码:",
+                local attrs = has_prefix and {prefix=name .. " Timecode:",
                                               indent=o.prefix_sep .. o.prefix_sep, nl=""}
-                                          or {prefix=name .. " 时间码:"}
+                                          or {prefix=name .. " Timecode:"}
                 append(s, frame_info[prop], attrs)
                 break
             end
@@ -1069,8 +1073,8 @@ local function add_video(s)
     end
     append_img_params(s, r, ro)
     append_hdr(s, ro)
-    append_property(s, "video-bitrate", {prefix="码率:"})
-    append_filters(s, "vf", "视频滤镜:")
+    append_property(s, "video-bitrate", {prefix="Bitrate:"})
+    append_filters(s, "vf", "Filters:")
 end
 
 
@@ -1089,7 +1093,7 @@ local function add_audio(s)
         return (a == b or a == nil) and a or (a .. " ➜ " .. b)
     end
 
-    append(s, "", {prefix="音频:", nl=o.nl .. o.nl, indent=""})
+    append(s, "", {prefix="Audio:", nl=o.nl .. o.nl, indent=""})
     local track = mp.get_property_native("current-tracks/audio")
     if track then
         append(s, track["codec-desc"], {prefix_sep="", nl="", indent=""})
@@ -1100,22 +1104,22 @@ local function add_audio(s)
                    no_prefix_markup=true, suffix="]"})
         end
     end
-    append_property(s, "current-ao", {prefix="音频输出:", nl="",
+    append_property(s, "current-ao", {prefix="AO:", nl="",
                                       indent=o.prefix_sep .. o.prefix_sep})
-    local dev = append_property(s, "audio-device", {prefix="设备:"})
-    local ao_mute = mp.get_property_native("ao-mute") and "（静音）" or ""
-    append_property(s, "ao-volume", {prefix="音量:", suffix="%" .. ao_mute,
+    local dev = append_property(s, "audio-device", {prefix="Device:"})
+    local ao_mute = mp.get_property_native("ao-mute") and " (Muted)" or ""
+    append_property(s, "ao-volume", {prefix="AO Volume:", suffix="%" .. ao_mute,
                                      nl=dev and "" or o.nl,
                                      indent=dev and o.prefix_sep .. o.prefix_sep})
     if math.abs(mp.get_property_native("audio-delay")) > 1e-6 then
-        append_property(s, "audio-delay", {prefix="音频延迟:"})
+        append_property(s, "audio-delay", {prefix="A-V delay:"})
     end
-    local cc = append(s, merge(r, ro, "channel-count"), {prefix="声道:"})
-    append(s, merge(r, ro, "format"), {prefix="格式:", nl=cc and "" or o.nl,
+    local cc = append(s, merge(r, ro, "channel-count"), {prefix="Channels:"})
+    append(s, merge(r, ro, "format"), {prefix="Format:", nl=cc and "" or o.nl,
                             indent=cc and o.prefix_sep .. o.prefix_sep})
-    append(s, merge(r, ro, "samplerate"), {prefix="采样率:", suffix=" Hz"})
-    append_property(s, "audio-bitrate", {prefix="码率:"})
-    append_filters(s, "af", "音频滤镜:")
+    append(s, merge(r, ro, "samplerate"), {prefix="Sample Rate:", suffix=" Hz"})
+    append_property(s, "audio-bitrate", {prefix="Bitrate:"})
+    append_filters(s, "af", "Filters:")
 end
 
 
@@ -1252,32 +1256,29 @@ local function add_track(c, t, i)
         return
     end
 
-    local type = t.image and "图像" or t["type"]:sub(1, 1):upper() .. t["type"]:sub(2)
+    local type = t.image and "Image" or t["type"]:sub(1, 1):upper() .. t["type"]:sub(2)
     append(c, "", {prefix=type .. ":", nl=o.nl .. o.nl, indent=""})
     append(c, t["title"], {prefix_sep="", nl="", indent=""})
     append(c, t["id"], {prefix="ID:"})
-    append(c, t["src-id"], {prefix="解复用器 ID:", nl="", indent=o.prefix_sep .. o.prefix_sep})
-    append(c, t["program-id"], {prefix="节目 ID:", nl="", indent=o.prefix_sep .. o.prefix_sep})
-    append(c, t["ff-index"], {prefix="FFmpeg 索引:", nl="", indent=o.prefix_sep .. o.prefix_sep})
-    append(c, t["external-filename"], {prefix="文件:"})
-    append(c, "", {prefix="标志:"})
-    local flag_names = {default="默认", forced="强制", dependent="从属", ["visual-impaired"]="视力障碍",
-                        ["hearing-impaired"]="听力障碍", original="原始", commentary="评论", image="图像",
-                        albumart="专辑封面", external="外部"}
+    append(c, t["src-id"], {prefix="Demuxer ID:", nl="", indent=o.prefix_sep .. o.prefix_sep})
+    append(c, t["program-id"], {prefix="Program ID:", nl="", indent=o.prefix_sep .. o.prefix_sep})
+    append(c, t["ff-index"], {prefix="FFmpeg Index:", nl="", indent=o.prefix_sep .. o.prefix_sep})
+    append(c, t["external-filename"], {prefix="File:"})
+    append(c, "", {prefix="Flags:"})
     local flags = {"default", "forced", "dependent", "visual-impaired",
                    "hearing-impaired", "original", "commentary", "image",
                    "albumart", "external"}
     local any = false
     for _, flag in ipairs(flags) do
         if t[flag] then
-            append(c, flag_names[flag] or flag, {prefix=any and ", " or "", nl="", indent="", prefix_sep=""})
+            append(c, flag, {prefix=any and ", " or "", nl="", indent="", prefix_sep=""})
             any = true
         end
     end
     if not any then
         table.remove(c)
     end
-    if append(c, t["codec-desc"], {prefix="编解码器:"}) then
+    if append(c, t["codec-desc"], {prefix="Codec:"}) then
         append(c, t["codec-profile"], {prefix="[", nl="", indent=" ", prefix_sep="",
                no_prefix_markup=true, suffix="]"})
         if t["codec"] ~= t["decoder"] then
@@ -1285,50 +1286,50 @@ local function add_track(c, t, i)
                    no_prefix_markup=true, suffix="]"})
         end
     end
-    append(c, t["lang"], {prefix="语言:"})
-    append(c, t["demux-channel-count"], {prefix="声道:"})
-    append(c, t["demux-channels"], {prefix="声道布局:"})
-    append(c, t["demux-samplerate"], {prefix="采样率:", suffix=" Hz"})
+    append(c, t["lang"], {prefix="Language:"})
+    append(c, t["demux-channel-count"], {prefix="Channels:"})
+    append(c, t["demux-channels"], {prefix="Channel Layout:"})
+    append(c, t["demux-samplerate"], {prefix="Sample Rate:", suffix=" Hz"})
     local function B(b) return b and string.format("%.2f", b / 1024) end
-    local bitrate = append(c, B(t["demux-bitrate"]), {prefix="码率:", suffix=" kbps"})
-    append(c, B(t["hls-bitrate"]), {prefix="HLS 码率:", suffix=" kbps",
+    local bitrate = append(c, B(t["demux-bitrate"]), {prefix="Bitrate:", suffix=" kbps"})
+    append(c, B(t["hls-bitrate"]), {prefix="HLS Bitrate:", suffix=" kbps",
                                     nl=bitrate and "" or o.nl,
                                     indent=bitrate and o.prefix_sep .. o.prefix_sep})
     append_resolution(c, {w=t["demux-w"], h=t["demux-h"], ["crop-x"]=t["demux-crop-x"],
                           ["crop-y"]=t["demux-crop-y"], ["crop-w"]=t["demux-crop-w"],
-                          ["crop-h"]=t["demux-crop-h"]}, "分辨率:")
+                          ["crop-h"]=t["demux-crop-h"]}, "Resolution:")
     if not t["image"] and t["demux-fps"] then
         append_fps(c, "track-list/" .. i .. "/demux-fps", "")
     end
-    append(c, t["format-name"], {prefix="格式:"})
-    append(c, t["demux-rotation"], {prefix="旋转:"})
+    append(c, t["format-name"], {prefix="Format:"})
+    append(c, t["demux-rotation"], {prefix="Rotation:"})
     if t["demux-par"] then
         local num, den = float2rational(t["demux-par"])
-        append(c, string.format("%d:%d", num, den), {prefix="像素宽高比:"})
+        append(c, string.format("%d:%d", num, den), {prefix="Pixel Aspect Ratio:"})
     end
     local track_rg = t["replaygain-track-peak"] ~= nil or t["replaygain-track-gain"] ~= nil
     local album_rg = t["replaygain-album-peak"] ~= nil or t["replaygain-album-gain"] ~= nil
     if track_rg or album_rg then
-        append(c, "", {prefix="回放增益:"})
+        append(c, "", {prefix="Replay Gain:"})
     end
     if track_rg then
-        append(c, "", {prefix="轨道:", indent=o.indent .. o.prefix_sep, prefix_sep=""})
-        append(c, t["replaygain-track-gain"], {prefix="增益:", suffix=" dB",
+        append(c, "", {prefix="Track:", indent=o.indent .. o.prefix_sep, prefix_sep=""})
+        append(c, t["replaygain-track-gain"], {prefix="Gain:", suffix=" dB",
                                                nl="", indent=o.prefix_sep})
-        append(c, t["replaygain-track-peak"], {prefix="峰值:", suffix=" dB",
+        append(c, t["replaygain-track-peak"], {prefix="Peak:", suffix=" dB",
                                                nl="", indent=o.prefix_sep})
     end
     if album_rg then
-        append(c, "", {prefix="专辑:", indent=o.indent .. o.prefix_sep, prefix_sep=""})
-        append(c, t["replaygain-album-gain"], {prefix="增益:", suffix=" dB",
+        append(c, "", {prefix="Album:", indent=o.indent .. o.prefix_sep, prefix_sep=""})
+        append(c, t["replaygain-album-gain"], {prefix="Gain:", suffix=" dB",
                                                nl="", indent=o.prefix_sep})
-        append(c, t["replaygain-album-peak"], {prefix="峰值:", suffix=" dB",
+        append(c, t["replaygain-album-peak"], {prefix="Peak:", suffix=" dB",
                                                nl="", indent=o.prefix_sep})
     end
     if t["dolby-vision-profile"] or t["dolby-vision-level"] then
-        append(c, "", {prefix="杜比视界:"})
-        append(c, t["dolby-vision-profile"], {prefix="配置文件:", nl="", indent=""})
-        append(c, t["dolby-vision-level"], {prefix="级别:", nl="",
+        append(c, "", {prefix="Dolby Vision:"})
+        append(c, t["dolby-vision-profile"], {prefix="Profile:", nl="", indent=""})
+        append(c, t["dolby-vision-level"], {prefix="Level:", nl="",
                                             indent=t["dolby-vision-profile"] and
                                             o.prefix_sep .. o.prefix_sep or ""})
     end
@@ -1375,18 +1376,18 @@ local function cache_stats()
 
     eval_ass_formatting()
     add_header(stats)
-    append(stats, "", {prefix="缓存信息:", nl="", indent=""})
+    append(stats, "", {prefix="Cache Info:", nl="", indent=""})
 
     local info = mp.get_property_native("demuxer-cache-state")
     if info == nil then
-        append(stats, "不可用。", {})
+        append(stats, "Unavailable.", {})
         return finalize_page({}, stats, false)
     end
 
     local a = info["reader-pts"]
     local b = info["cache-end"]
 
-    append(stats, opt_time(a) .. " - " .. opt_time(b), {prefix = "数据包队列:"})
+    append(stats, opt_time(a) .. " - " .. opt_time(b), {prefix = "Packet Queue:"})
 
     local r = nil
     if a ~= nil and b ~= nil then
@@ -1400,22 +1401,22 @@ local function cache_stats()
                                  nil, 0.8, 1)
         r_graph = o.prefix_sep .. r_graph
     end
-    append(stats, opt_time(r), {prefix = "预读:", suffix = r_graph})
+    append(stats, opt_time(r), {prefix = "Readahead:", suffix = r_graph})
 
     -- These states are not necessarily exclusive. They're about potentially
     -- separate mechanisms, whose states may be decoupled.
-    local state = "读取中"
+    local state = "reading"
     local seek_ts = info["debug-seeking"]
     if seek_ts ~= nil then
-        state = "寻址中 (至 " .. mp.format_time(seek_ts) .. ")"
+        state = "seeking (to " .. mp.format_time(seek_ts) .. ")"
     elseif info["eof"] == true then
-        state = "文件尾"
+        state = "eof"
     elseif info["underrun"] then
-        state = "缓存欠载"
+        state = "underrun"
     elseif info["idle"]  == true then
-        state = "未激活"
+        state = "inactive"
     end
-    append(stats, state, {prefix = "状态:"})
+    append(stats, state, {prefix = "State:"})
 
     local speed = info["raw-input-rate"] or 0
     local speed_graph = nil
@@ -1425,37 +1426,37 @@ local function cache_stats()
                                      nil, 0.8, 1)
         speed_graph = o.prefix_sep .. speed_graph
     end
-    append(stats, utils.format_bytes_humanized(speed) .. "/s", {prefix="速度:",
+    append(stats, utils.format_bytes_humanized(speed) .. "/s", {prefix="Speed:",
         suffix=speed_graph})
 
     append(stats, utils.format_bytes_humanized(info["total-bytes"]),
-           {prefix = "总内存:"})
+           {prefix = "Total RAM:"})
     append(stats, utils.format_bytes_humanized(info["fw-bytes"]),
-           {prefix = "前向内存:"})
+           {prefix = "Forward RAM:"})
 
     local fc = info["file-cache-bytes"]
     if fc ~= nil then
         fc = utils.format_bytes_humanized(fc)
     else
-        fc = "（已禁用）"
+        fc = "(disabled)"
     end
-    append(stats, fc, {prefix = "磁盘缓存:"})
+    append(stats, fc, {prefix = "Disk Cache:"})
 
-    append(stats, info["debug-low-level-seeks"], {prefix = "媒体寻址:"})
-    append(stats, info["debug-byte-level-seeks"], {prefix = "流寻址:"})
+    append(stats, info["debug-low-level-seeks"], {prefix = "Media Seeks:"})
+    append(stats, info["debug-byte-level-seeks"], {prefix = "Stream Seeks:"})
 
-    append(stats, "", {prefix="缓存范围:", nl=o.nl .. o.nl, indent=""})
+    append(stats, "", {prefix="Ranges:", nl=o.nl .. o.nl, indent=""})
 
-    append(stats, info["bof-cached"] and "是" or "否",
-           {prefix = "起始已缓存:"})
-    append(stats, info["eof-cached"] and "是" or "否",
-           {prefix = "末尾已缓存:"})
+    append(stats, info["bof-cached"] and "yes" or "no",
+           {prefix = "Start Cached:"})
+    append(stats, info["eof-cached"] and "yes" or "no",
+           {prefix = "End Cached:"})
 
     local ranges = info["seekable-ranges"] or {}
     for n, range in ipairs(ranges) do
         append(stats, mp.format_time(range["start"]) .. " - " ..
                       mp.format_time(range["end"]),
-               {prefix = format("范围 %s:", n)})
+               {prefix = "Range " .. n .. ":"})
     end
 
     return finalize_page({}, stats, false)
@@ -1484,12 +1485,12 @@ cache_recorder_timer:kill()
 -- Current page and <page key>:<page function> mapping
 curr_page = o.key_page_1
 pages = {
-    [o.key_page_1] = { idx = 1, f = default_stats, desc = "默认信息" },
-    [o.key_page_2] = { idx = 2, f = vo_stats, desc = "扩展帧时间", scroll = true },
-    [o.key_page_3] = { idx = 3, f = cache_stats, desc = "缓存统计" },
-    [o.key_page_4] = { idx = 4, f = keybinding_info, desc = "活跃键位绑定", scroll = true },
-    [o.key_page_5] = { idx = 5, f = track_info, desc = "轨道信息", scroll = true },
-    [o.key_page_0] = { idx = 0, f = perf_stats, desc = "内部性能信息", scroll = true },
+    [o.key_page_1] = { idx = 1, f = default_stats, desc = "Default" },
+    [o.key_page_2] = { idx = 2, f = vo_stats, desc = "Extended Frame Timings", scroll = true },
+    [o.key_page_3] = { idx = 3, f = cache_stats, desc = "Cache Statistics" },
+    [o.key_page_4] = { idx = 4, f = keybinding_info, desc = "Active Key Bindings", scroll = true },
+    [o.key_page_5] = { idx = 5, f = track_info, desc = "Tracks Info", scroll = true },
+    [o.key_page_0] = { idx = 0, f = perf_stats, desc = "Internal Performance Info", scroll = true },
 }
 
 
@@ -1603,7 +1604,7 @@ local remove_page_bindings
 
 local function filter_bindings()
     input.get({
-        prompt = "过滤绑定:",
+        prompt = "Filter bindings:",
         opened = function ()
             -- This is necessary to close the console if the oneshot
             -- display_timer expires without typing anything.
@@ -1844,3 +1845,1169 @@ end
 mp.observe_property('current-window-scale', 'native', update_property_cache)
 mp.observe_property('display-names', 'string', update_property_cache)
 mp.observe_property('hwdec-current', 'string', update_property_cache)
+
+
+
+
+
+-- ============================================================
+-- 自动翻译模块 - 全局替换版（yosh.wang_20260712）（QQ交流群：1097053691）
+-- ============================================================
+
+-- 通用词汇翻译表
+local function auto_translate_text(text)
+    if not text or type(text) ~= "string" then
+        return text
+    end
+
+    local translations = {
+        -- ==================== 页面标题 ====================
+        ["Default"] = "默认信息",
+        ["Extended Frame Timings"] = "扩展帧耗时",
+        ["Cache Statistics"] = "缓存统计",
+        ["Active Key Bindings"] = "活动按键绑定",
+        ["Tracks Info"] = "轨道信息",
+        ["Internal Performance Info"] = "内部性能信息",
+
+        -- ==================== 文件/媒体信息 ====================
+        ["File:"] = "文件：",
+        ["Title:"] = "标题：",
+        ["Duration:"] = "时长：",
+        ["Edition:"] = "版本：",
+        ["Chapter:"] = "章节：",
+        ["Size:"] = "大小：",
+        ["Format/Protocol:"] = "格式/协议：",
+        ["Total Cache:"] = "总缓存：",
+        [" sec)"] = " 秒）",
+        [" sec"] = " 秒",
+        [" fps (specified)"] = " fps（指定）",
+        [" fps (estimated)"] = " fps（估计）",
+        [" fps"] = " fps",
+        [" Hz (specified)"] = " Hz（指定）",
+        [" Hz (estimated)"] = " Hz（估计）",
+        [" Hz"] = " Hz",
+        [" kbps"] = " kbps",
+        [" (specified)"] = "（指定）",
+        [" (estimated)"] = "（估计）",
+
+        -- ==================== 视频/显示器信息 ====================
+        ["Display:"] = "显示器：",
+        ["Context:"] = "渲染后端：",
+        ["A-V:"] = "音视频同步：",
+        ["Refresh Rate:"] = "刷新率：",
+        ["Frame Rate:"] = "帧率：",
+        ["Dropped Frames:"] = "丢帧：",
+        [" (decoder)"] = "（解码器）",
+        [" (output)"] = "（输出）",
+        ["Deinterlacing:"] = "去隔行：",
+        ["Resolution:"] = "分辨率：",
+        ["Output Resolution:"] = "输出分辨率：",
+        ["Format:"] = "格式：",
+        ["Levels:"] = "色彩范围：",
+        ["Chroma Loc:"] = "色度位置：",
+        ["Colormatrix:"] = "色彩矩阵：",
+        ["Primaries:"] = "色域基色：",
+        ["Transfer:"] = "传输函数：",
+        ["Bitrate:"] = "码率：",
+        ["Filters:"] = "滤镜：",
+        ["HW:"] = "硬解：",
+        ["AO:"] = "音频输出：",
+        ["Device:"] = "设备：",
+        ["AO Volume:"] = "音量：",
+        [" (Muted)"] = "（静音）",
+        ["A-V delay:"] = "音视频延迟：",
+        ["Channels:"] = "声道数：",
+        ["Sample Rate:"] = "采样率：",
+
+        -- ==================== 显示同步 ====================
+        ["DS:"] = "显示同步：",
+        ["Mistimed:"] = "错时帧：",
+        ["Delayed:"] = "延迟帧：",
+        ["VSync Ratio:"] = "垂直同步比率：",
+        ["VSync Jitter:"] = "垂直同步抖动：",
+
+        -- ==================== HDR相关 ====================
+        ["Mastering display:"] = "母版显示：",
+        ["MaxCLL:"] = "最大内容亮度：",
+        ["MaxFALL:"] = "最大帧平均亮度：",
+        ["MaxRGB:"] = "最大RGB：",
+        ["Avg:"] = "平均：",
+        [" cd/m²"] = " cd/m²",
+        ["HDR10:"] = "HDR10：",
+        ["HDR10+:"] = "HDR10+：",
+        ["PQ(Y):"] = "PQ(Y)：",
+        ["Max:"] = "最大：",
+        -- ["in"] = "使用",   -- 不启用：模糊匹配会破坏包含 "in" 的英文单词（Container, Vision 等）
+
+        -- ==================== 视频轨道信息 ====================
+        ["Video:"] = "视频：",
+        ["Audio:"] = "音频：",
+        ["Image:"] = "图像：",
+        ["Frame:"] = "帧：",
+        ["Picture Type:"] = "画面类型：",
+        ["Interlaced"] = "隔行扫描",
+        ["Timecode:"] = "时间码：",
+        ["GOP"] = "GOP",
+        ["SMPTE"] = "SMPTE",
+        ["Estimated SMPTE"] = "估计SMPTE",
+        ["GOP Timecode:"] = "GOP时间码：",
+        ["SMPTE Timecode:"] = "SMPTE时间码：",
+        ["Estimated SMPTE Timecode:"] = "估计SMPTE时间码：",
+
+        -- ==================== 帧耗时页面 ====================
+        ["Frame Timings:"] = "帧耗时：",
+        ["Total"] = "总计",
+        ["(last/average/peak μs)"] = "（最新/平均/峰值 微秒）",
+
+        -- ==================== 缓存信息 ====================
+        ["Cache Info:"] = "缓存信息：",
+        ["Packet Queue:"] = "数据包队列：",
+        ["Readahead:"] = "预读：",
+        ["State:"] = "状态：",
+        ["reading"] = "读取中",
+        ["eof"] = "文件尾",
+        ["underrun"] = "缓存不足",
+        ["inactive"] = "空闲",
+        ["seeking"] = "定位中",
+        ["Speed:"] = "速度：",
+        ["Total RAM:"] = "总内存：",
+        ["Forward RAM:"] = "前向内存：",
+        ["Disk Cache:"] = "磁盘缓存：",
+        ["(disabled)"] = "（已禁用）",
+        ["Media Seeks:"] = "媒体定位：",
+        ["Stream Seeks:"] = "流定位：",
+        ["Ranges:"] = "范围：",
+        ["Start Cached:"] = "起始已缓存：",
+        ["End Cached:"] = "结尾已缓存：",
+        ["Range "] = "范围 ",
+        ["Unavailable."] = "不可用。",
+        ["yes"] = "是",
+        ["no"] = "否",
+
+        -- ==================== 按键绑定页面 ====================
+        ["script: "] = "脚本：",
+        ["[unknown]"] = "[未知]",
+        ["Filter bindings:"] = "过滤绑定：",
+        ["(hint: scroll with "] = "（提示：使用 ",
+        [" and search with "] = " 滚动，使用 ",
+
+        -- ==================== 轨道信息页面 ====================
+        ["ID:"] = "ID：",
+        ["Demuxer ID:"] = "解复用器ID：",
+        ["Program ID:"] = "节目ID：",
+        ["FFmpeg Index:"] = "FFmpeg索引：",
+        ["Flags:"] = "标志：",
+        ["Codec:"] = "编解码器：",
+        ["Language:"] = "语言：",
+        ["Channel Layout:"] = "声道布局：",
+        ["HLS Bitrate:"] = "HLS码率：",
+        ["Rotation:"] = "旋转：",
+        ["Pixel Aspect Ratio:"] = "像素宽高比：",
+        ["Replay Gain:"] = "重放增益：",
+        ["Track:"] = "音轨：",
+        ["Album:"] = "专辑：",
+        ["Gain:"] = "增益：",
+        ["Peak:"] = "峰值：",
+        ["Dolby Vision:"] = "杜比视界：",
+        ["Profile:"] = "配置文件：",
+        ["Level:"] = "级别：",
+        ["default"] = "默认",
+        ["forced"] = "强制",
+        ["dependent"] = "依赖",
+        ["visual-impaired"] = "视觉障碍",
+        ["hearing-impaired"] = "听觉障碍",
+        ["original"] = "原始",
+        ["commentary"] = "解说",
+        ["albumart"] = "专辑封面",
+        ["external"] = "外部",
+
+        -- ==================== 滤镜相关 ====================
+        [" (disabled)"] = "（已禁用）",
+    }
+
+    -- 精确匹配
+    local result = translations[text]
+    if result then
+        return result
+    end
+
+    -- 模糊匹配（跳过过短的键，防止破坏包含短英文单词的文本）
+    for en, zh in pairs(translations) do
+        if #en >= 4 and text:find(en, 1, true) then
+            text = text:gsub(en, zh, 1)
+        end
+    end
+
+    return text
+end
+
+-- ==================== 性能标签翻译 ====================
+local perf_translations = {
+    ["poll-time"] = "轮询耗时",
+    ["demuxer/thread"] = "解封装/线程",
+    ["main/iterations"] = "主循环/单次",
+    ["main/thread"] = "主循环/线程",
+    ["osd/osd-render/cpu"] = "OSD渲染/CPU",
+    ["osd/osd-render/time"] = "OSD渲染/总时",
+    ["osd/sub-render/cpu"] = "字幕渲染/CPU",
+    ["osd/sub-render/time"] = "字幕渲染/总时",
+    ["vo/iterations"] = "视频输出/单次",
+    ["vo/video-draw/cpu"] = "视频输出/绘制/CPU",
+    ["vo/video-draw/time"] = "视频输出/绘制/总时",
+    ["vo/video-flip/cpu"] = "视频输出/提交/CPU",
+    ["vo/video-flip/time"] = "视频输出/提交/总时",
+}
+
+-- 保存原始函数
+local original_append_general_perfdata = append_general_perfdata
+
+-- 重写性能数据函数
+append_general_perfdata = function(s)
+    for i, data in ipairs(mp.get_property_native("perf-info") or {}) do
+        local display_name = perf_translations[data.name]
+        if not display_name and data.name:match("^script/") then
+            display_name = data.name:gsub("^script/", "脚本/")
+        elseif not display_name then
+            display_name = data.name
+        end
+
+        append(s, data.text or data.value, {prefix="["..tostring(i).."] "..display_name.."："})
+
+        if o.plot_perfdata and o.use_ass and data.value then
+            local buf = perf_buffers[data.name]
+            if not buf then
+                buf = {0, pos = 1, len = 50, max = 0}
+                perf_buffers[data.name] = buf
+            end
+            graph_add_value(buf, data.value)
+            s[#s] = s[#s] .. generate_graph(buf, buf.pos, buf.len, buf.max, nil, 0.8, 1)
+        end
+    end
+end
+
+-- ==================== 重写核心翻译函数 ====================
+-- 保存原始函数
+local original_append = append
+local original_append_property = append_property
+local original_scroll_hint = scroll_hint
+local original_cmd_subject = cmd_subject
+
+-- 重写 append
+append = function(s, str, attr)
+    if str and type(str) == "string" then
+        str = auto_translate_text(str)
+    end
+    if attr then
+        if attr.prefix then
+            attr.prefix = auto_translate_text(attr.prefix)
+        end
+        if attr.suffix then
+            attr.suffix = auto_translate_text(attr.suffix)
+        end
+    end
+    return original_append(s, str, attr)
+end
+
+-- 重写 append_property
+append_property = function(s, prop, attr, excluded, cached)
+    if attr then
+        if attr.prefix then
+            attr.prefix = auto_translate_text(attr.prefix)
+        end
+        if attr.suffix then
+            attr.suffix = auto_translate_text(attr.suffix)
+        end
+    end
+    return original_append_property(s, prop, attr, excluded, cached)
+end
+
+-- 重写 scroll_hint
+scroll_hint = function(search)
+    local hint = original_scroll_hint(search)
+    return auto_translate_text(hint)
+end
+
+-- 重写 cmd_subject
+cmd_subject = function(cmd)
+    local result = original_cmd_subject(cmd)
+    return auto_translate_text(result)
+end
+
+-- ==================== 翻译页面描述 ====================
+for k, page in pairs(pages) do
+    if page.desc then
+        page.desc = auto_translate_text(page.desc)
+    end
+end
+
+-- ============================================================
+-- 自动翻译模块结束
+-- ============================================================
+
+
+
+-- ============================================================
+-- 系统 CPU / GPU 占用率获取模块（yosh.wang_20260712）（QQ交流群：1097053691）
+-- ============================================================
+
+local cpu_usage = "N/A"
+local gpu_usages = {}
+local cpu_name = nil
+local gpu_names = {}
+local hw_detected = false
+local stats_refresh_timer = nil
+local update_counter = 0
+local sys_lang = nil
+local nvidia_smi_usage = nil  -- nvidia-smi 最新返回的数值，用于 LUID 归属识别
+
+-- 异步执行系统命令
+local function run_async(cmd_args, callback)
+    mp.command_native_async({
+        name = "subprocess",
+        args = cmd_args,
+        capture_stdout = true,
+        capture_stderr = true,
+        playback_only = false,
+    }, function(success, res)
+        if callback then
+            callback(success, res and (res.stdout or "") or "", res and (res.stderr or "") or "")
+        end
+    end)
+end
+
+-- 强制刷新页面
+local function refresh_display()
+    if display_timer and display_timer:is_enabled() and curr_page then
+        local ass_content = pages[curr_page].f(false)
+        if o.persistent_overlay then
+            mp.set_osd_ass(0, 0, ass_content)
+        else
+            mp.osd_message((o.use_ass and ass_start or "") .. ass_content,
+                           display_timer.oneshot and o.duration or o.redraw_delay + 1)
+        end
+    end
+end
+
+-- 检测系统语言（缓存结果）
+local function detect_sys_lang(callback)
+    if sys_lang then
+        callback(sys_lang)
+        return
+    end
+    run_async({"typeperf", "-q", "Processor"}, function(success, stdout)
+        if success and stdout:match("Processor") then
+            sys_lang = "en"
+            callback("en")
+            return
+        end
+        run_async({"typeperf", "-q", "处理器"}, function(success2, stdout2)
+            if success2 and stdout2:match("处理器") then
+                sys_lang = "zh"
+                callback("zh")
+                return
+            end
+            sys_lang = "en"
+            callback("en")
+        end)
+    end)
+end
+
+-- 判断是否为虚拟 GPU
+local function is_virtual_gpu(name)
+    if not name then return true end
+    local lower = name:lower()
+    local virtual_keywords = {
+        "virtual", "remote", "hyper-v", "hyperv", "microsoft basic",
+        "basic render", "standard vga", "vms3d", "vmware", "virtualbox",
+        "parallels", "citrix", "rdp", "wddm", "render only",
+        "oray", "orayldd", "sunflower", "向日葵"
+    }
+    for _, kw in ipairs(virtual_keywords) do
+        if lower:find(kw, 1, true) then
+            return true
+        end
+    end
+    return false
+end
+
+-- 判断是否为集显（iGPU）
+local function is_integrated_gpu(name)
+    if not name then return false end
+    local lower = name:lower()
+    -- NVIDIA 始终是独显
+    if lower:find("nvidia", 1, true) or lower:find("geforce", 1, true)
+       or lower:find("rtx", 1, true) or lower:find("gtx", 1, true) then
+        return false
+    end
+    -- Intel Arc 是独显
+    if lower:find("arc", 1, true) then return false end
+    -- AMD Radeon RX 系列是独显；Radeon 带 M 后缀或 "Graphics" 是集显
+    if lower:find("radeon", 1, true) then
+        if lower:find("rx ", 1, true) then return false end
+        return true
+    end
+    -- Intel UHD / Iris / HD Graphics 是集显
+    if lower:find("uhd", 1, true) or lower:find("iris", 1, true)
+       or lower:find("hd graphics", 1, true) then
+        return true
+    end
+    return false
+end
+
+-- 检测 CPU / GPU 硬件型号（只检测一次，缓存结果）
+-- 注意：wmic 在 Windows 11 中已被移除，优先使用 PowerShell Get-CimInstance
+local function detect_hardware()
+    if hw_detected then return end
+    hw_detected = true
+
+    local os_name = mp.get_property("platform", "unknown")
+    if os_name ~= "windows" then return end
+
+    -- CPU 型号：优先 CIM，备用注册表
+    run_async({"powershell", "-NoProfile", "-Command",
+               "(Get-CimInstance Win32_Processor).Name"}, function(success, stdout)
+        if success then
+            local name = stdout:match("^(.-)[\r\n]*$")
+            if name and #name > 0 then
+                name = name:gsub("^%s+", ""):gsub("%s+$", "")
+                cpu_name = name
+                refresh_display()
+                return
+            end
+        end
+        -- 备用：注册表
+        run_async({"reg", "query", "HKLM\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", "/v", "ProcessorNameString"}, function(success2, stdout2)
+            if success2 then
+                local name2 = stdout2:match("ProcessorNameString%s+REG_SZ%s+(.-)[\r\n]")
+                if name2 and #name2 > 0 then
+                    name2 = name2:gsub("^%s+", ""):gsub("%s+$", "")
+                    cpu_name = name2
+                    refresh_display()
+                end
+            end
+        end)
+    end)
+
+    -- GPU 型号：优先 CIM（收集所有真实 GPU），备用注册表
+    run_async({"powershell", "-NoProfile", "-Command",
+               "Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name"}, function(success, stdout)
+        local found = {}
+        if success then
+            for name in stdout:gmatch("[^\r\n]+") do
+                name = name:gsub("^%s+", ""):gsub("%s+$", "")
+                if #name > 0 and not is_virtual_gpu(name) then
+                    local dup = false
+                    for _, n in ipairs(found) do
+                        if n == name then dup = true; break end
+                    end
+                    if not dup then
+                        table.insert(found, name)
+                    end
+                end
+            end
+        end
+        if #found > 0 then
+            gpu_names = found
+            -- 排序：集显在前，独显在后
+            table.sort(gpu_names, function(a, b)
+                local a_int = is_integrated_gpu(a)
+                local b_int = is_integrated_gpu(b)
+                if a_int ~= b_int then return a_int end
+                return false
+            end)
+            for _, n in ipairs(gpu_names) do
+                gpu_usages[n] = "N/A"
+            end
+            refresh_display()
+            return
+        end
+        -- 备用：注册表（遍历 0000、0001、0002... 检测所有 GPU）
+        local reg_base = "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}"
+        local found_reg = {}
+        local function probe_reg_gpu(idx)
+            local subkey = string.format("%04d", idx)
+            run_async({"reg", "query", reg_base .. "\\" .. subkey, "/v", "DriverDesc"}, function(success3, stdout3)
+                if success3 then
+                    local name3 = stdout3:match("DriverDesc%s+REG_SZ%s+(.-)[\r\n]")
+                    if name3 and #name3 > 0 then
+                        name3 = name3:gsub("^%s+", ""):gsub("%s+$", "")
+                        if #name3 > 0 and not is_virtual_gpu(name3) then
+                            local dup = false
+                            for _, n in ipairs(found_reg) do
+                                if n == name3 then dup = true; break end
+                            end
+                            if not dup then
+                                table.insert(found_reg, name3)
+                            end
+                        end
+                        probe_reg_gpu(idx + 1)
+                        return
+                    end
+                end
+                if #found_reg > 0 then
+                    gpu_names = found_reg
+                    -- 排序：集显在前，独显在后
+                    table.sort(gpu_names, function(a, b)
+                        local a_int = is_integrated_gpu(a)
+                        local b_int = is_integrated_gpu(b)
+                        if a_int ~= b_int then return a_int end
+                        return false
+                    end)
+                    for _, n in ipairs(gpu_names) do
+                        gpu_usages[n] = "N/A"
+                    end
+                    refresh_display()
+                end
+            end)
+        end
+        probe_reg_gpu(0)
+    end)
+end
+
+-- ============================================================
+-- CPU 占用率获取（Windows）
+-- ============================================================
+
+-- 方案1：CIM（兼容 Windows 10+，wmic 在 Win11 中已移除）
+local function update_cpu_cim(callback)
+    run_async({"powershell", "-NoProfile", "-Command",
+               "(Get-CimInstance Win32_Processor).LoadPercentage"}, function(success, stdout)
+        if success then
+            local load = stdout:match("(%d+)")
+            if load and tonumber(load) and tonumber(load) <= 100 then
+                callback(load)
+                return
+            end
+        end
+        callback(nil)
+    end)
+end
+
+-- 方案2：typeperf（稳定，支持中英文）
+local function update_cpu_typeperf(callback)
+    detect_sys_lang(function(lang)
+        local counter = lang == "zh"
+            and "\\处理器(_Total)\\%% 处理器时间"
+            or "\\Processor(_Total)\\%% Processor Time"
+        run_async({"typeperf", counter, "-sc", "1"}, function(success, stdout)
+            if success then
+                local load = stdout:match(",\"(%d+%.?%d*)\"")
+                if load and tonumber(load) and tonumber(load) <= 100 then
+                    callback(load)
+                    return
+                end
+            end
+            -- 再试另一种语言
+            local counter2 = lang == "zh"
+                and "\\Processor(_Total)\\%% Processor Time"
+                or "\\处理器(_Total)\\%% 处理器时间"
+            run_async({"typeperf", counter2, "-sc", "1"}, function(success2, stdout2)
+                if success2 then
+                    local load2 = stdout2:match(",\"(%d+%.?%d*)\"")
+                    if load2 and tonumber(load2) and tonumber(load2) <= 100 then
+                        callback(load2)
+                        return
+                    end
+                end
+                callback(nil)
+            end)
+        end)
+    end)
+end
+
+-- 方案3：PowerShell Get-Counter（最后备选）
+local function update_cpu_powershell(callback)
+    detect_sys_lang(function(lang)
+        local counter = lang == "zh"
+            and "\\处理器(_Total)\\% 处理器时间"
+            or "\\Processor(_Total)\\% Processor Time"
+        run_async({"powershell", "-NoProfile", "-Command",
+            "Get-Counter '" .. counter .. "' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty CounterSamples | Select-Object -ExpandProperty CookedValue"
+        }, function(success, stdout)
+            if success then
+                local load = stdout:match("(%d+%.?%d*)")
+                if load and tonumber(load) and tonumber(load) <= 100 then
+                    callback(load)
+                    return
+                end
+            end
+            callback(nil)
+        end)
+    end)
+end
+
+-- ============================================================
+-- GPU 占用率获取（Windows）
+-- ============================================================
+
+-- 方案1：nvidia-smi（只支持 NVIDIA 显卡，最准确）
+local function update_gpu_nvidia(callback)
+    run_async({"nvidia-smi", "--query-gpu=utilization.gpu", "--format=csv,noheader,nounits"}, function(success, stdout)
+        if success then
+            local load = stdout:match("(%d+)")
+            if load and tonumber(load) and tonumber(load) <= 100 then
+                callback(load)
+                return
+            end
+        end
+        callback(nil)
+    end)
+end
+
+-- 方案2：CIM GPU 性能计数器（兼容性最好，与系统语言无关，支持多 GPU 分组）
+-- wmic 在 Win11 中已移除，改用 PowerShell Get-CimInstance
+local function update_gpu_cim(callback)
+    run_async({"powershell", "-NoProfile", "-Command",
+               "Get-CimInstance Win32_PerfFormattedData_GPUPerformanceCounters_GPUEngine | ForEach-Object { Write-Output ($_.Name + '|' + $_.UtilizationPercentage) }"},
+              function(success, stdout)
+        if success then
+            -- 返回所有引擎的原始数据（key=完整引擎名，value=利用率）
+            local engines = {}
+            for line in stdout:gmatch("[^\r\n]+") do
+                local name, util = line:match("^(.-)|(%d+)$")
+                if name and util then
+                    local val = tonumber(util)
+                    if val and val >= 0 and val <= 100 then
+                        name = name:gsub("^%s+", ""):gsub("%s+$", "")
+                        engines[name] = val
+                    end
+                end
+            end
+            if next(engines) then
+                callback(engines)
+                return
+            end
+        end
+        callback(nil)
+    end)
+end
+
+-- 方案3：typeperf GPU 引擎（支持中英文，支持多 GPU 分组）
+-- typeperf CSV 输出：
+--   行1（表头）: "\\COMPUTER\GPU Engine(pid_..._engtype_3D)\Utilization Percentage",...
+--   行2（数据）: "07/12/2026 15:30:45.123","0.000","15.000",...
+--   行3（收尾）: "Exiting..." / "退出代码..."
+-- 需要按列位置匹配表头与数据（跳过第1列=时间戳）
+local function parse_typeperf_engines(stdout)
+    if not stdout then return nil end
+    local lines = {}
+    for line in stdout:gmatch("[^\r\n]+") do
+        lines[#lines + 1] = line
+        if #lines >= 2 then break end
+    end
+    if #lines < 2 then return nil end
+    -- 解析表头列（完整计数器路径）
+    local headers = {}
+    for h in lines[1]:gmatch('"([^"]*)"') do
+        headers[#headers + 1] = h
+    end
+    -- 解析数据列（第1列为时间戳）
+    local values = {}
+    for v in lines[2]:gmatch('"([^"]*)"') do
+        values[#values + 1] = v
+    end
+    -- 按列位置匹配，跳过第1列（表头标签/数据时间戳）
+    local engines = {}
+    for i = 2, #headers do
+        local path = headers[i]
+        local val_str = values[i]
+        if path and val_str then
+            local val = tonumber(val_str)
+            if val and val >= 0 and val <= 100 then
+                local engine_name = path:match("GPU[Ee]ngine%(([^)]+)%)")
+                if engine_name then
+                    engines[engine_name] = val
+                end
+            end
+        end
+    end
+    return next(engines) and engines or nil
+end
+
+local function update_gpu_typeperf(callback)
+    detect_sys_lang(function(lang)
+        local counter = lang == "zh"
+            and "\\GPU 引擎(*)\\利用率百分比"
+            or "\\GPU Engine(*)\\Utilization Percentage"
+        run_async({"typeperf", counter, "-sc", "1"}, function(success, stdout)
+            if success then
+                local engines = parse_typeperf_engines(stdout)
+                if engines then
+                    callback(engines)
+                    return
+                end
+            end
+            -- 再试另一种语言
+            local counter2 = lang == "zh"
+                and "\\GPU Engine(*)\\Utilization Percentage"
+                or "\\GPU 引擎(*)\\利用率百分比"
+            run_async({"typeperf", counter2, "-sc", "1"}, function(success2, stdout2)
+                if success2 then
+                    local engines = parse_typeperf_engines(stdout2)
+                    if engines then
+                        callback(engines)
+                        return
+                    end
+                end
+                callback(nil)
+            end)
+        end)
+    end)
+end
+
+-- 方案4：PowerShell Get-Counter（最后备选，单值）
+local function update_gpu_powershell(callback)
+    detect_sys_lang(function(lang)
+        local counter = lang == "zh"
+            and "\\GPU 引擎(*)\\利用率百分比"
+            or "\\GPU Engine(*)\\Utilization Percentage"
+        local ps_cmd = "Get-Counter '" .. counter .. "' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty CounterSamples | ForEach-Object { $_.CookedValue } | Sort-Object -Descending | Select-Object -First 1"
+        run_async({"powershell", "-NoProfile", "-Command", ps_cmd}, function(success, stdout)
+            if success then
+                local load = stdout:match("(%d+%.?%d*)")
+                if load and tonumber(load) and tonumber(load) <= 100 then
+                    callback(load)
+                    return
+                end
+            end
+            callback(nil)
+        end)
+    end)
+end
+
+-- ============================================================
+-- 统一入口
+-- ============================================================
+
+-- 判断是否为 NVIDIA 显卡
+local function is_nvidia_gpu(name)
+    if not name then return false end
+    local lower = name:lower()
+    return lower:find("nvidia", 1, true)
+        or lower:find("geforce", 1, true)
+        or lower:find("rtx", 1, true)
+        or lower:find("gtx", 1, true)
+end
+
+-- 把分组数据应用到 gpu_usages（跳过 NVIDIA 显卡，N 卡数据以 nvidia-smi 为准）
+-- 引擎名格式：pid_X_luid_0xLOW_0xHIGH_phys_Y_eng_Z_engtype_TYPE
+-- 引擎名不含显卡名称，而是用 LUID 标识 GPU，因此按 LUID 分组
+-- 通过 nvidia-smi 的值匹配找出 NVIDIA 的 LUID 并跳过，其余 LUID 分配给非 N 卡
+local function apply_gpu_usage_map(gpu_map, fmt)
+    if not gpu_map then return false end
+    local updated = false
+    -- 按 LUID 分组，收集每个 LUID 的引擎数据
+    local luid_data = {}      -- luid -> { max_val=0, val_3d=0, has_3d=false, eng_types={} }
+    local luid_order = {}     -- 保持 LUID 出现顺序
+    for engine_name, util in pairs(gpu_map) do
+        local luid = engine_name:match("luid_(0x%x+_0x%x+)") or "unknown"
+        if not luid_data[luid] then
+            luid_data[luid] = { max_val = 0, val_3d = 0, has_3d = false, eng_types = {} }
+            luid_order[#luid_order + 1] = luid
+        end
+        local val = tonumber(util)
+        if val and val >= 0 and val <= 100 then
+            if val > luid_data[luid].max_val then
+                luid_data[luid].max_val = val
+            end
+            -- 记录引擎类型（用于过滤虚拟显卡：虚拟显卡只有 3D 引擎）
+            local etype = engine_name:match("engtype_(.+)$")
+            if etype then luid_data[luid].eng_types[etype:lower()] = true end
+            -- 检查是否是 3D 引擎（engtype_3D）
+            if engine_name:lower():find("engtype_3d", 1, true) then
+                if not luid_data[luid].has_3d or val > luid_data[luid].val_3d then
+                    luid_data[luid].has_3d = true
+                    luid_data[luid].val_3d = val
+                end
+            end
+        end
+    end
+    -- 过滤虚拟显卡 LUID（只有 3D 引擎、没有其他引擎类型的 LUID）
+    -- 如 OrayIddDriver 等间接显示驱动只有 engtype_3D 实例
+    local filtered_order = {}
+    for _, luid in ipairs(luid_order) do
+        local types = luid_data[luid].eng_types
+        local non_3d = false
+        for t, _ in pairs(types) do
+            if t ~= "3d" then non_3d = true; break end
+        end
+        if non_3d or not next(types) then
+            filtered_order[#filtered_order + 1] = luid
+        end
+    end
+    luid_order = filtered_order
+    if #luid_order == 0 then return false end
+
+    -- 计算每个 LUID 的代表利用率（优先 3D 引擎，否则取最大值）
+    local luid_utils = {}
+    for i, luid in ipairs(luid_order) do
+        local d = luid_data[luid]
+        luid_utils[i] = {
+            luid = luid,
+            util = d.has_3d and d.val_3d or d.max_val,
+        }
+    end
+
+    -- 通过 nvidia-smi 值识别 NVIDIA 的 LUID（取差值最小的，容差 ±15）
+    local nvidia_luid_idx = nil
+    -- 参考值：优先使用本轮 nvidia-smi 值，其次使用上一轮残留的 N 卡利用率
+    local nv_ref = nvidia_smi_usage
+    if not nv_ref then
+        for _, gname in ipairs(gpu_names) do
+            if is_nvidia_gpu(gname) and gpu_usages[gname] then
+                local prev = tonumber(gpu_usages[gname]:match("(%d+)"))
+                if prev then
+                    nv_ref = prev
+                    break
+                end
+            end
+        end
+    end
+    if nv_ref and #luid_utils > 1 then
+        local nv_val = tonumber(nv_ref)
+        if nv_val then
+            local best_diff = math.huge
+            for i, lu in ipairs(luid_utils) do
+                local diff = math.abs(lu.util - nv_val)
+                if diff < best_diff then
+                    best_diff = diff
+                    nvidia_luid_idx = i
+                end
+            end
+            if best_diff > 15 then
+                nvidia_luid_idx = nil
+            end
+        end
+    end
+    -- 单 N 卡系统兜底：只有 1 个 LUID 且有 NVIDIA 显卡时，直接将该 LUID 分配给 N 卡
+    if not nvidia_luid_idx and #luid_utils == 1 then
+        for _, gname in ipairs(gpu_names) do
+            if is_nvidia_gpu(gname) then
+                nvidia_luid_idx = 1
+                break
+            end
+        end
+    end
+    -- 兜底：有 N 卡但没能通过值匹配识别 LUID 时，跳过利用率最高的 LUID
+    -- （mpv 硬解通常在 N 卡上，负载高于集显）
+    if not nvidia_luid_idx and #luid_utils > 1 then
+        local has_nv = false
+        for _, gname in ipairs(gpu_names) do
+            if is_nvidia_gpu(gname) then has_nv = true; break end
+        end
+        if has_nv then
+            local max_util = -1
+            for i, lu in ipairs(luid_utils) do
+                if lu.util > max_util then
+                    max_util = lu.util
+                    nvidia_luid_idx = i
+                end
+            end
+        end
+    end
+
+    -- 收集非 NVIDIA 显卡名称（按检测顺序）
+    local non_nv_names = {}
+    for _, gname in ipairs(gpu_names) do
+        if not is_nvidia_gpu(gname) then
+            non_nv_names[#non_nv_names + 1] = gname
+        end
+    end
+
+    -- 将非 NVIDIA 的 LUID 分配给非 N 卡（按顺序）
+    local non_nv_idx = 1
+    for i, lu in ipairs(luid_utils) do
+        if i == nvidia_luid_idx then
+            -- 跳过 NVIDIA LUID（已由 nvidia-smi 更新）
+        else
+            if non_nv_idx <= #non_nv_names then
+                local gname = non_nv_names[non_nv_idx]
+                gpu_usages[gname] = fmt and string.format(fmt, lu.util)
+                                   or (tostring(lu.util) .. "%")
+                updated = true
+                non_nv_idx = non_nv_idx + 1
+            elseif #gpu_names == 0 then
+                -- 没检测到型号，记个总的
+                gpu_usages["__total__"] = fmt and string.format(fmt, lu.util)
+                                        or (tostring(lu.util) .. "%")
+                updated = true
+            end
+        end
+    end
+    return updated
+end
+
+-- 获取 CPU 占用率
+local function update_cpu()
+    local os_name = mp.get_property("platform", "unknown")
+
+    if os_name == "windows" then
+        -- 优先级：CIM → typeperf → powershell
+        update_cpu_cim(function(load)
+            if load then
+                cpu_usage = load .. "%"
+                refresh_display()
+            else
+                update_cpu_typeperf(function(load2)
+                    if load2 then
+                        cpu_usage = string.format("%.0f%%", tonumber(load2))
+                        refresh_display()
+                    else
+                        update_cpu_powershell(function(load3)
+                            if load3 then
+                                cpu_usage = string.format("%.0f%%", tonumber(load3))
+                            else
+                                cpu_usage = "N/A"
+                            end
+                            refresh_display()
+                        end)
+                    end
+                end)
+            end
+        end)
+    elseif os_name == "linux" then
+        run_async({"sh", "-c", "top -bn1 | grep 'Cpu(s)' | awk '{print $2}'"}, function(success, stdout)
+            if success then
+                local load = stdout:match("(%d+%.?%d*)")
+                if load then
+                    cpu_usage = load .. "%"
+                else
+                    cpu_usage = "N/A"
+                end
+            else
+                cpu_usage = "N/A"
+            end
+            refresh_display()
+        end)
+    elseif os_name == "darwin" then
+        run_async({"ps", "-A", "-o", "%cpu"}, function(success, stdout)
+            if success then
+                local total = 0
+                for line in stdout:gmatch("[^\r\n]+") do
+                    local num = line:match("^(%d+%.?%d*)")
+                    if num then total = total + tonumber(num) end
+                end
+                if total > 0 then
+                    cpu_usage = string.format("%.1f%%", total)
+                else
+                    cpu_usage = "N/A"
+                end
+            else
+                cpu_usage = "N/A"
+            end
+            refresh_display()
+        end)
+    end
+end
+
+-- 获取 GPU 占用率（CIM → typeperf → powershell 完整回退链）
+local function update_gpu_full_fallback()
+    update_gpu_cim(function(result)
+        if result and type(result) == "table" then
+            apply_gpu_usage_map(result, "%.0f%%")
+            refresh_display()
+        else
+            update_gpu_typeperf(function(result2)
+                if result2 and type(result2) == "table" then
+                    apply_gpu_usage_map(result2, "%.0f%%")
+                    refresh_display()
+                else
+                    update_gpu_powershell(function(load4)
+                        if load4 then
+                            -- 单值兜底：只给还没有有效数据的 GPU 设置值，不覆盖已有数据
+                            for _, gname in ipairs(gpu_names) do
+                                if not gpu_usages[gname] or gpu_usages[gname] == "N/A" then
+                                    gpu_usages[gname] = string.format("%.0f%%", tonumber(load4))
+                                end
+                            end
+                            if #gpu_names == 0 then
+                                gpu_usages["__total__"] = string.format("%.0f%%", tonumber(load4))
+                            end
+                        else
+                            -- 失败时也只清空那些本来就是 N/A 的，不覆盖已有数据
+                            for _, gname in ipairs(gpu_names) do
+                                if not gpu_usages[gname] or gpu_usages[gname] == "N/A" then
+                                    gpu_usages[gname] = "N/A"
+                                end
+                            end
+                            if #gpu_names == 0 then
+                                gpu_usages["__total__"] = "N/A"
+                            end
+                        end
+                        refresh_display()
+                    end)
+                end
+            end)
+        end
+    end)
+end
+
+-- 获取 GPU 占用率
+local function update_gpu()
+    local os_name = mp.get_property("platform", "unknown")
+
+    if os_name == "windows" then
+        -- 先尝试 nvidia-smi（快，只更新 N 卡），然后继续完整回退链更新所有 GPU
+        update_gpu_nvidia(function(load)
+            if load then
+                -- 记录 nvidia-smi 数值，供 apply_gpu_usage_map 做 LUID 归属识别
+                nvidia_smi_usage = tonumber(load) or nil
+                -- nvidia-smi 返回单值，找 NVIDIA 显卡分配
+                local found_nv = false
+                for _, gname in ipairs(gpu_names) do
+                    if is_nvidia_gpu(gname) then
+                        gpu_usages[gname] = load .. "%"
+                        found_nv = true
+                    end
+                end
+                if not found_nv and #gpu_names == 0 then
+                    -- 没检测到型号，记个总的
+                    gpu_usages["__total__"] = load .. "%"
+                end
+                refresh_display()
+            else
+                nvidia_smi_usage = nil
+            end
+            -- 无论 nvidia-smi 是否成功，都继续完整回退链，确保所有 GPU（含 Intel/AMD 集显）都有数据
+            update_gpu_full_fallback()
+        end)
+    elseif os_name == "linux" then
+        run_async({"nvidia-smi", "--query-gpu=utilization.gpu", "--format=csv,noheader,nounits"}, function(success, stdout)
+            if success then
+                local load = stdout:match("(%d+)")
+                if load then
+                    gpu_usages["__total__"] = load .. "%"
+                    refresh_display()
+                    return
+                end
+            end
+            run_async({"sh", "-c", "radeontop --dump - | grep 'gpu' | awk '{print $2}' | head -1"}, function(success2, stdout2)
+                if success2 then
+                    local load2 = stdout2:match("(%d+%.?%d*)")
+                    if load2 then
+                        gpu_usages["__total__"] = string.format("%.0f%%", tonumber(load2))
+                        refresh_display()
+                        return
+                    end
+                end
+                run_async({"sh", "-c", "intel_gpu_top -J | grep 'render' | head -1 | awk '{print $2}'"}, function(success3, stdout3)
+                    if success3 then
+                        local load3 = stdout3:match("(%d+%.?%d*)")
+                        if load3 then
+                            gpu_usages["__total__"] = string.format("%.0f%%", tonumber(load3))
+                        else
+                            gpu_usages["__total__"] = "N/A"
+                        end
+                    else
+                        gpu_usages["__total__"] = "N/A"
+                    end
+                    refresh_display()
+                end)
+            end)
+        end)
+    elseif os_name == "darwin" then
+        run_async({"sh", "-c", "ioreg -l | grep PerformanceStatistics | grep GPU | head -1"}, function(success, stdout)
+            if success then
+                local load = stdout:match("GPU Activity Factor = (%d+)")
+                if load then
+                    gpu_usages["__total__"] = load .. "%"
+                else
+                    gpu_usages["__total__"] = "N/A"
+                end
+            else
+                gpu_usages["__total__"] = "N/A"
+            end
+            refresh_display()
+        end)
+    end
+end
+
+-- 刷新统计数据
+local function refresh_stats()
+    update_counter = update_counter + 1
+    if update_counter % 3 == 0 then
+        update_gpu()
+    end
+    update_cpu()
+end
+
+-- 修改 add_file
+local original_add_file = add_file
+add_file = function(s, print_cache, print_tags)
+    original_add_file(s, print_cache, print_tags)
+
+    if not hw_detected then
+        detect_hardware()
+    end
+
+    if cpu_usage == "N/A" then
+        refresh_stats()
+    end
+
+    -- 显示 CPU（占用率 + 型号，百分比右对齐到 4 字符以对齐后续标签，兼容 100%）
+    local cpu_display = cpu_usage ~= "N/A" and cpu_usage or "--%"
+    local cpu_line = "CPU: " .. string.format("%4s", cpu_display)
+    if cpu_name then
+        cpu_line = cpu_line .. "  CPU:" .. cpu_name
+    end
+    append(s, cpu_line, {nl=o.nl, prefix="", prefix_sep=""})
+
+    -- 显示 GPU（每个 GPU 一行）
+    if #gpu_names > 0 then
+        for _, gname in ipairs(gpu_names) do
+            local gutil = gpu_usages[gname] or "N/A"
+            local gpu_display = gutil ~= "N/A" and gutil or "--%"
+            local gpu_line = "GPU: " .. string.format("%4s", gpu_display) .. "  GPU:" .. gname
+            append(s, gpu_line, {nl=o.nl, prefix="", prefix_sep=""})
+        end
+    elseif gpu_usages["__total__"] then
+        local gpu_display = gpu_usages["__total__"] ~= "N/A" and gpu_usages["__total__"] or "--%"
+        local gpu_line = "GPU: " .. string.format("%4s", gpu_display)
+        append(s, gpu_line, {nl=o.nl, prefix="", prefix_sep=""})
+    else
+        append(s, "GPU: " .. string.format("%4s", "--%"), {nl=o.nl, prefix="", prefix_sep=""})
+    end
+end
+
+-- 页面激活时启动定时器
+local original_process_key_binding = process_key_binding
+process_key_binding = function(oneshot)
+    original_process_key_binding(oneshot)
+
+    if display_timer and display_timer:is_enabled() then
+        if not stats_refresh_timer then
+            stats_refresh_timer = mp.add_periodic_timer(1.0, refresh_stats)
+            mp.add_timeout(0.1, refresh_stats)
+        end
+    else
+        if stats_refresh_timer then
+            stats_refresh_timer:stop()
+            stats_refresh_timer = nil
+            update_counter = 0
+        end
+    end
+end
+
+-- 退出时清理
+local original_remove_page_bindings = remove_page_bindings
+remove_page_bindings = function()
+    original_remove_page_bindings()
+    if stats_refresh_timer then
+        stats_refresh_timer:stop()
+        stats_refresh_timer = nil
+        update_counter = 0
+    end
+end
+
+-- 文件切换时重置
+mp.register_event("file-loaded", function()
+    cpu_usage = "N/A"
+    for k, _ in pairs(gpu_usages) do
+        gpu_usages[k] = "N/A"
+    end
+    update_counter = 0
+end)
+
+-- ============================================================
+-- 系统统计模块结束
+-- ============================================================

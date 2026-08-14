@@ -10,8 +10,8 @@
 | **工作区** | 私包内置 VantaInstaller + 发布流程统一候选目录；改动待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.2（已发布） |
-| **上次操作** | 私用全量包内置最新 VantaInstaller；发布流程统一候选目录到 release |
-| **自定义脚本** | `stats.lua`、`quality_status.lua`、`lsfg_control.lua` |
+| **上次操作** | 更换 stats.lua 为 yosh-wang 汉化版（自动翻译+CPU/GPU 监控），原版备份至 backup/ |
+| **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua`、`lsfg_control.lua` |
 
 ## 环境
 
@@ -27,7 +27,7 @@ c:\Program portable\mpv2\
 ├── mpv.exe, mpv.com          # MPV 核心 (gitignore)
 ├── yt-dlp.exe                # 在线视频解析器 (gitignore，Base 包会复制)
 ├── portable_config/          # 配置文件 (git 跟踪)
-│   └── scripts/stats.lua     # 汉化版统计信息脚本
+│   └── scripts/stats.lua     # yosh-wang 汉化版统计信息脚本（自动翻译+CPU/GPU 监控）
 ├── vs-plugins/, vs-scripts/  # VapourSynth (gitignore)
 ├── Faster-Whisper-XXL/       # AI 字幕 (gitignore)
 ├── lua/, socket/, mime/      # Lua 运行时
@@ -2323,3 +2323,22 @@ c:\Program portable\mpv2\
 - **消歧**：原“图形接口”改名“渲染接口”，明确它只代表 VO/GPU 上下文，不代表解码路径。
 - **实测**：同一 H.264 文件在 `hwdec=no` 下属性为 `no`，`auto-safe` 为 `d3d11va`，显式 copy 为 `d3d11va-copy`；完整配置以 `d3d11va-copy` 播放通过，stats 无错误。LuaJIT 语法和 `git diff --check` 通过。
 - **边界**：仅修改 `portable_config/scripts/stats.lua` 和记录，未改硬解配置、未构建或发布。
+### 2026-08-14 12:57 · stats.lua 更换为 yosh-wang 汉化版（原版备份兜底）
+
+- **需求**：用户提供 https://github.com/yosh-wang/mpv-stats.lua-zh-chinese-translation- ，要求换用其汉化版 stats.lua，原版不删、保留兜底。
+- **兼容性核对**：GitHub 版是 mpv 内置 stats.lua（同步上游 de0f2f9，2026-02-10）的「自动翻译模块·全局替换版」，另集成 CPU/GPU 实时占用监控（PowerShell Get-CimInstance / nvidia-smi / typeperf 回退链，全部内置、无额外文件）；binding 名 `stats/display-stats`、`stats/display-stats-toggle`、`stats/display-page-*` 与 input.conf（i/I）及 osc_lazy.lua 底栏按钮联动一致；现有 `script-opts/stats.conf` 选项全部兼容，无未知选项警告。
+- **改动文件**：
+  - `portable_config/scripts/stats.lua`：GitHub 汉化版（112,050 字节 / 3002 行，UTF-8 无 BOM，CRLF→LF 对齐仓库规范）。
+  - `portable_config/backup/stats-original-20260814.lua`：原版完整备份（68,978 字节，backup 目录未跟踪）。
+  - `portable_config/mpv.conf` 第 526 行注释补充汉化版来源。
+- **功能移植**：新版缺仓库自定义的 `user-data/stats/toggled` 状态同步（osc 底栏/lsfg_control.lua 依赖），已移植两处：`process_key_binding` 末尾按 `display_timer:is_enabled() and not oneshot` 写真实开关状态；启动时初始化为 false。
+- **验证**：① 隔离加载 `--no-config --script=` 退出 0、无 Lua 错误；② 集成测试（临时 config-dir 含 `load-stats-overlay=no` + 真实 stats.conf）确认以 `stats` 名称加载、读取 stats.conf、无警告；③ bindlist 模式 stdout 输出中文按键页标题「活动按键绑定」；④ IPC 实测 `user-data/stats/toggled` 初始 false → toggle 后 true → 再 toggle 后 false，与 lsfg_control 预期一致。
+- **差异说明**：README 所述 `toggle-stats-page-*`/`toggle-stats`/`close-stats` script-message 接口在当前 main 代码中不存在（本仓库仅用 script-binding，不受影响）；上游 `hwdec-current` 前缀由翻译表 `["HW:"]="硬解："` 覆盖，旧版内联「解码方式」行不再内联，功能等价。
+- **边界**：未构建/发布 mpv 包、未上传 Release；仅配置目录改动，backup 目录与临时目录不跟踪。
+### 2026-08-14 13:10 · 修复汉化版 stats 软解时解码方式被过滤
+
+- **需求**：用户反馈更换为 yosh-wang 汉化版后，软解时 `hwdec-current=no` 仍被过滤，解码方式整行消失（与 2026-07-27/08-13 记录的旧版同源问题）。
+- **根因**：新版保留上游 `append_property(s, "hwdec-current", ..., {no=true, [""]=true}, true)`，excluded 表把 `no`（软解）与空串一并过滤。
+- **修复**：移植旧版已验证方案——视频区始终显示 `解码方式:`：`hwdec=no` 显示「软件解码」，有值显示「硬件解码（后端）」如 `d3d11va-copy`，未初始化显示「未知（解码器尚未初始化）」；该行不再依赖 codec-desc 存在，从 `if track and append(codec-desc)` 内移入 `if track` 内。
+- **实测**：临时 config-dir + 日志钩子抓取 ASS 输出——软解 `hwdec-current=no` → `解码方式: 软件解码`；`--hwdec=d3d11va-copy` → `解码方式: 硬件解码（d3d11va-copy）`；加载无 Lua 错误。
+- **边界**：仅改 `portable_config/scripts/stats.lua`（并记录），未构建/发布 mpv 包。
