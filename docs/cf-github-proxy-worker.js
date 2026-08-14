@@ -162,9 +162,9 @@ const LANDING_HTML = `<!DOCTYPE html>
       <h3><span class="bar"></span>安装与覆盖顺序</h3>
       <ul class="order">
         <li><b>01</b><span>Base 基础包（含随包 ffmpeg，必须）</span></li>
-        <li><b>02</b><span>Extras 扩展包（.001 + .002 放同目录解压）</span></li>
+        <li><b>02</b><span>Extras 扩展包（.001 + .002 放同目录解压）<em class="req">可选</em></span></li>
         <li><b>03</b><span>Faster-Whisper AI 字幕 <em class="req">可选</em></span></li>
-        <li><b>04</b><span>Config 个人配置（最后安装覆盖）</span></li>
+        <li><b>04</b><span>Config 个人配置（最后安装覆盖）<em class="req">可选</em></span></li>
       </ul>
       <div class="note">按文件名前缀从小到大依次解压覆盖到同一目录即可。</div>
     </div>
