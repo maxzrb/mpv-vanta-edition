@@ -2411,3 +2411,20 @@ c:\Program portable\mpv2\
 - **验证**：luajit 全过；merge_stable 单测通过；完整配置真实播放正常（SDR 徽章淡入、yaozhi 模式黑边样本无错误）；assets loaded 28 logos。
 - **其他评估**：音轨/字幕策略本地已合理；AList 与 ASS 色彩模式不适用/已有。
 - **边界**：仅配置/脚本/素材，未构建未发布。
+
+### 2026-08-14 18:40 · VantaInstaller v0.3.3（四包跟进 + 放宽 Base 强制）
+
+- **问题**：公开包改 01~04 后安装器仍按旧结构；且扫描强制要求 01 Base，Base 已装好的升级场景（只下载 04 Config）被卡住。
+- **改动**：
+  - `PackageScanner.Scan(directory, allowMissingBase=false)`：宽松模式缺 01 只警告、版本不一致降级警告（升级目录常混旧包）。
+  - `InstallEngine`：扫描走宽松模式；新增把关——全新安装必须含 01（目标目录无 mpv.exe 时），覆盖升级可不带 01；本次选中包强制同版本；`.vanta-version` 按选中包版本写入。
+  - UI：欢迎页/组件页文案改 01~04；组件页缺 Base 时显示黄色提示（覆盖升级可继续）。
+  - 版本：今日统一锁定 v0.3.3（不递增）。
+- **验证**：build 0 警告 0 错误；引擎三场景实测通过；ScanTool 严格模式不变；单文件 publish 成功，发布候选已放 release/。
+- **边界**：附属工具，不触发 Gate；mpv 包未构建。
+
+### 2026-08-14 19:10 · VantaInstaller v0.3.3（同编号多版本目录无法下一步）
+
+- **问题**：同 Id 多版本（如 01×1.5.1/1.5.2）→ PackagesViewModel.Refresh 的 ToDictionary 重复键异常 → 向导卡住。
+- **修复**：PackageScanner 同 Id 只保留最高版本（旧版警告忽略）；PackagesViewModel ToDictionary 改 GroupBy 容错。
+- **验证**：build 0 警告 0 错误；扫描/引擎多版本场景实测通过；v0.3.3 发布候选已放 release/。

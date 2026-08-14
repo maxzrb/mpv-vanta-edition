@@ -7,7 +7,7 @@ using Vanta.Core.Services;
 namespace Vanta.Installer.ViewModels;
 
 /// <summary>
-/// 欢迎页：选择并扫描包含 01~05 增量包的目录
+/// 欢迎页：选择并扫描包含 01~04 增量包的目录
 /// </summary>
 public partial class WelcomeViewModel : ObservableObject
 {
@@ -62,7 +62,7 @@ public partial class WelcomeViewModel : ObservableObject
     {
         var dlg = new OpenFolderDialog
         {
-            Title = "选择包含 01~05 增量包的文件夹",
+            Title = "选择包含 01~04 增量包的文件夹",
             Multiselect = false,
         };
         if (dlg.ShowDialog() == true)
@@ -86,7 +86,9 @@ public partial class WelcomeViewModel : ObservableObject
 
         try
         {
-            var result = await Task.Run(() => PackageScanner.Scan(SourceDirectory));
+            // 宽松扫描：缺少 01 Base 只警告不阻止，让已装 Base 的升级场景能继续；
+            // 是否必须 Base 由安装引擎按目标目录状态把关。
+            var result = await Task.Run(() => PackageScanner.Scan(SourceDirectory, allowMissingBase: true));
             ScanResult = result;
 
             // 写入会话，供后续页面使用
@@ -94,8 +96,12 @@ public partial class WelcomeViewModel : ObservableObject
             _session.ScanResult = result;
 
             StatusText = result.CanInstall
-                ? $"识别到 {result.Packages.Count} 个包，统一版本 v{result.UnifiedVersion}，可以安装。"
+                ? $"识别到 {result.Packages.Count} 个包，版本 {result.UnifiedVersion ?? "多个"}，可以安装。"
                 : $"扫描完成，但有 {result.Errors.Count} 个问题无法安装。";
+            if (result.CanInstall && result.MissingRequiredIds.Count > 0)
+            {
+                StatusText += " 缺少 01 Base：仅覆盖升级（目标已有 mpv）可继续，全新安装需补 01。";
+            }
         }
         catch (Exception ex)
         {

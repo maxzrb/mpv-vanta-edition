@@ -1,11 +1,11 @@
 namespace Vanta.Core.Models;
 
 /// <summary>
-/// 一个 Vanta 增量包（01~05）
+/// 一个 Vanta 增量包（01~04）
 /// </summary>
 public sealed class VantaPackage
 {
-    /// <summary>包编号：01~05</summary>
+    /// <summary>包编号：01~04</summary>
     public required string Id { get; init; }
 
     /// <summary>包显示名（如 Base · 核心播放器）</summary>

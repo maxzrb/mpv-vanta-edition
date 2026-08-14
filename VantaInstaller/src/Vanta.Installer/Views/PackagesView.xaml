@@ -22,14 +22,18 @@
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
             <TextBlock Text="选择要安装的组件" FontSize="28" FontWeight="SemiBold"
                        Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
-            <TextBlock Text="03（AI 字幕）与 04（补帧）为可选扩展，可按需取消。" FontSize="14" Margin="0,8,0,0"
+            <TextBlock Text="02（着色器/运行时）与 03（AI 字幕）为可选扩展；04（Config）为个人设置覆盖层。已安装 Base 时可不带 01 直接升级。" FontSize="14" Margin="0,8,0,0"
                        Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
         </StackPanel>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <TextBlock Text="{Binding SummaryText}" FontSize="12" Margin="4,0,0,12"
+                <TextBlock Text="{Binding SummaryText}" FontSize="12" Margin="4,0,0,6"
                            Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
+                <TextBlock Text="{Binding MissingBaseHint}" FontSize="12" Margin="4,0,0,12"
+                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorWarningBrush}"
+                           TextWrapping="Wrap"
+                           Visibility="{Binding HasMissingBaseHint, Converter={StaticResource BoolToVis}}" />
 
                 <ui:Card Padding="24">
                     <ItemsControl ItemsSource="{Binding Packages}">

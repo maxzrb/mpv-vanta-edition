@@ -43,7 +43,8 @@ public sealed class InstallEngine
             AddLog($"7z：{sevenZipPath}");
 
             // 2. 扫描包
-            var scan = PackageScanner.Scan(options.SourceDirectory);
+            // 升级场景允许缺少 01 Base：是否必须 Base 由下方按目标目录状态把关
+            var scan = PackageScanner.Scan(options.SourceDirectory, allowMissingBase: true);
             foreach (var e in scan.Errors)
             {
                 AddLog($"[错误] {e}");
@@ -58,7 +59,7 @@ public sealed class InstallEngine
             var wantFull = options.SelectedPackageIds?.Contains("00") == true;
             AddLog(wantFull
                 ? $"检测到个人全量包 v{scan.FullPackage!.Version}（解压即用一体包），将跳过增量包安装"
-                : $"识别到 {scan.Packages.Count} 个增量包（统一版本 v{scan.UnifiedVersion}）");
+                : $"识别到 {scan.Packages.Count} 个增量包（版本 {scan.UnifiedVersion ?? "多个版本"}）");
 
             // 3. 选出本次要安装的包
             List<VantaPackage> selected;
@@ -86,8 +87,18 @@ public sealed class InstallEngine
                 return result;
             }
 
+            // 3.1 本次选中的包必须同版本（目录里混有旧包时扫描仅警告，这里强制把关）
+            var selectedVersions = selected.Select(p => p.Version).Distinct().ToList();
+            if (!wantFull && selectedVersions.Count > 1)
+            {
+                result.Success = false;
+                result.Error = $"选中的包版本不一致：{string.Join(" / ", selectedVersions)}。请取消勾选旧版本包，只保留同一版本的组合。";
+                AddLog(result.Error);
+                return result;
+            }
+
             // 4. 安装前逐文件 SHA-256 校验。所有入口都必须执行；有风险时由 UI 明确询问用户。
-            var integrityVersion = wantFull ? scan.FullPackage!.Version : scan.UnifiedVersion!;
+            var integrityVersion = wantFull ? scan.FullPackage!.Version : selectedVersions[0];
             AddLog($"开始校验 {selected.Sum(package => package.Files.Count)} 个安装包文件的 SHA-256…");
             var integrityProgress = new Progress<PackageIntegrityProgress>(p =>
             {
@@ -134,6 +145,19 @@ public sealed class InstallEngine
             AddLog(result.IsUpgrade
                 ? $"目标目录已有旧版，进入覆盖升级模式：{options.InstallDirectory}"
                 : $"全新安装：{options.InstallDirectory}");
+
+            // 5.1 全新安装必须包含 01 Base；覆盖升级（目标已有 mpv）允许只升级组件/配置
+            if (!wantFull && !result.IsUpgrade && !selected.Any(p => p.Id == "01"))
+            {
+                result.Success = false;
+                result.Error = "全新安装必须包含 01 Base 包。若只是升级已安装的 mpv，请选择已安装的 mpv 目录作为安装位置（会进入覆盖升级模式，可不带 01）。";
+                AddLog(result.Error);
+                return result;
+            }
+            if (!wantFull && result.IsUpgrade && !selected.Any(p => p.Id == "01"))
+            {
+                AddLog("升级模式：包目录未包含 01 Base，仅升级所选组件/配置（跳过 Base）。");
+            }
 
             // 6. 磁盘空间预检
             Directory.CreateDirectory(options.InstallDirectory);
@@ -214,8 +238,9 @@ public sealed class InstallEngine
                 AddLog("警告：安装后未找到 mpv.exe，请检查是否选择了 01 号包。");
             }
 
-            // 10. 写入版本标记（供检查更新识别当前包版本）；全量包模式用全量包版本
-            var installVersion = wantFull ? scan.FullPackage!.Version : scan.UnifiedVersion;
+            // 10. 写入版本标记（供检查更新识别当前包版本）；全量包模式用全量包版本，
+            // 增量模式用本次选中包版本（升级只装 04 时也要更新标记到新版本）
+            var installVersion = wantFull ? scan.FullPackage!.Version : selectedVersions[0];
             if (!string.IsNullOrWhiteSpace(installVersion))
             {
                 try

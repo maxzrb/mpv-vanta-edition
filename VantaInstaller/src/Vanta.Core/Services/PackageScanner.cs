@@ -36,7 +36,15 @@ public static partial class PackageScanner
     private static partial Regex FullPrivateVersionRegex();
 
     /// <summary>扫描指定目录</summary>
-    public static PackageScanResult Scan(string directory)
+    /// <summary>
+    /// 扫描指定目录。
+    /// </summary>
+    /// <param name="directory">包目录</param>
+    /// <param name="allowMissingBase">
+    /// 是否允许缺少 01 Base 包（已安装升级场景：目标目录已有 mpv 时可不带 Base 升级组件/配置）。
+    /// 为 false（全新安装场景）时缺少 01 会作为错误阻止安装。
+    /// </param>
+    public static PackageScanResult Scan(string directory, bool allowMissingBase = false)
     {
         var result = new PackageScanResult();
 
@@ -180,7 +188,41 @@ public static partial class PackageScanner
         // 按编号排序
         result.Packages.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
 
-        // 版本一致性（仅增量包；全量包是独立一体包，不参与）
+        // 同编号多版本去重：同一编号存在多个版本时只保留版本号最大的包，
+        // 其余降级为警告并从列表移除。常见于包目录同时保留新旧版本（如
+        // 01 base 1.5.1 与 1.5.2）；旧版本不参与安装与版本一致性，避免
+        // 组件页出现重复编号、安装混版本以及“下一步”被卡。
+        var keepById = new Dictionary<string, VantaPackage>();
+        var dropped = new List<VantaPackage>();
+        foreach (var pkg in result.Packages)
+        {
+            if (!keepById.TryGetValue(pkg.Id, out var existing))
+            {
+                keepById[pkg.Id] = pkg;
+                continue;
+            }
+            if (UpdateService.CompareVersions(pkg.Version, existing.Version) > 0)
+            {
+                dropped.Add(existing);
+                keepById[pkg.Id] = pkg;
+            }
+            else
+            {
+                dropped.Add(pkg);
+            }
+        }
+        foreach (var d in dropped)
+        {
+            result.Warnings.Add($"检测到同一编号的多个版本：{d.DisplayText} 将被忽略，使用 {keepById[d.Id].DisplayText}。");
+        }
+        foreach (var d in dropped)
+        {
+            result.Packages.Remove(d);
+        }
+
+        // 版本一致性（仅增量包；全量包是独立一体包，不参与）。
+        // 宽松模式（升级场景目录常混有旧版包）下降级为警告，实际安装时由引擎
+        // 对"本次选中的包"强制同版本，避免升级被旧包目录卡住。
         var versions = result.Packages.Select(p => p.Version).Distinct().ToList();
         if (versions.Count == 1)
         {
@@ -188,10 +230,19 @@ public static partial class PackageScanner
         }
         else if (versions.Count > 1)
         {
-            result.Errors.Add($"包版本不一致：{string.Join(" / ", versions)}。请确保所有包来自同一版本。");
+            if (allowMissingBase)
+            {
+                result.Warnings.Add($"检测到多个版本：{string.Join(" / ", versions)}。安装时仅允许选中同一版本的包组合。");
+            }
+            else
+            {
+                result.Errors.Add($"包版本不一致：{string.Join(" / ", versions)}。请确保所有包来自同一版本。");
+            }
         }
 
-        // 必选包检查：存在全量包时放宽（全量包解压即用，无需 01~05 齐全）
+        // 必选包检查：存在全量包时放宽（全量包解压即用，无需 01~04 齐全）；
+        // allowMissingBase=true（已安装升级）时缺少 01 只警告不阻止，
+        // 由安装引擎根据目标目录是否已有 mpv.exe 最终把关（全新安装仍需 01）。
         if (result.FullPackage is null)
         {
             var foundIds = result.Packages.Select(p => p.Id).ToHashSet();
@@ -204,7 +255,16 @@ public static partial class PackageScanner
             }
             if (result.MissingRequiredIds.Count > 0)
             {
-                result.Errors.Add($"缺少必选包：{string.Join("、", result.MissingRequiredIds.Select(id => $"{id} 号包"))}。");
+                if (allowMissingBase)
+                {
+                    result.Warnings.Add(
+                        $"缺少 {string.Join("、", result.MissingRequiredIds.Select(id => $"{id} 号包"))}（01 Base 不在包目录中）。"
+                        + "若目标目录已安装 mpv（覆盖升级）可继续；全新安装必须包含 01 Base 包。");
+                }
+                else
+                {
+                    result.Errors.Add($"缺少必选包：{string.Join("、", result.MissingRequiredIds.Select(id => $"{id} 号包"))}。");
+                }
             }
         }
         else

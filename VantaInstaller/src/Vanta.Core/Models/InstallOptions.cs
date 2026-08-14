@@ -5,7 +5,7 @@ namespace Vanta.Core.Models;
 /// </summary>
 public sealed class InstallOptions
 {
-    /// <summary>包所在目录（自动扫描 01~05）</summary>
+    /// <summary>包所在目录（自动扫描 01~04）</summary>
     public required string SourceDirectory { get; init; }
 
     /// <summary>目标安装目录</summary>
@@ -18,7 +18,7 @@ public sealed class InstallOptions
     public int KeepBackups { get; init; } = 5;
 
     /// <summary>
-    /// 要安装的包编号集合（如 ["01","02","05"]）。
+    /// 要安装的包编号集合（如 ["01","02","04"]）。
     /// 为 null 时安装全部扫描到的包。
     /// </summary>
     public IReadOnlyCollection<string>? SelectedPackageIds { get; init; }

@@ -29,6 +29,23 @@ public partial class PackagesViewModel : ObservableObject
     /// <summary>汇总文本</summary>
     public string SummaryText => $"共 {Packages.Count} 个包，选中 {Packages.Count(p => p.IsSelected)} 个 · 需要 {VantaPackage.FormatSize(_session.ScanResult?.SelectedTotalSize ?? 0)}";
 
+    /// <summary>缺少 01 Base 时的提示（升级场景允许继续，全新安装需补 Base）</summary>
+    public string MissingBaseHint
+    {
+        get
+        {
+            var scan = _session.ScanResult;
+            if (scan is null || scan.FullPackage is not null || !scan.MissingRequiredIds.Contains("01"))
+            {
+                return string.Empty;
+            }
+            return "包目录缺少 01 Base 包：仅当目标目录已安装 mpv（覆盖升级）时可继续；全新安装需补充 01 Base。";
+        }
+    }
+
+    /// <summary>是否显示缺少 Base 提示</summary>
+    public bool HasMissingBaseHint => !string.IsNullOrEmpty(MissingBaseHint);
+
     public PackagesViewModel(AppSession session)
     {
         _session = session;
@@ -45,7 +62,10 @@ public partial class PackagesViewModel : ObservableObject
         RegisterSingleInstance = _session.RegisterAssociations?.Contains(PlaybackMode.SingleInstance) == true;
 
         // 保留用户已勾选状态（返回本页时不重置）
-        var previousSelection = Packages.ToDictionary(p => p.Id, p => p.IsSelected);
+        // 按 Id 分组取最后一个，避免同编号多包（理论上已由扫描去重）导致重复键异常
+        var previousSelection = Packages
+            .GroupBy(p => p.Id)
+            .ToDictionary(g => g.Key, g => g.Last().IsSelected);
         Packages.Clear();
 
         if (_session.ScanResult is { } scan)
@@ -83,6 +103,8 @@ public partial class PackagesViewModel : ObservableObject
         _session.SelectedPackageIds = Packages.Where(p => p.IsSelected).Select(p => p.Id).ToList();
         OnPropertyChanged(nameof(CanProceed));
         OnPropertyChanged(nameof(SummaryText));
+        OnPropertyChanged(nameof(MissingBaseHint));
+        OnPropertyChanged(nameof(HasMissingBaseHint));
     }
 
     partial void OnRegisterMultiInstanceChanged(bool value) => SyncRegisterAssociations();
