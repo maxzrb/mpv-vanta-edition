@@ -115,11 +115,13 @@ if (installMode is not null)
         var progress = new Progress<InstallProgress>(p =>
             Console.Write($"\r  {p.Percent,3}%  {p.Message,-40}"));
 
+        // 仅安装 01 号包（若存在多个版本取第一个，按复合键选择）
+        var baseKey = scan.Packages.FirstOrDefault(p => p.Id == "01")?.Key;
         var result = await engine.RunAsync(new InstallOptions
         {
             SourceDirectory = sourceDir,
             InstallDirectory = installMode,
-            SelectedPackageIds = ["01"],
+            SelectedPackageKeys = baseKey is null ? null : [baseKey],
         }, progress);
 
         Console.WriteLine();

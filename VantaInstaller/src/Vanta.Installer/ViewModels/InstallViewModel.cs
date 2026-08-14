@@ -110,7 +110,7 @@ public partial class InstallViewModel : ObservableObject
             {
                 SourceDirectory = _session.SourceDirectory!,
                 InstallDirectory = _session.InstallDirectory!,
-                SelectedPackageIds = _session.SelectedPackageIds,
+                SelectedPackageKeys = _session.SelectedPackageKeys,
                 RegisterAssociations = _session.RegisterAssociations,
                 ConfirmIntegrityRisksAsync = ConfirmIntegrityRisksAsync,
             };

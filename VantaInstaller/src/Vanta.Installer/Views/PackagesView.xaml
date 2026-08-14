@@ -58,7 +58,13 @@
                                                            Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
                                                 <TextBlock Text="{Binding DisplayName, Mode=OneWay}" FontWeight="SemiBold" Margin="8,0,0,0"
                                                            Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                                                <!-- 版本标签：每个包都醒目标注版本号，同编号多版本靠它区分 -->
                                                 <Border Background="#FFE8E0FB" CornerRadius="4" Padding="6,1" Margin="10,0,0,0">
+                                                    <TextBlock FontSize="11" Foreground="#FF6B3FD8">
+                                                        <Run Text="v" /><Run Text="{Binding Version, Mode=OneWay}" />
+                                                    </TextBlock>
+                                                </Border>
+                                                <Border Background="#FFE8E0FB" CornerRadius="4" Padding="6,1" Margin="6,0,0,0">
                                                     <Border.Style>
                                                         <Style TargetType="Border">
                                                             <Setter Property="Visibility" Value="Collapsed" />

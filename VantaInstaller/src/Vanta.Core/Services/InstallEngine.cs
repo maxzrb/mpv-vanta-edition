@@ -56,7 +56,7 @@ public sealed class InstallEngine
                 return result;
             }
             // 全量包模式：用户选中 "00"（个人全量包）时，只解压全量包（解压即用一体包），忽略增量包
-            var wantFull = options.SelectedPackageIds?.Contains("00") == true;
+            var wantFull = options.SelectedPackageKeys?.Contains("00") == true;
             AddLog(wantFull
                 ? $"检测到个人全量包 v{scan.FullPackage!.Version}（解压即用一体包），将跳过增量包安装"
                 : $"识别到 {scan.Packages.Count} 个增量包（版本 {scan.UnifiedVersion ?? "多个版本"}）");
@@ -76,9 +76,9 @@ public sealed class InstallEngine
             }
             else
             {
-                selected = (options.SelectedPackageIds is null)
+                selected = (options.SelectedPackageKeys is null)
                     ? scan.Packages
-                    : scan.Packages.Where(p => options.SelectedPackageIds.Contains(p.Id)).ToList();
+                    : scan.Packages.Where(p => options.SelectedPackageKeys.Contains(p.Key)).ToList();
             }
             if (selected.Count == 0)
             {

@@ -2428,3 +2428,9 @@ c:\Program portable\mpv2\
 - **问题**：同 Id 多版本（如 01×1.5.1/1.5.2）→ PackagesViewModel.Refresh 的 ToDictionary 重复键异常 → 向导卡住。
 - **修复**：PackageScanner 同 Id 只保留最高版本（旧版警告忽略）；PackagesViewModel ToDictionary 改 GroupBy 容错。
 - **验证**：build 0 警告 0 错误；扫描/引擎多版本场景实测通过；v0.3.3 发布候选已放 release/。
+
+### 2026-08-14 19:30 · VantaInstaller v0.3.3（每个包带版本标签，多版本全保留）
+
+- **需求**：多版本包目录不再自动丢旧版，每个版本独立显示可自选。
+- **改动**：VantaPackage.Key（编号|版本）复合键；PackageScanner 移除去重、多版本降为警告；选择模型改 SelectedPackageKeys；组件页加版本标签胶囊。
+- **验证**：build 0 警告 0 错误；扫描/引擎多版本场景实测通过；发布候选 v0.3.3 已更新（版本号未递增）。

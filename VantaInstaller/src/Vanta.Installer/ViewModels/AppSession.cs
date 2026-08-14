@@ -16,8 +16,8 @@ public sealed class AppSession
     /// <summary>目标安装目录</summary>
     public string? InstallDirectory { get; set; }
 
-    /// <summary>选中的包编号集合</summary>
-    public List<string>? SelectedPackageIds { get; set; }
+    /// <summary>选中的包选择键集合（"编号|版本"，全量包为 "00"）</summary>
+    public List<string>? SelectedPackageKeys { get; set; }
 
     /// <summary>安装结果</summary>
     public InstallResult? InstallResult { get; set; }

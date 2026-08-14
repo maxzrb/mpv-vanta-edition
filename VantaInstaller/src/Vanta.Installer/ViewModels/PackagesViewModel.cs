@@ -62,9 +62,9 @@ public partial class PackagesViewModel : ObservableObject
         RegisterSingleInstance = _session.RegisterAssociations?.Contains(PlaybackMode.SingleInstance) == true;
 
         // 保留用户已勾选状态（返回本页时不重置）
-        // 按 Id 分组取最后一个，避免同编号多包（理论上已由扫描去重）导致重复键异常
+        // 按 Key（编号|版本）分组：同编号多版本各自独立保留勾选
         var previousSelection = Packages
-            .GroupBy(p => p.Id)
+            .GroupBy(p => p.Key)
             .ToDictionary(g => g.Key, g => g.Last().IsSelected);
         Packages.Clear();
 
@@ -85,7 +85,7 @@ public partial class PackagesViewModel : ObservableObject
             foreach (var pkg in scan.Packages)
             {
                 var item = new PackageItem(pkg);
-                if (previousSelection.TryGetValue(pkg.Id, out var selected))
+                if (previousSelection.TryGetValue(pkg.Key, out var selected))
                 {
                     item.IsSelected = selected;
                 }
@@ -99,8 +99,8 @@ public partial class PackagesViewModel : ObservableObject
             }
         }
 
-        // 同步选中状态到会话
-        _session.SelectedPackageIds = Packages.Where(p => p.IsSelected).Select(p => p.Id).ToList();
+        // 同步选中状态到会话（复合键，同编号多版本可各自勾选）
+        _session.SelectedPackageKeys = Packages.Where(p => p.IsSelected).Select(p => p.Key).ToList();
         OnPropertyChanged(nameof(CanProceed));
         OnPropertyChanged(nameof(SummaryText));
         OnPropertyChanged(nameof(MissingBaseHint));
@@ -155,10 +155,10 @@ public partial class PackagesViewModel : ObservableObject
                 }
             }
 
-            // 同步到会话，供安装页读取
-            _session.SelectedPackageIds = Packages
+            // 同步到会话，供安装页读取（复合键）
+            _session.SelectedPackageKeys = Packages
                 .Where(p => p.IsSelected)
-                .Select(p => p.Id)
+                .Select(p => p.Key)
                 .ToList();
 
             OnPropertyChanged(nameof(CanProceed));
@@ -176,6 +176,9 @@ public partial class PackageItem : ObservableObject
     public VantaPackage Package { get; }
 
     public string Id => Package.Id;
+
+    /// <summary>复合选择键（"编号|版本"，全量包为 "00"）</summary>
+    public string Key => Package.Key;
 
     public string DisplayName => Package.DisplayName;
 

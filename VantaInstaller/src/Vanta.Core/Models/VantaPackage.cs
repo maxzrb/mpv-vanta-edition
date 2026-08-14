@@ -8,6 +8,12 @@ public sealed class VantaPackage
     /// <summary>包编号：01~04</summary>
     public required string Id { get; init; }
 
+    /// <summary>
+    /// 复合选择键：增量包为 "编号|版本"（如 01|1.5.2），个人全量包为 "00"。
+    /// 同一编号存在多个版本时每个版本都是独立条目，靠 Key 区分勾选与安装。
+    /// </summary>
+    public string Key => Id == "00" ? "00" : $"{Id}|{Version}";
+
     /// <summary>包显示名（如 Base · 核心播放器）</summary>
     public required string DisplayName { get; init; }
 

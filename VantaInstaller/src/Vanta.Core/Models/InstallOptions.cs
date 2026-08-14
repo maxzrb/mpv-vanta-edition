@@ -18,10 +18,11 @@ public sealed class InstallOptions
     public int KeepBackups { get; init; } = 5;
 
     /// <summary>
-    /// 要安装的包编号集合（如 ["01","02","04"]）。
+    /// 要安装的包选择键集合（增量包为 "编号|版本"，如 "01|1.5.2"、"04|1.5.2"；
+    /// 个人全量包为 "00"）。同一编号不同版本是独立条目，用完整键区分。
     /// 为 null 时安装全部扫描到的包。
     /// </summary>
-    public IReadOnlyCollection<string>? SelectedPackageIds { get; init; }
+    public IReadOnlyCollection<string>? SelectedPackageKeys { get; init; }
 
     /// <summary>
     /// 安装完成后要注册的文件关联入口（null/空=不注册）。

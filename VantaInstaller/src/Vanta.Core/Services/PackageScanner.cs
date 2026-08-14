@@ -188,41 +188,12 @@ public static partial class PackageScanner
         // 按编号排序
         result.Packages.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
 
-        // 同编号多版本去重：同一编号存在多个版本时只保留版本号最大的包，
-        // 其余降级为警告并从列表移除。常见于包目录同时保留新旧版本（如
-        // 01 base 1.5.1 与 1.5.2）；旧版本不参与安装与版本一致性，避免
-        // 组件页出现重复编号、安装混版本以及“下一步”被卡。
-        var keepById = new Dictionary<string, VantaPackage>();
-        var dropped = new List<VantaPackage>();
-        foreach (var pkg in result.Packages)
-        {
-            if (!keepById.TryGetValue(pkg.Id, out var existing))
-            {
-                keepById[pkg.Id] = pkg;
-                continue;
-            }
-            if (UpdateService.CompareVersions(pkg.Version, existing.Version) > 0)
-            {
-                dropped.Add(existing);
-                keepById[pkg.Id] = pkg;
-            }
-            else
-            {
-                dropped.Add(pkg);
-            }
-        }
-        foreach (var d in dropped)
-        {
-            result.Warnings.Add($"检测到同一编号的多个版本：{d.DisplayText} 将被忽略，使用 {keepById[d.Id].DisplayText}。");
-        }
-        foreach (var d in dropped)
-        {
-            result.Packages.Remove(d);
-        }
-
-        // 版本一致性（仅增量包；全量包是独立一体包，不参与）。
-        // 宽松模式（升级场景目录常混有旧版包）下降级为警告，实际安装时由引擎
-        // 对"本次选中的包"强制同版本，避免升级被旧包目录卡住。
+        // 同编号多版本全部保留：每个版本都是独立条目（UI 以版本标签区分，可自选）。
+        // 目录同时放新旧版本（如 01 base 1.5.1 与 1.5.2）时都会列出；
+        // 是否混装由安装引擎对"本次选中组合"强制同版本把关。
+        // 版本一致性（仅增量包；全量包是独立一体包，不参与）：
+        // 多版本仅警告（两种模式一致），实际安装时由引擎对选中包强制同版本，
+        // 避免目录混有新旧包时被整体卡住。
         var versions = result.Packages.Select(p => p.Version).Distinct().ToList();
         if (versions.Count == 1)
         {
@@ -230,14 +201,8 @@ public static partial class PackageScanner
         }
         else if (versions.Count > 1)
         {
-            if (allowMissingBase)
-            {
-                result.Warnings.Add($"检测到多个版本：{string.Join(" / ", versions)}。安装时仅允许选中同一版本的包组合。");
-            }
-            else
-            {
-                result.Errors.Add($"包版本不一致：{string.Join(" / ", versions)}。请确保所有包来自同一版本。");
-            }
+            result.Warnings.Add(
+                $"检测到多个版本：{string.Join(" / ", versions)}。组件页已按版本列出，安装时请只勾选同一版本的包组合。");
         }
 
         // 必选包检查：存在全量包时放宽（全量包解压即用，无需 01~04 齐全）；
