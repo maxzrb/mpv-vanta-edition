@@ -9,7 +9,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $Root = $PSScriptRoot
 $SevenZip = Join-Path $Root '7z.exe'
-$PackageName = "05-mpv-config-v${Version}"
+$PackageName = "04-mpv-config-v${Version}"
 $Stage = Join-Path $Root "build/$PackageName"
 $OutputRoot = Join-Path $Root $OutputDir
 $Archive = Join-Path $OutputRoot "$PackageName.7z"
@@ -34,7 +34,7 @@ foreach ($exclude in @('shaders', 'vs', 'cache', 'files')) {
     $exPath = Join-Path $configDest $exclude
     if (Test-Path $exPath) { Remove-Item -Recurse -Force $exPath }
 }
-# 内置 HarmonyOS Sans SC 字体与其授权文件归 01 Base，05 Config 不重复携带
+# 内置 HarmonyOS Sans SC 字体与其授权文件归 01 Base，04 Config 不重复携带
 foreach ($exclude in @('fonts', 'licenses')) {
     $exPath = Join-Path $configDest $exclude
     if (Test-Path $exPath) { Remove-Item -Recurse -Force $exPath }
@@ -50,11 +50,11 @@ if (Test-Path $assetsPath) { Remove-Item -Recurse -Force $assetsPath }
     $stateFile = Join-Path $configDest 'script-opts/window_state.conf'
     if (Test-Path $stateFile) { Remove-Item -Force $stateFile }
 
-    # Vanta 安装标记由 01 Base 写入，05 Config 不得覆盖（防止 05 覆盖版本标记）
+    # Vanta 安装标记由 01 Base 写入，04 Config 不得覆盖（防止 04 覆盖版本标记）
     $vantaMarker = Join-Path $configDest '.vanta-version'
     if (Test-Path $vantaMarker) { Remove-Item -Force $vantaMarker }
 
-# 项目说明文件：显式目标路径复制（README.MD 必须随 05 包分发）
+# 项目说明文件：显式目标路径复制（README.MD 必须随 04 包分发）
 foreach ($file in @('README.MD', '.gitignore')) {
     $src = Join-Path $Root $file
     if (Test-Path -LiteralPath $src) {
@@ -64,7 +64,7 @@ foreach ($file in @('README.MD', '.gitignore')) {
 
 # 打包前校验 README.MD 已进入构建目录（缺失即终止）
 if (-not (Test-Path -LiteralPath (Join-Path $Stage 'README.MD'))) {
-    throw 'README.MD 未进入 05 构建目录，终止打包。'
+    throw 'README.MD 未进入 04 构建目录，终止打包。'
 }
 
 # 清理缓存
@@ -78,7 +78,7 @@ foreach ($dir in $cacheDirs) {
 
 $Readme = Join-Path $Stage 'README-Config包.txt'
 @"
-MPV Vanta Edition 05 Config v${Version}
+MPV Vanta Edition 04 Config v${Version}
 ==================================
 
 这是最终覆盖层，包含个人定制的脚本、OSC 主题、字体和设置。
@@ -88,10 +88,9 @@ MPV Vanta Edition 05 Config v${Version}
   01. 01-mpv-base-v${Version}.7z
   02. 02-mpv-extras-v${Version}.7z.001（将 .002 放在同目录，只解压 .001）
   03. 03-mpv-fasterwhisper-addon-v${Version}.7z（可选）
-  04. 04-mpv-lsfg-addon-v${Version}.7z（可选）
-  05. 05-mpv-config-v${Version}.7z（本包，最后安装）
+  04. 04-mpv-config-v${Version}.7z（本包，最后安装）
 
-如果只更新配置，只需解压本包覆盖即可，无需重新安装 01～04。
+如果只更新配置，只需解压本包覆盖即可，无需重新安装 01～03。
 "@ | Set-Content -LiteralPath $Readme -Encoding UTF8
 
 if (Test-Path -LiteralPath $Archive) {

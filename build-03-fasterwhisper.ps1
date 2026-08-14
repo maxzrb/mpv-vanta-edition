@@ -52,8 +52,7 @@ MPV Faster-Whisper 扩展包 v${Version}
   01. 01-mpv-base-v${Version}.7z
   02. 02-mpv-extras-v${Version}.7z.001（将 .002 放在同目录，只解压 .001）
   03. 03-mpv-fasterwhisper-addon-v${Version}.7z（本包）
-  04. 04-mpv-lsfg-addon-v${Version}.7z（可选补帧扩展）
-  05. 05-mpv-config-v${Version}.7z（个人设置，最后安装覆盖）
+  04. 04-mpv-config-v${Version}.7z（个人设置，最后安装覆盖）
 
 包边界说明：
   Faster-Whisper 菜单和控制脚本已经包含在 Base/Config 中。

@@ -189,8 +189,7 @@ MPV Vanta Edition 02 Extras v${Version}
   01. 01-mpv-base-vX.Y.Z.7z
   02. 02-mpv-extras-vX.Y.Z.7z.001（本包；将 .002 放在同目录，只解压 .001）
   03. 03-mpv-fasterwhisper-addon-v${Version}.7z（可选 AI 字幕扩展）
-  04. 04-mpv-lsfg-addon-v${Version}.7z（可选补帧扩展）
-  05. 05-mpv-config-v${Version}.7z（个人设置，最后安装覆盖）
+  04. 04-mpv-config-v${Version}.7z（个人设置，最后安装覆盖）
 
 Contains:
 - Shaders (portable_config/shaders/)    129 MB
