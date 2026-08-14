@@ -166,7 +166,7 @@ const LANDING_HTML = `<!DOCTYPE html>
         <li><b>03</b><span>Faster-Whisper AI 字幕 <em class="req">可选</em></span></li>
         <li><b>04</b><span>Config 个人配置（最后安装覆盖）<em class="req">可选</em></span></li>
       </ul>
-      <div class="note">按文件名前缀从小到大依次解压覆盖到同一目录即可。</div>
+      <div class="note">按文件名前缀从小到大依次解压覆盖到同一目录即可。<br>建议使用 VantaInstaller 安装器辅助安装。</div>
     </div>
     <div class="panel">
       <h3><span class="bar"></span>加速使用说明</h3>
