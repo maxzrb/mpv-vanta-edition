@@ -5,12 +5,12 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master` 与 `origin/master` 同步（v1.5.2 已发布并推送） |
-| **最新发布提交** | `c3ac48e`（tag: `v1.5.2`，已推送） |
+| **分支** | `master` 与 `origin/master` 同步（v1.5.3 已发布并推送） |
+| **最新发布提交** | `164c77f`（tag: `v1.5.3`，已推送） |
 | **工作区** | LSFG 接入已废弃（文件移入根 trash/），04 包改为 Config；改动待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.2（已发布） |
-| **上次操作** | 停止 LSFG 接入并回退研究提交，04 包改为 Config，发布流程改四包结构 |
+| **项目版本** | v1.5.3（已发布） |
+| **上次操作** | 发布 v1.5.3（四包结构、LSFG 停止接入、VantaInstaller v0.3.3），6 个资产已上传核对 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2502,3 +2502,10 @@ c:\Program portable\mpv2\
 ### 结论
 - 今日全部改动经两轮验证：无已知用户可见 bug。
 - 仍未发布；大改动 Gate 命中状态不变，待用户决定是否发布。
+
+## 发布结果（2026-08-15，v1.5.3）
+
+- GitHub Release：https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.5.3（正式版，非草稿/预发布）。
+- 资产核对：6 个公开资产远端大小与 SHA-256 全部与本地一致（01/02.001/02.002/03/04/VantaInstaller-v0.3.3），无重复、无 diag 残留；私包未上传。
+- 上传过程：曾遇 GitHub 上行线路波动（0.3~0.7MB/s）暂停；诊断确认非本地带宽（百度网盘正常、直连 GitHub 真实 IP 亦慢、走代理也慢）；线路恢复后（3MB/s+）并行上传完成。
+- 收尾：版本迭代记录/工作进度/本文件已更新；master 与 origin/master 同步（发布提交 164c77f + 收尾提交）。
