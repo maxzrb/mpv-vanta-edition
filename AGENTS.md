@@ -166,7 +166,7 @@ return M
 4. **Key Bindings**: descriptive names (`browse-files`)
 5. **External Scripts**: `MAINTAINER-ONLY-WARNING-upstream-sources.json` 仅定义维护者上游审计源，不是用户更新入口
 6. **Shader paths in input.conf**: Use `~~/shaders/<category>/<name>.glsl`
-7. **Backup 两级约定**: 项目根 `backup/` 为用户级备份，不进包不跟踪；`portable_config` 下各 `backup/`（如 `backup/`、`script-opts/backup/`、`scripts/backup/`）为开发级备份，淘汰但曾可用的脚本/配置随 01/05 公开包保留以便回滚，且不设忽略（可 git 跟踪）。
+7. **Backup 两级约定**: 项目根 `backup/` 为用户级备份，不进包不跟踪；`portable_config` 下各 `backup/`（如 `backup/`、`script-opts/backup/`、`scripts/backup/`）为开发级备份，淘汰但曾可用的脚本/配置随 01/04 公开包保留以便回滚，且不设忽略（可 git 跟踪）。
 
 ## Common Pitfalls
 
@@ -193,5 +193,5 @@ return M
 - 本仓库所有“发布 / 打包 / 创建 GitHub Release”操作必须严格遵循根目录《发布流程.md》。
 - 执行发布任务前，必须先完整阅读《发布流程.md》并逐项执行其中的检查清单，检查结果写入 `docs/codex/STATUS.md`。
 - 若本次改动命中《发布流程.md》第 3.2 节“大改动 Gate”（包结构、构建脚本、核心运行时、安装方式、版权边界等影响发布内容的变更），必须停止发布并向用户汇报，由用户决定是否修正发布流程；agent 不得自行修改《发布流程.md》。
-- 04 公开包内置 `Lossless Scaling\Lossless.dll` 是项目所有者已确认的既定发布内容（见《发布流程.md》）；除该文件外，公开包不得包含其他第三方专有文件。
+- 公开包不得包含任何第三方专有文件（如商业软件 Lossless Scaling 等）；已废弃的 LSFG 相关文件（含 Lossless.dll）统一移入根目录 `trash/`，不进仓库、不进公开包。
 - 个人私用全量包 `mpv-full-private-vX.Y.Z.7z` 仅限本地保留，禁止上传公开 GitHub Release。

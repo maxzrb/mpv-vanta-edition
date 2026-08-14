@@ -7,11 +7,11 @@
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master` 与 `origin/master` 同步（v1.5.2 已发布并推送） |
 | **最新发布提交** | `c3ac48e`（tag: `v1.5.2`，已推送） |
-| **工作区** | 私包内置 VantaInstaller + 发布流程统一候选目录；改动待提交 |
+| **工作区** | LSFG 接入已废弃（文件移入根 trash/），04 包改为 Config；改动待提交 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.2（已发布） |
-| **上次操作** | 修复迷你进度线：贴到窗口底部边缘铺满整窗，暂停时保持显示 |
-| **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua`、`lsfg_control.lua` |
+| **上次操作** | 停止 LSFG 接入并回退研究提交，04 包改为 Config，发布流程改四包结构 |
+| **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
 
@@ -2392,3 +2392,14 @@ c:\Program portable\mpv2\
 - **清理**：删除历史 13 份 `uosc-theme-*.conf` 残留（约 230KB，git 已跟踪 12 份 + 未跟踪 1 份），`script-opts/backup/` 现为空。
 - **验证**：单测——应用主题前后 backup 文件数 0→0、theme 正确更新、`menu_submenu_delay`/`progress` 等其它行原样保留；Release 构建 0 警告 0 错误。
 - **边界**：仅安装器逻辑与备份清理；mpv.conf 的 `MpvConfigService.Backup`（保存设置才触发、频率低）保持不变。uosc.conf `theme` 已为用户当前值 lava-orange（一并提交）。
+
+### 2026-08-14 16:30 · 停止 LSFG 接入并改为四包结构
+
+- **决策**：LSFG 深挖（10bit swapchain 格式转换、telemetry、present 节奏诊断）后仍无 SVP 的丝滑效果，用户决定整体放弃 LSFG 接入；SVP 方案本就通过 VapourSynth 接入 mpv，不受影响。
+- **回退**：`git reset --hard e3813dd`（丢弃今天 7 个 lsfg 研究提交，保留 stats 汉化/迷你进度线/菜单延迟/备份约定/主题不备份等功能）。
+- **废弃目录**：新建根 `trash/` 收纳全部 LSFG 相关文件（.gitignore 忽略、不进公开包）：build-04-lsfg.ps1、start-mpv-lsfg.ps1、lsfg_control.lua、research/lsfg-vk-win（183 文件）、lsfg-vk/、Lossless Scaling/、release/04-mpv-lsfg-addon-*.7z。
+- **菜单/脚本**：input.conf 恢复 `CTRL+` `vf clr ""`、补帧菜单恢复「关闭补帧」+ mpv/VapourSynth 选项、移除 `user-data/lsfg` 状态条件；quality_status.lua 移除 LSFG 块。
+- **打包**：04 LSFG 废除；`build-05-config.ps1` → `build-04-config.ps1`，公开包变为 01/02/03/04（04 = Config 最终覆盖层）；build-all-packages 构建四包；build-full-private 不再含 LSFG/Lossless Scaling。
+- **流程/文档**：发布流程.md 改 01~04、移除 Lossless.dll 既定内容条款、新增根 trash 不进包约定；README、下载站 worker、.gitignore、AGENTS.md 同步。
+- **验证**：全部 build 脚本 PowerShell AST 解析通过；quality_status.lua luajit 语法通过；git grep 确认跟踪文件无 lsfg 功能残留（历史记录保留）。
+- **边界**：不构建、不发布；提交分三次（chore 回退/移除、build 打包脚本、docs 流程文档）。

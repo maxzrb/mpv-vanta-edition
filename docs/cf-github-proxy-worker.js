@@ -81,18 +81,6 @@ const FALLBACK_RELEASE = {
             "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/03-mpv-fasterwhisper-addon-v1.5.1.7z"
         },
         {
-            "name": "04-mpv-lsfg-addon-v1.5.1.7z",
-            "size": 3197223,
-            "content_type": "application/x-compressed",
-            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/04-mpv-lsfg-addon-v1.5.1.7z"
-        },
-        {
-            "name": "05-mpv-config-v1.5.1.7z",
-            "size": 5114786,
-            "content_type": "application/x-compressed",
-            "browser_download_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.5.1/05-mpv-config-v1.5.1.7z"
-        },
-        {
             "name": "VantaInstaller-win-x64-v0.3.0.exe",
             "size": 67648516,
             "content_type": "application/x-msdownload",
@@ -217,8 +205,7 @@ const LANDING_HTML = `<!DOCTYPE html>
         <li><b>01</b><span>Base 基础包（含随包 ffmpeg，必须）</span></li>
         <li><b>02</b><span>Extras 扩展包（.001 + .002 放同目录解压）</span></li>
         <li><b>03</b><span>Faster-Whisper AI 字幕 <em class="req">可选</em></span></li>
-        <li><b>04</b><span>LSFG 补帧扩展 <em class="req">可选</em></span></li>
-        <li><b>05</b><span>Config 个人配置（最后安装覆盖）</span></li>
+        <li><b>04</b><span>Config 个人配置（最后安装覆盖）</span></li>
       </ul>
       <div class="note">按文件名前缀从小到大依次解压覆盖到同一目录即可。</div>
     </div>
@@ -251,7 +238,6 @@ const LANDING_HTML = `<!DOCTYPE html>
   var badgeFor = function (name) {
     var n = name.toLowerCase();
     if (n.indexOf('installer') >= 0 || n.endsWith('.exe')) return 'EXE';
-    if (n.indexOf('lsfg') >= 0) return 'LSF';
     if (n.indexOf('whisper') >= 0) return 'AI';
     if (n.indexOf('config') >= 0) return 'CFG';
     if (n.indexOf('base') >= 0) return 'APP';
@@ -262,7 +248,7 @@ const LANDING_HTML = `<!DOCTYPE html>
   var tagFor = function (name) {
     var n = name.toLowerCase();
     if (n.indexOf('installer') >= 0) return '<span class="tag tag-inst">安装器</span>';
-    if (n.indexOf('fasterwhisper') >= 0 || n.indexOf('lsfg') >= 0) return '<span class="tag tag-opt">可选</span>';
+    if (n.indexOf('fasterwhisper') >= 0) return '<span class="tag tag-opt">可选</span>';
     return '';
   };
   var sortKey = function (name) {
