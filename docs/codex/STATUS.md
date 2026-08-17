@@ -7,7 +7,7 @@
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master` 与 `origin/master` 同步（v1.5.3 已发布并推送） |
 | **最新发布提交** | `164c77f`（tag: `v1.5.3`，已推送） |
-| **工作区** | v1.5.4 发布前检查通过；MediaInfo 真实轨道识别与 uosc 交互改动待提交，随后构建四个公开包 |
+| **工作区** | v1.5.4 四个公开包与个人私包已构建；GitHub 仅保留暂停中的草稿（04 Config 单资产），未正式发布 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.3（已发布） |
 | **上次操作** | 扩展 MediaInfo 真实轨道 codec 标准化映射，补齐专业/旧视频格式和常见音频格式，不引入文件名或媒体标题推断 |
@@ -2621,3 +2621,10 @@ c:\Program portable\mpv2\
 - **校验和**：01 `85F6CF77304C1D90B747FDAB971C203D6E080772FBB71B0B0B7A862EDF94C5E7`；02.001 `13C16A8D45AF98F8C0668DE8817946E16FD2FEB0A1AE1CC8AF29A8DD6FB35496`；02.002 `5CAF3795E9207E85E4A7A0AE0C58A69A9DE8E0A349FE726A04FAC119E22F048C`；03 `A320E9966AF0985CB9B216CE7912588AAF476B5D790B3C760CCC9B7517C4CCB8`；04 `19F7CF212F44E7AF12BC53B53C262D561F1D5B058E51A0AE22ADC7B541736621`；安装器 v0.3.3 `CB75EDA922D68C82A320589C0F47224C09481A99D76D32B73749BC6A03527D58`。
 - **安装器与运行验证**：沿用 v0.3.3 安装器启动 4 秒探针通过；完整配置 8K VP9 实样片加载并呈现，无本次目标 `error/fatal`。既有 `auto_profiles` 条件警告和自动播放脚本超时已知且无残留进程。
 - **下一步**：提交构建记录，创建并推送 `v1.5.4` 标签，使用 `gh release create` 上传 6 个公开资产；禁止上传私用全量包。
+
+### 2026-08-17 16:06 · 暂停上传并完成个人私包
+
+- **上传状态**：GitHub v1.5.4 草稿已创建，但上传速度异常；已终止 `gh` 上传进程。草稿当前只有 `04-mpv-config-v1.5.4.7z`，状态仍为 draft、非正式发布；未继续上传其他资产，也未上传私用全量包。
+- **个人私包**：执行 `build-full-private.ps1 -Version 1.5.4 -OutputDir release` 成功，生成 `release/mpv-full-private-v1.5.4.7z`（3,004,654,678 bytes）；包含 01/02/04、Faster-Whisper 占位说明和 v0.3.3 安装器，不合并 03 运行时。
+- **私包验证**：`7z t` 为 `Everything is Ok`；SHA-256 `D56D8E9299E7E51C7A1F9D755783046B315485D71C7594DC8C2EA17FEBA0C9A5`。该文件仅本地保留，禁止上传 GitHub Release。
+- **待办**：后续恢复发布前需决定是否保留/删除当前草稿并补传其余公开资产；当前不要将草稿标记为正式发布。私包构建脚本留下的 `build/mpv-full-private-v1.5.4` 暂存目录待下次发布收尾时清理。
