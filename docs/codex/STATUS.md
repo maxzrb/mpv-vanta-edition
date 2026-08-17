@@ -5,12 +5,12 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master` 与 `origin/master` 同步（v1.5.3 已发布并推送） |
-| **最新发布提交** | `164c77f`（tag: `v1.5.3`，已推送） |
-| **工作区** | v1.5.4 四个公开包与个人私包已构建；GitHub 仅保留暂停中的草稿（04 Config 单资产），未正式发布 |
+| **分支** | `master` 与 `origin/master` 同步（v1.5.4 已发布，发布结果已记录） |
+| **最新发布提交** | `4b7d651`（tag: `v1.5.4`，已推送） |
+| **工作区** | v1.5.4 已正式发布，6 个公开资产校验一致；个人私包仅本地保留，构建暂存已清理 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.3（已发布） |
-| **上次操作** | 扩展 MediaInfo 真实轨道 codec 标准化映射，补齐专业/旧视频格式和常见音频格式，不引入文件名或媒体标题推断 |
+| **项目版本** | v1.5.4（已发布） |
+| **上次操作** | 完成 v1.5.4 直连上传、远端校验与正式发布；定位 Steam++ GitHub 加速规则导致上传降速 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2628,3 +2628,11 @@ c:\Program portable\mpv2\
 - **个人私包**：执行 `build-full-private.ps1 -Version 1.5.4 -OutputDir release` 成功，生成 `release/mpv-full-private-v1.5.4.7z`（3,004,654,678 bytes）；包含 01/02/04、Faster-Whisper 占位说明和 v0.3.3 安装器，不合并 03 运行时。
 - **私包验证**：`7z t` 为 `Everything is Ok`；SHA-256 `D56D8E9299E7E51C7A1F9D755783046B315485D71C7594DC8C2EA17FEBA0C9A5`。该文件仅本地保留，禁止上传 GitHub Release。
 - **待办**：后续恢复发布前需决定是否保留/删除当前草稿并补传其余公开资产；当前不要将草稿标记为正式发布。私包构建脚本留下的 `build/mpv-full-private-v1.5.4` 暂存目录待下次发布收尾时清理。
+
+### 2026-08-17 16:38 · v1.5.4 直连上传与正式发布完成
+
+- **降速根因**：Steam++ 正在监听本机 `80/443`，并持续把 `github.com`、`api.github.com`、`uploads.github.com` 写入 `hosts` 指向 `127.0.0.1`；`gh` 的上传连接实际经过 Steam++ 本地转发，速度约 500 KiB/s。仅修改 `hosts` 时规则会被立即写回。
+- **环境处理**：临时退出 `Steam++.exe` 与 `Steam++.Accelerator.exe`，注释三条 GitHub 映射并刷新 DNS；解析恢复为 `github.com=20.205.243.166`、`api.github.com=20.205.243.168`、`uploads.github.com -> 20.205.243.161`。系统目录保留 `hosts.v154-upload-20260817-161841.bak` 与 `hosts.v154-upload-20260817-161958.bak`；重新启用 Steam++ 的 GitHub 加速后可能再次写回规则。
+- **速度验证**：`gh` 上传连接核实为本机 `192.168.0.12` 直连 `20.205.243.161:443`；10 秒网卡采样稳定约 6.75-6.97 MiB/s。五个待传资产批量上传用时约 12 分 22 秒，命令退出码 0。
+- **远端校验**：6 个公开资产均为 `uploaded`，远端大小与 GitHub `digest` SHA-256 逐项匹配本地；无多余资产、无个人私包。Release 已由草稿转为正式发布，非预发布：https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.5.4 。
+- **收尾**：删除 `build/mpv-full-private-v1.5.4` 暂存目录（11,747 个文件、约 5.0 GB）；`release/mpv-full-private-v1.5.4.7z` 仍仅在本地保留。本记录纳入发布收尾提交并推送。
