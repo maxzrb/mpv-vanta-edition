@@ -312,7 +312,11 @@ function Timeline:render()
 			}
 		end
 	end
-	local seek_hovered = cursor:collides_with(seek_hitbox)
+	-- 菜单会覆盖到底部的扩展 seek 命中区；菜单打开后不能让隐藏时间轴
+	-- 继续接收 hover 或向 thumbfast 请求缩略图。
+	local menu_open = Elements.menu and not Elements.menu.is_closing
+	if menu_open then self:clear_thumbnail() end
+	local seek_hovered = not menu_open and cursor:collides_with(seek_hitbox)
 
 	if size < 1 then
 		self:clear_thumbnail()
@@ -326,7 +330,7 @@ function Timeline:render()
 	if miss_guard_hitbox then
 		cursor:zone('primary_down', miss_guard_hitbox, function() end)
 	end
-	if visibility > 0 then
+	if visibility > 0 and not menu_open then
 		cursor:zone('primary_down', seek_hitbox, function()
 			self:handle_cursor_down()
 			cursor:once('primary_up', function() self:handle_cursor_up() end)

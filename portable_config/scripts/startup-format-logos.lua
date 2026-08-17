@@ -7,6 +7,9 @@ local utils = require 'mp.utils'
 local logo_bounds = dofile(mp.command_native({
     'expand-path', '~~/script-modules/startup-logo-bounds.lua',
 }))
+local media_format_info = dofile(mp.command_native({
+    'expand-path', '~~/script-modules/media-format-info.lua',
+}))
 
 local o = {
     enabled = true,
@@ -18,7 +21,6 @@ local o = {
     show_sdr = true,
     show_common_audio = true,
     require_video = false,
-    filename_fallback = true,
     show_on_audio_change = true,
     position = 'top-right',
     anchor_to_video = true,
@@ -103,6 +105,7 @@ local state = {
     opacity_index = 0,
     current = nil,
     last_aid = nil,
+    last_vid = nil,
     frame_ready = false,
     waiting_for_frame = false,
     content_insets = nil,
@@ -394,11 +397,11 @@ end
 
 local TRACK_TEXT_FIELDS = {
     'codec', 'codec-desc', 'codec-profile', 'decoder-desc',
-    'demux-codec', 'title', 'lang', 'format',
+    'demux-codec', 'format',
 }
 
 
-local function build_context(track, include_filename, extra)
+local function build_context(track, include_track_title, extra)
     local parts = {}
     append_context(parts, extra)
     if type(track) == 'table' then
@@ -407,20 +410,19 @@ local function build_context(track, include_filename, extra)
         end
         if type(track.metadata) == 'table' then
             for key, value in pairs(track.metadata) do
-                append_context(parts, key)
-                append_context(parts, value)
+                local normalized = tostring(key):lower():gsub('[^%w]', '')
+                if normalized ~= 'title' then
+                    append_context(parts, key)
+                    append_context(parts, value)
+                end
             end
         end
     end
-    if include_filename then
-        append_context(parts, mp.get_property('filename', ''))
-        append_context(parts, mp.get_property('media-title', ''))
-        append_context(parts, mp.get_property('path', ''))
+    if include_track_title and type(track) == 'table' then
+        append_context(parts, track.title)
     end
     local raw = table.concat(parts, ' '):lower()
-    -- Keep the meaning of literal "+" markers before stripping punctuation.
-    -- This makes filenames such as HDR10+ and DD+ match the same rules as
-    -- their spelled-out forms without weakening the brand checks.
+    -- 在去除标点前保留“+”的语义，使轨道标题中的 HDR10+、DD+ 可受限兜底。
     local compact = raw:gsub('%+', 'plus')
         :gsub('[%s%._%-:/\\%[%]%(%)]+', '')
     return raw, compact
@@ -485,14 +487,13 @@ local function detect_video_candidates(track)
     end
 
     local params = mp.get_property_native('video-params', {})
-    local _, compact = build_context(track, o.filename_fallback, nil)
+    local _, compact = build_context(track, true, nil)
     if has_dolby_vision(track, params, compact) then
         candidates['dolby-vision'] = true
     end
     if (type(params) == 'table' and params['hdr-vivid'] == true)
-        or (o.filename_fallback
-            and (contains_plain(compact, 'hdrvivid')
-                or contains_plain(compact, 'cuvahdr'))) then
+        or (contains_plain(compact, 'hdrvivid')
+            or contains_plain(compact, 'cuvahdr')) then
         candidates['hdr-vivid'] = true
     end
     if has_hdr10_plus(track, params, compact) then
@@ -503,13 +504,13 @@ local function detect_video_candidates(track)
         and tostring(params.gamma or params.transfer or ''):lower()
         or ''
     if gamma == 'pq' or gamma == 'smpte2084'
-        or (o.filename_fallback and contains_plain(compact, 'hdr10')) then
+        or contains_plain(compact, 'hdr10') then
         candidates.hdr10 = true
     end
     if gamma == 'hlg'
         or gamma == 'arib-std-b67'
         or gamma == 'aribstdb67'
-        or (o.filename_fallback and contains_plain(compact, 'hlg')) then
+        or contains_plain(compact, 'hlg') then
         candidates.hlg = true
     end
     if o.show_sdr then
@@ -519,14 +520,14 @@ local function detect_video_candidates(track)
 end
 
 
-local function detect_audio_candidates(track, include_filename)
+local function detect_audio_candidates(track, include_track_title)
     local candidates = {}
     if type(track) ~= 'table' or track.type ~= 'audio' then
         return candidates
     end
 
     local codec = mp.get_property('audio-codec', '')
-    local raw, compact = build_context(track, include_filename == true, codec)
+    local raw, compact = build_context(track, include_track_title == true, codec)
     local _, codec_compact = build_context(track, false, codec)
 
     if contains_plain(compact, 'atmos')
@@ -726,11 +727,8 @@ local function detect_selected_audio(track)
         atmos_carrier
     )
 
-    -- File names describe the whole container, not the selected audio track.
-    -- They are therefore unsafe in multi-audio files. For a single track they
-    -- may only refine a compatible codec family, never replace it with Dolby
-    -- or DTS from another family.
-    if o.filename_fallback and count_tracks('audio') == 1 then
+    -- 轨道标题只能细化兼容的真实 codec 家族，不能跨家族覆盖当前音轨。
+    if track.title and track.title ~= '' then
         local fallback = filter_audio_candidates(
             detect_audio_candidates(track, true),
             family,
@@ -754,12 +752,42 @@ local function detect_pair()
     end
 
     local audio_track = read_selected_track('audio')
-    local video = o.show_video
-        and choose_candidate(detect_video_candidates(video_track), o.video_priority)
-        or nil
-    local audio = o.show_audio
-        and detect_selected_audio(audio_track)
-        or nil
+    local info = media_format_info.collect()
+    local video_label = tostring(info.dynamic_range or '')
+    local video = nil
+    if o.show_video then
+        if video_label:find('Dolby Vision', 1, true) == 1 then
+            video = 'dolby-vision'
+        elseif video_label == 'HDR Vivid' then video = 'hdr-vivid'
+        elseif video_label == 'HDR10+' then video = 'hdr10-plus'
+        elseif video_label == 'HDR10' or video_label == 'HDR' then video = 'hdr10'
+        elseif video_label == 'HLG' then video = 'hlg'
+        elseif video_label == 'SDR' and o.show_sdr then video = 'sdr'
+        end
+    end
+
+    local audio_map = {
+        ['Dolby Atmos'] = 'dolby-atmos',
+        ['DTS:X'] = 'dts-x',
+        ['Audio Vivid'] = 'audio-vivid',
+        ['Dolby TrueHD'] = 'dolby-truehd',
+        ['DTS-HD MA'] = 'dts-hd-ma',
+        ['DTS-HD HRA'] = 'dts-hd-hra',
+        ['Dolby Digital Plus'] = 'dolby-digital-plus',
+        ['Dolby Digital'] = 'dolby-digital',
+        DTS = 'dts',
+        ['Dolby AC-4'] = 'ac4',
+        ['MPEG-H Audio'] = 'mpeg-h',
+        FLAC = 'flac', ALAC = 'alac', PCM = 'pcm', MLP = 'mlp',
+        WavPack = 'wavpack', APE = 'ape', WMA = 'wma', Opus = 'opus',
+        AAC = 'aac', Vorbis = 'vorbis', MP3 = 'mp3',
+    }
+    local audio = o.show_audio and audio_map[info.audio_codec] or nil
+    local common_audio = {
+        flac = true, alac = true, pcm = true, mlp = true, wavpack = true,
+        ape = true, wma = true, opus = true, aac = true, vorbis = true, mp3 = true,
+    }
+    if audio and common_audio[audio] and not o.show_common_audio then audio = nil end
     local audio_pending = false
     if o.show_audio and not audio then
         if type(audio_track) == 'table' and audio_track.type == 'audio' then
@@ -1930,6 +1958,7 @@ local function on_file_loaded()
     state.bar_anchor_locked = false
     cancel_lookahead_requests()
     state.last_aid = mp.get_property_native('aid')
+    state.last_vid = mp.get_property_native('vid')
     state.overlay_error_logged = false
     cancel_display(true)
     stop_timer('frame-wait')
@@ -1989,6 +2018,7 @@ local function on_end_file()
     state.badge_displayed = false
     state.bar_anchor_locked = false
     state.last_aid = nil
+    state.last_vid = nil
     stop_timer('frame-wait')
     stop_timer('bar-detect')
     stop_timer('bar-detect-timeout')
@@ -2000,6 +2030,7 @@ local function on_end_file()
     cancel_lookahead_requests()
     stop_timer('retry')
     stop_timer('audio-change')
+    stop_timer('video-change')
     cancel_display(true)
 end
 
@@ -2023,6 +2054,26 @@ local function on_audio_track_change(_, value)
             end
         end)
     end
+end
+
+
+local function on_video_track_change(_, value)
+    if not state.loaded then
+        state.last_vid = value
+        return
+    end
+    if value == state.last_vid then return end
+    state.last_vid = value
+    if not state.frame_ready or not o.enabled then return end
+    schedule('video-change', 0.18, function()
+        if not state.loaded then return end
+        local video, audio = detect_pair()
+        if video or audio then
+            show_pair(video, audio, 'video-track-change')
+        else
+            cancel_display(true)
+        end
+    end)
 end
 
 
@@ -2111,6 +2162,7 @@ mp.register_event('file-loaded', on_file_loaded)
 mp.register_event('playback-restart', on_playback_restart)
 mp.register_event('end-file', on_end_file)
 mp.observe_property('aid', 'native', on_audio_track_change)
+mp.observe_property('vid', 'native', on_video_track_change)
 mp.observe_property('osd-dimensions', 'native', function()
     if state.visible and state.opacity_index > 0 then
         render_level(state.opacity_index)

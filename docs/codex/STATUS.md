@@ -7,10 +7,10 @@
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master` 与 `origin/master` 同步（v1.5.3 已发布并推送） |
 | **最新发布提交** | `164c77f`（tag: `v1.5.3`，已推送） |
-| **工作区** | LSFG 接入已废弃（文件移入根 trash/），04 包改为 Config；改动待提交 |
+| **工作区** | v1.5.4 发布前检查通过；MediaInfo 真实轨道识别与 uosc 交互改动待提交，随后构建四个公开包 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.3（已发布） |
-| **上次操作** | 发布 v1.5.3（四包结构、LSFG 停止接入、VantaInstaller v0.3.3），6 个资产已上传核对 |
+| **上次操作** | 扩展 MediaInfo 真实轨道 codec 标准化映射，补齐专业/旧视频格式和常见音频格式，不引入文件名或媒体标题推断 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2509,3 +2509,106 @@ c:\Program portable\mpv2\
 - 资产核对：6 个公开资产远端大小与 SHA-256 全部与本地一致（01/02.001/02.002/03/04/VantaInstaller-v0.3.3），无重复、无 diag 残留；私包未上传。
 - 上传过程：曾遇 GitHub 上行线路波动（0.3~0.7MB/s）暂停；诊断确认非本地带宽（百度网盘正常、直连 GitHub 真实 IP 亦慢、走代理也慢）；线路恢复后（3MB/s+）并行上传完成。
 - 收尾：版本迭代记录/工作进度/本文件已更新；master 与 origin/master 同步（发布提交 164c77f + 收尾提交）。
+
+### 2026-08-17 12:17 · MediaInfo 胶囊编码识别逻辑核查
+
+- `portable_config/scripts/uosc/elements/MediaInfo.lua` 只负责调用 `MediaFormatInfo.collect()` 并展示 `info.video_codec`；识别逻辑在 `portable_config/script-modules/media-format-info.lua`。
+- `read_snapshot()` 读取 `video-codec`、`current-tracks/video` 等 mpv 属性；`build_context()` 又把视频轨道字段、`video-codec`、文件名、媒体标题和完整路径拼接，并经 `compact()` 去掉标点后用于子串匹配。
+- `VIDEO_CODEC_RULES` 按顺序扫描，`AVC` 规则位于 `AV1` 之前；`contains()` 是无边界的纯子串查找。因此真实 `video_codec=av1` 时，只要标题、文件名或路径含 `avc`，就会先返回 `AVC`。模拟验证覆盖标题、文件名、目录和轨道字段组合，均复现该误判；仅标题写 `AV1` 也能在真实属性缺失时被识别为 AV1。
+- 同一上下文污染也会影响动态范围/音频标签：标题中的 `Dolby Vision`、`HLG`、`Atmos` 可分别触发对应标签。此次未修改代码，待用户确认后再按“权威轨道属性优先、标题/路径仅作受限兜底”的方向修复。
+- 验证命令：`luajit.exe -e ... media-format-info.lua`（合成快照测试）；`mpv.exe --version` 正常。记录前代码工作树为 `master...origin/master` 且干净；当前仅新增本次两份 HandShake 记录文件。
+
+### 2026-08-17 12:27 · 核对杳知 mpv 8.17 编码识别修复
+
+- 来源：GitHub Release `mpv-Yaozhi_整合包`，资产 `Yaozhi-mpv-8.17.7z`，发布说明明确声称视频格式只按当前真实轨道/解复用器/解码器识别。
+- 包内活动链路：`scripts/uosc/elements/Timeline.lua` 加载 `script-modules/media-format-info.lua`，`build_media_info_segments()` 使用 `MediaFormatInfo.collect()`；`uosc/main.lua` 的独立 `elements/MediaInfo` 构造器仍被注释，实际胶囊走 Timeline。
+- `media-format-info.lua` 新增 `detect_snapshot_video_codec()`，只检查 `video-codec`、选中视频轨的 `codec`/`demux-codec`/`codec-desc`/`decoder-desc`/`format`，不再把文件名、标题、路径用于基础视频编码判定。
+- 发布包 LuaJIT 合成快照验证：真实 AV1 + 标题 AVC、文件名 x265/HEVC、目录污染均返回 AV1；真实 HEVC + 文件名 AV1 返回 HEVC；仅标题 AV1 且无真实视频属性返回空值。
+- 保留风险：包内备用 `scripts/uosc/elements/MediaInfo.lua` 仍直接用 `video-params/codec` 加文件名判断，存在旧误判逻辑；但当前 `main.lua` 未启用该元素。动态范围/音频识别仍可使用标题/路径上下文，这是发布说明允许的补充元数据兜底范围。
+
+### 2026-08-17 12:37 · 修复本仓库 MediaInfo 编码识别优先级
+
+- `portable_config/script-modules/media-format-info.lua`：将视频编码识别拆为独立字段检测；按真实 `video-codec`、视频轨道 `codec`/`demux-codec`/`codec-desc`/`decoder-desc`/`format`，再按文件名，最后按媒体标题的顺序返回。路径不再参与基础视频编码判断。
+- `portable_config/scripts/uosc/elements/MediaInfo.lua`：补充观察 `video-codec`、`filename`、`media-title`，切轨或属性变化后及时刷新胶囊。
+- 边界修复：实际候选字段统一为空字符串，避免 Lua `ipairs` 在缺失字段处提前停止，导致跳过后续轨道属性。
+- 验证：LuaJIT 语法通过；5 组合成快照优先级断言通过（真实轨道覆盖文件名/标题、文件名覆盖标题、标题兜底、路径忽略）；完整 `mpv.exe --config-dir=portable_config` 播放真实 AV1 样片 2 帧，uosc 与媒体模块加载正常，无 `[e]/[f]` 或 Lua 错误；`git diff --check` 通过（仅已有 LF→CRLF 警告）。
+
+### 2026-08-17 12:50 · 新增进度条时间显示模式与统一时长格式
+
+- `portable_config/scripts/uosc/main.lua`：保留默认 `playtime-remaining`，新增 `time-display-toggle` 消息，在播放时长/剩余时长与播放时长/总时长之间切换；切换后持久化 `destination_time`，并发布 `user-data/uosc/time-display` 供菜单状态使用。
+- `update_human_times()` 改为先计算左右原始秒数，再用两者绝对值较大的时长统一调用 `format_time()`；总时长超过一小时且当前进度较短时，左侧会保留小时位（如 `00:15:01/01:15:55`）。
+- `portable_config/input.conf`：新增 `CTRL+ALT+m` 和“其它 > 时间显示”菜单入口，当前为总时长模式时显示勾选状态。
+- `portable_config/script-opts/uosc.conf`：补充模式切换说明；默认仍为播放时长/剩余时长。
+- 验证：LuaJIT `main.lua`/`TimeDisplay.lua` 语法通过；完整配置默认启动发布 `time-display=remaining`；临时探针切换 `total` 后日志确认 `destination_time=total` 已持久化、状态发布为 `total`，随后恢复正式配置；`git diff --check` 通过。完整配置测试另有既存 `undoredo.lua`/`simplehistory.lua` 错误，与本次时间显示无关。
+
+### 2026-08-17 13:00 · 时间区域支持鼠标点击切换
+
+- `portable_config/scripts/uosc/elements/TimeDisplay.lua`：在可见的完整时间显示矩形上注册 `primary_click` 命中区，点击后向 uosc 发送 `time-display-toggle`。
+- 点击、`CTRL+ALT+m` 和“其它 > 时间显示”菜单共用同一消息处理器，因此模式状态、OSD 提示与 `uosc.conf` 持久化行为完全一致。
+- 验证：TimeDisplay LuaJIT 语法通过；完整配置真实 AV1 样片短启动无 uosc/TimeDisplay 错误；`git diff --check` 通过。
+
+### 2026-08-17 13:11 · MediaInfo 与其它视频信息显示文本污染审计
+
+- 本轮只审计，未修改识别代码。此前基础视频编码修复有效：真实 `video-codec`/轨道字段优先，文件名其次，媒体标题最后，路径不参与；合成快照确认真实 AV1 配合旧 H.265 文件名及 AVC 标题仍返回 AV1。
+- MediaInfo 动态范围仍把轨道文本、文件名、媒体标题和完整路径混为同一上下文。复现：真实 SDR + 文件名 `DOVI` 返回 Dolby Vision；真实 PQ + 文件名 `HDR10Plus` 返回 HDR10+。Dolby Vision、HDR Vivid、HLG 等均存在同类文本触发路径。
+- MediaInfo 音频格式仍会被文件名、媒体标题、路径及轨道标题误导。复现：真实 AAC + 文件名 `Atmos` 返回 Dolby Atmos；真实 AAC + 媒体标题 `DTS-HD MA` 返回 DTS-HD MA。
+- 声道布局存在两处问题：候选数组首项为 `nil` 时 Lua `ipairs` 立即停止，后续真实布局可能不检查；文件名布局又先于真实声道数回退。复现：真实 6 声道 + 文件名 `2.0` 返回 2.0；真实 `7.1.4`/12 声道在首候选缺失时返回 `12ch`。
+- 其它准确性边界：`hwdec-current` 空值被显示为软解；未知视频编码（如 FFV1）不显示，未知音频编码可回退为原始 `audio-codec` 大写；宽银幕分辨率按宽或高阈值粗分，`2560x1080` 显示 1440P QHD、`3840x1600` 显示 4K UHD。
+- 独立起播 Logo 默认 `filename_fallback=yes`，视频 Dolby Vision/HDR Vivid/HDR10+/HDR10/HLG 会读取文件名、标题和路径；音频 Logo 已有限制，只允许单音轨且与真实 Dolby/DTS codec 家族兼容的文本兜底。`stats.lua`、dyn_menu/uosc 轨道菜单直接使用 mpv 轨道/参数字段，未发现文件名参与格式推断；quality-menu 展示 yt-dlp 的格式 JSON 字段，也不以媒体标题推断格式。
+- 格式覆盖：视频明确映射 VVC、AVS3、AVS2、AVS+、HEVC、EVC、AVC、AV1、VP9、VP8、MPEG-2、MPEG-4、VC-1、ProRes、Theora、JPEG XL、WebP；MPEG-1、H.263、MJPEG、FFV1、HuffYUV、DNxHD/DNxHR、CineForm、Dirac、APV、rawvideo、WMV1/2、VP6、RealVideo 等无明确映射。音频覆盖 Dolby/DTS、Audio Vivid、AC-4、MPEG-H、AAC 系、FLAC/ALAC/WavPack/TAK/TTA/APE/WMA/Opus/Vorbis/MP3/PCM/MLP，未映射格式仍显示原始值。
+- 验证：使用根目录 `luajit.exe` 调用 `MediaFormatInfo.from_snapshot()` 完成 10 组合成快照与 4 组分辨率测试；工作树仍包含此前 8 个未提交文件，本轮仅改动本状态文件和 `version/工作进度.md` 的审计记录。
+
+### 2026-08-17 13:27 · MediaInfo 胶囊移除文件名/标题格式兜底
+
+- `portable_config/script-modules/media-format-info.lua`：删除 filename、media-title、path、轨道 title 和任意 metadata 文本参与格式推断；视频/音频只读取当前轨道 codec、profile、demux/decoder 字段、video/audio params 和受限结构化元数据白名单。
+- 动态范围仅接受 Dolby Vision profile/level、HDR Vivid、HDR10+/静态 HDR 元数据及真实 transfer/gamma；无可靠字段返回“动态范围未知”。视频/音频无法映射但存在真实 codec 时显示真实 codec 名称，完全缺失时分别显示“未知视频格式”“未知音频格式”。
+- 声道布局移除文件名回退并修复空候选截断；无布局和声道数时显示“声道未知”。`hwdec-current` 为空时胶囊显示“解码未知”，不再误报软解；无音轨时不显示虚假的未知音频段。
+- `portable_config/scripts/uosc/elements/MediaInfo.lua`：移除 filename/media-title 属性观察，增加 `video-frame-info` 观察；按 HW/SW/UNKNOWN 三态显示解码方式。
+- 验证：LuaJIT 16 组合成快照断言、结构化元数据断言、目标脚本语法和 mpv 无配置单帧启动均通过；完整配置真实样片退出码 0。完整配置日志仍有既存 auto_profiles 条件警告，与本次改动无关；`git diff --check` 通过。
+
+### 2026-08-17 14:41 · 8K VP9 60fps 硬解卡顿诊断
+
+- 样片 `F:\演示片\DOLBY_VISION_CES\8K 秘鲁 HDR画质 60FPS FUHD Peru HDR 60FPS FUHD .webm` 的真实轨道是 VP9 Profile 0、7680x4320、59.9401fps、yuv420p、BT.709，平均码率约 68.7Mbps；文件名中的 Dolby Vision/HDR 不符合轨道参数。
+- 设备为 AMD Radeon RX 6600，显示器 1920x1080 144Hz。完整配置日志确认初始 `auto-copy` 会先尝试 `vp9-d3d11va-copy`，随后 `[8k-fix]` 正确应用 `hwdec=auto-safe` 并重启为原生零拷贝 `d3d11va`，所以持续卡顿不是 8K 条件配置未生效。
+- 无用户配置基线（原生 `d3d11va`、`video-sync=audio`、禁用插值/去色带、bilinear 缩放）播放 12 秒仍记录 526 次 `drop-vo`、仅 194 次视频绘制；`vo=gpu` 基线为 460 次 `drop-vo`、260 次视频绘制。`gpu-next` 有影响，但改用旧渲染器仍不足以流畅，说明 RX 6600 的 VP9 8K60 解码余量与 mpv 的呈现/驱动队列共同成为瓶颈。
+- 完整配置另有启动阶段附加负载：起播 Logo 的编码黑边后瞻从约 3.17 秒启动独立 ffmpeg 软件解码 8K VP9 帧，到约 9.81 秒才返回，约持续 6.6 秒；这会放大刚起播时的卡顿，但不能解释禁用全部用户脚本后的持续丢帧。
+- FFF Player 设置仅能确认“解码方式=2”，本地没有其后端映射或运行统计，不能据此断言它使用哪种硬解 API；更平滑的合理差异是不同的硬解后端、帧队列、丢帧策略或更直接的 D3D/Vulkan 呈现路径。
+- 本轮只诊断并生成 `tmp/mpv-8k-*.log` 与 stats 临时记录，未修改任何播放配置。若继续修复，优先顺序应是：8K 时关闭起播 Logo 的 ffmpeg 黑边后瞻，再建立专用低负载渲染配置，最后对比 D3D11VA/AMF/Vulkan 可用路径。
+
+### 2026-08-17 14:52 · uosc 菜单与隐藏时间轴缩略图交互穿透修复
+
+- 根因：`Timeline:render()` 在时间轴不可见时仍按扩展 seek 命中区计算 `seek_hovered`，缩略图分支未检查菜单状态；菜单覆盖到该区域时，底层时间轴继续向 thumbfast 请求预览。
+- `portable_config/scripts/uosc/elements/Timeline.lua`：菜单存在且未处于关闭动画时，立即清除缩略图、阻止 `seek_hovered`、停止注册时间轴的点击/滚轮命中区。菜单关闭后时间轴恢复原本交互。
+- `portable_config/scripts/uosc/elements/Menu.lua`：菜单创建时主动调用 `Timeline:clear_thumbnail()`，避免菜单打开前一帧已经显示的缩略图残留。
+- 验证：两文件 LuaJIT 语法检查通过；完整配置短启动日志无 uosc/Menu/Timeline Lua 错误，并确认菜单创建路径向 thumbfast 发送 `clear`；`git diff --check` 通过。实际窗口交互需人工打开菜单并将光标移到原问题区域复核。
+
+### 2026-08-17 14:56 · uosc 底栏单轨计数显示
+
+- `portable_config/scripts/uosc/elements/Controls.lua`：字幕、音频、视频控件的 badge 条件由 `sub/audio/video > 1` 改为 `> 0`。
+- 结果：存在一条轨道时相应图标显示 `1`；不存在该类型轨道时不显示数字。播放列表、章节、版本仍保留“多于一项才显示计数”的原有规则。
+- 验证：Controls.lua LuaJIT 语法通过；规则断言确认三个轨道均为 `>0` 且 playlist/chapters/editions 仍为 `>1`；`git diff --check` 通过。
+
+### 2026-08-17 15:03 · MediaInfo 真实 codec 映射扩展
+
+- `portable_config/script-modules/media-format-info.lua` 视频映射新增：MPEG-1、MS MPEG-4、H.263、WMV1/2、DNxHD/DNxHR、CineForm、FFV1、HuffYUV、Dirac、APV、HAP、MJPEG、JPEG 2000、VP6、RealVideo、RAW；已有常见编码规则不变。
+- 音频映射新增：Dolby E、MPEG Layer I/II、泛 MPEG Audio、Musepack、Speex、AMR-NB/WB、ATRAC、ADPCM、G.711 A-law/mu-law。`mpa` 不再错误显示为 MP3，而是在真实 codec 无法细分层级时显示 MPEG Audio。
+- 修复规则顺序边界：ATRAC3plus 的实际 codec 文本含 `ac3`，现优先匹配 ATRAC，避免误报 Dolby Digital。
+- 所有新增识别仍只读取当前选中轨道、解码器及受限结构化元数据；合成快照额外验证真实 FFV1/MP2 不会被轨道标题 AV1 HDR/Dolby Atmos 覆盖。
+- 验证：15 个视频与 13 个音频新增映射快照通过；三个目标 Lua 文件语法通过；完整配置日志确认 MediaInfo/起播 Logo 均加载共享模块，启动阶段未见 Lua 错误。`--frames=1` 受既有自动播放脚本影响持续加载后续文件，30 秒后人工停止测试进程，无遗留进程；`git diff --check` 通过。
+
+### 2026-08-17 15:18 · 今日 MediaInfo 与 uosc 改动鲁棒性复核
+
+- MediaInfo、共享格式模块与起播 Logo 的实际调用链已复核：编码、动态范围、声道布局、解码方式和起播格式 Logo 只使用当前选中轨道、解码器、视频/音频参数及受限结构化元数据；文件名和媒体标题不参与格式判定。轨道标题仅在真实字段缺失时作为受限兜底，且音频不得跨真实 codec 家族细化。
+- `MediaInfo.lua` 的网络速度标签由路径协议文本改为 mpv `demuxer-via-network` 状态，并观察该属性刷新；避免本地特殊路径、伪协议或 URL 文本造成“网络”误报。
+- `uosc.conf` 保持原默认“播放时长/剩余时长”；新增的“播放时长/总时长”仍可通过点击时间区、菜单和 `CTRL+ALT+m` 切换。
+- 起播 Logo 内仍有一组未调用的旧识别辅助函数；运行时只走共享 `media-format-info.lua`，故不影响当前结果。后续重构时应删除该死代码，防止维护者误接回不受限的旧逻辑。
+- 验证：今日 8 个修改 Lua 文件 `loadfile` 解析通过；合成快照确认真实 FFV1/SDR/AAC 覆盖伪造文件名、媒体标题及不兼容轨道标题，轨道标题只在真实信息缺失时兜底；`git diff --check` 通过（仅既有文档 LF→CRLF 警告）。
+
+### 2026-08-17 15:31 · v1.5.4 发布前检查
+
+- **3.1 工作区与 Git**：`git status --short --branch` 已核对 13 个待发布改动（MediaInfo、起播 Logo、uosc、记录文件）；`git fetch origin` 成功，`master` 与 `origin/master` 均指向 `71ebb3f`，远端无未合并改动。功能改动、构建记录、发布结果将按流程分提交。
+- **3.2 大改动 Gate**：不触发。公开包仍为 01 Base → 02 Extras → 03 Faster-Whisper → 04 Config；所有今日运行时改动均在 `portable_config/`，`build-01-base.ps1` 与 `build-04-config.ps1` 递归复制该目录。未改构建脚本、运行时、安装方式、包边界或第三方版权内容。
+- **发布覆盖核验**：01 复制全部 `portable_config`（仅既有的 shaders/vs/cache/files 排除）；04 同样复制本次文件，且按既有边界排除 `script-assets`、fonts、licenses、`.vanta-version`。故共享模块、uosc、input.conf 和 script-opts 均会进入 01/04；起播 Logo 素材继续仅进入 01。
+- **3.3 文档**：STATUS 与工作进度已追加；版本记录已切换为 v1.5.4 发布准备中并归档 v1.5.3；README 的安装顺序与包结构无变化，无需更新。
+- **3.4 验证**：139 个 `scripts`/`script-modules` Lua 文件逐个 `loadfile` 通过；11 个本次 Lua/conf 改动为 UTF-8 无 BOM、LF；`git diff --check` 通过（仅 STATUS/工作进度已有 LF→CRLF 警告）。完整配置以 8K VP9 实样片加载并呈现，MediaInfo/uosc/起播 Logo 均已加载，未见本次目标 `error/fatal`；单帧参数被既有自动播放脚本带入后续文件，测试已超时结束，无残留 mpv 进程。
+- **安装器**：VantaInstaller 源码无本次改动，沿用 `release/VantaInstaller-win-x64-v0.3.3.exe` 候选（69,653,458 bytes），无需重建或提升其独立版本。

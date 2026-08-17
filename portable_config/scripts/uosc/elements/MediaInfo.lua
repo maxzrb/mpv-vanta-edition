@@ -133,8 +133,8 @@ local function read_bitrate(mode, filter)
 end
 
 local function read_network_speed()
-	local path = mp.get_property('path', ''):lower()
-	if not path:match('^%a[%w+.-]*://') then return '' end
+	-- 使用 mpv 的解复用状态，而非从路径文本推断网络媒体。
+	if mp.get_property_native('demuxer-via-network', false) ~= true then return '' end
 	local bytes = mp.get_property_number('cache-speed', 0)
 	if bytes <= 0 then return '' end
 	if bytes >= 1024 * 1024 then return string.format('↓ %.1f MB/s', bytes / 1024 / 1024) end
@@ -174,8 +174,10 @@ local function build_segments(mode, filter)
 	-- 硬解/软解放在最前，一眼确认当前解码状态
 	if info.hwdec == 'HW' then
 		append(parts, '硬解', 'muted', 'decode')
-	else
+	elseif info.hwdec == 'SW' then
 		append(parts, '软解', 'muted', 'decode')
+	else
+		append(parts, '解码未知', 'muted', 'decode')
 	end
 	append(parts, info.resolution_long, 'primary', 'picture')
 	if info.dynamic_range ~= '' then
@@ -183,7 +185,7 @@ local function build_segments(mode, filter)
 	end
 	append(parts, info.video_codec, 'primary', 'video')
 	append(parts, info.fps_label, 'muted', 'video')
-	if info.audio_codec ~= '' or info.audio_layout ~= '' then
+	if info.audio_present then
 		append(parts, info.audio_codec, 'primary', 'audio')
 		append(parts, info.audio_layout, 'muted', 'audio')
 	end
@@ -344,9 +346,11 @@ function MediaInfo:init()
 	self.bitrate_filter = { value = 0, time = 0, display = 0, mean = 0 }
 	local function refresh() request_render() end
 	for _, property in ipairs({
-		'hwdec-current', 'video-params', 'estimated-vf-fps', 'container-fps',
+		'hwdec-current', 'video-params', 'video-frame-info', 'video-codec',
+		'estimated-vf-fps', 'container-fps',
 		'video-bitrate', 'audio-bitrate', 'audio-codec', 'audio-params', 'audio-out-params/format',
-		'current-tracks/video', 'current-tracks/audio', 'cache-speed',
+		'current-tracks/video', 'current-tracks/audio', 'track-list', 'vid', 'aid',
+		'cache-speed', 'demuxer-via-network',
 	}) do
 		self:observe_mp_property(property, 'native', refresh)
 	end

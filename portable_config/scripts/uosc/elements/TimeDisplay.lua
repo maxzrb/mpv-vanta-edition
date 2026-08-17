@@ -19,6 +19,11 @@ function TimeDisplay:render()
 	local visibility = self:get_visibility()
 	if visibility <= 0 then return end
 
+	-- 点击左右时间区域切换“剩余时长 / 总时长”显示模式。
+	cursor:zone('primary_click', self, function()
+		mp.commandv('script-message-to', 'uosc', 'time-display-toggle')
+	end)
+
 	local ass = assdraw.ass_new()
 	local current = state.time_human or '00:00'
 	local destination = state.destination_time_human or '00:00'

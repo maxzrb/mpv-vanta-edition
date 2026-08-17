@@ -582,18 +582,25 @@ end
 function update_human_times()
 	state.speed = state.speed or 1
 	if state.time then
-		if state.duration then
+		local destination_time
+		if state.duration and state.duration > 0 then
 			if options.destination_time == 'playtime-remaining' then
-				state.destination_time_human = format_time((state.time - state.duration) / state.speed, state.duration)
+				destination_time = (state.time - state.duration) / state.speed
 			elseif options.destination_time == 'total' then
-				state.destination_time_human = format_time(state.duration, state.duration)
+				destination_time = state.duration
 			else
-				state.destination_time_human = format_time(state.time - state.duration, state.duration)
+				destination_time = state.time - state.duration
 			end
+		end
+		if destination_time ~= nil then
+			-- 左右两侧共用较长时长，避免一侧有小时位而另一侧没有。
+			local display_max_seconds = math.max(math.abs(state.time), math.abs(destination_time))
+			state.time_human = format_time(state.time, display_max_seconds)
+			state.destination_time_human = format_time(destination_time, display_max_seconds)
 		else
+			state.time_human = format_time(state.time, state.time)
 			state.destination_time_human = nil
 		end
-		state.time_human = format_time(state.time, state.duration or state.time)
 	else
 		state.time_human, state.destination_time_human = nil, nil
 	end
@@ -1349,6 +1356,37 @@ local function set_mini_progress(value, silent)
 end
 mp.register_script_message('mini-progress-toggle', set_mini_progress)
 publish_mini_progress_state()
+-- 时间显示模式：播放时长/剩余时长与播放时长/总时长之间切换，并持久化到 uosc.conf。
+local function publish_time_display_state()
+	mp.set_property(
+		'user-data/uosc/time-display',
+		options.destination_time == 'total' and 'total' or 'remaining'
+	)
+end
+local function set_time_display(value, silent)
+	local requested = tostring(value or 'toggle'):lower()
+	if requested == 'total' then
+		options.destination_time = 'total'
+	elseif requested == 'remaining' or requested == 'playtime-remaining' then
+		options.destination_time = 'playtime-remaining'
+	else
+		options.destination_time = options.destination_time == 'total'
+			and 'playtime-remaining' or 'total'
+	end
+	handle_options({destination_time = true})
+	persist_uosc_option('destination_time', options.destination_time)
+	publish_time_display_state()
+	if not silent then
+		mp.osd_message(
+			options.destination_time == 'total'
+				and '时间显示：播放时长 / 总时长'
+				or '时间显示：播放时长 / 剩余时长',
+			2
+		)
+	end
+end
+mp.register_script_message('time-display-toggle', set_time_display)
+publish_time_display_state()
 -- 打开方式单选：replace=替换当前实例，new=启动新实例（持久化）
 local function set_open_file_mode(mode)
 	options.menu_open_file_mode = mode

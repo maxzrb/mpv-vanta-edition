@@ -49,10 +49,10 @@ function Controls:init_options()
 		-- 暂停时标记为 active，复用全屏按钮的主题色填充与主题文字色。
 		['play-pause'] = 'cycle:pause:pause:no/yes=play_arrow!?' .. t('Play/Pause'),
 		menu = 'command:menu_book:script-binding uosc/menu-blurred?' .. t('Menu'),
-		subtitles = 'command:closed_caption:script-binding uosc/subtitles#sub>1?' .. t('Subtitles'),
-		audio = 'command:graphic_eq:script-binding uosc/audio#audio>1?' .. t('Audio'),
+		subtitles = 'command:closed_caption:script-binding uosc/subtitles#sub>0?' .. t('Subtitles'),
+		audio = 'command:graphic_eq:script-binding uosc/audio#audio>0?' .. t('Audio'),
 		['audio-device'] = 'command:speaker:script-binding uosc/audio-device?' .. t('Audio device'),
-		video = 'command:smart_display:script-binding uosc/video#video>1?' .. t('Video'),
+		video = 'command:smart_display:script-binding uosc/video#video>0?' .. t('Video'),
 		playlist = 'command:list_alt:script-binding uosc/playlist#playlist>1?' .. t('Playlist'),
 		chapters = 'command:library_books:script-binding uosc/chapters#chapters>1?' .. t('Chapters'),
 		['editions'] = 'command:movie_filter:script-binding uosc/editions#editions>1?' .. t('Editions'),

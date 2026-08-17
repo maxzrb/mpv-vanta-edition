@@ -280,6 +280,8 @@ function Menu:init(data, callback, opts)
 	end
 	mp.set_property_native('user-data/uosc/menu/type', self.type or 'undefined')
 	self:update(data)
+	-- 菜单一出现就撤销时间轴预览，避免上一帧的 thumbfast 画面残留在菜单旁。
+	Elements:maybe('timeline', 'clear_thumbnail')
 
 	-- 鼠标导航（右键）菜单跟随光标位置打开，而不是固定在屏幕中央
 	if self.mouse_nav and cursor.x < math.huge and cursor.y < math.huge then
