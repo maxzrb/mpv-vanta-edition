@@ -2612,3 +2612,12 @@ c:\Program portable\mpv2\
 - **3.3 文档**：STATUS 与工作进度已追加；版本记录已切换为 v1.5.4 发布准备中并归档 v1.5.3；README 的安装顺序与包结构无变化，无需更新。
 - **3.4 验证**：139 个 `scripts`/`script-modules` Lua 文件逐个 `loadfile` 通过；11 个本次 Lua/conf 改动为 UTF-8 无 BOM、LF；`git diff --check` 通过（仅 STATUS/工作进度已有 LF→CRLF 警告）。完整配置以 8K VP9 实样片加载并呈现，MediaInfo/uosc/起播 Logo 均已加载，未见本次目标 `error/fatal`；单帧参数被既有自动播放脚本带入后续文件，测试已超时结束，无残留 mpv 进程。
 - **安装器**：VantaInstaller 源码无本次改动，沿用 `release/VantaInstaller-win-x64-v0.3.3.exe` 候选（69,653,458 bytes），无需重建或提升其独立版本。
+
+### 2026-08-17 15:52 · v1.5.4 构建与本地门禁
+
+- **构建**：执行 `build-all-packages.ps1 -Version 1.5.4` 成功，生成 01 Base、02 Extras 两卷、03 Faster-Whisper、04 Config；构建暂存 `build/` 已清理。
+- **完整性**：全部归档 `7z t` 通过；02 分卷大小为 1,900 MB / 745.4 MB，符合 GitHub 限制。
+- **内容门禁**：今日修改文件均在 01/04；01 含 `script-assets/`、`ffmpeg/ffmpeg.exe`、`.vanta-version=1.5.4`；04 排除 `script-assets/`、fonts、licenses、`.vanta-version`、`window_state.conf`。公开包无顶层 release/build/tmp/.git、项目根 backup、日志、pyc、Lossless 专有文件。
+- **校验和**：01 `85F6CF77304C1D90B747FDAB971C203D6E080772FBB71B0B0B7A862EDF94C5E7`；02.001 `13C16A8D45AF98F8C0668DE8817946E16FD2FEB0A1AE1CC8AF29A8DD6FB35496`；02.002 `5CAF3795E9207E85E4A7A0AE0C58A69A9DE8E0A349FE726A04FAC119E22F048C`；03 `A320E9966AF0985CB9B216CE7912588AAF476B5D790B3C760CCC9B7517C4CCB8`；04 `19F7CF212F44E7AF12BC53B53C262D561F1D5B058E51A0AE22ADC7B541736621`；安装器 v0.3.3 `CB75EDA922D68C82A320589C0F47224C09481A99D76D32B73749BC6A03527D58`。
+- **安装器与运行验证**：沿用 v0.3.3 安装器启动 4 秒探针通过；完整配置 8K VP9 实样片加载并呈现，无本次目标 `error/fatal`。既有 `auto_profiles` 条件警告和自动播放脚本超时已知且无残留进程。
+- **下一步**：提交构建记录，创建并推送 `v1.5.4` 标签，使用 `gh release create` 上传 6 个公开资产；禁止上传私用全量包。
