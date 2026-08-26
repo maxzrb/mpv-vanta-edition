@@ -2762,3 +2762,13 @@ c:\Program portable\mpv2\
 - **3.2 Gate**：不触发。包数量/编号/覆盖顺序、构建脚本、7-Zip 参数、mpv 核心/运行时、安装方式、版权边界和分卷规则均不变；VantaInstaller 功能/界面变化按流程明文豁免。
 - **3.3 文档**：`version/版本迭代记录.md` 已建立 v1.5.5 当前版本和待补校验区；README 安装器名称更新为 v0.3.12；本条记录作为发布前清单，构建后补 SHA-256、资产和最终状态。
 - **3.4 构建入口**：已审阅 `build-all-packages.ps1`、`build-01-base.ps1`、`build-02-extras.ps1`、`build-03-fasterwhisper.ps1`、`build-04-config.ps1`、`build-full-private.ps1`；均覆盖当前 portable_config/安装器候选/私包既定边界，无需修改发布流程或构建脚本。
+
+### 2026-08-26 18:12 · v1.5.5 本地构建与归档验收
+
+- **构建**：`build-all-packages.ps1 -Version 1.5.5 -IncludePrivate` 退出码 0；01 Base、02 Extras（`.001/.002`）、03 Faster-Whisper、04 Config、`mpv-full-private-v1.5.5.7z` 均生成，构建暂存 `build/` 已清理。
+- **安装器**：VantaInstaller v0.3.12 的 Release self-contained single-file 发布候选启动探针通过；私包内置 exe 与 `release/VantaInstaller-win-x64-v0.3.12.exe` SHA-256 均为 `820010E22CD82A7AB1E3E9B78F5E9B0B5E6E6A1D8CFDA6CCAD7906F617492BFA`。
+- **完整性**：五个归档逐一执行 `7z t` 并全部返回 `Everything is Ok`；02 分卷为 1,992,294,400 + 781,554,918 bytes，单卷低于 2 GB。
+- **内容门禁**：01 含启动素材、随包 `ffmpeg/ffmpeg.exe` 和版本标记；02 含 shaders/VapourSynth；03 含 Faster-Whisper 运行时；04 含 uosc 配置且排除启动素材/fonts/licenses/版本标记/window state；私包含 Faster-Whisper 占位说明但不含 03 运行时。所有公开包和私包均无 release/build/tmp/.git、Python 缓存、日志、Lossless/Steam 专有文件。
+- **版本标记**：根目录和 01 包内 `portable_config/.vanta-version` 均为 `1.5.5`（UTF-8、无 BOM、无换行）。
+- **SHA-256**：01 `26DC2054870D8CBF5DB5CBF047C45C5933FF309D6F0E0C3B73C01F8E4F02DA34`；02.001 `728E4ABD722783378859A2454576EFE1C8B807BF351C55E4B8F8BA66379A67DA`；02.002 `B3FFEF6FA0378C2CFA8DE2BFE20987FB5A7C87BE15339C0AD3343EDFCB9937E5`；03 `D929EE669F8FCD8CBAD69D99D9CE5CC0D4CD9BA581C60D0A5387CEBC64AE06F0`；04 `B0106B0403605156A8B3014852C23B150EAF97AF7087FF45EADCCFBFE472B52B`；Installer `820010E22CD82A7AB1E3E9B78F5E9B0B5E6E6A1D8CFDA6CCAD7906F617492BFA`；私包 `2CCF6B2AAEA74DA491AE7493DC754230E89620CC5545A73FC7607045863CD67A`（仅本地）。
+- **下一步**：提交本构建记录，创建并推送 `v1.5.5` 标签，随后上传 GitHub 6 个公开资产；私包不得上传。ModelScope 同步结果在远端发布后补录。
