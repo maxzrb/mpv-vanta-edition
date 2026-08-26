@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using System.IO;
 using System.Windows.Input;
 using Vanta.Core.Services;
 
@@ -16,6 +17,22 @@ public partial class HomeViewModel : ObservableObject
     /// <summary>检测到的安装信息（未安装为 null）</summary>
     [ObservableProperty]
     private InstallationDetector.InstallationInfo? _installation;
+
+    // ---- mpv 更新建议（检测到 Vanta 安装时自动比对远端最新版） ----
+
+    /// <summary>是否有 mpv 更新建议（Vanta 安装且远端 Release 版本更新）</summary>
+    [ObservableProperty]
+    private bool _hasMpvUpdate;
+
+    /// <summary>更新建议文本</summary>
+    [ObservableProperty]
+    private string _mpvUpdateText = string.Empty;
+
+    /// <summary>本会话缓存的最新 Release 信息（避免每次回首页都请求 GitHub API）</summary>
+    private UpdateService.UpdateInfo? _cachedLatest;
+
+    /// <summary>缓存对应的本地 Vanta 版本（本地版本变化时重新查询）</summary>
+    private string? _checkedVantaVersion;
 
     /// <summary>是否已安装</summary>
     public bool IsInstalled => Installation is { IsValid: true };
@@ -60,6 +77,9 @@ public partial class HomeViewModel : ObservableObject
     /// <summary>进入设置模式</summary>
     public ICommand OpenSettingsCommand => _main.OpenSettingsCommand;
 
+    /// <summary>去更新：跳转设置页并自动执行检查更新</summary>
+    public ICommand GoSettingsForUpdateCommand => _main.GoSettingsForUpdateCommand;
+
     public HomeViewModel(MainViewModel main)
     {
         _main = main;
@@ -77,6 +97,9 @@ public partial class HomeViewModel : ObservableObject
             _ = LoadDetailsAsync(detected);
         }
 
+        // 后台比对远端最新版本，展示首页更新建议（失败静默）
+        _ = UpdateMpvUpdateSuggestionAsync();
+
         OnPropertyChanged(nameof(IsInstalled));
         OnPropertyChanged(nameof(IsVanta));
         OnPropertyChanged(nameof(InstallDirectory));
@@ -87,6 +110,62 @@ public partial class HomeViewModel : ObservableObject
         OnPropertyChanged(nameof(ManualMpvPath));
         OnPropertyChanged(nameof(HasManualPath));
         OnPropertyChanged(nameof(ShowManualClear));
+    }
+
+    /// <summary>
+    /// 检测到 Vanta 安装时，读取 .vanta-version 并与最新 Release 比对，
+    /// 有新版则在首页显示更新建议。网络/接口失败静默不提示。
+    /// 会话内缓存查询结果，仅本地版本变化时重新请求。
+    /// </summary>
+    private async Task UpdateMpvUpdateSuggestionAsync()
+    {
+        HasMpvUpdate = false;
+        MpvUpdateText = string.Empty;
+
+        if (Installation is not { IsVanta: true } info)
+        {
+            return;
+        }
+
+        var current = ReadVantaVersion(info.Directory);
+        if (string.IsNullOrWhiteSpace(current))
+        {
+            return;
+        }
+
+        try
+        {
+            if (_cachedLatest is null
+                || !string.Equals(_checkedVantaVersion, current, StringComparison.OrdinalIgnoreCase))
+            {
+                _cachedLatest = await UpdateService.CheckLatestAsync();
+                _checkedVantaVersion = current;
+            }
+
+            if (_cachedLatest is { } latest && latest.HasNewer(current))
+            {
+                HasMpvUpdate = true;
+                MpvUpdateText = $"发现新版本 {latest.LatestVersion}（当前 v{current}），建议到设置页检查更新或使用一键升级。";
+            }
+        }
+        catch
+        {
+            // 检查失败静默：首页不展示更新建议
+        }
+    }
+
+    /// <summary>读取安装目录的 Vanta 版本标记（portable_config\.vanta-version，纯版本号无 v 前缀）</summary>
+    private static string? ReadVantaVersion(string installDir)
+    {
+        try
+        {
+            var path = Path.Combine(installDir, "portable_config", ".vanta-version");
+            return File.Exists(path) ? File.ReadAllText(path).Trim() : null;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     /// <summary>后台填充版本与体积（不阻塞 UI）</summary>

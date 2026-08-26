@@ -59,32 +59,32 @@ end
 
 function Timeline:get_is_hovered() return self.enabled and self.is_hovered end
 
----@return number|nil
-function Timeline:get_loaded_pos_safe()
+---@return number[]|nil
+function Timeline:get_cached_range_safe()
 	if type(state.duration) ~= 'number' or state.duration <= 0 then return nil end
 	if type(state.time) ~= 'number' then return nil end
 
-	-- 优先使用 uncached_ranges：找当前时间之后的第一个未缓存缺口
-	if type(state.uncached_ranges) == 'table' and #state.uncached_ranges > 0 then
-		for _, range in ipairs(state.uncached_ranges) do
+	-- 取包含当前播放点的连续可跳转缓存区间，同时表达后向与前向缓冲。
+	if type(state.cached_ranges) == 'table' and #state.cached_ranges > 0 then
+		for _, range in ipairs(state.cached_ranges) do
 			if type(range) == 'table'
 				and type(range[1]) == 'number'
 				and type(range[2]) == 'number'
 			then
-				if range[1] <= state.time and range[2] >= state.time then
-					return nil -- 当前位置位于未缓存缺口内
-				end
-				if range[1] > state.time then
-					return math.max(state.time, math.min(range[1], state.duration))
+				-- 给缓存状态刷新与播放时钟之间保留半秒容差，避免边界闪烁。
+				if range[1] <= state.time + 0.5 and range[2] >= state.time - 0.5 then
+					return {
+						math.max(0, math.min(range[1], state.time)),
+						math.min(state.duration, math.max(range[2], state.time)),
+					}
 				end
 			end
 		end
-		return state.duration -- 当前时间之后没有未缓存缺口
 	end
 
-	-- 兜底：cache_duration
+	-- 旧版 mpv 或个别协议只提供 cache-duration，此时至少保留前向缓冲提示。
 	if type(state.cache_duration) == 'number' and state.cache_duration > 0 then
-		return math.min(state.time + state.cache_duration, state.duration)
+		return {state.time, math.min(state.time + state.cache_duration, state.duration)}
 	end
 
 	return nil
@@ -207,6 +207,7 @@ end
 function Timeline:on_prop_duration() self:decide_enabled() end
 function Timeline:on_prop_time() self:decide_enabled() end
 function Timeline:on_prop_uncached_ranges() request_render() end
+function Timeline:on_prop_cached_ranges() request_render() end
 function Timeline:on_prop_cache_duration() request_render() end
 function Timeline:on_prop_pause() request_render() end
 function Timeline:on_prop_border() self:update_dimensions() end
@@ -434,24 +435,6 @@ function Timeline:render()
 		radius = bar_height / 2,
 	})
 
-	-- 已缓冲/加载进度（uncached_ranges + cache_duration 兜底）
-	local loaded_progress_min_ahead = 15
-	local loaded_progress_opacity = 0.22
-	local loaded_pos = self:get_loaded_pos_safe()
-	if type(loaded_pos) == 'number'
-		and type(state.time) == 'number'
-		and loaded_pos - state.time >= loaded_progress_min_ahead
-	then
-		local loaded_x = bax + bar_width * (loaded_pos / state.duration)
-		if loaded_x > bax + 1 then
-			ass:rect(bax, bay, loaded_x, bby, {
-				color = config.color.match,
-				opacity = track_visibility * loaded_progress_opacity,
-				radius = bar_height / 2,
-			})
-		end
-	end
-
 	-- Progress
 	local function draw_progress()
 		ass:rect(fax, fay, fbx, fby, {
@@ -459,10 +442,60 @@ function Timeline:render()
 			opacity = bar_visibility * config.opacity.position,
 			radius = bar_height / 2,
 		})
+	end
+
+	-- 播放圆点始终最后绘制，避免缓冲斜纹或热图侵入圆点内部。
+	local function draw_progress_knob()
 		ass:circle(fbx, fay + (fby - fay) / 2, math.max(3, bar_height * 1.2), {
 			color = config.color.match,
 			opacity = visibility * config.opacity.position,
 		})
+	end
+
+	-- 双向缓冲层：后向缓冲在实心已播放进度上叠加主题对比色斜纹，
+	-- 前向缓冲在未播放轨道上叠加浅主题强调色，两侧在播放点自然分界。
+	local function draw_buffer()
+		-- 底部迷你进度线只表达已播放进度，不显示前向或后向缓存。
+		if has_minimized_progress or not options.timeline_buffer then return end
+		local range = self:get_cached_range_safe()
+		if not range then return end
+		local buffer_opacity = clamp(0, tonumber(options.timeline_buffer_opacity) or 0, 1)
+		if buffer_opacity <= 0 then return end
+
+		local buffer_ax = math.max(bax, t2x(range[1]))
+		local buffer_bx = math.min(bbx, t2x(range[2]))
+		if buffer_bx - buffer_ax < 1 then return end
+		local current_x = clamp(buffer_ax, t2x(state.time), buffer_bx)
+		local accent = config.color.accent or config.color.match
+
+		-- line 样式没有实心已播放区域，先给后向范围铺一层浅主题色。
+		if is_line and current_x - buffer_ax >= 1 then
+			ass:rect(buffer_ax, bay, current_x, bby, {
+				color = accent,
+				opacity = bar_visibility * buffer_opacity,
+			})
+		end
+
+		-- 后向缓冲：使用每套主题自带的 accent_text 作为斜纹对比色，
+		-- 避免同色覆盖已播放进度后完全不可见。
+		if current_x - buffer_ax >= 1 then
+			ass:texture(buffer_ax, bay, current_x, bby, visibility > 0 and 'b' or 'a', {
+				size = 80,
+				color = config.color.accent_text or bg,
+				opacity = bar_visibility * buffer_opacity,
+				anchor_x = bax,
+				anchor_y = bby,
+			})
+		end
+
+		-- 前向缓冲：在未播放轨道上浅铺主题强调色。
+		if buffer_bx - current_x >= 1 then
+			ass:rect(current_x, bay, buffer_bx, bby, {
+				color = accent,
+				opacity = bar_visibility * buffer_opacity,
+				radius = bar_height / 2,
+			})
+		end
 	end
 
 	-- Youtube heatmap
@@ -483,11 +516,14 @@ function Timeline:render()
 	-- Change draw order based on 'timeline_style' to keep the heatmap visible
 	if is_line then
 		draw_heatmap()
+		draw_buffer()
 		draw_progress()
 	else
 		draw_progress()
+		draw_buffer()
 		draw_heatmap()
 	end
+	draw_progress_knob()
 
 	-- Uncached ranges
 	if state.uncached_ranges then

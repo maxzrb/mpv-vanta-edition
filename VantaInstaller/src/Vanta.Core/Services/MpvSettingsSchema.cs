@@ -170,6 +170,77 @@ public static class MpvSettingsSchema
                 ],
             },
 
+            // ===== 缓存 =====
+            new()
+            {
+                Key = "cache",
+                DisplayName = "demuxer 缓存",
+                Group = "缓存",
+                Type = MpvOptionType.Choice,
+                DefaultValue = "yes",
+                Choices =
+                [
+                    new MpvChoice("yes", "开启（本地与网络）"),
+                    new MpvChoice("auto", "自动（通常仅网络）"),
+                    new MpvChoice("no", "关闭"),
+                ],
+                Description = "控制 mpv 是否缓存解复用后的媒体数据；关闭后 uosc 不再显示真实前后向缓存。",
+            },
+            new()
+            {
+                Key = "demuxer-max-bytes",
+                DisplayName = "前向缓存内存上限",
+                Group = "缓存",
+                Type = MpvOptionType.Slider,
+                DefaultValue = "300MiB",
+                Min = 32,
+                Max = 1024,
+                Step = 1,
+                ValueSuffix = "MiB",
+                DisplaySuffix = "MiB",
+                Description = "前向缓存允许使用的内存上限；实际预读还受下面的秒数限制。",
+            },
+            new()
+            {
+                Key = "demuxer-max-back-bytes",
+                DisplayName = "后向缓存内存上限",
+                Group = "缓存",
+                Type = MpvOptionType.Slider,
+                DefaultValue = "50MiB",
+                Min = 0,
+                Max = 512,
+                Step = 1,
+                ValueSuffix = "MiB",
+                DisplaySuffix = "MiB",
+                Description = "按字节限制已经读过并保留用于回退的数据；对应时长会随码率变化，0 表示不保留。",
+            },
+            new()
+            {
+                Key = "cache-secs",
+                DisplayName = "缓存预读时长",
+                Group = "缓存",
+                Type = MpvOptionType.Slider,
+                DefaultValue = "15",
+                Min = 1,
+                Max = 120,
+                Step = 1,
+                DisplaySuffix = "秒",
+                Description = "缓存启用时希望预取的媒体时长，主要约束播放点前方。",
+            },
+            new()
+            {
+                Key = "demuxer-readahead-secs",
+                DisplayName = "demuxer 最低预读时长",
+                Group = "缓存",
+                Type = MpvOptionType.Slider,
+                DefaultValue = "15",
+                Min = 0,
+                Max = 120,
+                Step = 1,
+                DisplaySuffix = "秒",
+                Description = "demuxer 尝试维持的最低前向预读量；不限制后向缓存时长。",
+            },
+
             // ===== 音频 =====
             new()
             {

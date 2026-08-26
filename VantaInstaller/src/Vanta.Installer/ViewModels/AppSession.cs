@@ -1,4 +1,5 @@
 using Vanta.Core.Models;
+using Vanta.Core.Services;
 
 namespace Vanta.Installer.ViewModels;
 
@@ -21,6 +22,12 @@ public sealed class AppSession
 
     /// <summary>安装结果</summary>
     public InstallResult? InstallResult { get; set; }
+
+    /// <summary>
+    /// 一键升级：远端最新 Release 信息。非 null 时安装页在执行引擎前
+    /// 先把全部增量包自动下载到 SourceDirectory，再继续覆盖升级。
+    /// </summary>
+    public UpdateService.UpdateInfo? UpgradeReleaseInfo { get; set; }
 
     /// <summary>
     /// 安装完成后要注册的文件关联入口（null/空=不注册）。

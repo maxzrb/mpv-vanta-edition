@@ -107,7 +107,8 @@ public static class PackageIntegrityService
         return results;
     }
 
-    private static async Task<string> ComputeSha256Async(
+    /// <summary>计算文件 SHA-256（供包校验与安装器自更新复用）</summary>
+    public static async Task<string> ComputeSha256Async(
         string path,
         Action<long> reportBytesRead,
         CancellationToken ct)

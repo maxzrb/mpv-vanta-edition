@@ -48,6 +48,13 @@ public partial class App : Application
         // 应用 Vanta 浅色主题（跟随系统强调色）
         ApplicationThemeManager.Apply(ApplicationTheme.Light);
     }
+    protected override void OnExit(ExitEventArgs e)
+    {
+        // 自更新：退出时调度隐藏助手用已下载的新 exe 覆盖当前程序
+        SelfUpdateReplacer.ScheduleOnExit();
+        base.OnExit(e);
+    }
+
     /// <summary>解析 --key value 形式的命令行参数</summary>
     private static string? GetArgValue(string[] args, string key)
     {

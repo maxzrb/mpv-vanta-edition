@@ -5,12 +5,12 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master` 与 `origin/master` 同步（v1.5.4 已发布，发布结果已记录） |
+| **分支** | `master` 与 `origin/master` 同步；v1.5.5 发布准备中 |
 | **最新发布提交** | `4b7d651`（tag: `v1.5.4`，已推送） |
-| **工作区** | v1.5.4 已正式发布，6 个公开资产校验一致；个人私包仅本地保留，构建暂存已清理 |
+| **工作区** | 发布前审计中；存在本次纳入 v1.5.5 的功能、VantaInstaller 和文档未提交改动，`.zcode/` 为本地计划临时文件不纳入发布 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.4（已发布） |
-| **上次操作** | 完成 v1.5.4 直连上传、远端校验与正式发布；定位 Steam++ GitHub 加速规则导致上传降速 |
+| **项目版本** | v1.5.5（准备发布） |
+| **上次操作** | 完成 v1.5.5 发布范围审计，确认不触发大改动 Gate；安装器版本定为 v0.3.12 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2636,3 +2636,129 @@ c:\Program portable\mpv2\
 - **速度验证**：`gh` 上传连接核实为本机 `192.168.0.12` 直连 `20.205.243.161:443`；10 秒网卡采样稳定约 6.75-6.97 MiB/s。五个待传资产批量上传用时约 12 分 22 秒，命令退出码 0。
 - **远端校验**：6 个公开资产均为 `uploaded`，远端大小与 GitHub `digest` SHA-256 逐项匹配本地；无多余资产、无个人私包。Release 已由草稿转为正式发布，非预发布：https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.5.4 。
 - **收尾**：删除 `build/mpv-full-private-v1.5.4` 暂存目录（11,747 个文件、约 5.0 GB）；`release/mpv-full-private-v1.5.4.7z` 仍仅在本地保留。本记录纳入发布收尾提交并推送。
+
+### 2026-08-23 20:20 · VantaInstaller v0.3.4：ModelScope 魔搭镜像 + 自更新走镜像
+
+- **镜像改动**：`DownloadMirror` 新增 `MirrorKind`（GitHubPrefix / ModelScopeDataset），注册表在自建镜像前新增 `modelscope`（`AerithDream/mpv-vanta-edition`）。映射规则：GitHub Release 资产 `{tag}/{文件名}` → `https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath={tag}%2F{文件名}`（URL 形状依据 ModelScope 官方 SDK v1.18 源码）。非 GitHub Release 地址不经该镜像，原样返回由调用方降级。
+- **自更新改造**：`MainViewModel` 自更新按钮由浏览器直链改为镜像下载（`Aria2Service.DownloadWithMirrorsAsync` + `MirrorRegistry.All` 逐镜像降级，GitHub digest SHA-256 校验后启动新版并退出，全部失败回退浏览器兜底）；`InstallerUpdateInfo` 增加 `Sha256`，`PackageIntegrityService.ComputeSha256Async` 改 public 供跨工程复用；UA 统一升至 `VantaInstaller/0.3.4`。
+- **验证**：Release 构建 0 警告 0 错误；`tmp/modelscope-resolve-test` 8 项断言全部通过；魔搭公开数据集（modelscope/chinese-poetry-collection）实测：匿名直链可用、Range 截断正常（200 + 截断正文，aria2 单连接降级不影响正确性）、百分号编码正确解码（`%2F` 子目录路径即官方 SDK 生产形态）、缺失文件返回 404（aria2 非零退出 → 自动降级下一镜像）；候选 exe 启动探针 3 秒存活（主窗口 Vanta Installer）。
+- **候选产物**：`release/VantaInstaller-win-x64-v0.3.4.exe`（69,655,216 bytes），SHA-256 `A9E1C2718665739976662A50FAB1C48D3DA071117BD41F950254D0639AAF5736`；未创建 Release、未上传任何资产。
+- **发布流程修订（经用户批准由 agent 代改）**：新增 7.1「同步上传 ModelScope 数据集（魔搭国内镜像）」检查项；第 8 节收尾新增 ModelScope 同步结果记录项；README.MD「方案二」增加魔搭下载渠道说明。
+- **待办（用户侧）**：在魔搭创建公开数据集 `AerithDream/mpv-vanta-edition`，按 `v1.5.4/` 子目录上传六个公开资产（01、02.001、02.002、03、04、VantaInstaller exe）；首次上传时验证 02.001（1,900 MB）是否触及魔搭单文件上限，必要时改用 git/LFS 上传。数据集未就绪前安装器中该镜像显示「不可用」，属预期。
+
+### 2026-08-23 21:05 · ModelScope 数据集创建与 v1.5.4 资产上传完成
+
+- **命名空间更正**：本地魔搭登录账号为 AerithDream（非 maxzrb），`maxzrb` 命名空间创建 403；改用 `AerithDream/mpv-vanta-edition`。安装器 `MirrorRegistry`、README、发布流程 7.1、临时测试工程已同步改为该 ID；受影响的 GitHub 仓库引用已核对未被误改。
+- **数据集**：已创建公开数据集 https://modelscope.cn/datasets/AerithDream/mpv-vanta-edition （visibility=5，license=other，描述注明为 GitHub Releases 同步镜像）。
+- **上传**：v1.5.4 六个公开资产全部上传至 `v1.5.4/` 子目录（01、02.001、02.002、03、04、VantaInstaller v0.3.3 exe），单文件最大 1,992,294,400 字节的 02.001 上传成功，未触及魔搭单文件上限；上传脚本 `tmp/ms-upload.py`，日志 `tmp/ms-upload.log`。
+- **核验**：SDK 文件列表逐一比对六个资产远端大小与本地一致；04（5,141,026 B）与 01（136,427,649 B）全量匿名下载回测 SHA-256 均与发布记录一致（04 `19F7CF21…621`、01 `85F6CF77…C5E7`）。无私用全量包上传。
+- **候选重建**：数据集 ID 变更后重建 `release/VantaInstaller-win-x64-v0.3.4.exe`（69,655,226 bytes），SHA-256 `3C015888403BB52D1DE20A86D49B0F8C2898422E240292437B5F03AA45182934`，启动探针通过；仍未创建 Release、未上传。
+- **注意**：现网已发布的 v0.3.3 安装器不含 ModelScope 镜像条目，该镜像随 v0.3.4 及后续版本生效；当前用户可经 README 的魔搭数据集链接手动下载。
+
+### 2026-08-23 21:30 · 默认下载镜像改为 ModelScope
+
+- **原自动机制（记录备查）**：设置页镜像下拉默认「自动检测（推荐）」且不持久化；下载时若仍为 auto，取最近一次「镜像检测」结果中可用且非官方的镜像按实测吞吐取最快，从未检测或全不可用则回落官方直连；测速仅在用户点击「镜像检测」时进行（逐镜像串行、8KB 预热 + 2 秒吞吐窗口、上限 32MB）。显式选中某镜像时单镜像下载、不自动降级。
+- **本次改动**：`MirrorRegistry` 中 ModelScope 移至官方直连之后（自建镜像仍末尾），设置页默认选中 `modelscope`（下拉首项仍为自动检测，更名为「自动检测（测速择优）」）；自动机制本身未改。自更新走 `MirrorRegistry.All` 顺序降级，ModelScope 现为第二顺位。
+- **验证与候选**：映射/顺序测试 8 项全过；重建 `release/VantaInstaller-win-x64-v0.3.4.exe`（69,655,231 bytes），SHA-256 `7F798AEFC327CB4E0F404612DD880231C51D90C22872E2F8A44F85912FE5E554`，启动探针通过；未创建 Release、未上传。
+
+### 2026-08-23 21:55 · 移除镜像自动检测；自更新改为 ModelScope→GitHub 与关闭时替换
+
+- **移除自动检测**：设置页镜像下拉删除「自动检测」选项（原默认项，从未测速时实际回落官方直连），`StartDownloadAsync` 删除 auto 分支，`_probedMirrors` 字段移除；下拉仅保留具体镜像，默认仍为 ModelScope。「镜像检测」按钮的逐镜像测速列表保留（供手动对比选择，不再参与自动选择）。
+- **自更新降级顺序**：由全注册表顺序改为固定 `[modelscope, official]`——先 ModelScope 数据集，失败降级 GitHub 官方直连；两者皆失败仍回退浏览器直链。
+- **关闭时替换升级**：下载并校验通过后不再立即启动新版退出，而是记录 `SelfUpdateReplacer.PendingNewExePath`、按钮显示「已下载·关闭后自动升级」；应用退出（OnExit）时调度隐藏 cmd 助手，以 `move /y` 重试循环（最多 30 次、waitfor 1s 延时）在进程解锁后把新 exe 覆盖到当前 exe 路径，脚本自清理。不依赖 tasklist/find 解析（规避非常规 PATH 环境下 find 被 GNU 工具遮蔽的问题）。
+- **验证**：Release 构建 0 警告 0 错误；替换脚本隔离语义测试通过（目标 exe 运行期间 move 被挡、新文件原地保留；进程退出后 move 成功、哈希与新版一致、脚本自清理）；沙箱环境的挂起删除语义下最终态同样正确。候选重建 `release/VantaInstaller-win-x64-v0.3.4.exe`（69,655,720 bytes），SHA-256 `B0B7FE312114DE62641F5D18ED56CA2DC08F74EE3DB0C273C1B757AF3E481FA1`，启动探针通过；未创建 Release、未上传。
+
+### 2026-08-23 22:20 · v0.3.5 发布：GitHub v1.5.4 与魔搭安装器资产替换（用户指定测试版）
+
+- **版本**：应用户指定编译 v0.3.5（csproj、UA 字符串同步 0.3.5）；候选 `release/VantaInstaller-win-x64-v0.3.5.exe`（69,655,736 bytes），SHA-256 `12AA0706591045FC8B608A33D840CB404DCD83100A2C53562FE758E2395572C1`，启动探针通过。
+- **GitHub v1.5.4 资产替换**：先按 REST 数字资产 ID 删除旧 `VantaInstaller-win-x64-v0.3.3.exe`（GraphQL 节点 ID 会 404），再上传 v0.3.5（`gh release upload --clobber`）。远端核对：恰好 6 个资产、单一安装器资产、state=uploaded、远端 digest `sha256:12aa0706…` 与本地一致；Release 说明中安装器文件名与校验和已同步更新（v0.3.5 / 12AA0706…）。
+- **魔搭同步（发布流程 7.1）**：`v1.5.4/VantaInstaller-win-x64-v0.3.5.exe` 上传完成，匿名全量回测 SHA 与 GitHub digest 一致。注意：魔搭 API 禁止删除文件（10020301011 Deletion restricted to web console），旧 v0.3.3 仍留在数据集 `v1.5.4/` 中，不影响更新器（按 GitHub 文件名精确映射），如需完全对齐可在网页端手动删除。
+- **文档**：README 安装器版本引用更新为 v0.3.5；`version/版本迭代记录.md` v1.5.4 节以带日期注记方式更新（保留 v0.3.3 历史 SHA）。
+- **大改动 Gate**：不触发——VantaInstaller 附属工具版本迭代（发布流程 3.2 明确豁免），01~04 公开包未动。
+- **测试提示（用户）**：运行本地 v0.3.4 候选即可见「有新版 0.3.5」徽标，点击应经魔搭下载（约 70MB）、SHA 校验后显示「已下载·关闭后自动升级」，关闭程序后 exe 应被自动替换；再次启动版本应为 v0.3.5 且徽标消失。
+
+### 2026-08-23 22:50 · v0.3.6：自更新替换改为「规范新文件名落地 + 删除旧名」
+
+- **问题（用户实测反馈）**：v0.3.5 自更新后内容已升级但 exe 文件名未变（替换为 move 覆盖到旧路径，文件名保留旧版本号）。
+- **修复**：`SelfUpdateReplacer` 改为两段式——异名场景把新 exe 以自带版本号的规范文件名 move 到当前 exe 同目录，并在进程退出后 `del` 旧文件名的 exe；同名场景（当前 exe 已是规范新名）保持覆盖式 move 重试。重试/延时机制不变（move/del 失败即重试，waitfor 1s，上限 30 次）。
+- **验证**：隔离语义测试六项全过（新名文件即时落地、旧名运行期间保留、退出后删除、内容哈希正确、源文件消费、脚本自清理；测试脚本汇总判定的 FAIL 为脚本自身在判定前删除了目录的顺序问题，不影响结论）。
+- **发布**：v0.3.5 资产已从 GitHub v1.5.4 删除并上传 v0.3.6（远端 digest `sha256:da56b55b…` 与本地一致、单一安装器资产）；Release 说明、README、版本迭代记录同步更新；魔搭 `v1.5.4/VantaInstaller-win-x64-v0.3.6.exe` 已上传并匿名回测哈希一致。魔搭数据集中 v0.3.3 / v0.3.5 两个旧 exe 仍留存（API 禁删，网页端可清理）。
+- **候选**：`release/VantaInstaller-win-x64-v0.3.6.exe`（69,655,892 bytes），SHA-256 `DA56B55B5BC511BA83E1557CB0B3B3BC7015D2A3D4C469E7BF240E69FC79F92B`，启动探针通过。
+
+### 2026-08-23 23:25 · v0.3.7：首页自动检测 mpv 版本并显示更新建议
+
+- **功能**：启动/回到首页时，检测到 Vanta 安装则读取 `portable_config\.vanta-version`，与 GitHub 最新正式 Release 比对（`UpdateService.CheckLatestAsync`）；有新版时首页「当前安装」卡片下方显示「MPV Vanta Edition 有可用更新」建议卡（含版本对比文本与「去更新」按钮）。非 Vanta 安装、无版本标记、网络失败均静默不显示。
+- **实现**：`HomeViewModel.UpdateMpvUpdateSuggestionAsync`（会话内缓存 Release 查询，仅本地版本变化时重查）；`MainViewModel.GoSettingsForUpdate` 跳转设置页并自动执行 `CheckUpdateCommand`；`HomeView.xaml` 新增建议卡片（样式对齐现有 ui:Card/按钮规范）。
+- **发布**：GitHub v1.5.4 资产 v0.3.6 删除、v0.3.7 上传（digest `sha256:fdabf457…` 与本地一致、单一安装器资产），Release 说明同步；魔搭 `v1.5.4/VantaInstaller-win-x64-v0.3.7.exe` 上传并匿名回测哈希一致。README/版本迭代记录同步更新。
+- **候选**：`release/VantaInstaller-win-x64-v0.3.7.exe`（69,656,780 bytes），SHA-256 `FDABF457F1A5959D103838B35D5376932D0BC9F6AA8680FD63C0140DC3FEDA62`，启动探针通过。
+- **说明**：魔搭数据集中 v0.3.3/v0.3.5/v0.3.6 旧 exe 留存（API 禁删，网页端可清理）；启动时首页建议与安装器自更新检查各自独立请求一次 GitHub API，互不影响。
+
+### 2026-08-23 23:59 · v0.3.8：一键升级（自动下载全部增量包并执行覆盖升级）
+
+- **功能**：首页更新建议卡新增「一键升级」。检测到 Vanta 安装时：查询最新 Release → 将全部增量包资产（01、02 两卷、03、04，排除安装器 exe）下载到 `文档\MPV Vanta Edition\packages\vX.Y.Z\`（ModelScope→GitHub 降级，已存在且大小一致的跳过，aria2 断点续传）→ 直接进入安装页自动执行覆盖升级（复用 InstallEngine 的配置备份、SHA-256 风险拦截、进度与完成页）。未检测到 Vanta 安装或网络异常回退设置页手动流程；升级不改动文件关联。
+- **实现**：`Vanta.Core/Services/UpgradePackageDownloader.cs`（资产筛选 + 逐包下载，进度回调统一「已完成数/总数/当前百分比」口径）；`AppSession.UpgradeReleaseInfo` 触发安装页下载阶段（进度分段：下载 0~45%、安装 45~100%）；`MainViewModel.OneClickUpgradeAsync` 组装会话并直跳安装页自启。
+- **验证**：Release 构建 0 警告 0 错误；映射/顺序/资产筛选测试 9 项全过（新增资产筛选断言）；候选启动探针通过。端到端升级需远端出现 v1.5.5+ Release 实测（当前 v1.5.4 已是最新，无法真实触发）。
+- **发布**：GitHub v1.5.4 资产 v0.3.7 删除、v0.3.8 上传（digest `sha256:fe2c8b20…` 与本地一致、单一安装器资产），Release 说明同步；魔搭 `v1.5.4/VantaInstaller-win-x64-v0.3.8.exe` 上传并匿名回测哈希一致（首次回测传输中断，断点续传重试后完整）。README/版本迭代记录同步。
+- **候选**：`release/VantaInstaller-win-x64-v0.3.8.exe`（69,658,983 bytes），SHA-256 `FE2C8B20D56F94B721C9067DEC69F89DE10C2A16244A901F65959EBA045865E7`。
+
+### 2026-08-24 00:15 · v0.3.9：一键升级入口调整与下载目录改临时目录
+
+- **入口调整（按用户要求）**：首页更新建议卡按钮恢复为「去更新」（跳设置页自动检查更新，文本相应更新）；「一键升级」按钮移至设置页「检查更新和下载增量包」卡片下方独立卡片，点击后全自动（下载 + 覆盖升级）。`SettingsViewModel` 新增 `MainViewModel` 引用透出命令（构造函数签名变更，仅 MainViewModel 一处调用）。
+- **下载目录**：一键升级增量包下载目录由 `文档\MPV Vanta Edition\packages\vX.Y.Z\` 改为 `%TEMP%\VantaInstaller\upgrade\vX.Y.Z\`（按用户要求放 tmp；同版本重复升级仍可跳过已存在文件/断点续传，临时目录由系统清理策略回收）。
+- **发布**：GitHub v1.5.4 资产 v0.3.8 删除、v0.3.9 上传（digest `sha256:5bbd5b79…` 与本地一致、单一安装器资产），Release 说明同步；魔搭 `v1.5.4/VantaInstaller-win-x64-v0.3.9.exe` 上传并匿名回测哈希一致。README/版本迭代记录同步。
+- **候选**：`release/VantaInstaller-win-x64-v0.3.9.exe`（69,659,190 bytes），SHA-256 `5BBD5B791AEC0B22CACCAB59B9E055EB933D16035779F399D555380E13B58AC8`，Release 构建 0 警告 0 错误、启动探针通过。
+
+### 2026-08-24 00:35 · v0.3.10：侧栏版本号/更新徽标布局微调
+
+- **布局**：侧栏底部版本号/更新徽标整体右移 13px 与导航图标左缘对齐（原 Margin 0→13）；更新徽标由版本号右侧改为版本号正下方 4px（StackPanel 改纵向，徽标左对齐不拉伸）。
+- **发布**：GitHub v1.5.4 资产 v0.3.9 删除、v0.3.10 上传（digest `sha256:b57191ef…` 与本地一致、单一安装器资产），Release 说明同步；魔搭 `v1.5.4/VantaInstaller-win-x64-v0.3.10.exe` 上传并匿名回测哈希一致。README/版本迭代记录同步。
+- **候选**：`release/VantaInstaller-win-x64-v0.3.10.exe`（69,659,423 bytes），SHA-256 `B57191EFE4A2C2E188486942FDE62D12DB582B86D2B6E3A9B295A7E6311FAE44`，构建 0 警告、启动探针通过。（注：本次首次构建进程被取消后重建，最终产物为含完整布局调整的版本。）
+
+### 2026-08-24 00:50 · v0.3.11：更新徽标恢复版本号右侧（仅保留右移）
+
+- **布局回退（按用户要求）**：撤销 v0.3.10 的「徽标移至版本号下方 4px」纵向布局，恢复徽标在版本号右侧横向排列；仅保留整行右移 13px 与导航图标左缘对齐。
+- **发布**：GitHub v1.5.4 资产 v0.3.10 删除、v0.3.11 上传（digest `sha256:dde403a1…` 与本地一致、单一安装器资产），Release 说明同步；魔搭 `v1.5.4/VantaInstaller-win-x64-v0.3.11.exe` 上传并匿名回测哈希一致。README/版本迭代记录同步。
+- **候选**：`release/VantaInstaller-win-x64-v0.3.11.exe`（69,659,198 bytes），SHA-256 `DDE403A109C6F8F9673BF55A47E95D15374CB9291F744A671EA7E2611E928AAF`，构建 0 警告、启动探针通过。
+
+### 2026-08-26 17:03 · uosc 进度条双向缓冲提示 + VantaInstaller 设置入口
+
+- **uosc 状态**：`demuxer-cache-state/seekable-ranges` 的规范化结果新增为 `state.cached_ranges`；时间线取包含当前播放点的连续缓存区间，当前位置之前表达后向缓冲，之后表达前向缓冲，旧协议以 `cache-duration` 兜底前向范围。
+- **绘制**：`Timeline.lua` 新增主题强调色缓冲层，默认透明度 0.18；缓冲层复用进度条 `bar_visibility`，因此展开时间线、窗口底部迷你进度线及渐隐动画保持同步。新增 `timeline_buffer` / `timeline_buffer_opacity`，保留原版 `timeline_cache=no` 避免纹理重复。
+- **VantaInstaller**：`UoscConfigService` 统一读写菜单延迟、双向缓冲开关和透明度，保留注释/行序/UTF-8 LF；设置页新增开关与 5%～40% 透明度滑块，纳入既有“保存 mpv 设置”修改检测。
+- **验证**：`dotnet build VantaInstaller/src/Vanta.Installer/Vanta.Installer.csproj -c Debug --no-restore` 通过（0 警告、0 错误）；配置服务 0.18→0.27 往返、布尔值和注释保留探针通过；完整 mpv 配置加载短 lavfi 视频时 uosc 无 Lua/加载错误；`git diff --check` 通过；目标文件均为 UTF-8 无 BOM、LF。
+- **Git**：`git fetch --prune` 后 `HEAD...origin/master = 0/0`；工作树原先已有 VantaInstaller、README、发布记录等未提交改动，本次只增量修改 6 个功能文件及两份 HandShake 记录，未提交。
+
+### 2026-08-26 17:12 · 双向缓冲可见性修正与本地缓存启用
+
+- **用户反馈与根因**：本地文件看不到缓冲是因为 mpv 默认 `cache=auto` 通常不为普通本地文件启用 demuxer 缓存；`demuxer-readahead-secs=15` 只限制已启用缓存的预读，并不负责开启缓存。网络视频的后向范围已经进入 `state.cached_ranges`，但此前与不透明的已播放进度使用同一强调色整高叠加，视觉上不可辨。
+- **修正**：`mpv.conf` 新增 `cache=yes`，本地与网络统一启用缓存，继续受现有 `demuxer-max-bytes=300MiB`、`cache-secs=15`、`demuxer-readahead-secs=15` 约束。`Timeline.lua` 改为后向缓冲用当前主题 `accent_text` 斜纹覆盖已播放实心段，前向缓冲用浅 `accent` 覆盖未播放轨道；两侧在播放点分界，并继续共用 `bar_visibility` 和 `timeline_buffer_opacity`。
+- **安装器文案**：VantaInstaller 设置页说明同步为“左侧后向斜纹 / 右侧前向浅色”，现有开关与透明度滑块继续同时控制两侧。
+- **验证**：120 秒本地测试视频在约 28.03 秒时，mpv IPC 返回包含播放点的 `seekable-ranges=0.00～119.97`，确认本地前后向缓存同时存在；完整配置 uosc 加载无 Lua 错误；VantaInstaller Debug 构建 0 警告/0 错误；`git diff --check` 通过。
+
+### 2026-08-26 17:20 · VantaInstaller 暴露完整 mpv 缓存设置
+
+- **设置组**：`MpvSettingsSchema` 新增“缓存”分组，暴露 `cache`（开启/自动/关闭）、`demuxer-max-bytes`（32～1024 MiB）、`demuxer-max-back-bytes`（0～512 MiB）、`cache-secs`（1～120 秒）、`demuxer-readahead-secs`（0～120 秒）。文案明确后向缓存按字节限制、对应时长随码率变化。
+- **单位滑块**：`MpvOption` 新增 `Step`、`ValueSuffix`、`DisplaySuffix`；`MpvOptionItem` 使用 InvariantCulture 解析/量化滑块，界面显示 `300 MiB`，配置写回 `300MiB`，其它无单位滑块保持兼容；滑块值显示宽度增至 70。
+- **默认配置**：`mpv.conf` 将后向缓存上限从注释示例改为显式 `demuxer-max-back-bytes=50MiB`，安装器读取确定值；缓存相关注释修正为前向/后向的真实含义。
+- **验证**：VantaInstaller Debug 构建 0 警告/0 错误；真实加载 `mpv.conf` 后五项值为 `yes / 300MiB / 50MiB / 15 / 15`；MiB 滑块显示与序列化通过；隔离写回 `no / 384MiB / 64MiB / 20 / 12` 五项均正确且保留中文注释。
+
+### 2026-08-26 17:23 · 缓冲斜纹不再侵入播放圆点
+
+- **问题**：bar 样式为保证后向斜纹覆盖已播放实心段，缓冲层绘制在进度之后，也会覆盖播放圆点靠近缓冲边界的部分。
+- **修正**：`Timeline.lua` 将实心进度和播放圆点拆分为两个绘制函数；缓冲层与热图完成后最后绘制圆点，确保圆点始终为完整主题色且处于最上层，前后向缓存范围本身不截断。
+- **验证**：完整 mpv 配置短视频运行探针无 Lua/uosc 错误；`git diff --check` 通过。
+
+### 2026-08-26 17:29 · 迷你进度线排除缓存 + 其它菜单持久化开关
+
+- **迷你进度线**：`Timeline.draw_buffer()` 在 `has_minimized_progress` 时直接返回；普通窗口底部 1.2 px 迷你进度线只显示已播放进度，不绘制前向浅色或后向斜纹。展开时间轴行为不变。
+- **运行时入口**：uosc 新增 `timeline-buffer-toggle` 脚本消息及 `user-data/uosc/timeline-buffer` 状态发布；`input.conf` 新增“其它 > 时间轴双向缓冲 > 开/关”，动态菜单根据 user-data 显示勾选状态。
+- **持久化**：开关默认沿用 `timeline_buffer=yes`；运行时切换立即调用 `persist_uosc_option()` 写回 `uosc.conf`。VantaInstaller 开关继续读写同一配置项，文案明确仅作用于展开时间轴。
+- **验证**：mpv IPC 实测 `yes → no → yes`，user-data 分别发布 `no/yes`，最终文件为 `timeline_buffer=yes`；VantaInstaller Debug 构建 0 警告/0 错误；`git diff --check` 通过。
+
+### 2026-08-26 17:42 · v1.5.5 发布前置审计
+
+- **版本确认**：用户确认 mpv 项目版本 `1.5.5`；VantaInstaller 因源码继续增加完整缓存设置和 uosc 缓冲入口，必要递增为独立版本 `0.3.12`。
+- **3.1 Git**：已执行 `git fetch --prune`；`HEAD...origin/master = 0/0`。当前未提交改动按功能、安装器、配置、文档和记录归入本次发布；`.zcode/` 计划文件不纳入提交/包。
+- **3.2 Gate**：不触发。包数量/编号/覆盖顺序、构建脚本、7-Zip 参数、mpv 核心/运行时、安装方式、版权边界和分卷规则均不变；VantaInstaller 功能/界面变化按流程明文豁免。
+- **3.3 文档**：`version/版本迭代记录.md` 已建立 v1.5.5 当前版本和待补校验区；README 安装器名称更新为 v0.3.12；本条记录作为发布前清单，构建后补 SHA-256、资产和最终状态。
+- **3.4 构建入口**：已审阅 `build-all-packages.ps1`、`build-01-base.ps1`、`build-02-extras.ps1`、`build-03-fasterwhisper.ps1`、`build-04-config.ps1`、`build-full-private.ps1`；均覆盖当前 portable_config/安装器候选/私包既定边界，无需修改发布流程或构建脚本。

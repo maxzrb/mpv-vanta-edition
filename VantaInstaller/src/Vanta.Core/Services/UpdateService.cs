@@ -39,7 +39,8 @@ public static class UpdateService
         string LatestVersion,
         string ReleaseUrl,
         string AssetUrl,
-        long AssetSize);
+        long AssetSize,
+        string? Sha256 = null);
 
     /// <summary>
     /// 检查 VantaInstaller 自身是否有更新：
@@ -81,7 +82,7 @@ public static class UpdateService
             return null;
         }
 
-        return new InstallerUpdateInfo(version, info.ReleaseUrl, asset.Url, asset.Size);
+        return new InstallerUpdateInfo(version, info.ReleaseUrl, asset.Url, asset.Size, asset.Sha256);
     }
 
     /// <summary>从资产名解析安装器版本：VantaInstaller-win-x64-v0.3.2.exe → 0.3.2</summary>
@@ -140,7 +141,7 @@ public static class UpdateService
     private static async Task<UpdateInfo?> CheckReleaseEndpointAsync(string endpoint, CancellationToken ct)
     {
         using var http = new HttpClient();
-        http.DefaultRequestHeaders.UserAgent.ParseAdd("VantaInstaller/0.3.2");
+        http.DefaultRequestHeaders.UserAgent.ParseAdd("VantaInstaller/0.3.12");
         http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
         http.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
         http.Timeout = TimeSpan.FromSeconds(15);

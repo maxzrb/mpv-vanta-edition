@@ -17,6 +17,10 @@ namespace Vanta.Installer.ViewModels;
 public partial class SettingsViewModel : ObservableObject
 {
     private readonly AppSession _session;
+    private readonly MainViewModel _main;
+
+    /// <summary>一键升级：自动下载全部增量包并执行覆盖升级（逻辑在 MainViewModel）</summary>
+    public System.Windows.Input.ICommand OneClickUpgradeCommand => _main.OneClickUpgradeCommand;
 
     /// <summary>检测到的安装信息</summary>
     [ObservableProperty]
@@ -241,7 +245,7 @@ public partial class SettingsViewModel : ObservableObject
             _evafastInitialSpeedCap, _evafastInitialSubsSpeedCap, _evafastInitialSubsLimit);
 
     /// <summary>保存按钮可用：mpv.conf、evafast 或 uosc 任一有修改</summary>
-    public bool CanSaveMpvSettings => MpvConfigModified || EvafastModified || UoscMenuModified;
+    public bool CanSaveMpvSettings => MpvConfigModified || EvafastModified || UoscModified;
 
     /// <summary>evafast 设置是否已加载（避免重复读盘）</summary>
     private bool _evafastLoaded;
@@ -263,32 +267,46 @@ public partial class SettingsViewModel : ObservableObject
         OnPropertyChanged(nameof(CanSaveMpvSettings));
     }
 
-    // ---- 菜单交互（uosc）----
+    // ---- uosc 交互与进度条 ----
 
     /// <summary>子菜单 hover 延迟展开（秒），0 更跟手，调大避免快速扫过父菜单时误弹出。</summary>
     [ObservableProperty]
     private double _uoscMenuSubmenuDelay = UoscConfigService.DefaultMenuSubmenuDelay;
 
+    /// <summary>是否在进度条上显示前向和后向缓冲。</summary>
+    [ObservableProperty]
+    private bool _uoscTimelineBuffer = UoscConfigService.DefaultTimelineBuffer;
+
+    /// <summary>缓冲层透明度。</summary>
+    [ObservableProperty]
+    private double _uoscTimelineBufferOpacity = UoscConfigService.DefaultTimelineBufferOpacity;
+
     /// <summary>加载时的 uosc 初始值（判断是否有未保存修改）</summary>
     private double _uoscInitialMenuSubmenuDelay = UoscConfigService.DefaultMenuSubmenuDelay;
+    private bool _uoscInitialTimelineBuffer = UoscConfigService.DefaultTimelineBuffer;
+    private double _uoscInitialTimelineBufferOpacity = UoscConfigService.DefaultTimelineBufferOpacity;
 
-    /// <summary>uosc 菜单设置是否有未保存修改</summary>
-    public bool UoscMenuModified =>
-        Math.Abs(UoscMenuSubmenuDelay - _uoscInitialMenuSubmenuDelay) >= 0.001;
+    /// <summary>uosc 设置是否有未保存修改</summary>
+    public bool UoscModified =>
+        Math.Abs(UoscMenuSubmenuDelay - _uoscInitialMenuSubmenuDelay) >= 0.001
+        || UoscTimelineBuffer != _uoscInitialTimelineBuffer
+        || Math.Abs(UoscTimelineBufferOpacity - _uoscInitialTimelineBufferOpacity) >= 0.001;
 
     /// <summary>uosc 菜单设置是否已加载（避免重复读盘）</summary>
-    private bool _uoscMenuLoaded;
+    private bool _uoscLoaded;
 
     /// <summary>uosc 菜单设置操作结果。</summary>
     [ObservableProperty]
     private string? _uoscMenuMessage;
 
     partial void OnUoscMenuSubmenuDelayChanged(double value) => RefreshUoscMenuModified();
+    partial void OnUoscTimelineBufferChanged(bool value) => RefreshUoscMenuModified();
+    partial void OnUoscTimelineBufferOpacityChanged(double value) => RefreshUoscMenuModified();
 
     /// <summary>刷新 uosc 菜单修改状态与保存按钮可用性</summary>
     private void RefreshUoscMenuModified()
     {
-        OnPropertyChanged(nameof(UoscMenuModified));
+        OnPropertyChanged(nameof(UoscModified));
         OnPropertyChanged(nameof(CanSaveMpvSettings));
     }
 
@@ -350,9 +368,6 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>逐镜像测速结果（供列表展示）</summary>
     public ObservableCollection<MirrorProbeService.ProbeResult> MirrorProbeResults { get; } = [];
 
-    /// <summary>最近一次探测到的可用镜像（按速度排序）</summary>
-    private List<MirrorProbeService.ProbeResult> _probedMirrors = [];
-
     /// <summary>下载取消令牌（暂停/停止用）</summary>
     private CancellationTokenSource? _downloadCts;
 
@@ -374,17 +389,17 @@ public partial class SettingsViewModel : ObservableObject
     private string MpvConfigPath =>
         IsInstalled ? Path.Combine(ConfigDirectory, "mpv.conf") : string.Empty;
 
-    public SettingsViewModel(AppSession session)
+    public SettingsViewModel(AppSession session, MainViewModel main)
     {
         _session = session;
+        _main = main;
 
-        // 镜像下拉：自动检测 + 各镜像
-        MirrorOptions.Add(new DownloadMirror("auto", "自动检测（推荐）", null));
+        // 镜像下拉：具体镜像列表（默认 ModelScope 国内直连；无持久化，每次启动重置）
         foreach (var m in MirrorRegistry.All)
         {
             MirrorOptions.Add(m);
         }
-        SelectedMirror = MirrorOptions[0];
+        SelectedMirror = MirrorRegistry.Find("modelscope") ?? MirrorOptions[0];
     }
 
     /// <summary>页面激活时刷新（检测安装 + 备份列表 + 缓存统计）</summary>
@@ -578,25 +593,29 @@ public partial class SettingsViewModel : ObservableObject
         }
     }
 
-    /// <summary>加载 uosc（菜单交互）设置，仅首次/未加载时读取。</summary>
+    /// <summary>加载 uosc 交互与进度条设置，仅首次/未加载时读取。</summary>
     private void LoadUoscMenuSettings()
     {
-        if (_uoscMenuLoaded || !IsInstalled)
+        if (_uoscLoaded || !IsInstalled)
         {
             return;
         }
 
         try
         {
-            // 先记录初始值，再赋值（赋值触发的 OnUoscMenuSubmenuDelayChanged 会据此判断未修改）
-            _uoscInitialMenuSubmenuDelay = UoscConfigService.LoadMenuSubmenuDelay(ConfigDirectory);
+            var settings = UoscConfigService.Load(ConfigDirectory);
+            _uoscInitialMenuSubmenuDelay = settings.MenuSubmenuDelay;
+            _uoscInitialTimelineBuffer = settings.TimelineBuffer;
+            _uoscInitialTimelineBufferOpacity = settings.TimelineBufferOpacity;
             UoscMenuSubmenuDelay = _uoscInitialMenuSubmenuDelay;
-            _uoscMenuLoaded = true;
+            UoscTimelineBuffer = _uoscInitialTimelineBuffer;
+            UoscTimelineBufferOpacity = _uoscInitialTimelineBufferOpacity;
+            _uoscLoaded = true;
             RefreshUoscMenuModified();
         }
         catch (Exception ex)
         {
-            UoscMenuMessage = $"菜单交互设置加载失败：{ex.Message}";
+            UoscMenuMessage = $"uosc 设置加载失败：{ex.Message}";
         }
     }
 
@@ -737,7 +756,6 @@ public partial class SettingsViewModel : ObservableObject
             var results = await MirrorProbeService.ProbeAsync(
                 asset.Url,
                 onProgress: msg => DispatcherInvoke(() => MirrorStatus = msg));
-            _probedMirrors = results.ToList();
 
             MirrorProbeResults.Clear();
             foreach (var r in results)
@@ -875,19 +893,7 @@ public partial class SettingsViewModel : ObservableObject
             await aria2.LocateAsync();
 
             // 确定用户选定的下载镜像（单选，不自动降级）
-            DownloadMirror chosenMirror;
-            if (SelectedMirror?.Id == "auto")
-            {
-                var fastest = _probedMirrors
-                    .Where(r => r.IsAvailable && !r.Mirror.IsOfficial)
-                    .OrderByDescending(r => r.SpeedBytesPerSec)
-                    .FirstOrDefault();
-                chosenMirror = fastest?.Mirror ?? MirrorRegistry.Find("official")!;
-            }
-            else
-            {
-                chosenMirror = SelectedMirror ?? MirrorRegistry.Find("official")!;
-            }
+            var chosenMirror = SelectedMirror ?? MirrorRegistry.Find("modelscope")!;
 
             OperationMessage = $"下载引擎：Aria2 Next {Aria2Service.EngineVersion}；镜像：{chosenMirror.Name}。";
             OnPropertyChanged(nameof(DownloadSummary));
@@ -1125,12 +1131,19 @@ public partial class SettingsViewModel : ObservableObject
                 savedParts.Add("方向键快进设置");
             }
 
-            // 菜单交互（uosc.conf）有修改时一并保存
-            if (UoscMenuModified)
+            // uosc.conf 有修改时一并保存
+            if (UoscModified)
             {
-                UoscConfigService.SaveMenuSubmenuDelay(ConfigDirectory, UoscMenuSubmenuDelay);
+                UoscConfigService.Save(ConfigDirectory, new UoscSettings
+                {
+                    MenuSubmenuDelay = UoscMenuSubmenuDelay,
+                    TimelineBuffer = UoscTimelineBuffer,
+                    TimelineBufferOpacity = UoscTimelineBufferOpacity,
+                });
                 _uoscInitialMenuSubmenuDelay = UoscMenuSubmenuDelay;
-                savedParts.Add("菜单交互设置");
+                _uoscInitialTimelineBuffer = UoscTimelineBuffer;
+                _uoscInitialTimelineBufferOpacity = UoscTimelineBufferOpacity;
+                savedParts.Add("uosc 设置");
             }
 
             var baseMsg = backup is null

@@ -54,6 +54,15 @@ public partial class InstallViewModel : ObservableObject
     private readonly object _logLock = new();
     private DispatcherTimer? _logTimer;
 
+    /// <summary>进度分段偏移：一键升级时下载阶段占 0~45%，安装阶段占 45~100%</summary>
+    private double _phaseOffset;
+
+    /// <summary>进度分段缩放（普通安装恒为 1.0）</summary>
+    private double _phaseScale = 1.0;
+
+    /// <summary>把阶段内 0~100 进度映射为整体进度</summary>
+    private int MapPercent(int value) => (int)Math.Clamp(_phaseOffset + value * _phaseScale, 0, 100);
+
     public InstallViewModel(AppSession session)
     {
         _session = session;
@@ -95,17 +104,51 @@ public partial class InstallViewModel : ObservableObject
         _engine.PackageProgress += (file, pct) => DispatcherInvoke(() =>
         {
             CurrentFile = file;
-            Percent = pct;
+            Percent = MapPercent(pct);
             OnPropertyChanged(nameof(PercentText));
         });
         _engine.GlobalProgress += pct => DispatcherInvoke(() =>
         {
-            Percent = pct;
+            Percent = MapPercent(pct);
             OnPropertyChanged(nameof(PercentText));
         });
 
         try
         {
+            // 一键升级：先自动下载全部增量包到包目录（0~45%），再执行覆盖升级（45~100%）
+            if (_session.UpgradeReleaseInfo is { } release)
+            {
+                _phaseOffset = 0;
+                _phaseScale = 0.45;
+                CurrentMessage = "正在下载增量包…";
+
+                var logSink = new Action<string>(line =>
+                {
+                    lock (_logLock)
+                    {
+                        _logBuffer.AppendLine(line);
+                    }
+                });
+                await UpgradePackageDownloader.DownloadAllAsync(
+                    release,
+                    _session.SourceDirectory!,
+                    UpgradePackageDownloader.DefaultMirrors(),
+                    logSink,
+                    (done, total, pct) => DispatcherInvoke(() =>
+                    {
+                        var overall = (done + pct / 100.0) / Math.Max(total, 1);
+                        Percent = MapPercent((int)(overall * 100));
+                        CurrentMessage = pct > 0
+                            ? $"正在下载增量包（第 {Math.Min(done + 1, total)}/{total} 个，{pct}%）…"
+                            : $"增量包下载进度：{done}/{total}";
+                        OnPropertyChanged(nameof(PercentText));
+                    }));
+                logSink($"增量包下载完成，开始覆盖升级：{_session.InstallDirectory}");
+
+                _phaseOffset = 45;
+                _phaseScale = 0.55;
+            }
+
             var options = new InstallOptions
             {
                 SourceDirectory = _session.SourceDirectory!,

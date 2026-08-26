@@ -99,7 +99,7 @@ public static class MirrorProbeService
             {
                 Timeout = TimeSpan.FromSeconds(15),
             };
-            http.DefaultRequestHeaders.UserAgent.ParseAdd("VantaInstaller/0.3.2");
+            http.DefaultRequestHeaders.UserAgent.ParseAdd("VantaInstaller/0.3.12");
             http.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(0, MaxProbeBytes - 1);
 
             using var response = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);

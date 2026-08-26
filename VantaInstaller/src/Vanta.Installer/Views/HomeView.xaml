@@ -75,6 +75,33 @@
                     </StackPanel>
                 </ui:Card>
 
+                <!-- 更新建议（检测到 Vanta 安装且远端有新版时显示） -->
+                <ui:Card Padding="20" Margin="0,0,0,20"
+                         Visibility="{Binding HasMpvUpdate, Converter={StaticResource BoolToVis}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="ArrowDownload24" FontSize="18" Foreground="#FF0078D4" />
+                                <TextBlock Text="MPV Vanta Edition 有可用更新" FontSize="14" FontWeight="SemiBold"
+                                           Margin="8,0,0,0" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                            </StackPanel>
+                            <TextBlock Margin="0,6,0,0" Text="{Binding MpvUpdateText, Mode=OneWay}"
+                                       FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                        <ui:Button Grid.Column="1" Content="去更新" Appearance="Primary" Padding="14,7"
+                                   VerticalAlignment="Center"
+                                   AutomationProperties.Name="去更新"
+                                   ToolTip="跳转设置页并自动检查更新"
+                                   Command="{Binding GoSettingsForUpdateCommand}" />
+                    </Grid>
+                </ui:Card>
+
                 <!-- 指定已安装的 mpv 位置（仅未检测到安装时显示，作为补救入口） -->
                 <ui:Card Padding="24" Margin="0,0,0,20"
                          Visibility="{Binding IsInstalled, Converter={StaticResource InverseVis}}">

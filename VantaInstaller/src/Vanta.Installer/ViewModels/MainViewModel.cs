@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -61,13 +62,20 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _hasInstallerUpdate;
 
-    /// <summary>可用的最新 VantaInstaller 版本号</summary>
+    /// <summary>自更新按钮文本（有新版 {x} / 下载中… / 校验中… / 失败提示）</summary>
     [ObservableProperty]
-    private string? _installerUpdateVersion;
+    private string? _installerUpdateText;
 
-    /// <summary>最新安装器下载直链</summary>
+    /// <summary>最新安装器下载直链（镜像全部失败时浏览器兜底用）</summary>
     [ObservableProperty]
     private string? _installerUpdateUrl;
+
+    /// <summary>是否正在下载自更新（防重复触发）</summary>
+    [ObservableProperty]
+    private bool _isInstallerUpdateDownloading;
+
+    /// <summary>最近一次检测到的自更新信息（含 SHA-256，下载后校验）</summary>
+    private UpdateService.InstallerUpdateInfo? _installerUpdateInfo;
 
     /// <summary>当前安装步骤索引</summary>
     [ObservableProperty]
@@ -150,7 +158,7 @@ public partial class MainViewModel : ObservableObject
 
         _home = new HomeViewModel(this);
         _uninstall = new UninstallViewModel(_session, this);
-        _settings = new SettingsViewModel(_session);
+        _settings = new SettingsViewModel(_session, this);
 
         _installPages =
         [
@@ -213,8 +221,9 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            InstallerUpdateVersion = update.LatestVersion;
+            InstallerUpdateText = $"有新版 {update.LatestVersion}";
             InstallerUpdateUrl = update.AssetUrl;
+            _installerUpdateInfo = update;
             HasInstallerUpdate = true;
         }
         catch
@@ -223,26 +232,100 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    /// <summary>打开最新 VantaInstaller 下载直链。</summary>
+    /// <summary>
+    /// 下载新版 VantaInstaller：默认先 ModelScope 数据集、失败降级 GitHub 官方直连。
+    /// 下载并按 GitHub digest 校验 SHA-256 后不立即重启——提示已就绪，
+    /// 应用关闭时由 SelfUpdateReplacer 自动替换当前 exe（全部失败回退浏览器直链）。
+    /// </summary>
     [RelayCommand]
-    private void OpenInstallerUpdate()
+    private async Task OpenInstallerUpdateAsync()
     {
-        if (string.IsNullOrEmpty(InstallerUpdateUrl))
+        if (IsInstallerUpdateDownloading || _installerUpdateInfo is not { } info)
         {
             return;
         }
+        if (!string.IsNullOrEmpty(SelfUpdateReplacer.PendingNewExePath))
+        {
+            return; // 已有就绪的更新等待关闭时替换
+        }
 
+        IsInstallerUpdateDownloading = true;
+        InstallerUpdateText = "准备下载…";
         try
         {
-            Process.Start(new ProcessStartInfo
+            var updatesDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "VantaInstaller",
+                "updates");
+            var fileName = $"VantaInstaller-win-x64-v{info.LatestVersion}.exe";
+
+            var aria2 = new Aria2Service();
+            void OnProgress(string _, int pct) => InstallerUpdateText = $"下载中 {pct}%";
+            aria2.ProgressChanged += OnProgress;
+            try
             {
-                FileName = InstallerUpdateUrl,
-                UseShellExecute = true,
-            });
+                // 降级顺序固定：ModelScope 国内直连 → GitHub 官方直连
+                var mirrors = new[]
+                {
+                    MirrorRegistry.Find("modelscope")!,
+                    MirrorRegistry.Find("official")!,
+                };
+                await aria2.DownloadWithMirrorsAsync(
+                    info.AssetUrl,
+                    updatesDir,
+                    mirrors,
+                    fileName);
+            }
+            finally
+            {
+                aria2.ProgressChanged -= OnProgress;
+            }
+
+            var downloaded = Path.Combine(updatesDir, fileName);
+            if (!string.IsNullOrWhiteSpace(info.Sha256))
+            {
+                InstallerUpdateText = "校验中…";
+                var actual = await PackageIntegrityService.ComputeSha256Async(downloaded, _ => { }, CancellationToken.None);
+                if (!string.Equals(actual, info.Sha256, StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        File.Delete(downloaded);
+                    }
+                    catch
+                    {
+                        // 删除失败不影响报错
+                    }
+                    throw new InvalidOperationException("新版安装器 SHA-256 校验失败，已删除下载文件。");
+                }
+            }
+
+            SelfUpdateReplacer.PendingNewExePath = downloaded;
+            InstallerUpdateText = "已下载·关闭后自动升级";
         }
         catch
         {
-            // 打不开时忽略
+            // ModelScope 与官方直连均失败：回退浏览器直链兜底，按钮保留供重试
+            InstallerUpdateText = "下载失败·点击重试";
+            try
+            {
+                if (!string.IsNullOrEmpty(InstallerUpdateUrl))
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = InstallerUpdateUrl,
+                        UseShellExecute = true,
+                    });
+                }
+            }
+            catch
+            {
+                // 浏览器也打不开时仅保留按钮重试
+            }
+        }
+        finally
+        {
+            IsInstallerUpdateDownloading = false;
         }
     }
 
@@ -304,6 +387,68 @@ public partial class MainViewModel : ObservableObject
         CurrentPage = _settings;
         _settings.Refresh();
         UpdatePanelState();
+    }
+
+    /// <summary>进入设置页并自动执行检查更新（首页更新建议入口）</summary>
+    [RelayCommand]
+    private void GoSettingsForUpdate()
+    {
+        OpenSettings();
+        _ = _settings.CheckUpdateCommand.ExecuteAsync(null);
+    }
+
+    /// <summary>
+    /// 一键升级：检测到 Vanta 安装时，自动下载最新 Release 全部增量包
+    /// （临时目录 %TEMP%\VantaInstaller\upgrade\vX.Y.Z\，ModelScope→GitHub 降级）
+    /// 并直接进入安装页执行覆盖升级（复用备份/校验/进度/完成页）。
+    /// 未检测到 Vanta 安装或网络异常时回退设置页手动流程。
+    /// </summary>
+    [RelayCommand]
+    private async Task OneClickUpgradeAsync()
+    {
+        var detected = InstallationDetector.Detect();
+        if (detected is not { IsVanta: true })
+        {
+            GoSettingsForUpdate();
+            return;
+        }
+
+        UpdateService.UpdateInfo? latest = null;
+        try
+        {
+            latest = await UpdateService.CheckLatestAsync();
+        }
+        catch
+        {
+            // 网络异常走手动流程兜底
+        }
+        if (latest is null)
+        {
+            GoSettingsForUpdate();
+            return;
+        }
+
+        var packagesDir = Path.Combine(
+            Path.GetTempPath(),
+            "VantaInstaller",
+            "upgrade",
+            latest.LatestVersion);
+        _session.SourceDirectory = packagesDir;
+        _session.InstallDirectory = detected.Directory;
+        _session.SelectedPackageKeys = null;
+        _session.RegisterAssociations = null; // 升级不改动文件关联
+        _session.UpgradeReleaseInfo = latest;
+
+        // 直接进入安装页（第 4 步）并自动开始：下载增量包 → 覆盖升级
+        CurrentMode = AppMode.Install;
+        CurrentStep = 3;
+        CurrentPage = _installPages[3];
+        UpdatePanelState();
+        UpdateSteps();
+        if (_installPages[3] is InstallViewModel installVm)
+        {
+            installVm.StartInstall();
+        }
     }
 
     /// <summary>刷新主页状态（卸载/安装完成后调用）</summary>

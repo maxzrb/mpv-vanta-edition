@@ -29,6 +29,8 @@ defaults = {
 	chapter_marker_border = 0,
 	timeline_step = '5',
 	timeline_cache = true,
+	timeline_buffer = true,
+	timeline_buffer_opacity = 0.18,
 	timeline_heatmap = 'overlay',
 	timeline_mbtn_right = '',
 	media_info = true,
@@ -509,6 +511,7 @@ state = {
 	on_shuffle = function() state.shuffle_history = nil end,
 	mouse_bindings_enabled = false,
 	uncached_ranges = nil,
+	cached_ranges = nil,
 	cache = nil,
 	cache_buffering = 100,
 	cache_underrun = false,
@@ -860,6 +863,7 @@ mp.observe_property('demuxer-cache-state', 'native', function(prop, cache_state)
 	if not (state.duration and (#cached_ranges > 0 or state.cache == 'yes' or
 			(state.cache == 'auto' and state.is_stream))) then
 		if state.uncached_ranges then set_state('uncached_ranges', nil) end
+		if state.cached_ranges then set_state('cached_ranges', nil) end
 		set_state('cache_duration', nil)
 		return
 	end
@@ -894,6 +898,7 @@ mp.observe_property('demuxer-cache-state', 'native', function(prop, cache_state)
 		end
 	end
 
+	set_state('cached_ranges', #ranges > 0 and ranges or nil)
 	set_state('uncached_ranges', uncached_ranges)
 end)
 mp.observe_property('display-fps', 'native', observe_display_fps)
@@ -1356,6 +1361,36 @@ local function set_mini_progress(value, silent)
 end
 mp.register_script_message('mini-progress-toggle', set_mini_progress)
 publish_mini_progress_state()
+-- 展开时间轴双向缓冲显示开关（默认开启；持久化到 uosc.conf）。
+local function publish_timeline_buffer_state()
+	mp.set_property(
+		'user-data/uosc/timeline-buffer',
+		options.timeline_buffer and 'yes' or 'no'
+	)
+end
+local function set_timeline_buffer(value, silent)
+	local requested = tostring(value or 'toggle'):lower()
+	if requested == 'yes' or requested == 'on' or requested == 'true' or requested == '1' then
+		options.timeline_buffer = true
+	elseif requested == 'no' or requested == 'off' or requested == 'false' or requested == '0' then
+		options.timeline_buffer = false
+	else
+		options.timeline_buffer = not options.timeline_buffer
+	end
+
+	handle_options({timeline_buffer = true})
+	persist_uosc_option('timeline_buffer', options.timeline_buffer)
+	publish_timeline_buffer_state()
+	if options.timeline_buffer then Elements:flash({'timeline'}) end
+	if not silent then
+		mp.osd_message(
+			options.timeline_buffer and '时间轴双向缓冲：开启' or '时间轴双向缓冲：关闭',
+			2
+		)
+	end
+end
+mp.register_script_message('timeline-buffer-toggle', set_timeline_buffer)
+publish_timeline_buffer_state()
 -- 时间显示模式：播放时长/剩余时长与播放时长/总时长之间切换，并持久化到 uosc.conf。
 local function publish_time_display_state()
 	mp.set_property(

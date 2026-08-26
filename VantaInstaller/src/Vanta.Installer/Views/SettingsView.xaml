@@ -23,7 +23,7 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <Slider Width="120" Minimum="{Binding Option.Min}" Maximum="{Binding Option.Max}"
                         Value="{Binding SliderValue, Mode=TwoWay}" />
-                <TextBlock Text="{Binding CurrentValue}" Width="32" Margin="8,0,0,0"
+                <TextBlock Text="{Binding SliderDisplayValue}" Width="70" Margin="8,0,0,0"
                            VerticalAlignment="Center" FontSize="12" TextAlignment="Right"
                            Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
             </StackPanel>
@@ -469,6 +469,21 @@
                     </StackPanel>
                 </ui:Card>
 
+                <!-- 一键升级 -->
+                <ui:Card Padding="24" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="一键升级" Style="{StaticResource CardTitleStyle}" />
+                        <TextBlock Style="{StaticResource CardDescStyle}">
+                            自动下载最新版本的全部增量包到临时目录并执行覆盖升级（升级前自动备份配置，不改动文件关联）；已下载且大小一致的包自动跳过。未检测到 Vanta 安装或网络异常时回退上方手动流程。
+                        </TextBlock>
+                        <ui:Button Content="一键升级（自动下载并安装）" Appearance="Primary"
+                                   Command="{Binding OneClickUpgradeCommand}"
+                                   AutomationProperties.Name="一键升级"
+                                   ToolTip="下载最新全部增量包（ModelScope 优先）并自动执行覆盖升级"
+                                   Padding="16,7" Margin="0,14,0,0" HorizontalAlignment="Left" />
+                    </StackPanel>
+                </ui:Card>
+
                 <!-- mpv 调节 -->
                 <ui:Card Padding="24" Margin="0,0,0,16"
                          Visibility="{Binding ShowMpvConfig, Converter={StaticResource BoolToVis}}">
@@ -627,12 +642,60 @@
                                         Severity="Informational" Margin="0,12,0,0" />
                         </StackPanel>
 
-                        <!-- 菜单交互（uosc）：独立配置文件，单独保存 -->
+                        <!-- uosc 交互与进度条 -->
                         <StackPanel Margin="0,18,0,0">
                             <Border Padding="0,0,0,8" BorderThickness="0,0,0,1"
                                     BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
-                                <TextBlock Text="菜单交互" FontSize="13" FontWeight="SemiBold"
+                                <TextBlock Text="uosc 交互与进度条" FontSize="13" FontWeight="SemiBold"
                                            Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                            </Border>
+
+                            <!-- 双向缓冲显示 -->
+                            <Border BorderThickness="0,0,0,1" Padding="0,10"
+                                    BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+                                        <TextBlock Text="显示前向与后向缓冲" FontSize="14"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="仅作用于展开时间轴：左侧以后向缓冲斜纹覆盖已播放部分，右侧以前向缓冲浅主题色覆盖未播放轨道；也可在 uosc“其它”菜单即时切换。" Margin="0,3,0,0"
+                                                   FontSize="11" TextWrapping="Wrap" LineHeight="16"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding UoscTimelineBuffer, Mode=TwoWay}"
+                                              VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+
+                            <!-- 缓冲层透明度 -->
+                            <Border BorderThickness="0,0,0,1" Padding="0,10"
+                                    BorderBrush="{DynamicResource Wpf.Ui.Brushes.DividerStrokeColorDefaultBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+                                        <TextBlock Text="缓冲提示透明度" FontSize="14"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="数值越低越克制；建议保持在 10%～25%。" Margin="0,3,0,0"
+                                                   FontSize="11" TextWrapping="Wrap" LineHeight="16"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
+                                                IsEnabled="{Binding UoscTimelineBuffer}">
+                                        <Slider Width="140" Minimum="0.05" Maximum="0.4" TickFrequency="0.01"
+                                                IsSnapToTickEnabled="True"
+                                                Value="{Binding UoscTimelineBufferOpacity, Mode=TwoWay}" />
+                                        <TextBlock Text="{Binding UoscTimelineBufferOpacity, StringFormat={}{0:P0}}" Width="42"
+                                                   Margin="8,0,0,0" FontSize="12" TextAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                </Grid>
                             </Border>
 
                             <!-- 子菜单 hover 延迟 -->

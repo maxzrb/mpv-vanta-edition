@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Vanta.Core.Models;
 
@@ -35,6 +36,7 @@ public partial class MpvOptionItem : ObservableObject
             OnPropertyChanged();
             OnPropertyChanged(nameof(BoolValue));
             OnPropertyChanged(nameof(SliderValue));
+            OnPropertyChanged(nameof(SliderDisplayValue));
             OnPropertyChanged(nameof(IsModified));
         }
     }
@@ -49,8 +51,36 @@ public partial class MpvOptionItem : ObservableObject
     /// <summary>滑块值（Slider 类型用）</summary>
     public double SliderValue
     {
-        get => double.TryParse(Option.CurrentValue, out var v) ? v : 0;
-        set => CurrentValue = value.ToString("0.##");
+        get
+        {
+            var raw = Option.CurrentValue.Trim();
+            if (Option.ValueSuffix.Length > 0
+                && raw.EndsWith(Option.ValueSuffix, StringComparison.OrdinalIgnoreCase))
+            {
+                raw = raw[..^Option.ValueSuffix.Length].TrimEnd();
+            }
+            return double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var value)
+                ? value
+                : 0;
+        }
+        set
+        {
+            var normalized = Option.Step > 0
+                ? Math.Round(value / Option.Step) * Option.Step
+                : value;
+            CurrentValue = normalized.ToString("0.##", CultureInfo.InvariantCulture) + Option.ValueSuffix;
+        }
+    }
+
+    /// <summary>滑块右侧显示值，单位与配置序列化分离。</summary>
+    public string SliderDisplayValue
+    {
+        get
+        {
+            var suffix = Option.DisplaySuffix.Length > 0 ? Option.DisplaySuffix : Option.ValueSuffix;
+            return SliderValue.ToString("0.##", CultureInfo.InvariantCulture)
+                + (suffix.Length > 0 ? $" {suffix}" : string.Empty);
+        }
     }
 }
 

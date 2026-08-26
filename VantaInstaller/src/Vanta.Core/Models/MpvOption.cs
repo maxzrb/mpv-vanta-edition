@@ -52,6 +52,15 @@ public sealed class MpvOption : INotifyPropertyChanged
     /// <summary>滑块范围上限</summary>
     public double Max { get; init; }
 
+    /// <summary>滑块步进；0 表示不额外量化。</summary>
+    public double Step { get; init; }
+
+    /// <summary>写入 mpv.conf 时附加到滑块数值后的单位，如 MiB。</summary>
+    public string ValueSuffix { get; init; } = string.Empty;
+
+    /// <summary>界面显示单位；为空时复用 ValueSuffix。</summary>
+    public string DisplaySuffix { get; init; } = string.Empty;
+
     /// <summary>说明</summary>
     public string? Description { get; init; }
 
