@@ -5,12 +5,12 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master` 与 `origin/master` 同步；v1.5.5 发布准备中 |
-| **最新发布提交** | `4b7d651`（tag: `v1.5.4`，已推送） |
-| **工作区** | 发布前审计中；存在本次纳入 v1.5.5 的功能、VantaInstaller 和文档未提交改动，`.zcode/` 为本地计划临时文件不纳入发布 |
+| **分支** | `master` 与 `origin/master` 同步；v1.5.5 已正式发布 |
+| **最新发布提交** | `1d38d87`（tag: `v1.5.5`，已推送） |
+| **工作区** | v1.5.5 公开资产、私包、GitHub Release、ModelScope 和发布记录已完成；`.zcode/` 与用户原有流程文件改动不纳入发布 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.5（准备发布） |
-| **上次操作** | 完成 v1.5.5 发布范围审计，确认不触发大改动 Gate；安装器版本定为 v0.3.12 |
+| **项目版本** | v1.5.5（已发布） |
+| **上次操作** | 完成 v1.5.5 GitHub/ModelScope 发布与远端资产核验；安装器版本为 v0.3.12 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2772,3 +2772,12 @@ c:\Program portable\mpv2\
 - **版本标记**：根目录和 01 包内 `portable_config/.vanta-version` 均为 `1.5.5`（UTF-8、无 BOM、无换行）。
 - **SHA-256**：01 `26DC2054870D8CBF5DB5CBF047C45C5933FF309D6F0E0C3B73C01F8E4F02DA34`；02.001 `728E4ABD722783378859A2454576EFE1C8B807BF351C55E4B8F8BA66379A67DA`；02.002 `B3FFEF6FA0378C2CFA8DE2BFE20987FB5A7C87BE15339C0AD3343EDFCB9937E5`；03 `D929EE669F8FCD8CBAD69D99D9CE5CC0D4CD9BA581C60D0A5387CEBC64AE06F0`；04 `B0106B0403605156A8B3014852C23B150EAF97AF7087FF45EADCCFBFE472B52B`；Installer `820010E22CD82A7AB1E3E9B78F5E9B0B5E6E6A1D8CFDA6CCAD7906F617492BFA`；私包 `2CCF6B2AAEA74DA491AE7493DC754230E89620CC5545A73FC7607045863CD67A`（仅本地）。
 - **下一步**：提交本构建记录，创建并推送 `v1.5.5` 标签，随后上传 GitHub 6 个公开资产；私包不得上传。ModelScope 同步结果在远端发布后补录。
+
+### 2026-08-26 18:42 · v1.5.5 正式发布与镜像收尾
+
+- **GitHub Release**：标签 `v1.5.5` 已推送；Release `https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.5.5` 已正式发布，`isDraft=false`、`isPrerelease=false`，恰好 6 个公开资产，无重复/临时资产，无私用全量包。
+- **远端核验**：6 个 GitHub 资产的大小与远端 digest SHA-256 逐项匹配本地：01 `26DC2054870D8CBF5DB5CBF047C45C5933FF309D6F0E0C3B73C01F8E4F02DA34`；02.001 `728E4ABD722783378859A2454576EFE1C8B807BF351C55E4B8F8BA66379A67DA`；02.002 `B3FFEF6FA0378C2CFA8DE2BFE20987FB5A7C87BE15339C0AD3343EDFCB9937E5`；03 `D929EE669F8FCD8CBAD69D99D9CE5CC0D4CD9BA581C60D0A5387CEBC64AE06F0`；04 `B0106B0403605156A8B3014852C23B150EAF97AF7087FF45EADCCFBFE472B52B`；Installer `820010E22CD82A7AB1E3E9B78F5E9B0B5E6E6A1D8CFDA6CCAD7906F617492BFA`。
+- **Release Note**：已根据用户追加规范调整为只保留更新内容；每条变更单独一行，使用 `[新增]`、`[更改]`、`[移除]` 前缀，不再放安装顺序、校验和或安装器说明。
+- **ModelScope**：`AerithDream/mpv-vanta-edition/v1.5.5/` 六个公开资产均上传成功；六条匿名直链 HTTP 200 且 Content-Length 与本地一致；01、04、VantaInstaller 下载回测 SHA-256 与本地一致。私包未上传。
+- **流程更新**：按用户明确要求，《发布流程.md》已追加 Release Note 规则，并将旧的“说明包含安装顺序/校验和”要求改为“Release Note 只保留更新内容，其余信息写入版本记录或包内 README”。
+- **收尾提交**：本条将与流程规范增量一并提交为 `docs: record v1.5.5 release results`；保留用户原有的《发布流程.md》其它未提交改动与 `.zcode/` 临时目录，不做清理或覆盖。
