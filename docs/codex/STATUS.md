@@ -7,11 +7,11 @@
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **分支** | `master` 与 `origin/master` 同步；v1.5.6 发布准备中 |
 | **最新发布提交** | `1d38d87`（tag: `v1.5.5`，已推送） |
-| **工作区** | v1.5.6 修复代码已完成验证；01/04 待重建，02/03 按新流程核验后复用，保留 `.zcode/` 用户目录 |
+| **工作区** | v1.5.6 本地公开资产已构建/核验；01/04 重建、02/03 原样复用，保留 `.zcode/` 用户目录 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.6（发布准备中） |
-| **上次操作** | 完成 uosc 底部显隐链修复及 Lua/MPV 探针验证；确认 02/03 输入自 v1.5.5 未变化 |
-| **当前排查** | 按用户批准的流程规则准备 v1.5.6：重建 01/04，原样复用 02/03，沿用未变更的 VantaInstaller v0.3.12 |
+| **上次操作** | 完成 v1.5.6 本地构建、复用包字节核验、内容门禁及运行探针；远端发布尚未执行 |
+| **当前排查** | 01/04 已重建，02/03 原样复用 v1.5.5，VantaInstaller v0.3.12 沿用；待提交构建记录后发布 GitHub/ModelScope |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2809,3 +2809,14 @@ c:\Program portable\mpv2\
 - **复用核验**：`portable_config/shaders`、`portable_config/vs`、`vs-plugins`、`vs-coreplugins`、`vs-scripts` 和 `Faster-Whisper-XXL` 均无 Git 跟踪改动，且相对 v1.5.5 产物时间点没有文件修改；来源 v1.5.5 归档 `7z t` 已通过，待复制后对新文件名再次测试。
 - **发布构成**：01/04 因含本次 uosc 修复将重建；02 两卷和 03 计划逐字节复制为 v1.5.6 规范文件名；VantaInstaller v0.3.12 因源码无改动沿用；私用全量包本次不重建、不上传。
 - **记录状态**：已建立 v1.5.6 版本记录占位；待完成构建、内容门禁、GitHub Release、ModelScope 同步和发布后收尾。
+
+## 2026-08-27 18:53
+
+### v1.5.6 本地构建与发布前验收
+
+- **产物**：01 Base 和 04 Config 已用 v1.5.6 重建；02 两卷、03 Faster-Whisper 与 v1.5.5 来源归档逐字节一致后改名复用；VantaInstaller v0.3.12 因源码无改动沿用。
+- **归档测试**：新文件名下 01、02（两卷）、03、04 均 `7z t` 通过；02 分卷分别为 1,992,294,400 和 781,554,918 bytes，均低于 2 GiB。
+- **内容门禁**：01 的 `script-assets/`、`ffmpeg/ffmpeg.exe`、`.vanta-version` 存在；04 排除启动素材、fonts、licenses、`.vanta-version` 和 `window_state.conf`；公开包无根级 backup、构建/发布泄漏、缓存、调试产物或 Lossless/Steam 专有文件。
+- **版本标记**：根目录和 01 包内 `.vanta-version` 均为 5 bytes 的 `1.5.6`，无 BOM、无换行；`build/` 暂存已清理。
+- **运行验证**：139 个 Lua 文件语法通过；完整配置空闲 6 秒、短视频 3 帧（显式 `--idle=no`）和 VantaInstaller 启动探针通过。
+- **校验和**：本地 SHA-256 已写入 `version/版本迭代记录.md`；待提交构建记录、推送 v1.5.6 标签、创建 GitHub Release 并同步 ModelScope。
