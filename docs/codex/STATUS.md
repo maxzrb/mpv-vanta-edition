@@ -5,13 +5,13 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master` 与 `origin/master` 同步；v1.5.6 已正式发布 |
+| **分支** | `master` 与 `origin/master` 同步；v1.5.6 覆盖修订中 |
 | **最新发布提交** | `e22ec52`（tag: `v1.5.6`，已推送） |
-| **工作区** | v1.5.6 GitHub Release、ModelScope 镜像和本地记录均已完成；保留 `.zcode/` 用户目录 |
+| **工作区** | v1.5.6 HDR 档位覆盖已本地重建/验证，待覆盖远端 01/04 资产；保留 `.zcode/` 用户目录 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.6（已发布） |
 | **上次操作** | 完成 v1.5.6 GitHub/ModelScope 发布与远端资产核验；01/04 重建、02/03 原样复用、安装器沿用 v0.3.12 |
-| **当前排查** | v1.5.6 已收尾；用户新提出 HDR 参考白亮度档位扩展想法，尚未纳入本版本 |
+| **当前排查** | 用户已指定将 `Ctrl+T` 扩展为 `auto → 50 → 80 → 100 → 203 → 300 → 400`，正在覆盖 v1.5.6 受影响资产 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2829,3 +2829,29 @@ c:\Program portable\mpv2\
 - **ModelScope**：`AerithDream/mpv-vanta-edition/v1.5.6/` 六个公开资产上传成功；匿名直链均 HTTP 200，`Content-Length` 与本地一致；私用全量包未上传。
 - **提交与标签**：`master` 与 `origin/master` 已同步，`v1.5.6` 标签已推送；待将本次发布收尾记录提交为 `docs: record v1.5.6 release results`。
 - **版本边界**：用户随后提出的 HDR 参考白亮度档位扩展属于下一次配置变更，未混入已发布的 v1.5.6。
+
+## 2026-08-27 19:26
+
+### v1.5.6 HDR 参考白亮度档位覆盖
+
+- **用户决定**：将 `Ctrl+T` 序列从 `auto → 100 → 203` 扩展为 `auto → 50 → 80 → 100 → 203 → 300 → 400`，并明确覆盖现有 v1.5.6 Release。
+- **代码改动**：已修改 `portable_config/input.conf`，仅增加 `hdr-reference-white` 的循环档位；mpv 支持范围和其它 HDR 参数不变。
+- **资产范围**：配置进入 01 Base 与 04 Config，因此只需重建并覆盖这两个同名资产；02 两卷、03 和 VantaInstaller v0.3.12 保持原资产。
+- **远端策略**：保留现有 v1.5.6 标签，待本地构建/验证通过后使用同名 `--clobber` 覆盖 GitHub 01/04，并覆盖 ModelScope 对应文件；Release Note 与版本记录同步增加本次更改。
+
+## 2026-08-27 19:32
+
+### v1.5.6 HDR 覆盖修订本地构建完成
+
+- **包内配置**：01 Base 与 04 Config 均已重建，包内 `input.conf` 已核验包含 `hdr-reference-white auto 50 80 100 203 300 400`。
+- **本地验收**：01/04 新归档 `7z t` 通过，内容门禁、根目录和 01 包内 `1.5.6` 版本标记、02/03 原样复用字节校验均通过。
+- **功能验收**：完整配置空闲启动 6 秒、短视频 3 帧启动通过；02/03 和 VantaInstaller v0.3.12 未重新构建。
+- **新校验和**：01 `8076F0B0591E0BEB1552B23BE3BAED5B5F3A75FC13A37F0D71367EC2A83C877C`（136,429,758 bytes）；04 `AA09A779B4D875ADBDF2F692571FA9DA129FAE423067821928013C314543AB45`（5,142,281 bytes）。
+- **远端状态**：GitHub/ModelScope 仍需用新 01/04 覆盖；02/03/Installer 远端资产保持不变。
+
+## 2026-08-27 19:33
+
+### v1.5.6 覆盖后生成私用全量包
+
+- **用户追加决定**：先完成 GitHub/ModelScope 的 01/04 同名资产覆盖及远端核验，再生成私用全量包。
+- **私包范围**：使用覆盖后的 v1.5.6 01、原样复用的 02、覆盖后的 04，加上 Faster-Whisper 占位说明和最新 VantaInstaller；私包只在本地保留，禁止上传。
