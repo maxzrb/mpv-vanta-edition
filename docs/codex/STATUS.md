@@ -5,12 +5,13 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master` 与 `origin/master` 同步；v1.5.5 已正式发布 |
+| **分支** | `master` 与 `origin/master` 同步；v1.5.6 发布准备中 |
 | **最新发布提交** | `1d38d87`（tag: `v1.5.5`，已推送） |
-| **工作区** | v1.5.5 公开资产、私包、GitHub Release、ModelScope 和发布记录已完成；`.zcode/` 与用户原有流程文件改动不纳入发布 |
+| **工作区** | v1.5.6 修复代码已完成验证；01/04 待重建，02/03 按新流程核验后复用，保留 `.zcode/` 用户目录 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.5（已发布） |
-| **上次操作** | 完成 v1.5.5 GitHub/ModelScope 发布与远端资产核验；安装器版本为 v0.3.12 |
+| **项目版本** | v1.5.6（发布准备中） |
+| **上次操作** | 完成 uosc 底部显隐链修复及 Lua/MPV 探针验证；确认 02/03 输入自 v1.5.5 未变化 |
+| **当前排查** | 按用户批准的流程规则准备 v1.5.6：重建 01/04，原样复用 02/03，沿用未变更的 VantaInstaller v0.3.12 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2781,3 +2782,30 @@ c:\Program portable\mpv2\
 - **ModelScope**：`AerithDream/mpv-vanta-edition/v1.5.5/` 六个公开资产均上传成功；六条匿名直链 HTTP 200 且 Content-Length 与本地一致；01、04、VantaInstaller 下载回测 SHA-256 与本地一致。私包未上传。
 - **流程更新**：按用户明确要求，《发布流程.md》已追加 Release Note 规则，并将旧的“说明包含安装顺序/校验和”要求改为“Release Note 只保留更新内容，其余信息写入版本记录或包内 README”。
 - **收尾提交**：本条将与流程规范增量一并提交为 `docs: record v1.5.5 release results`；保留用户原有的《发布流程.md》其它未提交改动与 `.zcode/` 临时目录，不做清理或覆盖。
+
+### 2026-08-27 17:43 · uosc MediaInfo 左上角误显问题定位
+
+- **现象**：鼠标靠近播放器左上角时，底部 MediaInfo 媒体参数胶囊再次渐显。
+- **根因**：`MediaInfo` 在 `Element:init()` 时继承默认坐标 `(0,0,0,0)`，实际绘制胶囊时只保存 `layout_x/layout_y/layout_width`，没有调用 `set_coordinates()` 更新自身命中矩形；因此接近左上角原点会被误判为接近 `media_info`。
+- **历史**：`MediaInfo.lua` 随提交 `e87365b`（2026-08-07）首次加入；v1.3.2 及更早没有该文件，v1.4.1～v1.5.5 均包含同一遗漏，期间没有补上命中坐标同步。
+- **交互核对**：胶囊中的硬解、分辨率、动态范围、视频编码、帧率、音频编码、声道布局和网络/码率均为状态展示；只有“实时码率/平均码率 + 数值”区域注册了点击，用于循环切换两种码率显示。
+- **本次变更**：未修改运行代码或配置；仅记录诊断。后续若修复，应让 MediaInfo 的实际绘制范围参与自身 proximity 计算，同时保留胶囊的码率点击命中区。
+- **Git 状态**：保留用户已有的 `发布流程.md` 未提交改动和 `.zcode/` 未跟踪目录，未做清理。
+
+### 2026-08-27 17:58 · uosc 底部显隐链修复
+
+- **显隐关系**：保留 `Controls → Timeline/MediaInfo → Speed` 的既有锚定关系；`Controls` 和 `Timeline` 的 proximity 改为只计算鼠标 Y 轴距离，`MediaInfo` 禁用自身 proximity，`Speed` 继续直接复用 MediaInfo 可见度。
+- **左上角误显**：MediaInfo 不再让基类默认 `(0,0,0,0)` 参与显隐，鼠标靠近左上角不会再暴露底部胶囊。
+- **悬停渐隐**：移除 `get_timeline_hover_fade()` 的水平范围门槛，并将速度区域保持可见判断改为仅检查 Y 轴；同一高度水平移动不改变底部组件显隐。
+- **改动文件**：`portable_config/scripts/uosc/elements/Element.lua`、`Controls.lua`、`Timeline.lua`、`MediaInfo.lua`、`lib/utils.lua`。
+- **验证**：139 个 Lua 文件 LuaJIT `loadfile` 全部通过；完整配置空闲启动 6 秒和短视频 3 帧启动均退出码 0，未发现 `[e]/[f]`、Lua error 或 `Cannot find`；目标文件 UTF-8 无 BOM/LF，`git diff --check` 通过（仅 Git 的 LF→CRLF 提示）。
+- **Git 状态**：功能代码及两份 HandShake 记录为本轮改动；继续保留用户已有的 `发布流程.md` 改动和 `.zcode/` 未跟踪目录，未提交。
+
+## 2026-08-27 18:25
+
+### v1.5.6 发布准备与 02/03 复用规则
+
+- **流程决定**：用户明确批准将“02/03 打包输入确认未变化后原样复用上一版本归档”的规则写入《发布流程.md》，用于节约大型资源包重复压缩时间；该流程文件变更已获授权，不再按 §3.2 阻断本次发布。
+- **复用核验**：`portable_config/shaders`、`portable_config/vs`、`vs-plugins`、`vs-coreplugins`、`vs-scripts` 和 `Faster-Whisper-XXL` 均无 Git 跟踪改动，且相对 v1.5.5 产物时间点没有文件修改；来源 v1.5.5 归档 `7z t` 已通过，待复制后对新文件名再次测试。
+- **发布构成**：01/04 因含本次 uosc 修复将重建；02 两卷和 03 计划逐字节复制为 v1.5.6 规范文件名；VantaInstaller v0.3.12 因源码无改动沿用；私用全量包本次不重建、不上传。
+- **记录状态**：已建立 v1.5.6 版本记录占位；待完成构建、内容门禁、GitHub Release、ModelScope 同步和发布后收尾。
