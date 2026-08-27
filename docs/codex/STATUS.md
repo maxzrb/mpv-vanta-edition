@@ -5,13 +5,13 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master` 与 `origin/master` 同步；v1.5.6 覆盖修订中 |
+| **分支** | `master` 与 `origin/master` 同步；v1.5.6 HDR 覆盖修订完成 |
 | **最新发布提交** | `e22ec52`（tag: `v1.5.6`，已推送） |
-| **工作区** | v1.5.6 HDR 档位覆盖已本地重建/验证，待覆盖远端 01/04 资产；保留 `.zcode/` 用户目录 |
+| **工作区** | v1.5.6 HDR 档位已覆盖 GitHub/ModelScope，私用全量包已本地生成；保留 `.zcode/` 用户目录 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
 | **项目版本** | v1.5.6（已发布） |
 | **上次操作** | 完成 v1.5.6 GitHub/ModelScope 发布与远端资产核验；01/04 重建、02/03 原样复用、安装器沿用 v0.3.12 |
-| **当前排查** | 用户已指定将 `Ctrl+T` 扩展为 `auto → 50 → 80 → 100 → 203 → 300 → 400`，正在覆盖 v1.5.6 受影响资产 |
+| **当前排查** | v1.5.6 覆盖修订和私包已完成；`Ctrl+T` 序列为 `auto → 50 → 80 → 100 → 203 → 300 → 400` |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2848,6 +2848,16 @@ c:\Program portable\mpv2\
 - **功能验收**：完整配置空闲启动 6 秒、短视频 3 帧启动通过；02/03 和 VantaInstaller v0.3.12 未重新构建。
 - **新校验和**：01 `8076F0B0591E0BEB1552B23BE3BAED5B5F3A75FC13A37F0D71367EC2A83C877C`（136,429,758 bytes）；04 `AA09A779B4D875ADBDF2F692571FA9DA129FAE423067821928013C314543AB45`（5,142,281 bytes）。
 - **远端状态**：GitHub/ModelScope 仍需用新 01/04 覆盖；02/03/Installer 远端资产保持不变。
+
+## 2026-08-27 19:46
+
+### v1.5.6 HDR 覆盖与私包完成
+
+- **GitHub 覆盖**：01/04 同名资产已使用 `--clobber` 覆盖；6 项资产无重复，新的本地 SHA-256 与 GitHub digest 全部一致，Release 保持正式非草稿状态，Release Note 已同步 HDR 档位说明。
+- **ModelScope 覆盖**：01/04 同名文件上传完成；六项匿名直链均 HTTP 200、大小一致，覆盖后的 01/04 下载 SHA-256 与本地一致。
+- **私包**：按用户要求在上传完成后生成 `release/mpv-full-private-v1.5.6.7z`；`7z t`、门禁、HDR 配置、`1.5.6` 标记、Faster-Whisper 占位说明和内置安装器 SHA-256 均通过。私包未上传。
+- **私包校验**：3,004,610,217 bytes；SHA-256 `D84E2D8FFD5DB1FDC333AC22166AEFCC826715798F1C7E2C9CAB541E95047ECC`；构建暂存已清理。
+- **记录状态**：待提交 HDR 覆盖及私包生成的最终记录；v1.5.6 标签保持原标签，不重新打标签。
 
 ## 2026-08-27 19:33
 
