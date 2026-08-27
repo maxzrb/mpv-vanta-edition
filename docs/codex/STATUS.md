@@ -5,13 +5,13 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master` 与 `origin/master` 同步；v1.5.6 发布准备中 |
-| **最新发布提交** | `1d38d87`（tag: `v1.5.5`，已推送） |
-| **工作区** | v1.5.6 本地公开资产已构建/核验；01/04 重建、02/03 原样复用，保留 `.zcode/` 用户目录 |
+| **分支** | `master` 与 `origin/master` 同步；v1.5.6 已正式发布 |
+| **最新发布提交** | `e22ec52`（tag: `v1.5.6`，已推送） |
+| **工作区** | v1.5.6 GitHub Release、ModelScope 镜像和本地记录均已完成；保留 `.zcode/` 用户目录 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.6（发布准备中） |
-| **上次操作** | 完成 v1.5.6 本地构建、复用包字节核验、内容门禁及运行探针；远端发布尚未执行 |
-| **当前排查** | 01/04 已重建，02/03 原样复用 v1.5.5，VantaInstaller v0.3.12 沿用；待提交构建记录后发布 GitHub/ModelScope |
+| **项目版本** | v1.5.6（已发布） |
+| **上次操作** | 完成 v1.5.6 GitHub/ModelScope 发布与远端资产核验；01/04 重建、02/03 原样复用、安装器沿用 v0.3.12 |
+| **当前排查** | v1.5.6 已收尾；用户新提出 HDR 参考白亮度档位扩展想法，尚未纳入本版本 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2820,3 +2820,12 @@ c:\Program portable\mpv2\
 - **版本标记**：根目录和 01 包内 `.vanta-version` 均为 5 bytes 的 `1.5.6`，无 BOM、无换行；`build/` 暂存已清理。
 - **运行验证**：139 个 Lua 文件语法通过；完整配置空闲 6 秒、短视频 3 帧（显式 `--idle=no`）和 VantaInstaller 启动探针通过。
 - **校验和**：本地 SHA-256 已写入 `version/版本迭代记录.md`；待提交构建记录、推送 v1.5.6 标签、创建 GitHub Release 并同步 ModelScope。
+
+## 2026-08-27 19:16
+
+### v1.5.6 GitHub/ModelScope 发布收尾
+
+- **GitHub**：v1.5.6 Release 已为正式、非草稿、非预发布状态，共 6 个公开资产；远端文件名、大小和 GitHub digest SHA-256 均与本地一致。
+- **ModelScope**：`AerithDream/mpv-vanta-edition/v1.5.6/` 六个公开资产上传成功；匿名直链均 HTTP 200，`Content-Length` 与本地一致；私用全量包未上传。
+- **提交与标签**：`master` 与 `origin/master` 已同步，`v1.5.6` 标签已推送；待将本次发布收尾记录提交为 `docs: record v1.5.6 release results`。
+- **版本边界**：用户随后提出的 HDR 参考白亮度档位扩展属于下一次配置变更，未混入已发布的 v1.5.6。
