@@ -29,7 +29,8 @@ local Controls = class(Element)
 
 function Controls:new() return Class.new(self) --[[@as Controls]] end
 function Controls:init()
-	Element.init(self, 'controls', {render_order = 6})
+	-- 底栏是 Timeline、MediaInfo 和 Speed 的共同显隐锚点，只按鼠标 Y 轴距离驱动。
+	Element.init(self, 'controls', {render_order = 6, proximity_axis = 'vertical'})
 	---@type ControlItem[] All control elements serialized from `options.controls`.
 	self.controls = {}
 	---@type ControlItem[] Only controls that match current dispositions.
@@ -217,7 +218,9 @@ function Controls:init_options()
 			end
 		elseif kind == 'speed' then
 			if not Elements.speed then
-				local element = Speed:new({anchor_id = 'controls', render_order = self.render_order})
+				local element = Speed:new({
+					anchor_id = 'controls', render_order = self.render_order, proximity_axis = 'vertical',
+				})
 				local scale = tonumber(params[1]) or 1.3
 				table_assign(control, {
 					-- 速度滑块由 Speed 自己居中并处理双行碰撞；这里只提供尺寸，

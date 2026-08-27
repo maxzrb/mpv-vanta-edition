@@ -11,7 +11,8 @@ local CONTROLS_HITBOX_GAP = 2
 
 function Timeline:new() return Class.new(self) --[[@as Timeline]] end
 function Timeline:init()
-	Element.init(self, 'timeline', {render_order = 5})
+	-- 时间轴与底栏共用垂直显隐逻辑，鼠标左右移动不改变其可见度。
+	Element.init(self, 'timeline', {render_order = 5, proximity_axis = 'vertical'})
 	---@type false|{pause: boolean, distance: number, dragging: boolean, last: {x: number, y: number}}
 	self.pressed = false
 	self.obstructed = false

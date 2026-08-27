@@ -1,4 +1,4 @@
----@alias ElementProps {enabled?: boolean; render_order?: number; ax?: number; ay?: number; bx?: number; by?: number; ignores_curtain?: boolean; anchor_id?: string;}
+---@alias ElementProps {enabled?: boolean; render_order?: number; ax?: number; ay?: number; bx?: number; by?: number; ignores_curtain?: boolean; anchor_id?: string; proximity_axis?: 'both'|'vertical'|'none';}
 
 -- Base class all elements inherit from.
 ---@class Element : Class
@@ -13,6 +13,8 @@ function Element:init(id, props)
 	self.enabled = true
 	-- Element coordinates
 	self.ax, self.ay, self.bx, self.by = 0, 0, 0, 0
+	-- proximity 默认按完整矩形计算；底栏锚点可改为只按 Y 轴，MediaInfo 可完全禁用自身 proximity。
+	self.proximity_axis = 'both'
 	-- Relative proximity from `0` - mouse outside `proximity_max` range, to `1` - mouse within `proximity_min` range.
 	self.proximity = 0
 	-- Raw proximity in pixels.
@@ -74,10 +76,18 @@ end
 function Element:update_proximity()
 	if cursor.hidden then
 		self:reset_proximity()
+	elseif self.proximity_axis == 'none' then
+		-- 该元素的显隐完全交给 anchor/min_visibility/forced_visibility，避免默认坐标参与计算。
+		self:reset_proximity()
 	else
 		local proximity_in, proximity_out = get_effective_proximity_distances()
 		local range = proximity_out - proximity_in
-		self.proximity_raw = get_point_to_rectangle_proximity(cursor, self)
+		if self.proximity_axis == 'vertical' then
+			-- 底部 UI 共用同一条显隐链，鼠标左右移动不应改变它们的显隐。
+			self.proximity_raw = math.max(self.ay - cursor.y, cursor.y - self.by)
+		else
+			self.proximity_raw = get_point_to_rectangle_proximity(cursor, self)
+		end
 		self.proximity = 1 - (clamp(0, self.proximity_raw - proximity_in, range) / range)
 	end
 end

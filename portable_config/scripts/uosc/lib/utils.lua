@@ -188,10 +188,7 @@ end
 ---@return boolean mouse_in_element 鼠标是否在元素交互区内
 function get_timeline_hover_fade(timeline, element_top, element_bottom)
 	if not (timeline and timeline.enabled and timeline.size > 0) then return 0, false end
-	-- 鼠标不在进度条水平范围内时不处理，避免误伤窗口边缘移动
-	local horizontal_tolerance = round(24 * state.scale)
-	if cursor.x < timeline.ax - horizontal_tolerance
-		or cursor.x > timeline.bx + horizontal_tolerance then return 0, false end
+	-- 只按鼠标 Y 轴与时间轴的距离处理；同一高度上的水平移动不改变渐隐结果。
 	local y = cursor.y
 	local mouse_in_element = element_top and element_bottom
 		and y >= element_top and y <= element_bottom

@@ -337,7 +337,10 @@ end
 function MediaInfo:new() return Class.new(self) --[[@as MediaInfo]] end
 
 function MediaInfo:init()
-	Element.init(self, 'media_info', {render_order = 5.5, anchor_id = 'controls'})
+	-- MediaInfo 由 Controls 锚点驱动，不使用自身坐标参与 proximity，避免默认原点误触发。
+	Element.init(self, 'media_info', {
+		render_order = 5.5, anchor_id = 'controls', proximity_axis = 'none',
+	})
 	-- 码率显示模式：'live' 实时码率 / 'avg' 平均码率，点击胶囊文本循环切换
 	self.bitrate_mode = 'live'
 	-- 记录本帧实际绘制的胶囊范围，供速度滑块做碰撞检测
@@ -384,7 +387,6 @@ function MediaInfo:get_visibility()
 	end
 	local speed = Elements.speed
 	local mouse_in_speed = speed and speed.enabled
-		and cursor.x >= speed.ax and cursor.x <= speed.bx
 		and cursor.y >= speed.ay and cursor.y <= speed.by
 	if mouse_in_speed then return base end
 	local fade, mouse_in_element = get_timeline_hover_fade(timeline, top, bottom)
