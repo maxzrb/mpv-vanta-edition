@@ -5,13 +5,13 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master` 与 `origin/master` 同步；v1.5.6 HDR 覆盖修订完成 |
+| **分支** | `master` 与 `origin/master` 同步；v1.5.7 发布准备改动待提交 |
 | **最新发布提交** | `e22ec52`（tag: `v1.5.6`，已推送） |
-| **工作区** | v1.5.6 HDR 档位已覆盖 GitHub/ModelScope，私用全量包已本地生成；保留 `.zcode/` 用户目录 |
+| **工作区** | v1.5.7 功能/版本记录待整理提交；另保留用户已有的 `window_size_position.conf` 改动和 `.zcode/` 目录 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.6（已发布） |
-| **上次操作** | 完成 v1.5.6 GitHub/ModelScope 发布与远端资产核验；01/04 重建、02/03 原样复用、安装器沿用 v0.3.12 |
-| **当前排查** | v1.5.6 覆盖修订和私包已完成；`Ctrl+T` 序列为 `auto → 50 → 80 → 100 → 203 → 300 → 400` |
+| **项目版本** | v1.5.7（发布准备；最新已发布 v1.5.6） |
+| **上次操作** | 启动 v1.5.7（Z+1）发布流程，完成前置检查并确认 01/04 重建、02/03 可按规则复用 |
+| **当前排查** | v1.5.7 待构建；HDR 参考白默认 `auto`、失败回退 203，统一白名单覆盖明确的跨启动全局偏好 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2859,9 +2859,47 @@ c:\Program portable\mpv2\
 - **私包校验**：3,004,610,217 bytes；SHA-256 `D84E2D8FFD5DB1FDC333AC22166AEFCC826715798F1C7E2C9CAB541E95047ECC`；构建暂存已清理。
 - **记录状态**：待提交 HDR 覆盖及私包生成的最终记录；v1.5.6 标签保持原标签，不重新打标签。
 
+## 2026-09-05 19:56
+
+### HDR 参考白默认值与持久化
+
+- **用户需求**：HDR 参考白亮度不应每次打开都回到 203；默认使用 `auto`，查询失败时以 203 兜底，并持久化用户通过 `Ctrl+T` 选择的值。
+- **代码改动**：`portable_config/mpv.conf` 将 `hdr-reference-white=auto` 设为显式全局默认；`portable_config/profiles.conf` 移除 `[HDR]` 中的固定值，避免每次 HDR 文件载入覆盖持久化值；`portable_config/script-opts/persist_properties.conf` 将 `hdr-reference-white` 加入已有 `volume,vf` 持久化白名单。
+- **持久化决策**：依赖 mpv 官方 `auto` 行为；当前配置注释已说明 Windows 显示器查询失败时回退到 `203 cd/m²`。不在条件 profile 中再次写入 203/auto，以免覆盖已恢复的用户选择。
+- **验证**：`git pull --ff-only` 已是最新；LuaJIT 语法通过；`input.conf` mpv 解析退出码 0；`mpv --show-profile=HDR` 确认 profile 不再包含 `hdr-reference-white`；完整配置 `idle=no` 启动 smoke test 退出码 0；隔离 mpv 往返测试确认 `auto → 100 → 保存 100 → 下次启动恢复 100`；3 个修改文件均为 UTF-8 无 BOM、LF，`git diff --check` 通过。
+- **未改动**：`portable_config/input.conf` 的 7 档 `Ctrl+T` 序列保持 `auto → 50 → 80 → 100 → 203 → 300 → 400`；项目版本和已发布资产不变，本次未执行打包或发布。
+- **Git 状态**：`master` 与 `origin/master` 同步；本次修改的 3 个 HDR 配置文件未提交；用户原有 `portable_config/script-opts/window_size_position.conf` 修改及 `.zcode/` 未跟踪目录均保留。
+- **下一步**：建议用户实际播放 HDR 片源，用 `Ctrl+T` 选择一个值并重启 mpv 确认；提交前可将本次 3 个配置文件单独 `git add`，不要误纳入用户已有改动。
+
+## 2026-09-05 20:15
+
+### 全局设置持久化审计与补充
+
+- **审计结果**：窗口尺寸/位置/置顶、音频直通模式、启动页、idle 图片、uosc 界面状态和音量已有独立或统一持久化；GLSL 着色器按现有约束不跨启动恢复。
+- **本次纳入统一白名单**：`audio-device`、`title-bar`、`tone-mapping`、`hdr-compute-peak`、`hr-seek-framedrop`，以及字幕字体、ASS 样式覆盖、视频信息传递、颜色兼容、时序修复、bidi 兼容和黑边输出等全局字幕偏好。
+- **边界决策**：轨道选择、速度、延迟、画面变换、循环、逐文件滤镜和可见性等受 `reset-on-next-file` 约束的状态不持久化；`target-trc`、`target-colorspace-hint`、ICC、gamut、混合字幕、PGS 输出等会被 profile 改写的选项不纳入；声道/独占模式继续交由音频直通脚本管理。
+- **profile 处理**：`HDR2SDR` 中的 `tone-mapping=auto` 和 `hdr-compute-peak=auto` 保留为启动默认，持久化脚本启动后恢复用户值；未发现条件 profile 对新增白名单的运行时覆盖。
+- **验证**：新增白名单下临时隔离 mpv 完成“写入 JSON → 第二次启动读回”的往返测试；LuaJIT 语法、完整配置 `HDR` 启动、profile/输入配置检查及 `git diff --check` 均通过；测试临时目录和脚本已清理。
+- **未改动**：项目版本、发布资产、`input.conf` 的 HDR 7 档快捷键序列和用户已有的 `window_size_position.conf`、`.zcode/` 均保持原状；本次未执行打包或发布。
+- **Git 状态**：`master` 与 `origin/master` 同步；本次 3 个配置文件及 HandShake 记录未提交，用户已有改动继续保留。
+- **下一步**：建议实际切换一次新增菜单项并重启确认体验；提交时只暂存本次配置与记录文件，避免带入用户已有改动。
+
 ## 2026-08-27 19:33
 
 ### v1.5.6 覆盖后生成私用全量包
 
 - **用户追加决定**：先完成 GitHub/ModelScope 的 01/04 同名资产覆盖及远端核验，再生成私用全量包。
 - **私包范围**：使用覆盖后的 v1.5.6 01、原样复用的 02、覆盖后的 04，加上 Faster-Whisper 占位说明和最新 VantaInstaller；私包只在本地保留，禁止上传。
+
+## 2026-09-05 20:32
+
+### v1.5.7 发布前置检查
+
+- **版本确认**：用户确认 Z 版本号加 1；当前版本由 v1.5.6 提升为 v1.5.7，VantaInstaller 继续使用独立版本 v0.3.12。
+- **3.1 Git**：已执行 `git status --short --branch` 和 `git fetch origin`；`master` 与 `origin/master` 同步。当前未提交项包含本次配置/记录改动，以及用户已有的 `portable_config/script-opts/window_size_position.conf` 和 `.zcode/`；后两者不纳入发布提交。
+- **3.2 Gate**：不触发。本次为 `portable_config` 普通配置/脚本选项变更，不改包结构、构建入口、核心运行时、安装方式、版权边界或发布流程。
+- **3.3 文档**：已建立 v1.5.7 当前版本记录；README 安装顺序、包结构和下载方式无变化，不需修改。
+- **3.4 功能**：Lua 语法、完整配置启动、HDR profile、输入配置、持久化往返、UTF-8 无 BOM/LF 和 `git diff --check` 已通过。
+- **构建覆盖**：`build-01-base.ps1` 和 `build-04-config.ps1` 会递归带入本次 `portable_config` 改动；02/03 输入目录无 Git 改动，计划按 4.1.1 核验后逐字节复用 v1.5.6；VantaInstaller 源码无改动，沿用 v0.3.12 候选。
+- **发布计划**：完成 01/04 构建、02/03 来源归档下载/核验/复用、私用全量包本地构建与门禁后，提交功能/版本记录，创建并推送 `v1.5.7` 标签，发布 GitHub 六项公开资产，再同步 ModelScope 六项资产；私包禁止上传。
+- **风险与待办**：当前 `release/` 为空，02/03 v1.5.6 来源归档和规范命名的 VantaInstaller 需从现有本地候选/远端补齐；完成后补写全部 SHA-256、资产大小和远端核验结果。
