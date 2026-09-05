@@ -5,13 +5,13 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **分支** | `master` 已包含 v1.5.7 功能提交，构建记录待提交并发布 |
-| **最新发布提交** | `e22ec52`（tag: `v1.5.6`，已推送） |
-| **工作区** | v1.5.7 本地构建与门禁已通过；保留用户已有的 `window_size_position.conf` 改动和 `.zcode/` 目录 |
+| **分支** | `master` 与 `origin/master` 同步；`v1.5.7` 标签已推送，发布已完成 |
+| **最新发布提交** | `7e302f8`（tag: `v1.5.7`，已推送） |
+| **工作区** | 发布已完成；仅保留用户已有的 `window_size_position.conf` 改动和 `.zcode/` 目录 |
 | **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.7（发布准备；最新已发布 v1.5.6） |
-| **上次操作** | 完成 v1.5.7 六项公开候选与一份完整私用全量包的本地构建、归档门禁、installer 启动和完整配置 smoke test |
-| **当前排查** | 待提交构建记录、推送 `v1.5.7` 标签、发布 GitHub 六项公开资产并同步 ModelScope；私包不上传 |
+| **项目版本** | v1.5.7（已正式发布） |
+| **上次操作** | 完成 GitHub v1.5.7 六项公开资产发布、ModelScope 六项资产同步及远端大小/digest 核验 |
+| **当前排查** | GitHub/ModelScope 远端核验已通过；最终收尾记录随本次发布记录提交。私用全量包保留本地且未上传 |
 | **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
 
 ## 环境
@@ -2912,3 +2912,12 @@ c:\Program portable\mpv2\
 - 147 个 Lua 文件语法检查、完整配置实际启动 smoke test 和 VantaInstaller 启动探针通过；完整配置退出码为 0，测试源仅出现既有 `auto_profiles` 元数据缺失警告。
 - 私用全量包仅保留一份完整产物 `release/mpv-full-private-v1.5.7.7z`，已含 installer，不上传任何公开发布渠道；`build/` 临时目录已清理。
 - 本地 SHA-256 与大小已写入 `version/版本迭代记录.md`；待提交构建记录、推送 `v1.5.7` 标签、创建 GitHub Release、同步 ModelScope 并补写远端核验结果。
+
+## 2026-09-05 22:11
+
+### v1.5.7 GitHub 与 ModelScope 发布完成
+
+- GitHub `v1.5.7` Release 已正式发布，状态为非草稿、非预发布，恰好包含 6 个公开资产；文件名、大小和 GitHub digest SHA-256 与本地逐项一致。
+- ModelScope `AerithDream/mpv-vanta-edition/v1.5.7/` 六项公开资产上传成功；匿名直链全部 HTTP 200，`Content-Length` 与本地逐项一致。
+- 私用全量包 `release/mpv-full-private-v1.5.7.7z` 仍只保留本地一份完整产物，含 installer，未上传 GitHub 或 ModelScope；公开 `release/` 目录保留 6 项发布文件和该私包。
+- `v1.5.7` 标签及 `master` 已推送；最终收尾记录已整理，提交后再次确认构建暂存目录、工作区和远端同步状态。
