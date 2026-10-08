@@ -149,13 +149,6 @@ if (Test-Path $vsScriptsSrc) {
 Write-Host "       Copying VapourSynth plugins (~4GB)..." -ForegroundColor Gray
 Invoke-CopyTo $ExtrasBuild @("vs-plugins", "vs-coreplugins", "vs-scripts")
 
-# SVPflow2 为个人／非商业专有组件，公开包只保留接口；用户自行安装许可组件。
-$privateSvp = Join-Path $ExtrasBuild 'vs-plugins/svpflow2_vs.dll'
-if (Test-Path -LiteralPath $privateSvp) {
-    Remove-Item -LiteralPath $privateSvp -Force
-    Write-Host '       已排除个人许可组件 svpflow2_vs.dll' -ForegroundColor Gray
-}
-
 # VapourSynth binaries
 Write-Host "       Copying VapourSynth binaries..." -ForegroundColor Gray
 $vsBinaries = @(
@@ -205,9 +198,6 @@ Contains:
 - Python runtime                        127 MB
 - Extra tools (TorrServer, alass)       75 MB
 
-SVP 许可组件说明：
-  本公开包不携带 svpflow2_vs.dll；使用 SVP 补帧需自行安装官方许可组件。
-  SVP 菜单和脚本保留，缺组件时按正常错误恢复流程回到原播放链。
 "@ | Set-Content $extrasReadme -Encoding UTF8
 
 Remove-GeneratedArtifacts $ExtrasBuild

@@ -183,7 +183,6 @@
 ### 视频处理
 - 500+ GLSL 着色器（Anime4K、FSRCNNX、ESRGAN 等 35 类）
 - VapourSynth 补帧/超分/降噪（RIFE、SVP、DRBA、ArtCNN）
-  - SVP 菜单和接口保留；公开包不携带个人许可的 SVPflow2，使用时需自行安装官方许可组件。
 - 显示能力明确时自动匹配 SDR／HDR 目标；未知时使用 SDR sRGB，支持会话内手动覆盖与可信 ICC
 
 ### 快捷键

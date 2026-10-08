@@ -50287,16 +50287,5 @@
     "merge_policy": "保留本地初始化时序，不恢复首帧后自动修改 hwdec",
     "default": "auto-safe",
     "policy": "direct decoding for ordinary playback; auto-copy for known CPU filters before initialization; respect explicit backend; normal GPU surface copy retained"
-  },
-  "public_distribution": {
-    "excluded_files": [
-      {
-        "path": "vs-plugins/svpflow2_vs.dll",
-        "reason": "个人／非商业专有许可；只保留本机与本地私用备份，不进公开包",
-        "license": "portable_config/licenses/SVP-libraries-personal-license.txt",
-        "source": "https://www.svp-team.com/wiki/Download#libs"
-      }
-    ],
-    "policy": "SVP脚本和菜单保留；公开包用户自行安装官方许可组件；各组件授权分别适用，合集GPL不替代SDK／模型原许可"
   }
 }
