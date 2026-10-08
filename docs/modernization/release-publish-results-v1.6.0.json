@@ -1,0 +1,98 @@
+{
+  "version": "1.6.0",
+  "verified_at": "2026-10-08 17:13",
+  "release_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.0",
+  "release_id": 406614760,
+  "tag_commit": "fe1f5118bd88faea116e4ae2bf5c0283a219784e",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-10-08T08:58:32Z",
+  "github_assets": [
+    {
+      "name": "01-mpv-base-v1.6.0.7z",
+      "bytes": 136889797,
+      "digest": "sha256:dd68d95454f0401bdfded694c3b725d17eadaba57eec40909b8a24ae43e382f3",
+      "state": "uploaded"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.0.7z.001",
+      "bytes": 1992294400,
+      "digest": "sha256:ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5",
+      "state": "uploaded"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.0.7z.002",
+      "bytes": 830172768,
+      "digest": "sha256:8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9",
+      "state": "uploaded"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.0.7z",
+      "bytes": 1476001942,
+      "digest": "sha256:e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2",
+      "state": "uploaded"
+    },
+    {
+      "name": "04-mpv-config-v1.6.0.7z",
+      "bytes": 5354609,
+      "digest": "sha256:0f4f402d5c4bb123c9a08700ff489955df4b73948719cfb0262f5a7eb13aa85d",
+      "state": "uploaded"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.13.exe",
+      "bytes": 69740725,
+      "digest": "sha256:f7a37b450d9cc7725497fc0238ad089719b0f13404a2b10db8fb5df07163453a",
+      "state": "uploaded"
+    }
+  ],
+  "modelscope": {
+    "repo": "AerithDream/mpv-vanta-edition",
+    "path": "v1.6.0/",
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.0.7z",
+        "bytes": 136889797,
+        "sha256": "dd68d95454f0401bdfded694c3b725d17eadaba57eec40909b8a24ae43e382f3",
+        "anonymous_status": 200,
+        "anonymous_bytes": 136889797
+      },
+      {
+        "name": "02-mpv-extras-v1.6.0.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5",
+        "anonymous_status": 200,
+        "anonymous_bytes": 1992294400
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.0.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2",
+        "anonymous_status": 200,
+        "anonymous_bytes": 1476001942
+      },
+      {
+        "name": "04-mpv-config-v1.6.0.7z",
+        "bytes": 5354609,
+        "sha256": "0f4f402d5c4bb123c9a08700ff489955df4b73948719cfb0262f5a7eb13aa85d",
+        "anonymous_status": 200,
+        "anonymous_bytes": 5354609
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.13.exe",
+        "bytes": 69740725,
+        "sha256": "f7a37b450d9cc7725497fc0238ad089719b0f13404a2b10db8fb5df07163453a",
+        "anonymous_status": 200,
+        "anonymous_bytes": 69740725
+      },
+      {
+        "name": "02-mpv-extras-v1.6.0.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9",
+        "anonymous_status": 200,
+        "anonymous_bytes": 830172768
+      }
+    ]
+  },
+  "private_uploaded": false,
+  "build_staging": "根build已归档至backup/release-v1.6.0-build-staging，仅本地保留"
+}
