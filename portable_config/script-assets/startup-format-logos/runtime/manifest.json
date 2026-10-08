@@ -1,5 +1,5 @@
 {
-  "version": 23,
+  "version": 24,
   "source_scale": 2,
   "opacity_levels": [
     18,
@@ -1410,6 +1410,87 @@
             "72": "logo-mpeg-h-white-072.bgra",
             "86": "logo-mpeg-h-white-086.bgra",
             "100": "logo-mpeg-h-white-100.bgra"
+          }
+        }
+      }
+    },
+    "dra": {
+      "w": 312,
+      "h": 128,
+      "intrinsic_frame": false,
+      "frame_style": "generated",
+      "mark_style": "source-color",
+      "palette": [
+        "#FF5A54",
+        "#E5282D",
+        "#FF7657",
+        "#C958A5"
+      ],
+      "files": {
+        "18": "logo-dra-018.bgra",
+        "36": "logo-dra-036.bgra",
+        "54": "logo-dra-054.bgra",
+        "72": "logo-dra-072.bgra",
+        "86": "logo-dra-086.bgra",
+        "100": "logo-dra-100.bgra"
+      },
+      "variants": {
+        "1": {
+          "w": 156,
+          "h": 64,
+          "files": {
+            "18": "logo-dra-018-1x.bgra",
+            "36": "logo-dra-036-1x.bgra",
+            "54": "logo-dra-054-1x.bgra",
+            "72": "logo-dra-072-1x.bgra",
+            "86": "logo-dra-086-1x.bgra",
+            "100": "logo-dra-100-1x.bgra"
+          }
+        },
+        "2": {
+          "w": 312,
+          "h": 128,
+          "files": {
+            "18": "logo-dra-018.bgra",
+            "36": "logo-dra-036.bgra",
+            "54": "logo-dra-054.bgra",
+            "72": "logo-dra-072.bgra",
+            "86": "logo-dra-086.bgra",
+            "100": "logo-dra-100.bgra"
+          }
+        }
+      },
+      "white_files": {
+        "18": "logo-dra-white-018.bgra",
+        "36": "logo-dra-white-036.bgra",
+        "54": "logo-dra-white-054.bgra",
+        "72": "logo-dra-white-072.bgra",
+        "86": "logo-dra-white-086.bgra",
+        "100": "logo-dra-white-100.bgra"
+      },
+      "white_variants": {
+        "1": {
+          "w": 156,
+          "h": 64,
+          "files": {
+            "18": "logo-dra-white-018-1x.bgra",
+            "36": "logo-dra-white-036-1x.bgra",
+            "54": "logo-dra-white-054-1x.bgra",
+            "72": "logo-dra-white-072-1x.bgra",
+            "86": "logo-dra-white-086-1x.bgra",
+            "100": "logo-dra-white-100-1x.bgra"
+          }
+        },
+        "2": {
+          "w": 312,
+          "h": 128,
+          "files": {
+            "18": "logo-dra-white-018.bgra",
+            "36": "logo-dra-white-036.bgra",
+            "54": "logo-dra-white-054.bgra",
+            "72": "logo-dra-white-072.bgra",
+            "86": "logo-dra-white-086.bgra",
+            "100": "logo-dra-white-100.bgra"
           }
         }
       }

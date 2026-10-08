@@ -1,150 +1,150 @@
 [
   {
-    "name":"evafast",
-    "git":"https://github.com/po5/evafast",
-    "branch":"rewrite",
-    "whitelist":"%.lua$",
-    "dest":"~~/scripts",
-    "install_missing":false
+    "name": "evafast",
+    "git": "https://github.com/po5/evafast",
+    "branch": "rewrite",
+    "whitelist": "%.lua$",
+    "dest": "~~/scripts",
+    "install_missing": false
   },
   {
-    "name":"delete-current-file",
-    "git":"https://github.com/stax76/mpv-scripts",
-    "branch":"main",
-    "whitelist":"delete_current_file%.lua$",
-    "dest":"~~/scripts",
-    "renames":{
-      "delete_current_file.lua":"delete-current-file.lua"
+    "name": "delete-current-file",
+    "git": "https://github.com/stax76/mpv-scripts",
+    "branch": "main",
+    "whitelist": "delete_current_file%.lua$",
+    "dest": "~~/scripts",
+    "renames": {
+      "delete_current_file.lua": "delete-current-file.lua"
     },
-    "install_missing":false
+    "install_missing": false
   },
   {
-    "name":"dyphire-scripts",
-    "git":"https://github.com/dyphire/mpv-scripts",
-    "branch":"main",
-    "blacklist":"LICENSE|README.*%.md$|drcbox%.lua$|.-%-list%.lua$",
-    "dest":"~~/scripts",
-    "install_missing":false
+    "name": "dyphire-scripts",
+    "git": "https://github.com/dyphire/mpv-scripts",
+    "branch": "main",
+    "blacklist": "LICENSE|README.*%.md$|drcbox%.lua$|.-%-list%.lua$",
+    "dest": "~~/scripts",
+    "install_missing": false
   },
   {
-    "name":"playlistmanager",
-    "git":"https://github.com/dyphire/mpv-playlistmanager",
-    "branch":"dev",
-    "whitelist":"playlistmanager%.lua$",
-    "dest":"~~/scripts",
-    "install_missing":false
+    "name": "playlistmanager",
+    "git": "https://github.com/dyphire/mpv-playlistmanager",
+    "branch": "dev",
+    "whitelist": "playlistmanager%.lua$",
+    "dest": "~~/scripts",
+    "install_missing": false
   },
   {
-    "name":"sub-assrt",
-    "git":"https://github.com/dyphire/mpv-sub-assrt",
-    "branch":"master",
-    "whitelist":"%.lua$",
-    "dest":"~~/scripts",
-    "install_missing":false
+    "name": "sub-assrt",
+    "git": "https://github.com/dyphire/mpv-sub-assrt",
+    "branch": "master",
+    "whitelist": "%.lua$",
+    "dest": "~~/scripts",
+    "install_missing": false
   },
   {
-    "name":"sub-fastwhisper",
-    "git":"https://github.com/dyphire/mpv-sub-fastwhisper",
-    "branch":"master",
-    "whitelist":"%.lua$",
-    "dest":"~~/scripts",
-    "install_missing":false
+    "name": "sub-fastwhisper",
+    "git": "https://github.com/dyphire/mpv-sub-fastwhisper",
+    "branch": "master",
+    "whitelist": "%.lua$",
+    "dest": "~~/scripts",
+    "install_missing": false
   },
   {
-    "name":"chapter-title-skip",
-    "git":"https://github.com/dyphire/chapterskip",
-    "branch":"dev",
-    "whitelist":"%.lua$",
-    "dest":"~~/scripts",
-    "enabled":false,
-    "install_missing":false
+    "name": "chapter-title-skip",
+    "git": "https://github.com/dyphire/chapterskip",
+    "branch": "dev",
+    "whitelist": "%.lua$",
+    "dest": "~~/scripts",
+    "enabled": false,
+    "install_missing": false
   },
   {
-    "name":"eisa-scripts",
-    "git":"https://github.com/dyphire/Eisa01_mpv-scripts",
-    "branch":"dev",
-    "whitelist":"undoredo%.lua$|simplehistory%.lua$|simplebookmark%.lua$|smartcopypaste.*%.lua$",
-    "strip_prefix":"scripts",
-    "dest":"~~/scripts",
-    "install_missing":false
+    "name": "eisa-scripts",
+    "git": "https://github.com/dyphire/Eisa01_mpv-scripts",
+    "branch": "dev",
+    "whitelist": "undoredo%.lua$|simplehistory%.lua$|simplebookmark%.lua$|smartcopypaste.*%.lua$",
+    "strip_prefix": "scripts",
+    "dest": "~~/scripts",
+    "install_missing": false
   },
   {
-    "name":"autosubsync",
-    "git":"https://github.com/dyphire/autosubsync-mpv",
-    "branch":"v0.33_CM",
-    "whitelist":"readme%.md$|%.lua$",
-    "dest":"~~/scripts/autosubsync",
-    "install_missing":false
+    "name": "autosubsync",
+    "git": "https://github.com/dyphire/autosubsync-mpv",
+    "branch": "v0.33_CM",
+    "whitelist": "readme%.md$|%.lua$",
+    "dest": "~~/scripts/autosubsync",
+    "install_missing": false
   },
   {
-    "name":"trakt-scrobble",
-    "git":"https://github.com/dyphire/trakt-scrobble",
-    "branch":"main",
-    "blacklist":"config%-example%.json$",
-    "dest":"~~/scripts/trakt-scrobble",
-    "enabled":false,
-    "install_missing":false
+    "name": "trakt-scrobble",
+    "git": "https://github.com/dyphire/trakt-scrobble",
+    "branch": "main",
+    "blacklist": "config%-example%.json$",
+    "dest": "~~/scripts/trakt-scrobble",
+    "enabled": false,
+    "install_missing": false
   },
   {
-    "name":"simple-mpv-webui",
-    "git":"https://github.com/open-dynaMIX/simple-mpv-webui",
-    "branch":"main",
-    "git_tree":true,
-    "download_candidates":false,
-    "whitelist":"readme%.md$|main%.lua$|webui%-page",
-    "dest":"~~/scripts/simple-mpv-webui",
-    "install_missing":false
+    "name": "simple-mpv-webui",
+    "git": "https://github.com/open-dynaMIX/simple-mpv-webui",
+    "branch": "main",
+    "git_tree": true,
+    "download_candidates": false,
+    "whitelist": "readme%.md$|main%.lua$|webui%-page",
+    "dest": "~~/scripts/simple-mpv-webui",
+    "install_missing": false
   },
   {
-    "name":"quality-menu",
-    "git":"https://github.com/christoph-heinrich/mpv-quality-menu",
-    "branch":"master",
-    "whitelist":"quality%-menu%.lua$",
-    "dest":"~~/scripts",
-    "install_missing":false
+    "name": "quality-menu",
+    "git": "https://github.com/christoph-heinrich/mpv-quality-menu",
+    "branch": "master",
+    "whitelist": "quality%-menu%.lua$",
+    "dest": "~~/scripts",
+    "install_missing": false
   },
   {
-    "name":"file-browser",
-    "git":"https://github.com/CogentRedTester/mpv-file-browser",
-    "branch":"master",
-    "whitelist":"main%.lua$|readme%.md$|doc|modules",
-    "dest":"~~/scripts/file-browser",
-    "install_missing":false
+    "name": "file-browser",
+    "git": "https://github.com/CogentRedTester/mpv-file-browser",
+    "branch": "master",
+    "whitelist": "main%.lua$|readme%.md$|doc|modules",
+    "dest": "~~/scripts/file-browser",
+    "install_missing": false
   },
   {
-    "name":"sub-select",
-    "git":"https://github.com/CogentRedTester/mpv-sub-select",
-    "branch":"master",
-    "whitelist":"sub%-select%.lua$",
-    "dest":"~~/scripts",
-    "install_missing":false
+    "name": "sub-select",
+    "git": "https://github.com/CogentRedTester/mpv-sub-select",
+    "branch": "master",
+    "whitelist": "sub%-select%.lua$",
+    "dest": "~~/scripts",
+    "install_missing": false
   },
   {
-    "name":"cycle-commands",
-    "git":"https://github.com/CogentRedTester/mpv-scripts",
-    "branch":"master",
-    "whitelist":"cycle%-commands%.lua$",
-    "dest":"~~/scripts",
-    "install_missing":false
+    "name": "cycle-commands",
+    "git": "https://github.com/CogentRedTester/mpv-scripts",
+    "branch": "master",
+    "whitelist": "cycle%-commands%.lua$",
+    "dest": "~~/scripts",
+    "install_missing": false
   },
   {
-    "name":"file-browser-addons",
-    "git":"https://github.com/CogentRedTester/mpv-file-browser",
-    "branch":"master",
-    "whitelist":"favourites%.lua$|find%.lua$|home%-label%.lua$|url%-decode%.lua$|windir%.lua$|winroot%.lua$",
-    "dest":"~~/script-modules/file-browser-addons",
-    "flatten_folders":true,
-    "install_missing":false
+    "name": "file-browser-addons",
+    "git": "https://github.com/CogentRedTester/mpv-file-browser",
+    "branch": "master",
+    "whitelist": "favourites%.lua$|find%.lua$|home%-label%.lua$|url%-decode%.lua$|windir%.lua$|winroot%.lua$",
+    "dest": "~~/script-modules/file-browser-addons",
+    "flatten_folders": true,
+    "install_missing": false
   },
   {
-    "name":"mpv-playkit-shaders",
-    "git":"https://github.com/hooke007/mpv_PlayKit.git",
-    "branch":"main",
-    "git_tree":true,
-    "download_candidates":false,
-    "whitelist":"%.glsl$",
-    "strip_prefix":"portable_config/shaders",
-    "dest":"~~/shaders",
-    "install_missing":false
+    "name": "mpv-playkit-shaders",
+    "git": "https://github.com/hooke007/mpv_PlayKit.git",
+    "branch": "main",
+    "git_tree": true,
+    "download_candidates": false,
+    "whitelist": "%.glsl$",
+    "strip_prefix": "portable_config/shaders",
+    "dest": "~~/shaders",
+    "install_missing": false
   }
 ]

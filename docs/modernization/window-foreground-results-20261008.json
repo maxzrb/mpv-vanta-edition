@@ -1,0 +1,64 @@
+[
+  {
+    "enabled": false,
+    "initial": {
+      "mpv_above_cover": false,
+      "foreground": false,
+      "topmost": false,
+      "ontop": false,
+      "minimized": false
+    },
+    "reopened": {
+      "mpv_above_cover": false,
+      "foreground": false,
+      "topmost": false,
+      "ontop": false,
+      "minimized": false
+    }
+  },
+  {
+    "enabled": true,
+    "initial": {
+      "mpv_above_cover": true,
+      "foreground": true,
+      "topmost": false,
+      "ontop": false,
+      "minimized": false
+    },
+    "reopened": {
+      "mpv_above_cover": true,
+      "foreground": true,
+      "topmost": false,
+      "ontop": false,
+      "minimized": false
+    },
+    "restored": {
+      "mpv_above_cover": true,
+      "foreground": true,
+      "topmost": false,
+      "ontop": false,
+      "minimized": false
+    },
+    "pause_cycle": {
+      "mpv_above_cover": false,
+      "foreground": true,
+      "topmost": false,
+      "ontop": false,
+      "minimized": false
+    },
+    "automatic_next": {
+      "mpv_above_cover": false,
+      "foreground": true,
+      "topmost": false,
+      "ontop": false,
+      "minimized": false
+    },
+    "existing_ontop": {
+      "mpv_above_cover": true,
+      "foreground": true,
+      "topmost": true,
+      "ontop": true,
+      "minimized": false
+    }
+  }
+]

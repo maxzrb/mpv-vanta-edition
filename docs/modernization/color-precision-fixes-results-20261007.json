@@ -1,0 +1,614 @@
+{
+  "date": "2026-10-07 17:59",
+  "policy": "标准数学与软件像素回归；真实面板测量可选，模型精度按后端适配",
+  "precision": {
+    "scope": "源转换层与静态真实滤镜；不是面板测量或全部模型观感",
+    "trials": [
+      {
+        "test": "格式保留与手动锁定",
+        "input": "YUV420P8",
+        "output": "YUV420P8",
+        "passed": true
+      },
+      {
+        "test": "格式保留与手动锁定",
+        "input": "YUV420P10",
+        "output": "YUV420P10",
+        "passed": true
+      },
+      {
+        "test": "格式保留与手动锁定",
+        "input": "YUV420P12",
+        "output": "YUV420P12",
+        "passed": true
+      },
+      {
+        "test": "格式保留与手动锁定",
+        "input": "YUV420P16",
+        "output": "YUV420P16",
+        "passed": true
+      },
+      {
+        "test": "格式保留与手动锁定",
+        "input": "YUV422P16",
+        "output": "YUV422P16",
+        "passed": true
+      },
+      {
+        "test": "格式保留与手动锁定",
+        "input": "YUV444P16",
+        "output": "YUV444P16",
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 8,
+        "matrix": 1,
+        "full": false,
+        "maximum_rgb_error": 6.294031412723555e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 8,
+        "matrix": 1,
+        "full": true,
+        "maximum_rgb_error": 5.853054574345151e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 8,
+        "matrix": 5,
+        "full": false,
+        "maximum_rgb_error": 3.475934479135745e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 8,
+        "matrix": 5,
+        "full": true,
+        "maximum_rgb_error": 2.5834289263393373e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 8,
+        "matrix": 6,
+        "full": false,
+        "maximum_rgb_error": 3.475934479135745e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 8,
+        "matrix": 6,
+        "full": true,
+        "maximum_rgb_error": 2.5834289263393373e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 8,
+        "matrix": 9,
+        "full": false,
+        "maximum_rgb_error": 5.365572020021858e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 8,
+        "matrix": 9,
+        "full": true,
+        "maximum_rgb_error": 2.9145222069093535e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 10,
+        "matrix": 1,
+        "full": false,
+        "maximum_rgb_error": 6.294031412723555e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 10,
+        "matrix": 1,
+        "full": true,
+        "maximum_rgb_error": 2.5401530434621122e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 10,
+        "matrix": 5,
+        "full": false,
+        "maximum_rgb_error": 3.475934479135745e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 10,
+        "matrix": 5,
+        "full": true,
+        "maximum_rgb_error": 2.7414858716490187e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 10,
+        "matrix": 6,
+        "full": false,
+        "maximum_rgb_error": 3.475934479135745e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 10,
+        "matrix": 6,
+        "full": true,
+        "maximum_rgb_error": 2.7414858716490187e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 10,
+        "matrix": 9,
+        "full": false,
+        "maximum_rgb_error": 5.365572020021858e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 10,
+        "matrix": 9,
+        "full": true,
+        "maximum_rgb_error": 8.385840355451535e-09,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 16,
+        "matrix": 1,
+        "full": false,
+        "maximum_rgb_error": 6.294031412723555e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 16,
+        "matrix": 1,
+        "full": true,
+        "maximum_rgb_error": 2.0783518128730805e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 16,
+        "matrix": 5,
+        "full": false,
+        "maximum_rgb_error": 3.475934479135745e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 16,
+        "matrix": 5,
+        "full": true,
+        "maximum_rgb_error": 1.587696751848e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 16,
+        "matrix": 6,
+        "full": false,
+        "maximum_rgb_error": 3.475934479135745e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 16,
+        "matrix": 6,
+        "full": true,
+        "maximum_rgb_error": 1.587696751848e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 16,
+        "matrix": 9,
+        "full": false,
+        "maximum_rgb_error": 5.365572020021858e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "标准矩阵与真实CCD色块",
+        "bits": 16,
+        "matrix": 9,
+        "full": true,
+        "maximum_rgb_error": 1.4304598838776883e-08,
+        "maximum_code_error": 0.0,
+        "passed": true
+      },
+      {
+        "test": "真实RIFE4.26-DML静态插值帧",
+        "matrix": 1,
+        "full": false,
+        "bits": 8,
+        "maximum_code_error": 0.0,
+        "output": "YUV444P8",
+        "passed": true
+      },
+      {
+        "test": "真实RIFE4.26-DML静态插值帧",
+        "matrix": 6,
+        "full": true,
+        "bits": 10,
+        "maximum_code_error": 0.0,
+        "output": "YUV444P10",
+        "passed": true
+      },
+      {
+        "test": "真实RIFE4.26-DML静态插值帧",
+        "matrix": 9,
+        "full": false,
+        "bits": 10,
+        "maximum_code_error": 0.0,
+        "output": "YUV444P10",
+        "passed": true
+      },
+      {
+        "test": "真实RIFE4.26-DML静态插值帧",
+        "matrix": 9,
+        "full": true,
+        "bits": 16,
+        "maximum_code_error": 0.0,
+        "output": "YUV444P16",
+        "passed": true
+      },
+      {
+        "test": "SVP兼容格式保持",
+        "main": "YUV420P10",
+        "analysis": "YUV420P8",
+        "passed": true
+      },
+      {
+        "test": "帧时长回退与VFR／EOF属性保留",
+        "input_duration": [
+          1,
+          24
+        ],
+        "output_duration": [
+          1,
+          24
+        ],
+        "passed": true
+      },
+      {
+        "test": "帧时长回退与VFR／EOF属性保留",
+        "input_duration": [
+          1,
+          30
+        ],
+        "output_duration": [
+          1,
+          30
+        ],
+        "passed": true
+      },
+      {
+        "test": "帧时长回退与VFR／EOF属性保留",
+        "input_duration": [
+          2,
+          48
+        ],
+        "output_duration": [
+          2,
+          48
+        ],
+        "passed": true
+      },
+      {
+        "test": "帧时长回退与VFR／EOF属性保留",
+        "input_duration": [
+          0,
+          1
+        ],
+        "output_duration": [
+          0,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "test": "帧时长回退与VFR／EOF属性保留",
+        "input_duration": [
+          -1,
+          1
+        ],
+        "output_duration": [
+          1,
+          24
+        ],
+        "passed": true
+      },
+      {
+        "test": "帧时长回退与VFR／EOF属性保留",
+        "input_duration": [
+          1,
+          0
+        ],
+        "output_duration": [
+          1,
+          24
+        ],
+        "passed": true
+      },
+      {
+        "test": "帧时长回退与VFR／EOF属性保留",
+        "input_duration": [
+          null,
+          null
+        ],
+        "output_duration": [
+          1,
+          24
+        ],
+        "passed": true
+      }
+    ]
+  },
+  "full_configuration": {
+    "scope": "完整配置、GPU高位深截图与静态色块真实滤镜；非面板测量",
+    "trials": [
+      {
+        "source": "full-601-8",
+        "bits": 8,
+        "matrix": 6,
+        "full": true,
+        "wide": false,
+        "baseline_maximum_code_error": 38,
+        "ccd_maximum_code_error": 38,
+        "output_format": "yuv444p",
+        "passed": true
+      },
+      {
+        "source": "limited-709-10",
+        "bits": 10,
+        "matrix": 1,
+        "full": false,
+        "wide": false,
+        "baseline_maximum_code_error": 1,
+        "ccd_maximum_code_error": 1,
+        "output_format": "yuv444p10",
+        "passed": true
+      },
+      {
+        "source": "full-709-16",
+        "bits": 16,
+        "matrix": 1,
+        "full": true,
+        "wide": false,
+        "baseline_maximum_code_error": 1,
+        "ccd_maximum_code_error": 1,
+        "output_format": "yuv444p16",
+        "passed": true
+      },
+      {
+        "source": "limited-2020-10",
+        "bits": 10,
+        "matrix": 9,
+        "full": false,
+        "wide": true,
+        "baseline_maximum_code_error": 110,
+        "ccd_maximum_code_error": 110,
+        "output_format": "yuv444p10",
+        "passed": true
+      },
+      {
+        "source": "full-2020-16",
+        "bits": 16,
+        "matrix": 9,
+        "full": true,
+        "wide": true,
+        "baseline_maximum_code_error": 98,
+        "ccd_maximum_code_error": 98,
+        "output_format": "yuv444p16",
+        "passed": true,
+        "combination_maximum_code_error": 98,
+        "short_loop_passed": true,
+        "steady_seconds": 20.054623599999104,
+        "loop_count": 0,
+        "clock_ratio": 0.9983233990988939,
+        "display_drops": 0,
+        "decoder_drops": 0
+      }
+    ]
+  },
+  "hdr": {
+    "scope": "完整配置静态HDR像素一致性与真实输出协商；隔离副本暂停显示检测并模拟能力，非面板测量",
+    "trials": [
+      {
+        "source": "hdr10",
+        "gamma": "pq",
+        "hdr_to_sdr_ccd_max_code_difference": 0,
+        "hdr_to_sdr_combination_max_code_difference": 0,
+        "source_params": {
+          "pixelformat": "yuv444p10",
+          "average-bpp": 48,
+          "w": 256,
+          "h": 256,
+          "dw": 256,
+          "dh": 256,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 256,
+          "crop-h": 256,
+          "aspect": 1.0,
+          "aspect-name": "Square",
+          "par": 1.0,
+          "sar": 1.0,
+          "sar-name": "Square",
+          "colormatrix": "bt.2020-ncl",
+          "colorlevels": "limited",
+          "primaries": "bt.2020",
+          "gamma": "pq",
+          "sig-peak": 49.261086,
+          "light": "display",
+          "chroma-location": "mpeg1/jpeg",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none",
+          "min-luma": 1e-06,
+          "max-luma": 10000.0,
+          "max-cll": 0.0,
+          "max-fall": 0.0
+        },
+        "simulated_hdr_target": {
+          "pixelformat": "rgba16hf",
+          "w": 1238,
+          "h": 696,
+          "dw": 1238,
+          "dh": 696,
+          "aspect": 1.778736,
+          "aspect-name": "16:9",
+          "par": "-nan(ind)",
+          "sar": 1.778736,
+          "sar-name": "16:9",
+          "colormatrix": "rgb",
+          "colorlevels": "full",
+          "primaries": "bt.709",
+          "gamma": "scrgb",
+          "sig-peak": 4.926108,
+          "light": "auto",
+          "chroma-location": "unknown",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "premul",
+          "min-luma": 0.01,
+          "max-luma": 1000.0,
+          "max-cll": 0.0,
+          "max-fall": 0.0
+        },
+        "passed": true
+      },
+      {
+        "source": "hlg",
+        "gamma": "hlg",
+        "hdr_to_sdr_ccd_max_code_difference": 0,
+        "hdr_to_sdr_combination_max_code_difference": 7,
+        "source_params": {
+          "pixelformat": "yuv444p10",
+          "average-bpp": 48,
+          "w": 256,
+          "h": 256,
+          "dw": 256,
+          "dh": 256,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 256,
+          "crop-h": 256,
+          "aspect": 1.0,
+          "aspect-name": "Square",
+          "par": 1.0,
+          "sar": 1.0,
+          "sar-name": "Square",
+          "colormatrix": "bt.2020-ncl",
+          "colorlevels": "limited",
+          "primaries": "bt.2020",
+          "gamma": "hlg",
+          "sig-peak": 4.926108,
+          "light": "hlg",
+          "chroma-location": "mpeg1/jpeg",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none",
+          "min-luma": 1e-06,
+          "max-luma": 1000.0,
+          "max-cll": 0.0,
+          "max-fall": 0.0
+        },
+        "simulated_hdr_target": {
+          "pixelformat": "rgba16hf",
+          "w": 1238,
+          "h": 696,
+          "dw": 1238,
+          "dh": 696,
+          "aspect": 1.778736,
+          "aspect-name": "16:9",
+          "par": "-nan(ind)",
+          "sar": 1.778736,
+          "sar-name": "16:9",
+          "colormatrix": "rgb",
+          "colorlevels": "full",
+          "primaries": "bt.709",
+          "gamma": "scrgb",
+          "sig-peak": 4.926108,
+          "light": "auto",
+          "chroma-location": "unknown",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "premul",
+          "min-luma": 0.01,
+          "max-luma": 1000.0,
+          "max-cll": 0.0,
+          "max-fall": 0.0
+        },
+        "passed": true
+      }
+    ]
+  },
+  "quality": {
+    "trials": 11,
+    "passed": true,
+    "scope": "实际DML／MVT／SVP／组合／缺失STD回退／HDR提示／无预检子进程"
+  },
+  "checks": {
+    "lua_files": 133,
+    "python_files": 62,
+    "syntax_passed": true,
+    "quality_state_passed": true,
+    "color_state_passed": true,
+    "color_preferences_passed": true,
+    "math_reference_passed": true,
+    "diff_check_passed": true
+  },
+  "model_inference_precision_changed": false,
+  "svp_forced_16bit": false,
+  "performance_defaults_changed": false,
+  "windows_hdr_changed": false,
+  "panel_measured": false,
+  "packaged": false,
+  "published": false,
+  "rollback": [
+    "backup/color-fixes-20261007-170911-before",
+    "backup/color-rife-duration-20261007-before",
+    "backup/color-duration-guard-20261007-before"
+  ]
+}

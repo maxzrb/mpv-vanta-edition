@@ -11,16 +11,15 @@ clip = video_in
 # 用户选项 #
 ############
 
-H_Pre = 1440
+H_Pre = 0
 Recal = True
 Block = True
 Lk_Fmt = False
-## 整数，预降低处理源高度（填你的显示器高度）
+## 整数，0 保留原分辨率；非零为显式性能模式处理高度
 ## <True|False> 是否使用二次分析
 ## <True|False> 是否使用Block模式
 ## <True|False> 锁定像素格式为yuv420p8
 
-ret = k7f.FPS_CTRL(clip, fps_in=container_fps, fps_ret=True)
 clip = k7f.FMT_CTRL(clip, h_max=H_Pre, fmt_pix=1 if Lk_Fmt else 0)
 clip = k7f.MVT_LQ(clip, fps_in=container_fps, fps_out=container_fps*2, recal=Recal, block=Block)
 

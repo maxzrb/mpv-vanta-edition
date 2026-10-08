@@ -391,6 +391,9 @@ local function detect_audio_codec_value(raw, context)
         or contains(context, 'mha1') then
         return 'MPEG-H Audio'
     end
+    if raw:match('%f[%w]dra%f[%W]') or contains(context, 'dynamicresolutionadaptation') then
+        return 'DRA'
+    end
     if contains(context, 'heaacv2') or contains(context, 'heaac2')
         or contains(context, 'sbrps') then
         return 'HE-AAC v2'

@@ -1,0 +1,46 @@
+{
+  "state": "paused-by-user",
+  "date": "2026-10-08",
+  "media": "ChouKaguya432048-Part.mkv",
+  "source_fps": 47.952,
+  "machine": "Intel Core i5-12600KF / RX 6600",
+  "tentative_author_target": "Ryzen 7 7840HS",
+  "scope": "完整 HQ／SDR ACM、CPU解码、1280x720输出、每轮约20秒；不是源48fps无丢帧达标",
+  "confirmation": {
+    "baseline": {
+      "rounds": 3,
+      "clock_ratio_median": 0.5444833608717642,
+      "cpu_cores_median": 11.331611350311327,
+      "vo_drop_counts": [
+        417,
+        461,
+        456
+      ],
+      "all_realtime_no_drop": false
+    },
+    "t12-d0": {
+      "rounds": 3,
+      "clock_ratio_median": 0.5701284784356203,
+      "cpu_cores_median": 10.931792326702924,
+      "vo_drop_counts": [
+        426,
+        474,
+        469
+      ],
+      "all_realtime_no_drop": false
+    },
+    "t8-d0": {
+      "rounds": 3,
+      "clock_ratio_median": 0.5760487645347792,
+      "cpu_cores_median": 7.957306050240274,
+      "vo_drop_counts": [
+        446,
+        477,
+        481
+      ],
+      "all_realtime_no_drop": false
+    }
+  },
+  "raw_archive": "backup/project-cleanup-20261008-151325/tmp/modernization/kaguya-softdecode-20261008",
+  "decision": "未更改生产线程、队列或画质；用户改为发布准备，不继续性能实验。"
+}

@@ -178,19 +178,36 @@
 ### 界面
 - 基于 [uosc](https://github.com/tomasklaen/uosc) 的现代化 OSC
 - 移植了来自[杳知mpv整合包](https://github.com/Yaozhil/mpv-Yaozhi/)的优秀uosc界面，并在此基础上做了个人定制
-- 弹幕系统（[uosc_danmaku](https://github.com/Loukyuu1120/uosc_danmaku)）
 - 汉化统计信息 OSD
 
 ### 视频处理
 - 500+ GLSL 着色器（Anime4K、FSRCNNX、ESRGAN 等 35 类）
 - VapourSynth 补帧/超分/降噪（RIFE、SVP、DRBA、ArtCNN）
-- HDR/SDR 自适应切换
+  - SVP 菜单和接口保留；公开包不携带个人许可的 SVPflow2，使用时需自行安装官方许可组件。
+- 显示能力明确时自动匹配 SDR／HDR 目标；未知时使用 SDR sRGB，支持会话内手动覆盖与可信 ICC
 
 ### 快捷键
 - `h/j/k/l` — 基本播放控制
 - `i` — 临时显示统计信息，`I`或`TAB` — 常驻显示
 - `1`~`5`/`0` — 切换统计信息页面
-- `Ctrl+数字` — 快速切换着色器
+- `Ctrl+0` — 清空着色器；`Ctrl+1/2/3` — 原有 FSRCNNX／FSRCNNX+／Anime4K 推荐方案
+- `Ctrl+Alt+0` — 当前启用项（可滚动列表，含详情入口）；完整 Shader 库在「着色器 → 专家库」
+
+「着色器」与「视频滤镜」保留原有推荐、用途、算法家族及分组。滤镜点击一次直接启用，首次模型／引擎初始化在真实播放中完成；HDR、广色域和倍率信息只作提示。组件审计仅供维护者手动执行。RIFE 提供 4.25 Lite、4.26 与 4.26 Heavy，DML、TensorRT、STD／NCNN 独立处理。两类各自清空；补帧、超分、降噪与 Shader 可以组合。
+
+「其它 → 播放性能」默认使用 HQ，另有高质量手动档位。普通播放默认 `auto-safe` 直接硬解，需要 CPU 滤镜时使用兼容路径；实验零复制为独立手动选项。
+
+默认 HQ 使用线性缩小，保持亮度平均。Windows SDR ACM 与 HDR 分别识别：SDR ACM 输出线性 BT.709 FP16 scRGB，由 Windows 负责显示校色，不重复套用显示 ICC；经典 SDR 保留 sRGB／可信 ICC 路线。可信 ICC 偏好同时检查显示身份、桌面模式和系统 ICC 报告路径。视频滤镜的直属「清空全部视频滤镜」会清除全部 VF，包括外部 VF；着色器仍单独清空。
+
+本地核心已更新为 shinchiro 20261008，修复了 libplacebo 最终浮点输出错误截断到 0～1 的问题，保留 scRGB 高光及广色域负值。原始 FP16 GPU 读回与色彩软件验证见[SDR ACM 与 FP16 输出优化](docs/modernization/SDR-ACM与FP16输出优化-20261008.md)。FP16 指浮点存储格式，不表示所有源、增强模型和显示面板都具有 16bit 有效精度。
+
+SVP 保留全分辨率、固定 59.94fps 目标；已达到目标的片源保留原帧，不重复运动估计、不降低原始帧率。裁黑边仍按 `C` 开启，只在实际检测旁路下载硬解表面，起播不再要求切换解码方式。状态列表可用滚轮、方向键和 PgUp/PgDn 查看；完整色彩信息进入「查看详细色彩与播放状态」。
+
+v1.6.0 包含上述色彩、滤镜与播放体验修复。最新行为、测试数据与回退方法见
+[滤镜恢复与色彩性能优化结果](docs/modernization/滤镜恢复与色彩性能优化结果-20261006.md)及[播放体验修复](docs/modernization/播放体验回归修复-20261007.md)。历史记录见[现代化实施报告](docs/modernization/实施报告.md)与[升级和回退](docs/modernization/升级和回退.md)。
+旧安装请使用支持组件隔离的 VantaInstaller v0.3.13；手动覆盖需按回退说明移走旧弹幕程序目录，保留用户下载文件。
+
+起播、主动打开新媒体和从最小化恢复时，播放器会抬到普通窗口前面；持续置顶选择仍由原菜单控制，暂停和自动切集不会反复抬窗。
 - `Alt+数字` — 切换预设配置组
 
 ## 自定义
@@ -223,3 +240,13 @@ gaoxing64/MPV-lazy-full (v2.0.0)
 ## License
 
 本项目各组件的许可证见各自源文件。原始项目按原作者 dyphire 的许可证约定执行。
+
+## 本地色彩准确优化（未发布）
+
+色彩入口位于「画面 > 色彩目标」：恢复自动匹配、SDR sRGB、用户明确信任的 ICC、HDR 目标、恢复切换前目标与状态查看。ICC 和指定峰值按显示器身份及桌面模式保存；临时滤镜、调色与片源修正不跨启动恢复，已有历史记录保留。
+
+默认不切换 Windows HDR，不启用额外对比度恢复。HDR 采用 scRGB → PQ → SDR 回退，未知能力使用 SDR 并说明原因；真实 HDR 面板色准与 NVIDIA／Intel 实机仍待验收。详见[本轮结果报告](docs/modernization/滤镜恢复与色彩性能优化结果-20261006.md)。
+
+## 项目目录与维护
+
+活动配置在 `portable_config/`；根目录的 Python／VS／DLL 和 `mpv/fonts.conf` 是便携运行支持。维护测试在 `tools/`，项目说明在 `docs/`，旧测试产物与回退快照进入本地 `backup/`，退役入口进入 `trash/`。完整职责、归档清单位置与回退约定见 [项目架构](docs/项目架构.md)。

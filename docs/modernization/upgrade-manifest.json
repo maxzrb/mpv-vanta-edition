@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-04",
+  "backup": "backup/modernization-20261004",
+  "files": [
+    {
+      "path": "mpv.exe",
+      "previous_sha256": "786e8a92cb316b6fb34661bd8086b56d56d92d2b222a7e0fa0b23e566cfd4b90",
+      "current_sha256": "a0e6b45d44270ddf09b3bde4345d07e34217c1253d6a58e62f6678e94d99db12"
+    },
+    {
+      "path": "mpv.com",
+      "previous_sha256": "c914f04a1db383d7782fca994f22792a309a27f58b7776ba8ae9470def85fabc",
+      "current_sha256": "a7b6515329505c610ce8506dafee4e79b6c29d145be067397b7422eb42799f39"
+    },
+    {
+      "path": "d3dcompiler_43.dll",
+      "previous_sha256": "4b074a3976399dc735484f5d43d04b519b7bdee8ac719d9ab8ed6bd4e6be0345",
+      "current_sha256": "4b074a3976399dc735484f5d43d04b519b7bdee8ac719d9ab8ed6bd4e6be0345"
+    },
+    {
+      "path": "yt-dlp.exe",
+      "previous_sha256": "52fe3c26dcf71fbdc85b528589020bb0b8e383155cfa81b64dd447bbe35e24b8",
+      "current_sha256": "66674953fe251b89f4d08c5f0e35e0728679bd67ab3d7d05c0562af101dd3e7a"
+    },
+    {
+      "path": "TorrServer-windows-amd64.exe",
+      "previous_sha256": "bdc6e80da81918a19d8a74d8fe43a6c1fc584889cb43de66d573d735f2209a5e",
+      "current_sha256": "d8bf93aba0521f2450436d4ede02c3b6e44a37b52c386aa9e6206daa8e5551ed"
+    }
+  ]
+}

@@ -115,12 +115,20 @@ $RECYCLE.BIN/
 .Trash-*
 
 # --- IDE / 编辑器 ---
+.zcode/
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 *.bak
+
+# --- Python 维护／滤镜生成缓存 ---
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+*.pyc
+*.pyo
 
 # --- 本地配置 (机器特定) ---
 /settings.xml

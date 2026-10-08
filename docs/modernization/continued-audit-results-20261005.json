@@ -1,0 +1,175 @@
+{
+  "date": "2026-10-05",
+  "scope": "研判；未修改活动配置或脚本；未做HDR面板测量或新性能基准",
+  "state_findings": [
+    {
+      "case": "color-repeat",
+      "scope": "Lua故障夹具；不是实机显示故障",
+      "reproduced": true,
+      "output": "色彩状态故障回归 PASS\nREPRO: 同模式重选未修复外部修改，状态仍标可用",
+      "error": ""
+    },
+    {
+      "case": "color-capability",
+      "scope": "Lua故障夹具；不是实机显示故障",
+      "reproduced": true,
+      "output": "色彩状态故障回归 PASS\nREPRO: 仅HDR能力标记变化未触发重新检查",
+      "error": ""
+    },
+    {
+      "case": "color-stable-file-rebuild",
+      "scope": "Lua故障夹具；不是实机显示故障",
+      "reproduced": true,
+      "output": "色彩状态故障回归 PASS\nREPRO: 同显示器同HDR目标的file-loaded再次撤轨重建",
+      "error": ""
+    },
+    {
+      "case": "color-restore-failure",
+      "scope": "Lua故障夹具；不是实机显示故障",
+      "reproduced": true,
+      "output": "色彩状态故障回归 PASS\nREPRO: 恢复写入失败仍标可用且丢失重试基线",
+      "error": ""
+    },
+    {
+      "case": "quality-sync-ownership",
+      "scope": "Lua故障夹具；不是实机显示故障",
+      "reproduced": true,
+      "output": "PASS：超时、迟到回调、缺模型重试、回退、互斥、清空保留、轻量插值、HDR／显卡拦截\nREPRO: 重置增强覆盖用户后续同步设置",
+      "error": ""
+    },
+    {
+      "case": "quality-expert-hdr",
+      "scope": "Lua故障夹具；不是实机显示故障",
+      "reproduced": true,
+      "output": "PASS：超时、迟到回调、缺模型重试、回退、互斥、清空保留、轻量插值、HDR／显卡拦截\nREPRO: 专家Shader入口在HDR下直接执行，未经过推荐入口的保真门禁",
+      "error": ""
+    }
+  ],
+  "runtime_checks": [
+    {
+      "case": "sdr8",
+      "passed": true,
+      "scope": "隔离配置；软件解码；SDR输出",
+      "source": {
+        "w": 640,
+        "h": 360,
+        "pixelformat": "yuv420p",
+        "gamma": "bt.1886",
+        "primaries": "bt.709",
+        "colorlevels": "limited"
+      },
+      "target": {
+        "pixelformat": "rgb10a2",
+        "gamma": "srgb",
+        "primaries": "bt.709"
+      },
+      "mode_drift": {
+        "target_trc": "gamma2.2",
+        "state_mode": "sdr",
+        "state_status": "可用"
+      }
+    },
+    {
+      "case": "quality-sdr10",
+      "passed": true,
+      "scope": "隔离配置；软件解码；SDR输出",
+      "source": {
+        "w": 320,
+        "h": 180,
+        "pixelformat": "yuv420p10",
+        "gamma": "bt.1886",
+        "primaries": "bt.709",
+        "colorlevels": "limited"
+      },
+      "target": {
+        "pixelformat": "rgb10a2",
+        "gamma": "srgb",
+        "primaries": "bt.709"
+      }
+    },
+    {
+      "case": "wide-sdr",
+      "passed": true,
+      "scope": "隔离配置；软件解码；SDR输出",
+      "source": {
+        "w": 640,
+        "h": 360,
+        "pixelformat": "yuv420p10",
+        "gamma": "bt.1886",
+        "primaries": "bt.2020",
+        "colorlevels": "limited"
+      },
+      "target": {
+        "pixelformat": "rgb10a2",
+        "gamma": "srgb",
+        "primaries": "bt.709"
+      }
+    },
+    {
+      "case": "hdr10",
+      "passed": true,
+      "scope": "隔离配置；软件解码；SDR输出",
+      "source": {
+        "w": 640,
+        "h": 360,
+        "pixelformat": "yuv420p10",
+        "gamma": "pq",
+        "primaries": "bt.2020",
+        "colorlevels": "limited"
+      },
+      "target": {
+        "pixelformat": "rgb10a2",
+        "gamma": "srgb",
+        "primaries": "bt.709"
+      }
+    },
+    {
+      "case": "hlg",
+      "passed": true,
+      "scope": "隔离配置；软件解码；SDR输出",
+      "source": {
+        "w": 640,
+        "h": 360,
+        "pixelformat": "yuv420p10",
+        "gamma": "hlg",
+        "primaries": "bt.2020",
+        "colorlevels": "limited"
+      },
+      "target": {
+        "pixelformat": "rgb10a2",
+        "gamma": "srgb",
+        "primaries": "bt.709"
+      }
+    },
+    {
+      "case": "d3d11va-copy",
+      "passed": true,
+      "scope": "640×360 HEVC10，启动和跳转；非性能基准",
+      "actual_hwdec": "d3d11va-copy"
+    },
+    {
+      "case": "d3d11va",
+      "passed": true,
+      "scope": "640×360 HEVC10，启动和跳转；非性能基准",
+      "actual_hwdec": "d3d11va"
+    }
+  ],
+  "sha256": {
+    "portable_config/mpv.conf": "dd483330c908fdbb593eb186cb8a1ee6dc34cb281e5fd9b79f0b3fce5497a61e",
+    "portable_config/profiles.conf": "2eb7584eb8bfdffb5d3daaffc4fc0f16c8f11b5308ac24730a6ec6a4eba57b20",
+    "portable_config/scripts/color-target.lua": "a5cac2bf802c2ac7c9868854669f56df802ac62cbe2fc6f240b84377b6130501",
+    "portable_config/scripts/quality.lua": "a807c7f586111d1882aa7c5a85bf312332a991069d8ea8b914d76d5a684479cb",
+    "portable_config/scripts/hwdec-select.lua": "ef16c92e7a33df98212b161464eb6ecac1a962386639bcaee156f91393290955",
+    "portable_config/scripts/hdr-mode.lua": "4700625249cb71d9ca66f5863169daae5c742b6649ec335848bdeae58c07f06b",
+    "portable_config/input.conf": "429a1c1eb4c40bb9b6d7e6f9d6c544f3f8a64ea627764015d410f29337b7a0af",
+    "portable_config/script-opts/persist_properties.conf": "e6c35b90908442234f3a98463cdad544d3d7a49c2cd959f7e1671b0948812290"
+  },
+  "baseline_checks": {
+    "lua_existing_suites": 4,
+    "all_passed": true,
+    "color_math": "PASS",
+    "lua_syntax": 133,
+    "python_syntax": 46,
+    "note": "历史stats JSON核对不是新性能测量"
+  }
+}

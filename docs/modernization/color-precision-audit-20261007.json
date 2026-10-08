@@ -1,0 +1,52 @@
+{
+  "scope": "手动维护测试；独立 VS 格式转换与模型输入矩阵，不是 RIFE 输出或面板测量",
+  "formats": [
+    {
+      "input": "YUV420P8",
+      "output": "YUV420P8",
+      "matrix_property": null,
+      "legacy_color_space": 9
+    },
+    {
+      "input": "YUV420P10",
+      "output": "YUV420P10",
+      "matrix_property": null,
+      "legacy_color_space": 9
+    },
+    {
+      "input": "YUV420P12",
+      "output": "YUV420P10",
+      "matrix_property": 2,
+      "legacy_color_space": 9
+    },
+    {
+      "input": "YUV420P16",
+      "output": "YUV420P10",
+      "matrix_property": 2,
+      "legacy_color_space": 9
+    },
+    {
+      "input": "YUV444P16",
+      "output": "YUV420P10",
+      "matrix_property": 2,
+      "legacy_color_space": 9
+    }
+  ],
+  "rgb709": [
+    0.6913761496543884,
+    0.47933027148246765,
+    0.29933395981788635
+  ],
+  "rgb2020ncl": [
+    0.6799257397651672,
+    0.4649311900138855,
+    0.2963851988315582
+  ],
+  "max_rgb_difference": 0.014399081468582153,
+  "date": "2026-10-07",
+  "runtime_changed": false,
+  "comparator_commit": "3fef8eb67d49da6dc92ab265cb67c07768895e5b",
+  "comparator_executed": false,
+  "panel_measured": false,
+  "warning": "可选 bm3dcuda_rtc.dll 初始化报告错误 126；本测试不使用该后端"
+}

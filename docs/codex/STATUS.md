@@ -5,14 +5,15 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
+| **用户核心优先级** | SDR／HDR 色彩显示准确优先；用户对超分／补帧不感兴趣，增强仅作为现有可选模块维护，不以模型数量或增强效果定义项目价值 |
 | **分支** | `master` 与 `origin/master` 同步；`v1.5.7` 标签已推送，发布已完成 |
 | **最新发布提交** | `7e302f8`（tag: `v1.5.7`，已推送） |
-| **工作区** | 发布已完成；仅保留用户已有的 `window_size_position.conf` 改动和 `.zcode/` 目录 |
-| **MPV 核心版本** | v0.41.0-922-gf4d13e1c2（2026-08-11，shinchiro/mpv-winbuild-cmake；FFmpeg N-126056-gee498f5e8） |
-| **项目版本** | v1.5.7（已正式发布） |
-| **上次操作** | 完成 GitHub v1.5.7 六项公开资产发布、ModelScope 六项资产同步及远端大小/digest 核验 |
-| **当前排查** | GitHub/ModelScope 远端核验已通过；最终收尾记录随本次发布记录提交。私用全量包保留本地且未上传 |
-| **自定义脚本** | `stats.lua`（yosh-wang 汉化版，含 CPU/GPU 监控）、`quality_status.lua` |
+| **工作区** | 发布前输入审计与707项可回退归档完成；起播／IPC打开／最小化抬窗修复与回归通过；此前色彩／HQ／滤镜改动保留；尚未提交／打包／发布 |
+| **MPV 核心版本** | 本地 v0.41.0-1107-g36bf3d529（shinchiro 20261008；FFmpeg N-127242-g5d4755f7d；libplacebo v7.374.0 / 0d043c7，含 99e80abd 浮点截断修复）；未发布 |
+| **项目版本** | v1.5.7（已正式发布）；下一版 v1.6.0 已由用户确认，尚未构建 |
+| **上次操作** | 2026-10-08 15:29 用户确认下一版v1.6.0，并授权按流程发布正式Release；准备与回归完成，等待3.2升级Gate决定 |
+| **当前排查** | 8K48软解优化已按用户要求搁置，不自动继续；下一版v1.6.0已确认，安装器独立版本尚未改；核心与运行时升级命中发布流程3.2 Gate，本次Gate已获用户一次性豁免，正式发布构建与校验进行中 |
+| **自定义脚本** | quality.lua、quality_status.lua、color-target.lua、display-color.lua＋display-color-native.lua、hdr-mode.lua、stats.lua＋system_metrics.lua、startup-format-logos.lua（保留用户定制） |
 
 ## 环境
 
@@ -37,6 +38,32 @@ c:\Program portable\mpv2\
 ```
 
 ## TODO
+
+- [x] 下一版本发布准备、可回退清理及起播前台显示修复（2026-10-08）
+- [ ] 发布执行：用户确认版本及3.2 Gate处理后再构建；02第三方插件／模型分发许可沿用已有待补证事项，不以输入审计替代授权
+- [ ] 搁置：本机8K48 AV1软解性能优化；仅用户明确恢复后继续
+
+- [x] 删除低功耗档／默认 HQ／菜单排序／直属清空；SDR ACM 与 ICC 分工、FP16 最终截断核心修复、线性缩小及原始读回验证（2026-10-08）
+
+- [x] 色彩原生状态／NaN去重、CCD同帧率完成事件、真实精度详情与K7补丁覆盖恢复回归（2026-10-08）
+- [x] PQ／HLG独立GPU数值参考、18组交接三轮20秒／54次启停、资源观察、带音频组合与HDR状态回归（2026-10-08）
+- [ ] 可选优化候选：RIFE首次初始化的短停顿／音频欠载，高分辨率CCD并行效率和内存；需独立测量，不自动降质或增加播放前核验
+
+- [x] 修复负／缺失帧时长导致的短片EOF撤链；保留有效VFR与EOF占位，CCD＋RIFE循环／长片时钟／跳转通过
+
+- [x] 色彩精度核查及3FPlayer固定提交源码对照（2026-10-07）；区分普通FP16渲染、滤镜精度、最终输出及面板
+- [x] 修正RIFE／DRBA／超分／CCD等固定709矩阵与范围，兼容现代／旧桥接属性；601／709／2020 NCL软件回归通过
+- [x] 通用包装层保留可桥接整数YUV高位深与色度；模型IO精度及SVP兼容格式保持原样；本机DML16bit实播通过
+- [x] 补完整配置SDR／广SDR像素参考与HDR静态组合回归、模拟FP16输出；真实屏幕测量不作为本轮完成条件
+
+- [x] 播放体验后续修复：裁剪硬解误报与实际旁路、SVP 目标满足时原帧保留、低帧率三轮回归、简洁滚动状态及播放性能迁至其它（2026-10-07）
+
+- [x] 恢复所有滤镜一键请求，移除解锁、普通流程组件扫描与模拟试跑，分离 RIFE 后端
+- [x] 修复色彩事务／恢复失败重试／外部覆盖／免重建／显示身份偏好与用户设置所有权
+- [x] 增加 RIFE 4.26／Heavy，更新 K7sfunc 1.8.1、VSORT v15.16 与 zsmooth 0.20.0，归档重复旧 SVP
+- [x] 完成三轮硬解／缩放／峰值分析／长 GOP／起播对比，推广 auto-safe，保留手动性能档与实验零复制
+- [x] 本轮结果报告、摘要 JSON、回退快照与 HandShake 记录更新（2026-10-06）
+- [ ] 可选后续实机补充：真实HDR色准、NVIDIA／Intel、DV与更多素材（不作为本轮软件验收条件，未以模拟结果替代）
 
 - [x] `settings.xml` 已加入 `.gitignore`
 - [x] 根据个人需求定制 mpv.conf
@@ -2921,3 +2948,462 @@ c:\Program portable\mpv2\
 - ModelScope `AerithDream/mpv-vanta-edition/v1.5.7/` 六项公开资产上传成功；匿名直链全部 HTTP 200，`Content-Length` 与本地逐项一致。
 - 私用全量包 `release/mpv-full-private-v1.5.7.7z` 仍只保留本地一份完整产物，含 installer，未上传 GitHub 或 ModelScope；公开 `release/` 目录保留 6 项发布文件和该私包。
 - `v1.5.7` 标签及 `master` 已推送；最终收尾记录已整理，提交后再次确认构建暂存目录、工作区和远端同步状态。
+
+## 2026-09-06 11:19
+
+### Hills 外部播放器 Emby 起播失败排查
+
+- **用户问题**：Hills Windows 外部 mpv 播放 Emby 网络视频时，取链/缓冲等待期间看起来约 2–3 秒就停止。
+- **已确认现象**：`portable_config/files/mpv.log:1` 的 mpv 命令行媒体参数已经包含 `.../embyhttps://cdn...`；`0.247s` 启动的 yt-dlp 预解析在 `4.343s` 以 HTTP 403 失败，随后 mpv 在 `4.383s` 请求同一个坏地址，`6.982s` 收到 HTTP 403，并在 `6.983s` 记录 `loading failed (reason 4)`。
+- **责任边界**：Hills 注入的 `hills_external_reporter.lua` 仅监听并输出播放事件，不改 URL。坏 URL 在 mpv 启动参数阶段已经存在，优先级高于 mpv 缓存和网络超时配置，具体来源仍需在 Hills 外部播放器与 Emby/线路返回值之间确认。
+- **mpv 配置审计**：本地 `mpv.conf` 已启用 `cache=yes`、`demuxer-max-bytes=300MiB`、`cache-secs=15`、`demuxer-readahead-secs=15`；本机构建 `--list-options` 显示 `network-timeout` 默认 60 秒、`cache-pause-initial` 默认关闭。故当前 2–3 秒停止不是 mpv 默认网络超时。`ytdl_hook.conf` 的 `try_ytdl_first=yes` 与只匹配 URL 末尾 `.mkv` 的排除规则，会让带签名查询参数的 `.mkv?...` 先额外触发 yt-dlp 探测。
+- **验证命令**：`git pull --ff-only`（Already up to date）；mpv `--version`/`--list-options`；LuaJIT 模式检查；读取 Hills 1.3.1.0 外部报告脚本；日志时间线和脱敏 URL 形状检查；坏地址与截取出的 CDN 地址的 curl 状态探测均未产生可用媒体响应。
+- **本次文件变化**：仅追加本状态记录和 `version/工作进度.md`；未修改 `portable_config` 配置/脚本、Hills 文件或用户已有的 `portable_config/script-opts/window_size_position.conf`，未更新版本号、未打包/发布。
+- **下一步**：优先升级 Hills Windows 客户端并复测命令行 URL 是否仍出现 `/embyhttps://`；若 URL 修复后仍有额外等待，再单独调整 ytdl 预解析排除规则。项目版本保持 v1.5.7。
+- **Git**：开始排查前 `master...origin/master` 同步；工作区原有 `window_size_position.conf` 修改和 `.zcode/` 未跟踪目录继续保留，本次状态/进度记录改动尚未提交。
+
+## 2026-09-06 12:54
+
+### Hills 1.4.1.0 内置与外部 mpv 网络路径对比
+
+- **版本与组件**：本机 Hills Appx 已为 `Mountains.HillsLite 1.4.1.0`；安装包内同时存在独立的 `data/player/HillsPlayer.exe` 和 `libmpv-2.dll`，不是调用项目根目录的外部 `mpv.exe`。
+- **内置播放器证据**：HillsPlayer 的 mpv 日志记录其通过 `http://<Emby>/emby/videos/.../original.mkv` 会话地址播放，并设置 `Hills Windows/1.0.1` User-Agent；该次打开约 0.15 秒完成，随后成功读流并以 `success` 结束。
+- **外部播放器证据**：最新 `portable_config/files/mpv.log` 的启动参数已直接收到 `https://cdnfhnfile.115cdn.net/.../*.mkv?...`，不再有 `.../embyhttps://`；yt-dlp 约 3.176 秒收到 HTTP 403，mpv 随后在约 3.395 秒记录 HTTP 403 和 `loading failed (reason 4)`。
+- **签名验证**：对当前外部 URL 做不下载媒体的 Range 探测，直连、显式 HTTP/SOCKS 代理、浏览器 User-Agent、Referer 和 HTTP/1.1 均返回 AliyunOSS `invalid signature`；因此不是 mpv 的 2–3 秒缓存/超时，而是 Hills 外部流程传出的直链签名或取链时机不正确。显式代理也未改变结果。
+- **结论与边界**：内置播放器由 Hills 自己取得新鲜 Emby 会话流，外部模式只接收 Hills 已经生成的单个 CDN URL，且 reporter Lua 仍仅上报事件。外部修复应让 Hills 刷新并传递有效签名 URL，或改传 Emby 会话地址/中转地址；仅调大 `network-timeout`、`cache-secs` 或关闭 yt-dlp 不能修复 403。
+- **本次文件变化**：仅更新本状态记录和 `version/工作进度.md`；未修改 `portable_config`、Hills 文件、用户已有 `window_size_position.conf` 或版本/发布资产。未记录签名 URL、API key 或请求 ID。
+
+
+## 2026-10-04 12:59 · 播放与画质现代化、本机回归及杳知徽标更新（未发布）
+
+- **范围与授权**：按用户已批准方案实施；追加跟进杳知起播徽标。Windows 10/11 为目标，不再受 Win7 约束。本轮不打包、不发布、不修改《发布流程.md》，版本仍 v1.5.7。开始时 `git pull --ff-only` 已同步；未创建提交／推送。
+- **初始工作区**：既有 STATUS、工作进度、startup_format_logos.conf、window_size_position.conf 和 .zcode/ 已单独保留；两份用户选项与初始备份逐字节相同。初始备份及旧核心／工具在忽略目录 `backup/modernization-20261004/`。
+- **组件**：验证官方资产 digest 后替换 shinchiro 20261004 整套核心（mpv/FFmpeg/libplacebo），升级 yt-dlp 2026.08.19、TorrServer MatriX.145.1；uosc 5.13.0 和 umpv 1.5.1 保留。17 项现有上游逐源审计，366 Shader 一致，定制差异保留，合并 hdr-mode 的失败恢复与轮询修复。
+- **VS 决策**：R80 的 Python 导入通过，隔离直接 mpv 测试在初始化退出 1，证据 `tmp/modernization/vs80-test.log`；维持 Python 3.14.6＋R73＋K7sfunc 1.3.1 现有整套，10012 个文件及 Python 包元数据锁定。K7sfunc 新版 1.8.1 不单独交付；插件／模型无可靠版本时以 SHA-256 标识。未知来源／专有授权须在以后公开打包前补证。未改系统 PATH。
+- **弹幕退役**：移除活动目录、专属配置、菜单／按键／审计入口；共享依赖与历史开发备份保留。新安装器检测退役标记后隔离到根 backup，保留目录内下载数据，拒绝跟随链接；真实迁移源码测试通过。旧公开安装器和手动解压不能自行清理残留，文档写明操作步骤。
+- **增强**：新增 quality.lua／quality/probe.py、状态与模型准备菜单。默认 AI、Shader 超分、去色带与轻量时间插值关闭；固定降噪→AI 超分→AI 补帧顺序，推荐同类互斥，原分辨率无预缩小，720p 性能方案显式标注。只清理三项自有标签及自有 Shader；取消／超时／切片使旧回调失效，准备完成仍需用户手动启用。HDR／广色域推荐增强暂时封锁，AMD 不开放 NVIDIA 专用后端。
+- **统计**：独立 Windows 原生 CPU／PDH GPU 指标模块；关闭停止采样、异步不重叠、切片失效、布局缓存／动态限频。修正覆盖层字体坐标尺度并重新做完整三轮测试。兼容查询关闭／切片取消测试通过。
+- **色彩**：默认 gpu-next、d3d11va-copy、BT.709/sRGB 目标，不强制 scRGB／HDR，不自动叠加创意调整。状态分别显示原始／推断源参数、滤镜输出、目标与亮度标尺、ICC、交换链未知。3FP 仅参考能力与标尺／回退思路；不复制渲染器，不采用 T0 排名，不把源位深、中间 FP16、交换链和面板统称 16bit。
+- **杳知徽标**：官方 1.0.6-2 资产 SHA-256 已核验，manifest v23→v24，新增 24 张 DRA 素材并保留 MIT 署名。视频徽标不等待迟到音轨、几何就绪触发已差异合并；保留本地真实格式优先、四种黑边模式、用户双路／白色选项。格式识别与 DRA 预览、双字幕截图复核通过；DRA 音频实际解码仍需素材。
+- **验证**：131 个活动 Lua、23 个 Python/VPY 语法通过，Shader 引用零缺失、无活动弹幕入口；Windows PowerShell 5 解析与更新器官方资产选择／自更新失败回滚通过（UTF-8 BOM 兼容中文脚本）；Vanta.Core 构建 0 警告／错误。真实完整配置 HEVC 8/10bit、广色域 SDR、带静态标记 HDR10、HLG，原色／传递函数断言通过。早期丢标签的 H.264 结果作废。HEVC 10bit 硬解、WASAPI 初始化、双字幕、HTTP 文件播放、AI 24→48fps、重复选择、快进、组合顺序、取消、切片、失败回退均通过。
+- **性能实测**：固定 1280×720 24fps，旧／新 stats 关闭／首次打开／反复开关／持续显示各 3×6 秒，共 24 次，未新增掉帧／错时／延迟；新版外部查询全部 0，旧持续三轮 18/22/18。主进程 CPU 未测得下降，不计旧子进程 CPU；新版文字尺度变化包含在测试中，不宣称总体降耗。额外 720p60／1080p23.976 无掉帧，2160p30 短起播窗口累计 1 帧，记录而非隐藏。
+- **交付**：`docs/modernization/实施报告.md`、`升级和回退.md`、上游／新旧核心／逐次统计／播放／尺寸 JSON、`portable_config/components.lock.json` 与 tools 下复核脚本。运行时二进制、候选资产、日志、截图和备份受 Git 忽略；仅同步 Git 不能复现整个本地环境。
+- **待验证／下次交接**：NVIDIA、Intel、HDR 显示输出、Dolby Vision P5/P7/P8、真实高负载长时段与仪器色准未验收，表已交付。R80 需整套隔离解决便携 VSScript 后再升级。将来发布必须按发布流程 3.2 提交核心／运行时／包内容 Gate，由用户决定，不自动豁免。建议保留本轮 Git 提交后再切设备；当前有未提交改动。
+
+
+## 2026-10-04 13:02 · 最终差异与菜单校验
+
+- 推荐增强和色彩入口已去重；完整 Shader 用途库／专家库保留。再次通过 131 Lua／23 Python 语法、引用／退役入口、用户选项逐字节、徽标素材完整性、发布流程未改和 git diff --check。更新器 Windows PowerShell 5 直接 ParseFile 与失败回滚测试通过。
+- 本轮文件均为 UTF-8／LF；用户两份既有选项保留原始字节。新增 UTF-8 BOM 仅用于兼容 Windows PowerShell 5 解析中文的维护更新器／测试脚本。没有测试会话或后台准备进程遗留。
+- 未创建提交／推送／新发布；当前仍保留用户既有修改及本轮未提交实现，切设备前建议先提交并另存忽略的运行时和备份。
+
+
+## 2026-10-04 13:20 · 菜单架构规划（建议稿，未实施）
+
+- 应用户请求审阅 input.conf 和 quality 动态菜单。问题为画面处理／窗口／导航入口分散、完整 Shader 双索引与旧配置组重复、重置范围和子页面标题不明确。
+- 建议一级收敛为打开、播放、画面、音频、字幕、界面、工具；着色器提升为画面 → 着色器；保留完整算法库、常用组合和快捷键，移除第二套完整 Shader 重复展开。
+- 规划、功能迁移表、关闭范围、状态规则及三阶段实施写入 docs/modernization/菜单架构规划.md。仅形成建议，未改 input.conf、脚本或快捷键，不视为用户已批准该架构。
+- 现有现代化工作区保持未提交，不打包／发布；下一步依用户反馈定稿菜单再实施。
+
+
+## 2026-10-04 13:32 · 菜单规划补充可选组件边界
+
+- 用户指出着色器与 nv／滤镜组件在分发中可独立安装。规划改为画面下着色器、VS／AI 滤镜、内置处理分区；NVIDIA 后端额外检查显卡支持。
+- 补充缺组件简洁灰色入口、逐方案依赖检查、实际准备结果、启用前复查、重新检测与非全量安装验收矩阵。不假设包标记等于组件齐全；不改变现有包编号／发布流程。
+- 仅更新 docs/modernization/菜单架构规划.md 与记录，未改真实菜单／快捷键；旧高级入口能力检查仍是待实施要求。
+
+
+## 2026-10-04 13:54 — 菜单架构实施（Asia/Shanghai）
+
+- 用户已确认按前述规划更新实际菜单；使用 HandShake，阅读 AGENTS.md、STATUS 与规划；INDEX 不存在。git pull --ff-only 提示 Already up to date，master 与 origin/master 同步。
+- input.conf 收敛为打开／播放／画面／音频／字幕／界面／工具；底部最小化／退出保留。原快捷键集合与原 Shader 组合效果保留；常用 Shader 快捷键接入同一动作目录；全部 VF 清空同步管理状态。
+- quality.lua＋quality_shaders.lua＋quality/shaders.json：Shader 与 VS／AI 分区，387 个既有 GLSL 引用、34 类算法、完整预设链保留；缺文件置灰／启用复核，手动 Shader 与推荐超分／补帧互斥；来源查看／逐项移除／全部清空。Shader 不加载 VS，VS 首次打开才核查组件；NVIDIA 专用方案检查显卡。关闭菜单后异步结果不会重新打开旧页面。
+- 模型／推理 DLL 最终能力仍在后台准备验证，VS 整套校验未放宽。不得将菜单「点击准备」等同于已完成推理；未改变手动高级项跨文件策略。
+- 验证通过：tools/check-modernization.py（132 Lua、24 Python、用户既有选项字节保留、发布流程未改）；test-menu-architecture.py（真实全配置／基础／Shader 菜单树、快捷键集合与引用）；test-shader-menu.lua（缺包／缺文件／完整组合／启用复核／互斥／状态管理）；test-quality-state.lua（四种组件组合、异步故障、NVIDIA 拦截、清空状态同步）；test-quality.py（AMD DirectML 实际准备／启用／重复选择／快进／CCD→超分→补帧／切片清理）；git diff --check。真实截图 tmp/modernization/menu-shaders.png 与 menu-vs.png 已视觉检查。
+- 变更说明见 docs/modernization/菜单架构规划.md 和 README。回退备份 backup/menu-architecture-20261004/input.conf 与 scripts/quality.lua 是本次改动前的版本，不覆盖此前现代化；临时测试配置与素材位于 tmp/modernization/。
+- Git 工作区保留此前未提交改动及 .zcode/；本轮未提交、未推送、未打包、未发布，未修改发布流程与版本号。完成逻辑检查后建议分批 git add／git commit 保留里程碑；NVIDIA／Intel 实机仍待外部验证。
+
+
+## 2026-10-04 15:22 — 回退菜单架构实施（Asia/Shanghai）
+
+- 用户明确要求回退，仅撤销最近一次菜单架构改动。input.conf 与 quality.lua 从 backup/menu-architecture-20261004/ 恢复并逐字节核对。
+- 新增 quality_shaders.lua、quality/shaders.json、两项菜单测试移入 backup/menu-architecture-20261004/reverted-152218/；此前 test-quality-state.lua 恢复原故障注入测试；README 恢复原菜单说明。规划文件标记为已回退，历史记录保留。
+- 此前现代化组件、VS 锁定、统计、色彩、弹幕移除、徽标与用户既有设置保持原状。停止本轮架构实施，后续调整范围需依用户具体指示。
+- 未提交、未推送、未打包、未发布；master 与 origin/master 同步，工作区仍有此前未提交改动。
+- 回退验证通过：原配置／脚本与菜单前备份逐字节一致；原增强故障注入、131 Lua／23 Python 语法、Shader 引用、用户选项保留及 git diff --check 全部通过。
+
+
+## 2026-10-04 16:13 — 用户要求暂停实施，调查两类菜单（Asia/Shanghai）
+
+- 用户最终改用「着色器／视频滤镜」两个一级分类，窗口设置明确留在画面；此前「NV 独立包」是用户记忆误差。当前打包清单 Extras 同时包含 Shader／VS／Python，未发现独立 NV 包。
+- 暂停前 input.conf 已局部迁移、合并重复 Shader 用途索引、保留快捷键，增加视频滤镜分区；quality.lua 已按 Shader／VS 菜单过滤、增加原预设依赖检查、允许保留手动 Shader 组合。Lua 故障注入与 check-modernization.py 在最后一组菜单入口新增之前通过；后续尚未做完整菜单／组合实机回归，不能宣称完成或稳定交付。
+- 用户随后明确「先等等，调查和规划」，已停止配置／脚本变更。本轮仅只读调查与文档记录。此前现代化与既有用户设置保留；局部调整前基线在 backup/menu-local-adjust-20261004/，不自行回退或继续实施。
+- 调查官方 mpv 手册、PlayKit GLSL／K7sfunc／FAQ 与 input_uosc 示例，建议一级分处理体系、二级按用途、三级具体方案，完整库保留额外算法目录；单项组合和完整预设必须区分。Shader 阶段在 vf 后且 HOOK 有固定约束，deband／interpolation 不应冒充 GLSL 或 VS。
+- 最新规划附在 docs/modernization/菜单架构规划.md；替代早先七类一级架构建议。等待用户明确后续实施范围。未提交、未推送、未打包、未发布；工作区仍含此前未提交改动。
+- 本轮 git diff --check 发现中间配置 input.conf 末尾多余空行；因用户要求停止实施，没有继续修改配置，后续验收时处理。
+
+## 2026-10-04 16:46 — 局部菜单与公开精选方案完成
+
+用户授权采用公开优质方案并以桌面 RTX 3050／4060／5060 Ti 作为低／中／高负载参考，允许合理时执行。保留熟悉一级入口，着色器／视频滤镜分开；窗口设置在画面，统计／截图归工具、速度／循环归导航。没有恢复此前已回退的七入口全面重构。
+
+- 精选 Shader：低档 FSRCNNX 8＋Anime4K Fast A/B/C；中档 ArtCNN C4F16＋Anime4K HQ A/B/C；高档 ArtCNN C4F32＋HQ A+A/B+B/C+A（至少 2×）。每项是独立选择，不把同档方案自动叠加。依据 Anime4K 官方完整组合与 ArtCNN 作者说明；性能档位是规划参考，非上游实测型号映射。
+- 常用单项按用途分组，完整算法库及原方案保留；相对于局部调整前备份，387 个 Shader 文件引用全部保留，绑定键无增删。整套 Shader 预设只替换本类链，VS 状态独立；分别清空含本类手动项。快速 Shader 与 VS 超分状态也独立保存，回归覆盖互不移除。
+- 缺 Shader 阻止执行；VS 根据组件／后端／GPU／准备结果判断能力；渲染器轻量插值与 deband 不混入 VS 分类页。精选入口仍阻止未经验证的 HDR／广色域处理。
+- 验证通过：131 Lua／24 Python 语法及现代化检查；test-quality-state.lua 故障与跨类状态回归；validate-quality-menu.py 真实 IPC 菜单、五种精选预设、十二组 Anime4K、2× 门禁、双类独立清空、缺文件、切片和广色域门禁。真实 VS 超分菜单截图检查后端提示及禁用状态。git diff --check 通过。报告在 tmp/modernization/validation/quality-menu-results.json。
+- RX 6600 上 ArtCNN C4F32 首次切换观察到约 160 秒编译等待，入口已提示首次编译可能较慢。该观察不是持续播放耗时；320×180 功能回归不能代替 1080p／4K 性能、色准或 NVIDIA 代表型号验收，后者保留外部实机待测。
+- README 与菜单架构规划同步；备份仍为 backup/menu-local-adjust-20261004/。保留所有本轮先前工作区修改和用户定制。没有提交、推送、打包、发布或修改《发布流程.md》。
+
+## 2026-10-04 17:04 — 仅恢复着色器与视频滤镜原方案
+
+用户反馈两类菜单更混乱，明确要求恢复原方案、其他整理保留。以当前已发布 HEAD 的原始两类菜单路径为基准，恢复着色器的推荐、用途分类、专家库与视频滤镜的补帧、超分、降噪、片源修复等；逐项比对 797 个着色器路径与 33 个视频滤镜路径完全一致。新增 3050／4060／5060 Ti 性能档位撤下，三个 Preset-* 配置移除，旧常规配置组回到其它。
+
+窗口设置仍在画面；工具中的统计、截图／导出及导航中的速度循环、书签保留。快捷键恢复原着色器方案（Ctrl+0 清空 Shader、Ctrl+1/2/3 为原推荐预设），工具中的系统恢复／状态菜单保留但解除冲突绑定。没有整体回退 input.conf，也没有回退核心、弹幕移除、组件锁定、统计与徽标等先前工作。
+
+底层保留缺文件检查、Shader／VS 独立状态和后台准备机制，VS 静态菜单首次选择可自行触发组件核查；未开放的 DRBA／SVP／NV ArtCNN 旧位置保持禁用，不恢复直接加载失败滤镜。README、菜单说明与验证工具同步。操作前备份：backup/menu-two-restore-20261004-170037/。
+
+验证通过：Lua 131／Python 24 语法和现代化检查；test-quality-state.lua 包含静态 VS 首次核查与两类状态独立测试；实际 mpv IPC 验证原目录生成、旧推荐方案、十二组 Anime4K、分别清空、缺文件、切片及广色域门禁；原两类路径完全恢复，其他整理入口仍存在；git diff --check 通过。工作区仍有先前现代化及用户修改，未提交／推送／打包／发布，《发布流程.md》未修改。
+
+## 2026-10-04 17:08 — 五组基础画面操作归入画面
+
+按用户明确要求，将视频滤镜中的「片源修复、画面变换、修复错误标记、帧率改写、色彩调整」五组共 13 项移至画面，画面变换与现有去黑边入口合并同组。仅修改菜单路径和分组位置，命令、快捷键与状态表达式逐字保留；着色器及其他菜单不变。操作前 input.conf 备份：backup/menu-picture-groups-20261004-170835/input.conf。静态核查五组不再位于视频滤镜，十三项命令／绑定不变。未提交、打包或发布。
+
+## 2026-10-04 17:17 — 三种菜单同步核查
+
+确认右键 uosc 从 input.conf 解析，Shift+右键 OSD 与中键原生菜单共用 dyn_menu 从同一 input.conf 生成的 menu-data。实际 mpv IPC 核查五组均在画面，视频滤镜无残留；uosc 主菜单成功打开。未修改活动配置。已运行播放器需重启，避免继续使用启动时缓存的旧菜单。
+
+## 2026-10-04 18:51 — 3FP 发行版与 HDR 色彩管线核查
+
+静态拆解用户提供的 FFF.Player.exe（2026.9.30+15995b807bf8a27037d2697fcdb89d13064ee247；SHA256 4AEFD9FFFC007D17858A4C85E9EFEEC639A6FF10E97627928CA28D843CB17C1B）。使用临时 ILSpy 与系统 D3DDisassemble，七组内置 Shader 与固定提交预编译数组逐字节一致；区分常规浮点计算、FP16 存储与最终输出。标准托管入口未设置 SDRscRGB模式，保持零，不能概括为任意 10bit SDR 自动进入 FP16。
+
+HDR 为核心核查对象。基础 PQ→scRGB 有绝对亮度、负通道与 nits/80 标尺；基础 HLG 按 RGB 独立幂变换，与 BT.2100 加权 OOTF 不同，数学复算显示灰阶一致而彩色通道比例不同，不冒充 GPU 回读或最终面板色差。指定 EXE 同目录及拆包清单无 FFF.DolbyVision.Test.dll，外部授权扩展与基础层回退需分别验收；没有分析或绕过授权。
+
+本机 mpv 五类素材各比较默认与 FP16，共十个独立会话；匹配 linear 后五类 GPU 错误为零，实际 FP16 scRGB 链确认。目标仍 SDR，不能宣称 HDR 实机色准通过。首轮 auto 初始化色彩空间不匹配及后续恢复保留证据。报告：docs/modernization/3FP与mpv色彩精度核查.md，含二进制证据、HLG 公式对照、实验配置及 HDR 优先验收表。研究工具与原始证据仅位于忽略目录 tmp/modernization/3fp-audit/，未纳入分发。
+
+公开 T0／第二档／不如 Windows 播放器的排名缺同机测量依据。HDR 显示器、NVIDIA／Intel、真实 DV 素材及仪器色差测量仍待外部验收。本轮未启动 3FP GUI、未修改活动配置、菜单或 Windows HDR；未提交、打包、发布或修改发布流程。
+
+## 2026-10-04 19:12 — 完善 mpv 色彩准确优化路线
+
+用户要求完善色彩优化路线。本轮审计 mpv.conf、profiles.conf、hdr-mode.lua／hdr_mode.conf、quality_status.lua 与色彩菜单，结合发行版核查及官方文档，新增 docs/modernization/mpv色彩准确优化路线.md，并与 3FP 核查报告互链。
+
+明确 P0 准确基线、P1 HDR 协商与统一状态管理、P2 诊断及数学／GPU 回读、P3 HDR 面板／多 GPU／动态格式验收。发现全局 HDR2SDR 启用 hdr-contrast-recovery=0.30；旧 HDR 脚本读取 target_contrast 属性有误、按亮度阈值判断 HDR 且恢复 SDR 写死 203。这些列为优先待修项；脚本当前 hdr_mode=noth，未启用。区分参考 ICC 与本机校准、FP16 请求与实际输出、源信息补齐与已知目标能力、HDR 格式识别与动态元数据执行。
+
+保留现有菜单，色彩目标在画面；SDR 默认保留，HDR 优先验证 FP16 scRGB，并规划 PQ 兼容与明确 SDR 回退。每类亮度标尺、显示信息来源、跨屏失效、异步回调、运行时不可写选项／VO 重建、映射责任、功能／GPU／仪器三层验收与回退条件均写入路线。
+
+本轮仅文档规划和记录，未改变活动配置、菜单、Windows HDR 或发布流程，未运行新增播放验收、未提交／发布。既有工作区修改保留；活动修复与 HDR 实机测量尚未实施，不能宣称已经优化完成。
+
+## 2026-10-04 19:32 — 8K AV1 HDR60 实素材掉帧排查
+
+用户提供 Downloads 中 LG OLED The Wild 8K HDR60 视频，实际 7680×4320／59.94fps／10bit AV1／BT.2020 PQ。mpv 当前配置及最小／fast、复制／直接／零复制硬解、关闭 VSync、Vulkan、禁脚本与纯解码对照共 13 个独立 mpv 会话。全部关闭；源文件与活动配置不变。
+
+当前 8k-fix 成功选择 d3d11va，Shader／vf 为空，插值／去色带关闭。最小与轻量路线仍丢帧，copy 更慢；Vulkan 与 vo=null 硬解请求回退软件，不能算有效硬解对照。PDH 单次播放器 Video Codec 引擎约 99.6%，低 CPU；预热后的两次禁脚本播放仍明显掉帧。独立 gyan FFmpeg 2026-08-09 工具纯硬解 GPU 帧输出 null，起始快进预解码等待单独剔除，末段约 45.3fps，低于59.94fps；不是所有显卡／驱动／8K素材的普遍硬件上限证明。
+
+新增 docs/modernization/8K-AV1掉帧排查.md，列出实际时长、推进与掉帧差分、渲染 pass、方法限制和处理建议，与色彩路线互链。原始数据／日志位于 tmp/modernization/，不分发个人路径及历史信息。优先建议 4K HDR60 或离线单独转换；未转码、未改驱动／Windows HDR／默认渲染精度，未提交／打包／发布。
+
+## 2026-10-04 19:45 — VS Renderer-Player 1.0.4 同步与观感调查
+
+只读核查用户提供便携包文档和 player.ini：3FP 核心／解码、预解码开启，文档说明原画直通与 VS 增强不同，增强路径有最新目标帧调度／自动降载；不能直接套用到本次原画 8K。包使用修改的 API14 3FP，源码基点获取失败，未把其他版本阈值冒充其实际实现。未启动 VS GUI 或修改其 INI，实际 GUI 呈现帧率／节奏尚未测量。
+
+随包 FFmpeg 对同一片源纯硬解末段约45.2fps，前轮工具约45.3fps；没有证据证明 CLI 解码器突破60fps。独立 mpv framedrop=no 为零掉帧但墙钟10.10秒推进7.56秒，内部 avsync3.59秒，测试ao=null不能当听感测量。发现8k-fix强制audio覆盖启动display-resample；作废首轮显示同步对照，加载后IPC重设再验证，实际display-resample、165Hz，10.89秒推进8.84秒、VO丢帧增502，吞吐问题仍在。
+
+新增 docs/modernization/VS播放器同步策略对照.md，与8K报告互链；原始数据tmp/modernization/vs-player-audit/。解释均匀低帧率、缓冲、降载与完整60fps的区别，不断言VS观感必然来自不同步。后续拆开8K硬解选择与同步策略，实测GUI唯一帧呈现／时钟／间隔分布。活动配置及视频未改，全部测试播放器关闭，未提交／打包／发布，先前工作区修改保留。
+
+
+## 2026-10-04 21:14 — 色彩准确路线软件实施与本机验证
+
+- 用户授权「推进并完成色彩准确优化路线」，继续实施而非只读规划；保留原着色器／视频滤镜及画面分类，没有重新设计一级菜单。既有未提交改动不回退。
+- 新增 color-target.lua／color-target.conf；菜单三种实现共享 input.conf 的五个色彩入口。SDR／可信系统 ICC、受能力门禁的 scRGB→PQ→SDR、有界协商、重复点击幂等、切片旧结果失效、跨屏重检、只恢复本系统拥有的值。HDR 状态仍标实机色准待测；不可定位流拒绝需要重建的 HDR 路线。
+- profiles.conf 的 HDR2SDR 对比度恢复 0.30→0，观感值留作 HDR-Contrast-Optional；8k-fix 保留 auto-safe，删除强制 video-sync=audio。旧 hdr-mode 默认不启用观察器，手动启用时按 PQ／HLG／DV 检测并委托新管理器，暂停有界等待、切片取消、只恢复自行改变前的系统 HDR。状态页分源／有效输入／滤镜输出／实际渲染目标与系统报告，不能确认的交换链／动态 HDR 执行标未知。
+- 调试发现直接逐项改 D3D11 选项会多次重建 VO，产生格式错配及 HEVC 参考帧错误；apply-profile 单次也不能避免参考帧丢失。已用暂停状态＋暂撤原视频轨＋目标写入＋恢复视频轨的事务修复，最终模拟能力协商日志无 GPU／解码错误。早期 .4 秒回退检查不稳定，改为有界状态等待，后续回归通过。真实 HDR 硬解与远程重建仍待覆盖。
+- 验证通过：132 Lua／28 Python；test-color-state（含未知／不可定位门禁、重复点击、写入失败、两级超时、旧回调、所有权、状态提示保持、视频轨／暂停恢复）；test-hdr-lifecycle；五类编码素材 validate-color-target（原生菜单新入口、SDR／ICC／恢复、源标记保持、实际 SDR 门禁、模拟能力实际 F16 scRGB 与回退，日志无错误）；RGB16 GPU PNG 1024 灰阶保留、最大采样码误差 0；10bit full／limited 端点；PQ／HLG／负值／FP16 数学参考。现有增强菜单、普通 HEVC10 硬解／音频／双字幕／HTTP 文件回归通过；git diff --check 无空白错误，只有已有 autocrlf 提示。
+- 夹具初版 FFmpeg 的隐式范围转换曾污染端点，已固定输入／输出标记并验证无损解码 Y 为 0、64、940、1023。范围结果 limited=0/0/65534/65535，full=50/4150/60268/65535；这是 GPU 截图结果，不是显示仪器或线性纹理回读。
+- 交付 docs/modernization/色彩优化实施与验证.md、color-validation-results.json、color-upgrade-manifest.json，更新路线／3FP核查／实施报告／同步报告／升级回退与 README；components.lock 新增色彩本地策略及许可。快照 backup/color-accuracy-20261004-203559/，五个原文件可单独恢复，移出新增管理器／选项，组件锁只撤 color_management，不全仓库 reset。
+- 完成范围：P0／P1 软件和本机功能完成；P2 按需诊断、数学／GPU 截图及范围工具完成，未取得原生线性纹理回读；P3 HDR 面板／仪器／NVIDIA／Intel／完整 DV、动态 HDR 仍待外部验收。未进行 3FP／Windows 播放器 HDR 同机色准排名；不把 SDR 或模拟能力结果认定为 HDR 色准通过。
+- Git：本轮开始 git pull --ff-only Already up to date，master／origin/master 仍为 7e302f8（v1.5.7）；工作区含本轮及既有修改，未提交。无打包／发布、无《发布流程.md》修改。需要保存既有差异后再按逻辑提交；版本不升，不更新版本迭代记录。
+- 下一步：按报告外部表取得 HDR 显示器和测量条件，先完成原生线性回读与 HDR10／HLG 亮度／色块，再测多 GPU／真实拒绝／远程硬解重建与完整动态格式；VS GUI 帧节奏仍待实测。发布必须另走发布流程及 Gate。
+
+
+## 2026-10-04 21:23 — 简化 ICC 用户提示
+
+- 按用户要求移除色彩选择后的 Windows ACM 核查／可信性长提示；ICC 仅显示「色彩目标：系统 ICC」，状态页不再要求用户确认可信，菜单简化为「SDR · 系统 ICC」。技术核查依据留在维护文档，色彩设置与能力门禁不变。
+- 同步原有故障回归的 ICC 预期及配置校验值。工作区原有未提交修改保留，未提交／打包／发布。
+- 验证：色彩状态故障回归 PASS；git diff --check PASS。
+
+
+## 2026-10-04 21:44 — 暂停 VS 对比，清理归档与项目架构整理
+
+- 用户确认顺滑表现来自作者内部测试版本，并非已下载的 VS Renderer-Player，取消当前性能测试；没有启动 VS GUI、没有新 GUI／性能采样。此前尝试 Computer Use 发现原生接口不可用，用户明确禁止后没有再使用；后续不借 GUI 数据推断内部版。对照报告追加暂停及版本边界。
+- 本轮先读 AGENTS／STATUS／Git 与当前目录，git pull --ff-only 返回 Already up to date。既有现代化、用户窗口／徽标和 .zcode 差异保留，没有 reset／提交／发布。
+- 检查引用与现有构建源确认 mpv/fonts.conf 与 shinchiro 原始包逐字节相同，是字体支持目录，不能清理；便携 Python／VS 和其锁定运行库、四种诊断 BAT 原编码、关联脚本、开发备份及 v1.5.7 release 保留。
+- 使用 PowerShell LiteralPath 原生搬移，先验证所有源在工作区、目标在指定 backup／trash 归档内、无覆盖目标和根级目录链接。185 项归档：tmp 原先 131 文件＋50历史目录；误生成空 $gateDir、_nul 和个人 dxdiag 诊断；过时 installer/configure-opengl-hq.bat。没有永久删除。普通文件逐个搬移前后 SHA-256 相同；目录整体移动，未递归计算内容哈希。
+- 用户级归档 backup/project-cleanup-20261004-213930/，含 archive-manifest.json；过时 BAT 到 trash/project-cleanup-20261004-213930/installer/。原报告中的旧 tmp 路径按清单映射到新位置。tmp 根仅保留 modernization，本轮研究／夹具／原始证据仍可用；不公开个人日志／诊断数据。
+- 新增 docs/项目架构.md、tools/README.md，更新 README／AGENTS 目录职责与当前支持，强调根运行库保持加载路径，活动配置只有 portable_config，开发／用户备份分开，tools 与 docs 和 doc 各有职责。本轮没有挪动构建入口或修改《发布流程.md》。
+- 验证 PASS：185 项源／目标存在性和文件校验、字体与 shinchiro 包一致、文档链接；check-modernization：132 Lua、28 Python、Shader／退役入口、统计／用户选项／徽标／发布流程；普通 HEVC10 硬解、静音音频设备、双字幕、DRA 预览、HTTP 文件；git diff --check 无空白错误。测试进程正常结束。
+- Git 仍 master／origin/master 7e302f8（v1.5.7），工作区不干净，含此前未提交修改及本轮文档／旧 BAT 删除。未打包／发布，版本未变。后续发布须复核退役入口与前轮组件 Gate；性能对照恢复前需取得对应内部版本、明确用户授权继续测试。HDR／多 GPU 等原未测验收仍待设备。
+
+
+## 2026-10-05 00:34 — ChouKaguya 8K AV1 软解回退修复
+
+- 用户询问 Downloads/ChouKaguya432048-Part.mkv 为何回退。读取实际 mpv 解码信息：AV1 Main、7680×4320、47.952fps、YUV42010、limited、BT.709／BT.1886 SDR，容器 111.874 秒；不是 HDR。源文件未改。
+- 首帧最小 d3d11va／copy 均成功，完整配置却在首帧后 8k-fix 改 hwdec 后出现 Invalid repeated frame header OBU／Failed to read packet，硬解失败后转软解。禁脚本短测和初始 auto-safe 不回退，体现时序竞态，不能把短首帧通过当完整功能通过。
+- 首次尝试 current-tracks/video/demux-w 条件仍迟到，真实回归失败；on_preloaded 实测 current-tracks 空而 track-list 尺寸已知。最终新增 hwdec-select.lua（MIT），on_preloaded 按可确定轨道尺寸写 file-local-options/hwdec。保留主配置 copy；显式 no／其他后端、非 D3D11、普通视频、未知尺寸、多轨 auto 不覆盖。旧 8k-fix 保留手动配置组，移除自动条件。
+- PASS：真实完整配置三次启动、30 秒精确快进、普通文件回到 d3d11va-copy、切回保持 d3d11va，日志无硬解错误／软件回退，选择发生在尝试硬解前；模拟作用域与用户后端保护；check-modernization 133 Lua／29 Python 与引用、用户选项、徽标、发布流程检查。
+- 备份 backup/hwdec-startup-20261005-002656/profiles.conf。报告 docs/modernization/8K-AV1硬解回退修复.md 和 hwdec-upgrade-manifest.json；更新工具／架构／回退文档与 components.lock 本地时序策略、当前色彩清单哈希。根运行库／色彩／同步默认未改。
+- 初始 ffprobe 在本机 ffmpeg 目录及旧 VS 路径不存在，未下载替代工具；改用 mpv 实际帧信息确认位深色彩。独立 FFmpeg 探测显示 pixel format 未指定，未据此误判不支持。没有使用 Computer Use，也没有恢复 VS 性能对照。
+- git pull --ff-only Already up to date；master／origin/master 7e302f8，保留既有未提交改动，未提交／打包／发布。原始日志可能含目录播放列表，不公开。此修复只保证本机当前初始化回归，不宣称任意 8K 实时吞吐或全显卡支持。
+
+
+## 2026-10-05 10:21 — VS 1.0.5 正式包与 mpv 性能研究
+
+- 用户重新授权以正式包和 ChouKaguya 8K AV1 片段继续对照；未使用 Computer Use。隔离解压 tmp/modernization/vs105，未覆盖已安装播放器或正式 INI、未修改视频或播放／显示默认设置。读取 AGENTS、STATUS 与既有调查；本轮开始 git pull --ff-only Already up to date，master／origin/master 7e302f8。
+- 原包 SHA256 f2c80dd377e667b5cc64d3a1801219d0d15ec5a5fbbef4bd4f4a93b74a7e7c9d；实际 FFF.Native.dll 094c19e0658235dafa0c5b5d46e59c211c9390632c71794aad45e4dcfe95de50／API16，区别包内后续文档 FF49CFC 构建。取得官方 GitHub 420dd3ee 源码的 perf-3fp／ThreeFpApi ABI 和 MIT 许可，只使用该实际 DLL。
+- 新增 benchmark-playback-compare.py、benchmark-vs105-native.py、benchmark-vs105-abi.py，创建自有可见 HWND，真实音频时钟／DXGI Present，以 IPC／C ABI／PID 级 PDH 测试，未操作 VS GUI。基础客户区 1280×720；完整 mpv 保留窗口脚本约1238×696。每组3次、15秒位置起约20秒墙钟，共39次，全部探针已退出。
+- 实测：完整 mpv 硬解基本实时，复测新增掉帧0/0/7（探索6/0/0）；基础硬解0/0/0；准确sRGB补测1280×720、三次0/0/0、进度约1.000、GPU passes约6.61ms。所有硬解样本 d3d11va，解码掉帧增量0，无软解回退。3FP默认Jinc净接受25.26fps、双线性25.73、D3D11原生30.65；请求tearing+pacing后Jinc26.65，未恢复实时。强制软解mpv约0.598倍／12.30核，3FP约0.612倍／12.50核、净接受14.71fps。
+- 3FP Present等待约28–38ms，解码计数接近源fps而接受帧显著少；不能仅归因Jinc或同步选项，也不能凭计数定位驱动／DWM具体机制。样片为SDR；交换链10bit不等于物理显示8bit或处理中间FP16，不作HDR／色准排名。GUI Qt、字幕、自动VS增强／降级及物理扫描未测，不能宣称完整 vs-player.exe 全面不如mpv。
+- 证据：docs/modernization/VS-1.0.5与mpv播放性能对照.md；原始JSON分别在tmp/modernization/vs105-results、vs105-controlled、vs105-color-matched，汇总vs105-comparison-summary.json。PDH未采集的早期轮次没有补造GPU数据。软解IPC高负载实际14–15点，用真实墙钟差；初次按每组21点的审计断言失败，核对为采样延迟后改按有效时间／模式／尺寸验证，39次元数据与解码掉帧不变量通过。
+- PASS：check-modernization 133 Lua／32 Python、Shader／弹幕活动入口、统计、用户既有选项逐字节、徽标、发布流程；新工具 py_compile、git diff --check。tmp包与结果受gitignore保护。仅新增维护工具／专项报告并更新tools README和记录，保留原未提交变更，未提交／打包／发布，版本不变，《发布流程.md》不变。下次如继续GUI／PresentMon／长时／HDR对照，应先明确口径和可用非CU统计接口；不替换此包为内部版本。
+
+
+## 2026-10-05 10:28 — 对齐作者性能验收条件
+
+- 再次对齐作者两套记录：4070 Jinc为1080p／4K→8K，780M 8K→4K的零掉帧使用204f2a37候选DLL（纹理slice直用、保留队列、三缓冲／有效两帧排队），并非本包094c19e DLL；候选明确不自动发布。780M为4K60Hz／算法519／120秒起60秒窗口，本轮1080p165Hz／原生算法7／片段10秒起20秒窗口。不同哈希不能独自证明缺某补丁，需构建核对。更新专项报告，收窄同步开关结论，不断言作者错误或3FP固有性能落后；作者同条件mpv也零新增掉帧。无新增播放试验或配置改动。
+
+
+## 2026-10-05 10:33 — 正式DLL继承关系与8K测试澄清
+
+- 用户指出正式DLL可能为昨晚候选的后续迭代，重新核查支持此可能：PE UTC 2026-10-04 17:09:46（本地10/5 01:09:46）、PDB build/bd-native-source，二进制含性能补丁的GPU_PROFILE／PRESENT_PROFILE和UTF16 VSR_3FP_PROFILE。不能按不同哈希／候选未自动发布推断未继承修复。确认用户所指780M确实测8K辉夜姬原片；4070较低分辨率→8K为另一组测试，不应混用作解释。
+- 新增一次算法519、VSR_3FP_PROFILE=1的路径诊断，无CU。20秒净接受29.80fps、0.917倍、287掉帧、VideoProcessor模式1；包含预热日志平均GPU上传0.000635ms、合成30.94ms、Present CPU30.73ms。说明已有诊断／上传优化相关实现，未证明全部补丁和精确提交继承；合成含调度等待，开启诊断数据不替换原39次三轮成绩。结果tmp/modernization/vs105-lineage/native-519-profile.json/.log。更新报告澄清版本解释和片源，未改配置／工具，测试进程已正常退出。
+
+
+## 2026-10-05 10:52 — VS1.0.5丢帧阶段诊断
+
+- 用户要求定位VS1.0.5具体丢帧环节并解释780M／RX6600差异。新增QPC稳定段边界、输出尺寸／质量参数和显式headless控制；新增analyze-vs105-stages.py统计区间均值／P95／PTS跳跃／计数闭合，更新tools README及专项报告。
+- 新增4次诊断：519的720p／1080p、513的720p、无渲染呈现硬解控制。稳定段解码／接受／丢弃分别873／604／270（队列-1）、896／603／293、918／516／402、964／964／0；全部计数闭合、合并增量0。720p提交PTS缺失270与掉帧一致。公开PlayerSession迟到判断在渲染提交前，容差max(2帧,50ms)，结合VS补丁与实测支持后解码迟到丢弃；精确DLL源码映射未取得，不宣称源码行断点追踪。
+- 稳定段：519 720p GPU上传0.00052ms／合成37.13ms／Present CPU等待28.25ms P95 73.38ms；1080p仍约30fps。513 GPU合成9.66ms但Present37.48ms P95 96.91ms，约25.66fps。GPU区间含共享上下文依赖，不能当纯shader耗时或与CPU等待相加。可见组音频欠载31–43，headless 0。
+- 同DLL headless硬解控制47.955fps、1.00005倍、0掉帧／0欠载／0DXGI Present；这不是可见播放成绩，与已有mpv实时结果一起定位渲染／呈现背压，反驳简单硬件解不了8K48解释。具体VP／解码共享队列／驱动／DWM等待仍需ETW或匹配源码计时，不把问题全部归给某个API。
+- RX6600驱动32.0.21045.5002，780M作者32.0.21030.2001；AMD官方资料区分媒体能力与3D规模，RDNA2／RDNA3不能直接推出视频性能胜负。活动主显示为RX6600的ASUS，GameViewer虚拟输出均未连接桌面；没有因此乱归因虚拟适配器。
+- 原始与分析：tmp/modernization/vs105-drop-stage/*.json/.log/*-stages.json；4组元数据／计数断言通过，新工具py_compile，check-modernization 133Lua／33Python等通过。测试进程正常退出，无CU／驱动变更／刷新率变更／配置改动。工作区仍master未提交且保留既有修改，未打包发布。
+
+
+## 2026-10-05 11:29 — VS／mpv ETW呈现探针
+
+新增独立PresentMon ETW采集、QPC稳定段分析和mpv呈现对照工具，完成5次采集。VS原生两次Present间隔约32.6ms，mpv准确SDR基础配置约20.85ms；已提交帧几乎均有显示事件。VS实际切换到Independent Flip、SyncInterval=0、允许tearing后仍约30fps，说明普通DWM合成不是充分解释；主要损失仍是提交前迟到丢弃。所有组未发现HybridPresent。
+
+mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增丢帧均为0；启动预热前已有58个输出丢帧，未宣称全程零掉帧。VideoBusy字段双方均为0且不可信，不能据此拆出解码耗时或把进程GPU忙区间当纯Shader成本。完整VS界面、实际光学输出与780M同条件复现仍未验收；下一层需帧ID／纹理slice／VideoProcessorBlt／GPU栅栏／Present／帧延迟等待关联探针。
+
+官方PresentMon v2.6.0校验值、原始CSV、JSON、会话及命令证据在tmp/modernization/vs105-probes/；未安装服务，未提升权限，仅读取目标PID且只停止自己的随机ETW会话。首次自动退出等待超时但CSV有效，已修复主动结束自己会话；其余4次返回码均0，无遗留会话。check-modernization通过133 Lua／36 Python及引用／用户选项检查，git diff --check通过。报告和tools/README已更新。默认配置、驱动、刷新率不改，未使用Computer Use，未提交／打包／发布，既有工作区修改保留。
+
+## 2026-10-05 14:06 — 持续追踪解码表面与图形队列依赖（尚未完成根因收敛）
+
+- 用户要求继续直至根因明确；本轮不以“呈现慢”结束。新增trace-vs105-calls.py/.js、analyze-vs105-calls.py、trace-vs105-gpu-etw.py、query-gpu-nodes.py、query-amd-metrics.py，并扩展两个原生／mpv测试宿主的可选暂停复制和只读AMD传感器。Frida17.22.1仅放tmp/modernization/vs105-instrument/deps；固定FFF二进制调用点要求094c19e…哈希，运行时改写只在自己的测试进程，不改磁盘DLL。
+- 最关键因果对照：Shader保留全部Draw、跳过Copy为47.953fps／963解码963接受0丢帧0欠载；保留Copy跳过Draw24.17fps丢458；只复制64×64仍23.13fps丢495；原生跳过VPBlt47.969fps／964解码964接受0丢帧0欠载。跳过像素处理均为无效画面控制，不能当可用优化。完整逐调用Shader基线23.02fps，Present均值40.97ms，AMD内部NtWaitSingle P95 84.39ms；跳过复制／VP后长等待消失。
+- 完整像素策略未修复：目标绑定520→8、源绑定520→512、纹理池22→12、Copy1 DISCARD＋目标SRV、实际设备Latency3→2、解码后／复制后Flush、复制移到Render接收阶段均未恢复实时。独立22纹理确实接入decoder view和输出Frame，源描述变Array1，却降7.76fps，未验收图片，不能当修复。早期独立纹理挂错VideoDevice索引5，后来修为7并加22纹理激活检查；旧无效数据保留但排除。
+- 显式复制完成等待：Present8.52ms、CopyCompletionWait49.02ms、16.80fps、进度0.666倍；显式解码完成等待：Present7.45ms、DecodeCompletionWait22.68ms、31.37fps、进度0.729倍且欠载168。等待位置转移不是成功。Pause后100次相同完整8K复制＋GPU完成查询平均4.00ms/max5.87，64×64均值0.96ms；暂停前后decoded708/presented293/presents295/时钟不变。支持持续解码和图形读表面的重叠依赖是主要长等待来源。
+- DxgKrnl独立会话成功，无需改权限；WPR GPU失败0xc5585011未改策略。shader-gpu-etw.etl174MB，tracerpt XML约1.825GB（外部工具编码原样保留），1,605,056事件／ETL丢失0，部分XML schema无法解释事件保留RawData。解析到tmp内gpu-queue-summary.json，解析代码本轮为内联，尚未做可复用分析脚本。QPC锚为首CalibrateGpuClockTask CpuClock和TimeCreated差值，按目标PID31904／Context稳定段筛选。同RX适配器PDH映射node0=3D、14=VideoCodec；图形排队66.82ms，视频49.53ms；已匹配0等待14为480次、14等待0为209次，尚有unknown来源。DMA跨度可能包含等待／抢占，不当纯GPU忙时长。全关键字追踪有开销，不能替代正式成绩；后续收窄关键字再对比mpv。
+- Local预算7378MiB、目标用量最高2142MiB，未见该采样段预算耗尽。等待栈仅amdxx64模块偏移，无私有符号，不能命名内部驱动函数。实际源P0107680×4352 Array22，复制可见7680×4320；不再追究错误复制高度。
+- mpv同COM探针：前几次未捕获Copy1是SetMultithreadProtected切换入口后漏刷新，不能据此说mpv零复制；已刷新Context1索引115。有效mpv-copy1-refresh：476次Copy1＋476次Present，源Array14 Bind520、目标Bind8、flags2，输出和解码新增drop0，进度1.0019，Present6.09ms。双方CreateVideoDecoder描述28字节和Config100字节逐字节一致。mpv设备创建flags0，VSflags32；去掉VS BGRAflag仍20.43fps。禁用VSR_3FP_PROFILE仍22.37fps，不是该原生诊断开关独自导致。
+- 当前正进行AMD驱动只读PMLog采样对照（shader-amd已完成，mpv-amd正在运行；不调用Setter），补查实际图形／内存频率与功耗；VCN传感器当前不被驱动支持，不能把缺失当0或已读出媒体频率。随后继续解码／提交节奏、资源生命周期与GPU队列比较，尚无能保留有效画面恢复实时的修改；不要声称根因已确定到源码行或修复成功。
+- 专项报告与tools README已补逐调用／GPU队列和实验边界。14:06 check-modernization通过133 Lua／41 Python，node --check通过，git diff --check通过（既有Git autocrlf提示不改变实际文件编码）。仓库master与origin/master仍同步，已有现代化和用户修改未提交且保留；不提交、不发布、不打包、不改发布流程，不使用Computer Use。下一步需要继续，不要求用户重新批准。
+
+## 2026-10-05 16:17 — 8K队列预算根因与完整处理复测
+
+- 正式094c19e DLL反汇编确认RVA 0x9310是128MiB／单帧估算并限制2–8帧，预算指令RVA 0x93ba。8K P010约94.92MiB，落到两帧下限；公开源码饱和条件queueLimit-1。原快照队列0–1帧。
+- 仅进程内修改预算到398131200字节形成四帧上限，不跳过Copy／Draw／VP、不改原文件／系统设置。原预算Frida对照22.9486fps丢487；重新加预算47.9480fps零丢帧。无Frida原预算26.8188fps丢380、欠载32。
+- 无Frida完整Shader三轮47.9858／47.9573／47.9486fps；VP三轮47.9615／47.9737／47.9426fps；六轮丢帧／合并／音频欠载0，解码与接受闭合，时钟1.00005倍。原生宿主可直接--video-queue-limit 4；核验SHA、原指令、保护恢复／指令缓存刷新。进程退出回退。
+- 新双QPC标记ETW原预算VS／mpv图形队列66.73／3.89ms、视频队列50.01／13.57ms；修改VS后3.12／11.07ms，事件600733丢失0、帧962/962/0、音频欠载0。DMA视频跨度39.06→37.56ms不作为纯运算耗时；结束残差21.2µs在包络内。
+- 旧CalibrateGpuClock配对约263ms锚点差异，未核验窗口；分析器默认拒绝旧锚点（显式兼容例外）。精简无标记试跑无效。工具新增独立标记、TDH ID查询、ID过滤；解析XML与性能采集串行。
+- 不成功的控制：复制后释放帧引用14.27fps；GPU优先级7、宿主mpv.exe名称、20ms解码节流均不恢复；外加负载提高GFX频率仍慢且竞争GPU，不能据此排除所有DVFS。驱动ADL不提供VCN频率。完整实验详见播放对照报告。
+- Frida加载阶段挂钩偶发卡住的试跑均排除并停止自有进程；预算实验迁移到宿主在DLL加载完、设备创建前直接改内存。原DLL SHA复核未变，不留下运行中的测试进程／会话。
+- 已确认本机具体触发策略和有效缓解，未交付替换DLL，不声称GUI／HDR／其他片源通过；780M不同驱动和环境为何不触发需外部同包复现。建议上游区分硬件引用与软件图像队列预算，保留表面池余量和有限时间提前量。mpv不加入此补丁。
+- 本轮无提交、打包、发布、驱动／刷新率变更，既有工作区修改保留。验证结果见后续核验记录。
+
+## 2026-10-05 16:35 — 默认Jinc与跳转回归补齐
+
+- Jinc原预算24.6626fps、丢427／欠载30；四帧限制三轮47.9409／47.9776／47.9536fps，新增丢帧／合并／欠载均0，正常时钟。持续播放有效缓解覆盖默认Jinc、双线性Shader及VP。
+- 新宿主--seek-cycle：稳定段第6秒请求媒体60秒，记录控制事件和阶段；含控制事件的逐调用／GPU分析器拒绝直接整窗归一。原／四／八帧均约2秒目标位置等待，不能判为队列修改新引入问题，也不凭快照证明扫描画面。
+- 媒体65秒后，原预算22.9822fps、新增丢381／欠载30；四帧47.9995fps、八帧47.9473fps，恢复段丢帧／欠载0。过渡四帧新增丢95、八帧33（各一次，非三轮对比）；仍不能称为完整启动／seek修复。未出现持续失败状态或软解回退。
+- 验证：45份tools Python／VS vpy语法、Frida JS语法、git diff --check通过；磁盘DLL SHA仍094c19e…。本轮不改Lua，既有Lua验证结果不冒充重跑。没有打包／发布／外发消息。
+- 后续仅在需要可交付的上游修复时：基于准确源码重构硬件引用队列预算并验证启动／seek、不同片源和HDR；已有本机根因及缓解证据已闭环。不要再次停在“Present慢”，也不要把未知AMD私有函数命名为确诊驱动缺陷。
+
+## 2026-10-05 17:10 — 色彩准确与播放性能继续优化研判
+
+- 用户要求先研判并汇报概览，再研究SDR／HDR色准、性能、兼容及健壮性；用户明确面向公开配置、多种硬件、稳健默认与可选模式。本轮不实施播放配置变更，不要求额外确认研究工作。
+- 读取AGENTS、HandShake、STATUS快照与专项报告；docs/codex/INDEX.md不存在，直接沿STATUS工作。git pull --ff-only已是最新；master与origin/master同步，工作区既有大量现代化／用户修改保留。
+- 新报告：docs/modernization/色彩与性能继续优化研判-20261005.md；公开证据：continued-audit-results-20261005.json，含本次被测活动文件SHA-256。原始探针与隔离日志在忽略tmp/modernization/continued-audit-20261005及validation，不公开个人日志。
+- 六个状态探针复现：同目标HDR切集重建、恢复写入失败仍报可用且丢失重试基线、重复选择不检查外部改写、HDR支持标记变化未使能力签名失效、增强reset覆盖后续同步修改、专家Shader入口未经过推荐HDR保真门禁。专家差异不等于证明Shader错色；夹具不等于HDR实机故障。同模式target-trc漂移在真实IPC复现。
+- 四组已有Lua回归、color-reference数学通过；check-modernization检查133 Lua／46 Python及引用通过，静态历史stats核对不算重跑性能测试。五类隔离软解素材SDR↔ICC切换源属性保持；640×360 HEVC10两条D3D11VA路径启动／跳转保持，日志无错误。均无HDR面板色准、新4K性能基准或提升百分比结论。
+- 直接配置发现：常规色彩快捷入口绕管理器、HDR菜单术语不精确、持久化仍含vf。当前本机持久化vf为空，映射／参考白auto，不能声称实际已受残留滤镜影响。
+- 路线：先修恢复与错误汇总／同目标免重建／状态漂移／增强所有权，再收敛常规菜单与持久化；随后三轮测直接与copy硬解、缩放和峰值候选；HDR面板、多GPU、动态格式与长时测试独立验收。保留高精度颜色解释，不将VS的进程预算补丁当mpv通用设置。
+- 未改活动配置、脚本、核心、驱动、Windows HDR、发布流程或持久化用户文件；测试全部使用隔离no-config与独立IPC，不加载persist_properties。自有播放器正常关闭。git diff --check通过，既有autocrlf提示未转换实际文件；无提交、打包、发布。
+
+
+## 2026-10-06 21:28 — 滤镜恢复、色彩状态与播放性能计划实施完成
+
+- 承接已批准计划与 HandShake；保留既有脏工作区。master 与 origin/master 同步、发布仍为 v1.5.7；不执行提交／打包／发布，不修改发布流程。
+- `quality.lua` 统一直接启用：四个旧硬编码禁用菜单恢复；真实初始化、具体 traceback、失败恢复前链、取消／切集／新选择令旧回调失效。普通流程没有组件扫描、显卡名核查、整包校验或模拟帧子进程。HDR／广色域／倍率只提示；VS 并发请求 4；上游变化重建已有补帧，保留降噪→超分→补帧与 Shader 组合。
+- 通用 RIFE 使用 ORT／DML，不依赖缺失 core.rife；STD／NCNN 的失败只影响实际 STD 选择。保留 4.25 Lite，新增 DML／TRT 的 4.26／Heavy；DML 三模型实际播放通过，NVIDIA 路线未冒充验收。
+- 新 `color-target.lua` 自动匹配已知显示目标，未知用 SDR sRGB；手动／外部覆盖会话内保留，主动重选可重新应用、恢复自动匹配可解除覆盖。恢复失败保留选项和播放轨道重试基线，重建／定位失败事务回滚；同目标切集无撤轨。切集取消旧定位恢复。ICC／峰值按显示身份及桌面 HDR 模式保存，手动 ICC 换屏也不沿用另一屏的记录。
+- 更新 input.conf、quality_status、hwdec-select、profiles、persist_properties 与脚本选项；更正 HDR 输出标记／峰值分析、精确跳转的含混标签。移除跨启动临时 vf／片源修正，保留用户历史 JSON；长期偏好保留。禁用增强时只恢复仍等于最后写入值的同步／插值／去色带，失败显示错误并可重试。
+- 本地组件 K7sfunc 1.3.1→1.8.1、VSORT v15.16 配套依赖、zsmooth 0.20.0 generic x86_64（MIT 原许可证留存）。ORT 1.23.0、VS R73、TRT v15.14 保留；旧 SVP flow2 4.3 与现用 4.6 重复加载，旧 DLL 移入本地 backup。维护清单 31 个改动相关条目与实际哈希相符，全部登记路径存在，不成为用户播放前核验。
+- 功能验证：test-quality-state.lua、test-color-state.lua（含持续轨道恢复失败重试）、test-hwdec-select.lua、test-hdr-lifecycle.lua 通过；test-quality.py 11 实播案例与四类组合至少 20 秒正常推进；validate-quality-menu.py 完整菜单／十二 Anime4K／HDR广色域允许选择／清空隔离通过。ArtCNN 首次编译约 24 秒，测试允许真实初始化时间，不增加模拟预热。
+- 色彩验证：validate-color-target.py 五类实际素材 SDR8／10、广色域 SDR、HDR10、HLG，实际 scRGB FP16 软件协商、外部覆盖与重选通过；test-color-preferences.py 两次启动、显示 UID／桌面模式隔离、ICC 换屏及同目标无撤轨通过。validate-color-ramp.py 16bit GPU 截图最大码值误差 0、1024 灰阶；validate-color-range.py 10bit 全／有限范围端点通过，不等同仪器或中间纹理测量。
+- 完整配置 test-playback-compat.py：HEVC10 D3D11VA、WASAPI 静音设备、双字幕、HTTP、菜单／徽标通过；test-playback-sizes.py 720p60／1080p23.976／2160p30 通过，均用 isolated-config.py 防止污染用户历史与持久设置。
+- benchmark-playback.py 同 4K30 H264＋AAC／1080p165Hz SDR，预热 5 秒、至少 20 秒、三轮交替：direct／copy／低功耗／高质量 CPU 单逻辑核心百分比中位数 6.586／17.104／5.678／6.095；显示掉帧分别 0,10,0／42,300,56／0,1,0／6,26,21。copy 一轮发生一次真实音频欠载（两行日志）；媒体时钟正常，解码掉帧全部 0。直接硬解 CPU 相对 copy 下降约 61.5%，默认推广 auto-safe；保留正常 GPU 表面复制，不默认零复制，不自动降低画质。高质量保留手动。
+- `benchmark-playback.py --verify-direct` 补三轮相同条件逐半秒稳定性核查，全部零显示／解码掉帧、零音频欠载／错误，时钟 0.9984～0.9992；持续掉帧增长断言通过。
+- benchmark-peak-seek.py：640×360 HDR10→SDR 峰值 auto／no 各三轮至少 20 秒、掉帧 0；CPU 中位数 6.362／0.614，关闭改变映射故保留 auto。长 GOP 五次精确定位、各三轮，中位数 no／yes 0.138／0.075 秒，缺 SVP／音频组合验收，暂不推广。benchmark-startup.py 管理器／相同完整配置去除管理脚本各三轮，就绪中位数 0.586／0.585 秒，冷缓存差异明显，无稳定收益支持额外起播改动。
+- 最终 check-modernization.py 133 Lua／55 Python 语法、Shader 引用、统计与徽标、用户选项逐字节保留、发布流程未修改通过；git diff --check 通过，既有 autocrlf 提示不改变文件 UTF-8／LF。
+- 交付：docs/modernization/滤镜恢复与色彩性能优化结果-20261006.md、optimization-results-20261006.json、README.MD、tools/README.md 与历史报告当前入口。回退源路径清单在 backup/optimization-20261005-before/manifest.json，37 项；含配置、旧 K7sfunc 和旧 VSORT 配套依赖。原始素材／日志在 tmp 忽略目录。测试自有播放器均退出，不终止用户进程。
+- 本机 `mpv.com --no-config --vd=help` 有 AV1／dav1d，没有 AV2；原始列表留在 tmp/modernization/optimization-20261005/decoder-list.txt。
+- 范围限制：真实 HDR 面板色准与 NVIDIA／Intel、动态 HDR／DV 执行、非可定位 HDR 网络流和 1080p／4K AI 实时性能未验收。全部增强可主动尝试，不因此设解锁门槛。下一步仅外部设备验收或用户另行指定；建议提交当前阶段便于回滚，不替用户提交。
+
+## 2026-10-07 16:29 — 播放体验回归修复完成
+
+- 用户决定：固定 59.94fps 目标；达到目标保留原帧，不重复运动估计；只保留全分辨率 SVP；8K 为用户测试素材，明确不纳入此次验收。
+- dynamic-crop.lua：移除未启用检测时的旧硬解警告；实播发现 lavfi 不自动下载 D3D11 帧，改为检测旁路显式 hwdownload＋原 hw-pixelformat，主链 GPU 表面保留。直接／copy／软件／HDR10 P010 实际裁剪及原色／PQ／矩阵／范围保持通过。
+- quality.lua／MEMC_SVP_PRO.vpy：约60fps／更高帧率保留原帧，Lua 普通链不添加 VS；后端也有目标满足时直通；外部帧率改写采用保守实际初始化分支。无模型准备、核验、降分辨率或运动参数降级。外部帧率保守分支覆盖调用测试，未冒充任意外部链实机验收。
+- quality_status.lua／color-target.lua：简洁启用项与详细色彩状态分开，通过 uosc 滚动显示，键盘信息项忽略处理且保持页面；无 uosc 时分页 OSD；截图确认可查看详情末项。input.conf 五个性能入口归入「其它」，取消后台准备改为取消启用。
+- 实播：预热5秒后每轮>=20秒，三轮顺序执行且隔离输入。实际4K约60fps原帧保留、1080p23.976全分辨率SVP、4K30全分辨率SVP全部零显示／解码丢帧、零音频欠载，时钟比分别0.99965～1.00013／0.99967～1.00028／1.00028～1.00085。一次被鼠标暂停干扰的旧轮次已排除。
+- 测试：test-quality-state.lua、test-color-state.lua、test-playback-followup.py、validate-quality-menu.py 通过；新增 benchmark-svp.py 实際完成4K30三轮；check-modernization.py 133Lua／57Python与资源／用户选项回归通过；git diff --check通过。普通起播／选择／菜单日志仍无组件扫描或模拟试跑。
+- 交付：docs/modernization/播放体验回归修复-20261007.md、playback-fixes-results-20261007.json，README和tools文档同步。六个活动文件原件位于 backup/playback-fixes-20261006-before/，含清单。用户播放路径不写入公开结果。
+- Git：master 与已知 origin/master 同步；全部既有脏修改保留；未提交、打包、发布，推荐按功能审阅并提交。版本未变化。真实HDR面板／NVIDIA／Intel等仍未验收。
+
+
+## 2026-10-07 16:59 色彩精度核查与3FPlayer对照
+
+- 用户提供3FPlayer仓库后，按此前色彩准确／处理精度优化范围继续核查；使用HandShake记录，不引入播放前核验。
+- 普通渲染日志确有FP16纹理，隔离sRGB GPU截图现有1024灰阶最大码值误差0；纠正其范围，不能代表完整配置／所有滤镜／HDR面板。
+- 实际FMT_CTRL测试：4208／42010保持；42012／42016／44416均转42010。固定709与2020NCL测试色块RGBS最大分量差0.014399（模型输入，不是最终滤镜色差）。
+- 对应核心VS桥接写_ColorSpace而非_Matrix等字段，并通过_MP_IMAGE保留原图属性；仅检查输出标签会漏掉中途转换错误。
+- 3FPlayer源码固定3fef8eb67d49da6dc92ab265cb67c07768895e5b；HDR FP16 scRGB、SDR8／10bit、像素回读与优化前后等价测试；未构建／执行，未做播放器色准排名。
+- 文件：docs/modernization/色彩精度核查与3FPlayer对照-20261007.md、docs/modernization/color-precision-audit-20261007.json、STATUS与version/工作进度。运行库／播放默认未改；后续修复TODO已补。
+- 验证：手动VS五种格式实际输出帧与矩阵数值，审阅现有截图结果和源码；可选bm3dcuda_rtc.dll初始化错误126已注明，测试不使用该后端。
+- Git：master与origin/master现有状态同步；工作区有既有大量修改，均保留；未提交／打包／发布，无项目版本变更。
+
+
+## 2026-10-07 17:59 源色彩与滤镜精度优化完成
+
+- 用户明确：以理论标准和软件验证为目标，不要求专业测量；模型／后端精度尊重实际支持和体验，不强制高位深导致报错或卡顿。
+- 已应用：K7七文件源矩阵与范围、FMT_CTRL整数YUV格式保留；六个非补帧入口修复源无效时长；八个RIFE入口只回退无效输出时长。模型RGBH／RGBS和推理FP16／FP32不改，SVP8／10主路径不改。
+- 42用例通过：标准矩阵独立复算、格式、真实CCD／RIFE-DML静态色块、有效VFR／EOF属性保留；完整配置五类GPU色块最大码值误差38／1／1／110／98。
+- 16bit CCD＋RIFE长片稳态 20.055 秒，时钟比 0.998323，显示／解码掉帧0；短片循环与跳转通过。短片每次重建模型仍有初始化开销，不将其混入稳态或冒充性能收益。
+- HDR10／HLG增强一致性通过，CCD差异0／0，组合差异0／7；隔离副本暂停真实显示检测以保持模拟能力，实际rgba16hf／scRGB及SDR回退通过，未改变Windows HDR。
+- 最终验证：test-quality.py 11项实际启用／组合／STD缺失回退／无预检子进程通过；两项Lua状态回归、ICC偏好、PQ／HLG数学、133Lua／62Python语法、资源引用与git diff --check通过。
+- 修正测试夹具的输入范围声明并逐字节解码回读；原先偏差来自夹具，不修改播放器色彩默认来迎合错误输入。最初完整配置测试写入的6条本轮测试历史已定向清理并备份，其他历史原字节保留；后续完整配置测试均使用隔离副本。
+- 运行库修改配方与GPL署名／许可、手动应用工具及对应组件摘要已保存；维护工具不接入起播／菜单／选择。三个根backup快照包含原件和清单。
+- 报告：docs/modernization/源色彩与滤镜精度优化结果-20261007.md；摘要color-precision-fixes-results-20261007.json；工具README、STATUS与工作进度更新。原核查报告保留为修改前记录。
+- Git：master与origin/master现有状态同步；工作区 102 条状态含大量既有修改，未覆盖；未提交／打包／发布，未改发布流程或项目版本。
+
+### 2026-10-07 20:22 — FP16 处理链路边界复查
+
+- 同工具延续，沿用 AGENTS.md 与 STATUS 状态；工作区既有修改保留，不重复拉取。
+- 复查十份既有真实 GPU 日志：五类素材×默认／scRGB 均实际创建 rgba16hf、rgb16hf；不是仅列出支持格式。
+- 当前配置无主动低位深 FBO 覆盖；十处低位深 Shader FORMAT 都是辅助 TEXTURE，不误判成主图像 8bit。
+- 区分 GPU 中间缓冲、模型／VS 整数交接、最终输出和系统显示；不能宣称任意组合全程 FP16。上游 fallback 解释与本机二进制证据分别标注。
+- 新增 docs/modernization/FP16处理链路边界核查-20261007.md；无运行配置修改、无新播放器测试、无新增播放核验；未提交／打包／发布。
+
+### 2026-10-08 11:12 — 延续优化：状态修复与独立 HDR 参考（进行中）
+
+- 用户明确继续已讨论的优化路线；应用 HandShake，同工具、同工作区延续，保留既有大量未提交修改，未再次 pull／提交／发布。
+- `quality.lua` 新增真实 video-reconfig 完成事件，修复同帧率 CCD 已工作但显示启用中；`color-target.lua` 原生表去重并将两个未知 NaN 视作相同，短诊断逐帧重复状态广播由数百降至3次。状态／滤镜／精度 Lua 回归通过。
+- 精度详情明确整数有效位深、浮点存储及实际硬解／VS交接；不从最终输出推断全部内部阶段。
+- PQ／HLG 独立GPU参考通过，最大通道误差0.539／0.610 cd/m²；正负分离16bit PNG测量，不是原始FP16、默认动态映射或面板验收。K7补丁已知版本覆盖恢复／只读／幂等／未知版本全量拒绝通过；生产7文件仍为已应用状态。
+- 三轮性能尚未收尾。2轮与手动菜单验证进程区间重叠已排除，隔离留档后串行重测；不同配置、最小化或短诊断均不混入最终三轮结论。菜单功能验证本身通过。4K CCD性能不足已有证据，不自动降低分辨率。
+- 修改前3个脚本已归档到 backup/modernization-20261008-before-handoff，保留旧优化；结果报告当前是草稿，须补齐统计、资源与真实UI／HDR状态回归后方可报完成。GPU测试须串行，当前 benchmark-filter-handoff.py --resume 正在运行。版本仍v1.5.7。
+
+### 2026-10-08 11:57 — 完成滤镜交接与HDR数值优化
+
+- 完成已讨论四项：交接性能与恢复、独立HDR参考、精度可观察性、组件更新补丁保留。没有新增普通流程组件核验／解锁／二次点击，没有强制模型FP16，没有修改硬解／性能档／色彩目标默认。
+- 修复 quality.lua 同帧率已初始化却卡在启用中；color-target.lua 原生字段比较替代JSON键序签名，两个未知NaN视为同一值。18份完整日志状态发布2～4次，真实显示／亮度／覆盖变化仍通过。
+- quality_status.lua 正确加载 render-precision.lua，明确整数有效位深、浮点存储、实际GPU／copy／VS交接，不由最终输出推断全链路。单元与完整配置P01010bit、模拟HDR实际rgba16hf详情通过，简洁／详情截图人工检查通过。
+- benchmark-filter-handoff.py：相同SVP1080p23.976、CCD4K30、RIFE4.26DML640×360HEVC10，直接／copy，各预热5秒后三轮至少20秒；18组54次启停暂停精确跳转，关闭后5秒时钟0.9919～1.0051，GPU／copy原格式、源尺寸、解码器和活动链恢复。SVP和RIFE稳态无显示／解码掉帧；CCD4K两路不实时，不推广；没有统一copy稳定收益，默认保持。2轮菜单运行重叠、旧配置、最小化与短诊断排除留档，最终无GPU维护测试并行。
+- SVP／CCD性能夹具无音轨，不能据零日志宣称音频通过。test-filter-av-handoff.py另用HEVC10＋AAC对两路验证SVP、CCD+SVP、CCD+RIFE、STD缺后端原链恢复、暂停跳转切集与实际精度详情，8个预热后5秒兼容样本时钟0.9955～1.0000，零掉帧／稳态音频欠载。RIFE性能六轮加载／重初始化阶段每轮4个实际欠载事件仍保留；稳态20秒均为零。
+- test-filter-gpu-memory.py三次启停PDH观察：关闭后GPU专用内存SVP约187.8MiB、RIFE77.6MiB、CCD469.3MiB的平台，无持续增长；私有内存有波动，不证明长期无泄漏。VS／DML大部分资源释放，renderer／Python／driver缓存不强制清空；退出无实例不冒充测得零。
+- test-hdr-gpu-reference.py PQ／HLG分别16色块独立参考通过，最大通道误差0.539／0.610cd/m²，固定逐通道阈值0.10+0.002×abs(reference)。正负分离16bitPNG与校准常量读回，非原始FP16、默认动态映射或面板验收。test-color-hdr-config.py HDR10／HLG静态CCD／组合差异0／0与0／7码值，模拟能力实际FP16scRGB及恢复SDR通过；WindowsHDR不变。
+- 维护补丁工具 apply-k7-color-fixes.py 重构隔离root入口；test-k7-patch-update.py验证已知上游覆盖恢复、默认只读、幂等、其它补丁保留、未知文件全量拒绝。生产7文件只读核查均已应用，核心运行库本轮未改。
+- 最终验证：Lua134／Python67语法、状态3项、既有所有权／HDR生命周期、菜单、playback-followup裁剪直接／copy／软解／HDR10及分页、color-preferences身份保存和同目标免撤轨全部通过。git diff --check无空白错误，仅仓库原有autocrlf提示，未改Git设置。
+- 交付 docs/modernization/滤镜交接与HDR数值优化-20261008.md、filter-handoff-hdr-results-20261008.json、tools/README.md；修改前3脚本保存在backup/modernization-20261008-before-handoff含SHA清单，忽略目录测试原件不进公开包。HandShake与中文进度更新；版本仍1.5.7，不改版本迭代记录。
+- Git：master／HEAD f7c6cab，103项工作区变更，绝大部分为此前工作；保留全部既有修改，未pull／提交／打包／发布。建议用户整体审阅后再提交，切换代理／设备前保留本记录。测试进程均已关闭。
+
+
+### 2026-10-08 12:18 — 对照本地改造与 mpv-Yaozhi
+
+- 用户询问大幅改造后与常规整合包（以mpv-Yaozhi为例）的差异；已读AGENTS、STATUS及10月4日至8日专项报告，核查当前mpv.conf、quality.lua、color-target.lua、精度模块与K7补丁配方。旧实施报告是历史行为，以10月6日至8日结果为准。
+- 公开资料：核查Yaozhil/mpv-Yaozhi主分支README与Releases；最新1.0.6-2条目明确为公开版，旧内测条目的“稳定版1.0.2”不作为当前状态。杳知也有自维护核心、原盘导航、沉浸声、AI安全回退和统计优化，不能笼统称为简单脚本堆叠。
+- 本地主要差异：统一显示目标与可信ICC偏好；源矩阵／范围和高位深格式修正；降噪→超分→补帧组合及真实失败恢复；一键尝试、没有播放前组件认证；直接硬解默认及手动性能档；分阶段精度状态与维护回归／补丁配方；退役弹幕而保留字幕。UI／起播徽标保留杳知来源，非独有原创。
+- 结论边界：本地10月改造未进入公开v1.5.7；没有双方同条件性能／色准实测，不宣称全面领先、全链路FP16、4K AI普遍实时或真实HDR面板色准已验收。61.5%CPU下降仅为本机直接／copy对照。
+- 本次未修改活动配置、运行库或安装器，未运行新的播放器性能测试；仅更新本记录与中文进度。git pull --ff-only返回Already up to date；master／HEAD f7c6cab，103项工作区变更保留。未提交／打包／发布，版本不变。
+- 来源：https://github.com/Yaozhil/mpv-Yaozhi/blob/main/README.md 及 https://github.com/Yaozhil/mpv-Yaozhi/releases/tag/mpv-Yaozhi-1.0.6-2 。
+
+
+### 2026-10-08 12:21 — 用户明确项目定位与维护优先级
+
+- 用户明确：对超分、补帧等画质增强不感兴趣；首要关注SDR和HDR下色彩显示的准确。增强作为已经存在的模块，需要维护。
+- 后续分析与改动以源矩阵／范围／原色／传递函数、显示目标匹配、HDR映射与输出标尺、可信ICC、输出精度和软件数值验证为优先依据。增强模块的维护重点是兼容、正确色彩交接、可关闭、失败恢复和不干扰普通播放；新增模型、扩充算法或追求增强效果不属于默认工作目标，需用户明确要求。
+- 保留用户既有增强模块、菜单和选择权，本次不调整运行配置，不据此删除功能。颜色准确的判断不以饱和度／锐度／顺滑度或模型数量代替；软件数值验证与真实显示端测量分开说明。
+- 仅更新STATUS当前快照与中文进度；项目版本保持v1.5.7，既有103项工作区变更保留，未提交／打包／发布。
+
+
+### 2026-10-08 12:27 — 核查正常播放色彩准确与FP16后续优化方向
+
+- 用户关注SDR／HDR色彩正确性和全链路16bit精度，要求对照Lake1059/FFF_Project寻找值得优化处；本次为源码／资料评估，不实施配置变更。
+- 已读取本地10月7日精度边界报告、3FP对照及路线，并沿用10月7日至8日已完成源矩阵／高位深修复和PQ／HLG独立数值结果；不将旧报告的缺陷重新认定为未修复。
+- FFF_Project远端master核查为12d8afca95c29fb9cc5101a8d4991b4a83af0d36；在忽略目录reference克隆fetch并用git show固定提交读取VideoRenderer.cpp，未切换原3fef8eb工作树。源码可见HDR／scRGB FP16输出、经典SDR源8／10bit输出及可选高位深SDR scRGB策略；支持原始半浮点交换链像素／区域读回。源码不能支持“Windows最强色准”的普遍排名。网络raw初次502／超时，后由git取回；未执行第三方播放器。
+- 本地具体候选：color-target.lua仅以HDR开关区分显示模式，偏好key为uid+hdr-status，尚无独立SDR Advanced Color／ACM策略；需核查系统／应用ICC职责及校色变化时偏好失效，而非直接强制所有SDR scRGB。微软文档区分SDR Advanced Color参考白与HDR scRGB80nit标尺。
+- 普通HQ／Balanced为linear-downscaling=no、cscale=bilinear；HighQuality开启线性缩小。候选为不含AI的线性缩小、色度位置／重建与混合色边像素回归，先测平均亮度／色差及播放负载，再决定默认；不机械启用线性放大。
+- 当前数学GPU验证已包含PQ／HLG正负值与高位深PNG编码读回，但不是原始FP16纹理／交换链采样；补充直接浮点读回需独立诊断工具或诊断核心，不能仅靠Lua或16bitPNG完成。现有流程不新增起播预检。
+- HDR后续重点为完整默认配置下的亮度保真区间、超峰值映射、动态峰值／场景切换、SDR在HDR桌面的参考白与OSD／字幕合成、输出量化／抖动；不能把隔离转换通过等同于默认映射全部通过。
+- FP16浮点与整数16bit不同；源8／10bit和最终8／10bit输出不等于中间处理错误，禁止为了名称把全部输入／输出强制同格式。增强模块仅保持兼容维护。
+- 来源：FFF_Project固定提交VideoRenderer.cpp；https://learn.microsoft.com/en-us/windows/win32/direct3darticles/high-dynamic-range 、https://learn.microsoft.com/en-us/windows/win32/wcs/advanced-color-icc-profiles 、https://mpv.io/manual/master/ 。
+- 本次未运行新的播放器／色差测试，未更换运行库；仅追加STATUS／工作进度与忽略目录参考源码。既有103项工作区改动保留，未提交／打包／发布，版本仍v1.5.7。
+
+## 2026-10-08 13:49 — 菜单整理与 SDR ACM／FP16 色彩优化收尾
+
+- 用户指令：删除 bilinear 低功耗档，默认 HQ；其它放工具和最小化之间；视频滤镜只保留直属全清空；继续色彩准确优化。全程保留此前修改，未发布／提交／改项目版本。
+- 起始 master／f7c6cab 与 origin 同步，git pull --ff-only 已为最新；起始 103 个脏工作区条目，本轮收尾 105 个条目（不是文件总数），未覆盖已有 VS／安装器等修改。
+- 活动配置：Performance-LowPower 与菜单／状态映射删除；旧低功耗偏好降级默认 HQ，用户保存高质量仍尊重。默认 HQ 线性缩小；其它排序已在真实菜单树与截图验证；清空 VF 直接可达并覆盖外部 VF，Shader 独立清空。
+- 新增 display-color 原生只读 DisplayConfig v2 检测与低频变化发布。本机实际 WCG／SDR ACM 识别成功；经典 SDR、ACM、HDR／未知边界分开，镜像目标歧义不猜测。
+- color-target：SDR ACM 用 BT.709 线性 FP16 scRGB／工作白 1.0、Windows 负责终端校色，不叠加显示 ICC；ICC 保存／关联上下文校验；scRGB 取消前置抖动及自动驱动黑位补偿，显式对比度仍尊重。手动 SDR 随桌面 ACM 状态调整输出编码，用户意图保持。
+- 输出配对用同一 apply-profile；包括原生 profile 部分失败回滚、免重建、恢复重试与空 target-gamut→auto 的等价恢复／去重。缺 profiles 的独立脚本环境保留降级路径。
+- 核心原始读回发现旧 libplacebo 92b5ac6 最后输出无条件夹到 0～1；官方修复 99e80abd 恰为其后继。校验官方资产 SHA，先验证隔离核心后更新本地匹配 mpv.exe／mpv.com／DLL／手册；新核心 36bf3d529／libplacebo 0d043c7。内嵌 FFmpeg 同步更新，独立 ffmpeg 工具未替换；components.lock 仅更新对应核心／色彩字段。
+- 原始 FP16 数值：标尺／负值／超过 1、实际 SDR ACM 1024 灰阶、广色域 SDR、软件隔离 PQ／HLG、线性缩小均通过。PQ／HLG 注入能力并隔离 SDR 桌面提示／参考白覆盖，非真实 HDR 桌面；FP16 存储不等同所有阶段 16bit 有效精度。
+- 性能：4K→1280×720，完整配置、直接 D3D11VA、WASAPI 静音，预热 5 秒后采样≥20秒，线性／非线性各三轮；六轮所有掉帧／延迟／错时计数为零，时钟 0.99869～1.00017，无错误或音频欠载。GPU fresh 平均阶段总和中位数 2.021735→2.051011ms（约+1.45%），CPU 单核心 5.99→7.36%。早期窗口受工作区尺寸限制的轮次未计入最终固定尺寸结果。
+- 回归命令：test-color-output.py、benchmark-linear-downscale.py、test-color-preferences.py、validate-quality-menu.py、test-playback-compat.py、test-color-config.py、test-color-hdr-config.py；Lua test-color-state／test-quality-state／test-hdr-lifecycle／test-render-precision；check-modernization（Lua136／Python70）。全部通过。追加 H2648 完整配置 D3D11VA／实际 ACM 无错误；H26410 菜单素材在本机软件回退，未计为硬解通过。
+- 报告 docs/modernization/SDR-ACM与FP16输出优化-20261008.md；结果 color-output-results-20261008.json；新旧 SHA 与来源 color-output-core-manifest-20261008.json。维护 Frida 17.22.1 仅在忽略依赖目录，日常播放不注入、不增加预扫描。
+- 最终校验：正式摘要／核心清单 JSON 可解析，实际核心及锁定文件 SHA 一致，活动代码／配置 UTF-8 LF，git diff --check 通过；master 与 origin 同步，工作区仍有 105 个条目。
+- 回退 backup/color-accuracy-menu-20261008-before/ 保留本轮前配置及匹配核心；新增检测文件回退时一并移走。版本仍 v1.5.7，未来发布核心／运行时变化必须执行发布流程 Gate；本轮未改发布流程、提交、打包、上传。
+- 可选后续保持：真实 HDR／仪器测量、其它 GPU、动态 DV 和 RIFE 初始化／CCD 性能独立优化；没有阻碍本轮收尾的依赖。切换设备前建议审阅并提交配置差异，另行保存忽略的运行时及备份；不要全仓库 reset。
+
+## 2026-10-08 15:21 — 用户搁置8K软解优化；发布准备、项目清理与起播抬窗
+
+- 用户已将目标改为“先搁置优化，做下个版本的预发布工作、清理项目文件”，随后要求修复起播不在桌面前面。本轮作为原任务转向，不继续性能优化、不推广实验参数。
+- 已完整读取发布流程／项目架构，沿用 HandShake；git fetch origin 后 master／origin 差异0／0。起始大批未提交改动保留，没有reset、暂存、提交、推送或创建标签。
+- 搁置性能证据：纯解码单轮约27～28fps；完整HQ三轮基线媒体推进中位数0.5445、12线程0.5701、8线程0.5760，均有大量VO丢帧，均非8K48达标。目标7840HS为用户提供的暂定型号，CPU-Z分数不能线性外推。9轮原始结果已归档，摘要 av1-software-paused-20261008.json；未降低位深／处理精度。
+- 清理：backup/project-cleanup-20261008-151325/archive-manifest.json 记录707项（551文件、156目录）；独立文件移动前后SHA一致，目录同盘整体移动未逐文件哈希，无永久删除。保留当前色彩／播放夹具、探针deps、用户cache/files、核心／VS／模型、开发backup及release。旧参考源码、ETW/XML、下载解包、R80候选、一次性脚本及生成缓存已归档。
+- .gitignore新增.zcode与Python生成缓存规则；保留本地计划文件，不纳入发布提交；新增／改动文件UTF-8 LF。起播脚本及选项默认启用；不改用户window_size_position.conf。
+- 起播修复：window-foreground.lua＋window_foreground.conf；有效原生HWND获取后一次申请前台，后台激活限制时原生短暂抬升并立即还原普通层级，不写ontop。窗口等待最多2秒，结束／退出取消；自动EOF下一集、暂停／继续不抬窗。保持原持久置顶与非Windows降级。
+- 原生回归：test-window-foreground.py用自有遮挡窗口与完整隔离配置，旧版起播／IPC重新打开仍被遮挡，修复后抬到上面；最小化恢复、保存ontop=no、原生TOPMOST为false、暂停和自动切集均通过。系统拒绝部分键盘焦点请求时显示顺序仍通过，不声明强制焦点。结果 window-foreground-results-20261008.json；专项报告 起播窗口前台修复-20261008.md。
+- 3.1：fetch、分支差异、工作区审阅完成；未提交改动仍须按功能／构建／结果逻辑整理，发布前未满足干净提交要求。
+- 3.2：触发Gate，涉及mpv核心、Python／关键VS插件／模型升级与安装更新／退役迁移交付；停止打包／发布。发布流程本身未改。需要用户决定流程修订或豁免；既有第三方组件许可待补证项仍须解决，不能视为已获授权。
+- 3.3：docs/发布准备-20261008.md完成内容、包归属、发布草稿与Gate清单，架构及工具说明更新；STATUS／中文进度追加。项目仍v1.5.7；.vanta-version逐字节1.5.7；安装器仍0.3.12，版本均未擅自递增。
+- 3.4：check-modernization通过Lua137／Python72、Shader引用、既有用户选项逐字节、徽标素材与流程未改检查；test-playback-compat通过HEVC10硬解／音频／双字幕／HTTP／DRA；validate-quality-menu、test-updater官方资产选择／失败恢复、test-retired-component迁移保留与幂等通过；git diff --check通过。
+- 输入只读审计：10,019核心／VS锁定文件逐个SHA256一致，新增／修改活动配置与安装文件均有现有包归属，四包输入无缺失、禁止缓存／日志／根backup/tmp泄漏或Lossless/LSFG命名；不等价实际新归档验证。完整清单与脚本SHA在tmp/release-prep-20261008/；pip包内部合法operations/build源码保留，不误判为根build泄漏。
+- 构建入口六个PowerShell语法通过，未修改；VantaInstaller源码Release编译0警告／0错误，仅编译检查，不是单文件发布产物。旧release安装器不含迁移改动，实际发布需重建独立候选。01／02／04需重建；03输入数量／字节与上版相同，仅为复用候选，仍需完整4.1.1证明。
+- 第4～5新包／7z完整性／SHA／版本标记／覆盖安装／全功能验收未执行；第6～8标签／上传／镜像未执行。本次“预发布工作”为本地准备，流程规定GitHubRelease必须正式发布，不创建prerelease。
+- 当前工作区不干净；版本和Gate决定后再整理提交。切换设备前建议审阅并提交功能／文档，忽略运行时和归档须另行同步，禁止全仓库reset。
+
+## 2026-10-08 15:29 — 用户确认v1.6.0并要求按流程发布
+
+- 用户选择下一版1.6.0，随后明确要求准备完成后按发布流程发布新Release；后续正式发布、构建与流程内提交／标签／公开资产／镜像同步已授权，不再重复征询一般发布权限。
+- 尚需用户单独决定流程3.2升级Gate：核心、Python／VS关键插件与模型变动。安装器退役迁移是附属功能，自身不单独触发Gate；此前日志中将其并列交付影响不代表它单独触发Gate。
+- 发布报告已对齐v1.6.0；当前已发布版本标记仍1.5.7，构建前再同步，安装器独立版本尚未改。未开始包构建、标签、推送或上传。
+- 补测原来ontop=yes时原生TOPMOST与mpv选项均保持true，窗口报告／JSON更新；现有check-modernization与diff检查通过。
+- 03来源包7z t通过，SHA E139FB897C53B1610B62CD6A4C6A0E57C8D2544225005F720EC43FD1F927E2B2与v1.5.7记录一致；输入5121文件／4714825519bytes一致，最新修改2025-04-13。Gate后可按4.1.1复制为新版本规范名并复测，尚未生成新文件。
+- 归档707项目标全部存在、moved标记全部为true；仅isolated／migration-test／lua-files.txt因后续验证重新生成源路径，不覆盖归档。107项Git状态条目，master与origin同步，既有修改保留。
+- 当前等待用户决定一次性豁免或修订发布流程。决定后继续完整发布检查，包括既有第三方组件许可核对；不得把Gate豁免当作公开分发授权证明。
+
+## 2026-10-08 15:41 — 用户允许发布，执行v1.6.0
+
+- 用户回复“可以发布”，本次核心／运行时／插件模型升级Gate一次性豁免；四包编号、覆盖顺序、发布流程保持。继续全部授权构建／校验／提交／标签／上传／镜像流程，不重复确认。
+- 第三方分发补证发现SVPflow2官方个人／非商业专有许可，Windows须SVP Pro；按强制禁止专有组件规则从02公开包排除该DLL。菜单／接口保留，本机文件不动；私用包从本机补入且绝不公开。02及私包脚本增加明确排除／本地保留规则，是本次已授权发布的必要内容修正，范围已向用户说明。
+- 补GPL文本与来源，SVPflow1 GPL来源独立于SVPflow2许可；TensorRT OSS Apache与SDK运行库分发授权分别核对，不将总体GPL覆盖厂商SDK。NVIDIA SDK许可原始页面保存在忽略调查目录。
+- 安装器新增迁移功能，为避免与旧exe混淆，必要补丁版本独立递增0.3.12→0.3.13，不影响mpv1.6.0。根.vanta-version已写纯1.6.0（UTF8无BOM无换行）。
+- git fetch已同步0／0，gh账号认证可用，远端尚无v1.6.0Release；预计01／02／04重建，03原样复用已验证v1.5.7来源。

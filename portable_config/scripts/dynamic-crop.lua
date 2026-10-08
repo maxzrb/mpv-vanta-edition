@@ -2,8 +2,8 @@
 This script uses the lavfi cropdetect filter to automatically insert a crop filter with appropriate parameters
     for the currently playing video, the script run continuously by default (mode 4).
 
-To use this script, "hwdec=no" (mpv default/recommended) or any "-copy" variant like "hwdec=auto-copy" is required,
-    consider editing "mpv.conf" to an appropriate value.
+实际启用裁剪时，在检测滤镜入口下载硬解表面；不要求用户预先切换解码器。
+    只有实际添加 cropdetect 失败才报告错误，未开启裁剪时不弹出硬解提示。
 
 The workflow is as follows: We observe ffmpeg log to collect metadata and process it.
     Collected metadata are stored sequentially in s.buffer, then process to check and
@@ -210,20 +210,28 @@ local function insert_cropdetect_filter(limit, change)
     if s.toggled > 1 or s.paused then return end
     local function insert_filter()
         local cropdetect = string.format("cropdetect@dyn_cd=limit=%d/255:round=%d:reset=1", limit, options.detect_round)
+        -- lavfi 不会像 VapourSynth 自动下载表面；只在实际检测入口处理，保持原位深。
+        local decoded = mp.get_property_native('video-dec-params', {}) or {}
+        local download = decoded['hw-pixelformat'] and
+            string.format('hwdownload,format=%s,', decoded['hw-pixelformat']) or ''
         if s.f_limit_runtime and change then
             command_filter(labels.cropdetect, "limit", string.format("%d/255", limit), "cropdetect")
             return true
         elseif s.f_limit_runtime and options.read_ahead_mode > 0 then
             return mp.commandv("vf", "pre",
-                string.format("@%s:lavfi=[split[a][b];[b]setpts=PTS-%s/TB,%s[b];%s]", labels.cropdetect,
-                    options.read_ahead_cropdetect, cropdetect, s.f_sync))
+                string.format("@%s:lavfi=[%ssplit[a][b];[b]setpts=PTS-%s/TB,%s[b];%s]", labels.cropdetect,
+                    download, options.read_ahead_cropdetect, cropdetect, s.f_sync))
         else
-            return mp.commandv("vf", "pre", string.format("@%s:lavfi=[split[a][b];[b]%s,nullsink;[a]null]",
-                labels.cropdetect, cropdetect))
+            -- 普通检测只下载旁路帧，主播放链继续保留 GPU 表面，避免重新上传整帧。
+            return mp.commandv("vf", "pre", string.format("@%s:lavfi=[split[a][b];[b]%s%s,nullsink;[a]null]",
+                labels.cropdetect, download, cropdetect))
         end
     end
-    if not insert_filter() then
-        mp.msg.error("Does vf=help as #1 line in mvp.conf return libavfilter list with crop/cropdetect in log?")
+    local ok, error_text = insert_filter()
+    if not ok then
+        local text = '裁黑边检测滤镜添加失败：' .. tostring(error_text or '详见播放器原始滤镜错误')
+        mp.msg.error(text)
+        mp.osd_message(text, 5)
         s.f_missing = true
         cleanup()
         return
@@ -311,17 +319,6 @@ local function generate_ratios(list)
             end
         end
     end
-end
-
-local function switch_hwdec(id, hwdec, error)
-    if hwdec ~= "no" and not string.match(hwdec, "-copy") then
-        local msg = "Switch to SW decoding or HW -copy variant."
-        mp.msg.info(msg)
-        mp.osd_message(string.format("%s: %s", label_prefix, msg), 5)
-    end
-    if s.hwdec and hwdec ~= s.hwdec and s.hwdec ~= "no" and not string.match(s.hwdec, "-copy") and
-        filter_state(labels.cropdetect) then mp.commandv("vf", "remove", string.format("@%s", labels.cropdetect)) end
-    s.hwdec = hwdec
 end
 
 local function process_metadata(collected, timestamp, elapsed_time)
@@ -766,7 +763,6 @@ function cleanup()
     mp.unregister_event(playback_events)
     mp.unregister_event(collect_metadata)
     mp.unobserve_property(time_pos)
-    mp.unobserve_property(switch_hwdec)
     mp.unobserve_property(pause)
     for _, label in pairs(labels) do
         if filter_state(label) then mp.commandv("vf", "remove", string.format("@%s", label)) end
@@ -821,7 +817,6 @@ local function on_start()
     mp.register_event("seek", playback_events)
     mp.register_event("playback-restart", playback_events)
     mp.observe_property("time-pos", "number", time_pos)
-    mp.observe_property("hwdec", "string", switch_hwdec)
     mp.observe_property("pause", "bool", pause)
     mp.enable_messages('v')
     mp.register_event("log-message", collect_metadata)

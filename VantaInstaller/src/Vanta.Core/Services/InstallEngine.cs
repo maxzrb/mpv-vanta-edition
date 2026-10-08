@@ -225,6 +225,9 @@ public sealed class InstallEngine
                 progress?.Report(new InstallProgress(10 + (int)((i + 1) * 90.0 / selected.Count), $"{pkg.DisplayName} 完成"));
             }
 
+            // 新版配置才执行退役组件迁移；只装旧包不会触发。
+            RetiredComponentService.Quarantine(options.InstallDirectory, AddLog);
+
             // 9. 自检
             var mpvExe = Path.Combine(options.InstallDirectory, "mpv.exe");
             result.MpvExists = File.Exists(mpvExe);

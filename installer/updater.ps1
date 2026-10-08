@@ -1,5 +1,16 @@
-$fallback7z = Join-Path (Get-Location) "\7z\7zr.exe";
+﻿$fallback7z = Join-Path (Get-Location) "\7z\7zr.exe";
 $useragent = "mpv-win-updater"
+
+function Backup-Tool($Target) {
+    $backup = Join-Path (Get-Location).Path ('backup\tool-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fffffff'))
+    New-Item -ItemType Directory -Path $backup -ErrorAction Stop | Out-Null
+    if (Test-Path -LiteralPath $Target) {
+        Copy-Item -LiteralPath $Target -Destination $backup -ErrorAction Stop
+        Get-FileHash -LiteralPath $Target -Algorithm SHA256 | Select-Object Hash, Path |
+            ConvertTo-Json | Set-Content -LiteralPath (Join-Path $backup 'old-checksum.json') -Encoding UTF8
+    }
+    return $backup
+}
 
 function Get-7z {
     $7z_command = Get-Command -CommandType Application -ErrorAction Ignore 7z.exe | Select-Object -Last 1
@@ -92,7 +103,19 @@ function Download-Ytplugin ($plugin, $version) {
             $plugin_exe = "youtube-dl.exe"
         }
     }
-    Invoke-WebRequest -Uri $link -UserAgent $useragent -OutFile $plugin_exe
+    # 首次下载也通过官方资产 digest 验证，先暂存再替换。
+    $repository = if ($plugin -like 'yt-dlp*') { 'yt-dlp/yt-dlp' } else { 'ytdl-org/youtube-dl' }
+    $release = Invoke-RestMethod -Uri ("https://api.github.com/repos/$repository/releases/tags/$version") -ErrorAction Stop
+    $asset = $release.assets | Where-Object name -eq $plugin_exe | Select-Object -First 1
+    if (-not $asset -or $asset.digest -notmatch '^sha256:[a-f0-9]{64}$') { throw '下载工具缺少官方 SHA-256，停止更新。' }
+    $stage = Join-Path (Get-Location).Path ('tmp\tool-' + [Guid]::NewGuid().ToString('N') + '.exe')
+    New-Item -ItemType Directory -Force -Path (Split-Path $stage) -ErrorAction Stop | Out-Null
+    Invoke-WebRequest -Uri $asset.browser_download_url -UserAgent $useragent -OutFile $stage -ErrorAction Stop
+    if ((Get-FileHash -LiteralPath $stage -Algorithm SHA256).Hash -ne $asset.digest.Substring(7)) { throw '下载工具校验失败。' }
+    $backup = Backup-Tool $plugin_exe
+    Copy-Item -LiteralPath $stage -Destination $plugin_exe -Force -ErrorAction Stop
+    Get-FileHash -LiteralPath $plugin_exe -Algorithm SHA256 | Select-Object Hash, Path |
+        ConvertTo-Json | Set-Content -LiteralPath (Join-Path $backup 'new-checksum.json') -Encoding UTF8
 }
 
 function Extract-Archive ($file) {
@@ -102,18 +125,13 @@ function Extract-Archive ($file) {
 }
 
 function Get-Latest-Mpv($Arch) {
-    $filename = ""
-    $download_link = ""
-    $api_gh = "https://api.github.com/repos/dyphire/mpv-winbuild/releases/latest"
+    $api_gh = "https://api.github.com/repos/shinchiro/mpv-winbuild-cmake/releases/latest"
     $json = Invoke-WebRequest $api_gh -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing | ConvertFrom-Json
-    $filename = $json.assets | where { $_.name -Match "mpv-$Arch-[0-9]{8}" } | Select-Object -ExpandProperty name
-    $download_link = $json.assets | where { $_.name -Match "mpv-$Arch-[0-9]{8}" } | Select-Object -ExpandProperty browser_download_url
-    if ($filename -is [array]) {
-        return $filename[0], $download_link[0]
+    $asset = $json.assets | Where-Object { $_.name -match ("^mpv-" + [Regex]::Escape($Arch) + "-[0-9]{8}-git-[a-f0-9]+\.7z$") } | Select-Object -First 1
+    if (-not $asset -or $asset.digest -notmatch '^sha256:[a-f0-9]{64}$') {
+        throw '上游未提供唯一构建或可信 SHA-256，停止更新。'
     }
-    else {
-        return $filename, $download_link
-    }
+    return $asset.name, $asset.browser_download_url, $asset.digest.Substring(7)
 }
 
 function Get-Latest-Ytplugin ($plugin) {
@@ -138,16 +156,11 @@ function Get-Latest-Ytplugin ($plugin) {
 }
 
 function Get-Latest-FFmpeg ($Arch) {
-    $api_gh = "https://api.github.com/repos/dyphire/mpv-winbuild/releases/latest"
+    $api_gh = "https://api.github.com/repos/shinchiro/mpv-winbuild-cmake/releases/latest"
     $json = Invoke-WebRequest $api_gh -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing | ConvertFrom-Json
-    $filename = $json.assets | where { $_.name -Match "ffmpeg-$Arch-git-" } | Select-Object -ExpandProperty name
-    $download_link = $json.assets | where { $_.name -Match "ffmpeg-$Arch-git-" } | Select-Object -ExpandProperty browser_download_url
-    if ($filename -is [array]) {
-        return $filename[0], $download_link[0]
-    }
-    else {
-        return $filename, $download_link
-    }
+    $asset = $json.assets | Where-Object { $_.name -match ('^ffmpeg-' + [Regex]::Escape($Arch) + '-git-[a-f0-9]+\.7z$') } | Select-Object -First 1
+    if (-not $asset -or $asset.digest -notmatch '^sha256:[a-f0-9]{64}$') { throw 'FFmpeg 缺少官方 SHA-256，停止更新。' }
+    return $asset.name, $asset.browser_download_url, $asset.digest.Substring(7)
 }
 
 function Get-Arch {
@@ -227,7 +240,7 @@ function Check-Arch($arch) {
     $file = "settings.xml"
 
     if (-not (Test-Path $file)) { Create-XML }
-    [xml]$doc = Get-Content $file
+    [xml]$doc = Get-Content -Encoding UTF8 $file
     if ($doc.settings.arch -eq "unset") {
         if ($arch -eq "i686") {
             $get_arch = "i686"
@@ -259,7 +272,7 @@ function Check-Autodelete($archive) {
     $file = "settings.xml"
 
     if (-not (Test-Path $file)) { exit }
-    [xml]$doc = Get-Content $file
+    [xml]$doc = Get-Content -Encoding UTF8 $file
     if ($doc.settings.autodelete -eq "unset") {
         $result = Read-KeyOrTimeout "Delete archives after extract? [Y/n] (default=Y)" "Y"
         Write-Host ""
@@ -288,7 +301,7 @@ function Check-GetFFmpeg() {
     $file = "settings.xml"
 
     if (-not (Test-Path $file)) { exit }
-    [xml]$doc = Get-Content $file
+    [xml]$doc = Get-Content -Encoding UTF8 $file
     if ($doc.settings.getffmpeg -eq "unset") {
         Write-Host "FFmpeg doesn't exist. " -ForegroundColor Green -NoNewline
         $result = Read-KeyOrTimeout "Proceed with downloading? [Y/n] (default=n)" "N"
@@ -320,7 +333,7 @@ function Upgrade-Mpv {
     if (Check-Mpv) {
         $file_arch = (Get-Arch).FileType
         $arch = Check-Arch $file_arch
-        $remoteName, $download_link = Get-Latest-Mpv $arch
+        $remoteName, $download_link, $archiveHash = Get-Latest-Mpv $arch
         $localgit = ExtractGitFromFile
         $localdate = ExtractDateFromFile
         $remotegit = ExtractGitFromURL $remoteName
@@ -358,7 +371,7 @@ function Upgrade-Mpv {
                 $original_arch = "i686"
             }
             $arch = Check-Arch $original_arch
-            $remoteName, $download_link = Get-Latest-Mpv $arch
+            $remoteName, $download_link, $archiveHash = Get-Latest-Mpv $arch
         }
         elseif ($result -eq 'N') {
             $need_download = $false
@@ -370,8 +383,43 @@ function Upgrade-Mpv {
 
     if ($need_download) {
         Download-Archive $remoteName $download_link
+        if ((Get-FileHash -LiteralPath $remoteName -Algorithm SHA256).Hash -ne $archiveHash) {
+            throw 'mpv 构建 SHA-256 不匹配，未替换播放器。'
+        }
         Check-7z
-        Extract-Archive $remoteName
+        # 只替换整套核心文件，避免上游安装脚本覆盖本项目设置。
+        $coreStage = Join-Path (Get-Location).Path ('tmp\core-update-' + [Guid]::NewGuid().ToString('N'))
+        $coreBackup = Join-Path (Get-Location).Path ('backup\core-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fffffff'))
+        New-Item -ItemType Directory -Path $coreStage, $coreBackup -Force | Out-Null
+        & (Get-7z) x -y "-o$coreStage" $remoteName mpv.exe mpv.com '*.dll'
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath (Join-Path $coreStage 'mpv.exe'))) {
+            throw '核心解压失败，未替换播放器。'
+        }
+        $coreFiles = Get-ChildItem -LiteralPath $coreStage -File
+        foreach ($coreFile in $coreFiles) {
+            $target = Join-Path (Get-Location).Path $coreFile.Name
+            if (Test-Path -LiteralPath $target) { Copy-Item -LiteralPath $target -Destination $coreBackup -ErrorAction Stop }
+        }
+        Get-ChildItem -LiteralPath $coreBackup -File | Select-Object Name, @{Name='SHA256'; Expression={(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}} |
+            ConvertTo-Json | Set-Content -LiteralPath (Join-Path $coreBackup 'old-core-checksums.json') -Encoding UTF8
+        $coreFiles | Select-Object Name, @{Name='SHA256'; Expression={(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}} |
+            ConvertTo-Json | Set-Content -LiteralPath (Join-Path $coreBackup 'new-core-checksums.json') -Encoding UTF8
+        try {
+            foreach ($coreFile in $coreFiles) {
+                Copy-Item -LiteralPath $coreFile.FullName -Destination (Join-Path (Get-Location).Path $coreFile.Name) -Force -ErrorAction Stop
+            }
+        }
+        catch {
+            # 复制失败时恢复整套旧文件，避免半套核心留在安装目录。
+            foreach ($coreFile in $coreFiles) {
+                $target = Join-Path (Get-Location).Path $coreFile.Name
+                $previous = Join-Path $coreBackup $coreFile.Name
+                if (Test-Path -LiteralPath $previous) { Copy-Item -LiteralPath $previous -Destination $target -Force -ErrorAction Stop }
+                elseif (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -ErrorAction Stop }
+            }
+            throw
+        }
+        Write-Host "核心旧版本保留在 $coreBackup；更新后请先完成播放回归。" -ForegroundColor Green
     }
     Check-Autodelete $remoteName
 }
@@ -389,7 +437,14 @@ function Upgrade-Ytplugin {
         }
         else {
             Write-Host "Newer" (Get-Item $yt).BaseName "build available" -ForegroundColor Green
+            $backup = Backup-Tool $yt
             & $yt --update
+            if ($LASTEXITCODE -ne 0) {
+                Copy-Item -LiteralPath (Join-Path $backup (Split-Path $yt -Leaf)) -Destination $yt -Force -ErrorAction Stop
+                throw '解析工具自更新失败，已恢复旧版。'
+            }
+            Get-FileHash -LiteralPath $yt -Algorithm SHA256 | Select-Object Hash, Path |
+                ConvertTo-Json | Set-Content -LiteralPath (Join-Path $backup 'new-checksum.json') -Encoding UTF8
         }
     }
     else {
@@ -430,7 +485,7 @@ function Upgrade-FFmpeg {
     }
 
     $need_download = $false
-    $remote_name, $download_link = Get-Latest-FFmpeg $arch
+    $remote_name, $download_link, $archiveHash = Get-Latest-FFmpeg $arch
     $ffmpeg = (Get-Location).Path + "\ffmpeg.exe"
     $ffmpeg_exist = Test-Path $ffmpeg
 
@@ -460,8 +515,17 @@ function Upgrade-FFmpeg {
 
     if ($need_download) {
         Download-Archive $remote_name $download_link
+        if ((Get-FileHash -LiteralPath $remote_name -Algorithm SHA256).Hash -ne $archiveHash) { throw 'FFmpeg 校验失败。' }
         Check-7z
-        Extract-Archive $remote_name
+        # 独立工具仅取 ffmpeg.exe，绝不提取 DLL 覆盖播放器核心。
+        $stage = Join-Path (Get-Location).Path ('tmp\ffmpeg-' + [Guid]::NewGuid().ToString('N'))
+        New-Item -ItemType Directory -Path $stage -ErrorAction Stop | Out-Null
+        & (Get-7z) x -y "-o$stage" $remote_name ffmpeg.exe
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath (Join-Path $stage 'ffmpeg.exe'))) { throw 'FFmpeg 解压失败。' }
+        $backup = Backup-Tool $ffmpeg
+        Copy-Item -LiteralPath (Join-Path $stage 'ffmpeg.exe') -Destination $ffmpeg -Force -ErrorAction Stop
+        Get-FileHash -LiteralPath $ffmpeg -Algorithm SHA256 | Select-Object Hash, Path |
+            ConvertTo-Json | Set-Content -LiteralPath (Join-Path $backup 'new-checksum.json') -Encoding UTF8
     }
     Check-Autodelete $remote_name
 }

@@ -1,0 +1,1898 @@
+{
+  "protocol": "1280x720 24fps 同核心各模式3次6秒，mpv CPU归一到整机，GPU整机PDH，渲染耗时ns，旧子进程CPU未计入，文字尺度修正包含在新版测量",
+  "trials": [
+    {
+      "implementation": "before",
+      "mode": "closed",
+      "trial": 0,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 119320,
+            "avg": 120639,
+            "peak": 144280,
+            "count": 155
+          },
+          {
+            "desc": "merging planes",
+            "last": 13360,
+            "avg": 13873,
+            "peak": 15800,
+            "count": 156
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108880,
+            "avg": 112794,
+            "peak": 339440,
+            "count": 156
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 222520,
+            "avg": 222603,
+            "peak": 225560,
+            "count": 155
+          }
+        ],
+        "redraw": [
+          {
+            "desc": "frame mixing (1 frame), color encoding, dithering (8 bits)",
+            "last": 0,
+            "avg": 0,
+            "peak": 0,
+            "count": 0
+          }
+        ]
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 0.016037056383306415,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 9.207607457530699,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.870927052042278,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.438805094290167,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 9.720917433782857,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.01535878339529,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "before",
+      "mode": "closed",
+      "trial": 1,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 111040,
+            "avg": 114570,
+            "peak": 272820,
+            "count": 154
+          },
+          {
+            "desc": "merging planes",
+            "last": 13920,
+            "avg": 13904,
+            "peak": 15720,
+            "count": 154
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 109200,
+            "avg": 130178,
+            "peak": 991610,
+            "count": 154
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 224880,
+            "avg": 225653,
+            "peak": 679370,
+            "count": 154
+          }
+        ],
+        "redraw": []
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 0.016158082279994896,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 14.00891688249333,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.456980869934606,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 7.798707148910194,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 9.538881801448172,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 14.082626486205983,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "before",
+      "mode": "closed",
+      "trial": 2,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 113360,
+            "avg": 114394,
+            "peak": 484070,
+            "count": 153
+          },
+          {
+            "desc": "merging planes",
+            "last": 14320,
+            "avg": 13905,
+            "peak": 16120,
+            "count": 153
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108920,
+            "avg": 121437,
+            "peak": 893210,
+            "count": 153
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 222080,
+            "avg": 222505,
+            "peak": 224720,
+            "count": 153
+          }
+        ],
+        "redraw": []
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 0.0,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 11.891446122406682,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 9.105190102372662,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 9.97385728409886,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 20.056018329509378,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 7.625007264508517,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "before",
+      "mode": "first-open",
+      "trial": 0,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 110400,
+            "avg": 108885,
+            "peak": 121320,
+            "count": 155
+          },
+          {
+            "desc": "merging planes",
+            "last": 13520,
+            "avg": 14035,
+            "peak": 15960,
+            "count": 156
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108720,
+            "avg": 147652,
+            "peak": 1252500,
+            "count": 156
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223360,
+            "avg": 228454,
+            "peak": 988120,
+            "count": 155
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 30040,
+            "avg": 29618,
+            "peak": 30640,
+            "count": 144
+          }
+        ],
+        "redraw": [
+          {
+            "desc": "frame mixing (1 frame), color encoding, dithering (8 bits)",
+            "last": 0,
+            "avg": 0,
+            "peak": 0,
+            "count": 0
+          }
+        ]
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 1.1118876921497634,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 11.86250804232101,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.376941562022708,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.819611929336386,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 7.701050951717214,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 9.023150611656865,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 18,
+      "provider_errors": [
+        "[   1.166][e][stats] Subprocess failed: init",
+        "[   2.666][e][stats] Subprocess failed: init",
+        "[   5.666][e][stats] Subprocess failed: init"
+      ]
+    },
+    {
+      "implementation": "before",
+      "mode": "first-open",
+      "trial": 1,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 110040,
+            "avg": 109355,
+            "peak": 131880,
+            "count": 155
+          },
+          {
+            "desc": "merging planes",
+            "last": 13560,
+            "avg": 13890,
+            "peak": 15760,
+            "count": 156
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108880,
+            "avg": 119018,
+            "peak": 952610,
+            "count": 156
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223120,
+            "avg": 223496,
+            "peak": 229160,
+            "count": 155
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 30080,
+            "avg": 29764,
+            "peak": 30600,
+            "count": 144
+          }
+        ],
+        "redraw": [
+          {
+            "desc": "frame mixing (1 frame), color encoding, dithering (8 bits)",
+            "last": 0,
+            "avg": 0,
+            "peak": 0,
+            "count": 0
+          }
+        ]
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 1.0326211804912586,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 12.49884996541673,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.509770620105378,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.122965560360578,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 9.307102277053389,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 7.679417037245264,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 22,
+      "provider_errors": [
+        "[   1.070][e][stats] Subprocess failed: init",
+        "[   1.999][e][stats] Subprocess failed: init",
+        "[   3.694][e][stats] Subprocess failed: init",
+        "[   6.694][e][stats] Subprocess failed: init"
+      ]
+    },
+    {
+      "implementation": "before",
+      "mode": "first-open",
+      "trial": 2,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 113480,
+            "avg": 108979,
+            "peak": 132640,
+            "count": 155
+          },
+          {
+            "desc": "merging planes",
+            "last": 13640,
+            "avg": 13935,
+            "peak": 16040,
+            "count": 156
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108360,
+            "avg": 132169,
+            "peak": 1227910,
+            "count": 156
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 1072670,
+            "avg": 234749,
+            "peak": 1102210,
+            "count": 155
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 29560,
+            "avg": 29754,
+            "peak": 30640,
+            "count": 144
+          }
+        ],
+        "redraw": [
+          {
+            "desc": "frame mixing (1 frame), color encoding, dithering (8 bits)",
+            "last": 0,
+            "avg": 0,
+            "peak": 0,
+            "count": 0
+          }
+        ]
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 0.3220948659236979,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 13.037166314629662,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.932043427972104,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 15.416891004751243,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.790216909304068,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.440927695546705,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 19,
+      "provider_errors": [
+        "[   1.064][e][stats] Subprocess failed: init",
+        "[   1.820][e][stats] Subprocess failed: init",
+        "[   4.670][e][stats] Subprocess failed: init"
+      ]
+    },
+    {
+      "implementation": "before",
+      "mode": "repeat",
+      "trial": 0,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 110520,
+            "avg": 110540,
+            "peak": 134960,
+            "count": 154
+          },
+          {
+            "desc": "merging planes",
+            "last": 13640,
+            "avg": 13963,
+            "peak": 15880,
+            "count": 155
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 109440,
+            "avg": 133202,
+            "peak": 962570,
+            "count": 155
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 222760,
+            "avg": 228957,
+            "peak": 1098730,
+            "count": 154
+          }
+        ],
+        "redraw": [
+          {
+            "desc": "frame mixing (1 frame), color encoding, dithering (8 bits)",
+            "last": 0,
+            "avg": 0,
+            "peak": 0,
+            "count": 0
+          }
+        ]
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 0.9385678027635223,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 11.266211610558372,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.512296888168782,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.2018065079889,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 15.001257375642167,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 16.533258966356037,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 15,
+      "provider_errors": [
+        "[   1.047][e][stats] Subprocess failed: init",
+        "[   2.065][e][stats] Subprocess failed: init"
+      ]
+    },
+    {
+      "implementation": "before",
+      "mode": "repeat",
+      "trial": 1,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 110840,
+            "avg": 110315,
+            "peak": 120400,
+            "count": 154
+          },
+          {
+            "desc": "merging planes",
+            "last": 14000,
+            "avg": 13970,
+            "peak": 16280,
+            "count": 155
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 109440,
+            "avg": 135703,
+            "peak": 1096060,
+            "count": 155
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223040,
+            "avg": 223512,
+            "peak": 246760,
+            "count": 154
+          }
+        ],
+        "redraw": [
+          {
+            "desc": "frame mixing (1 frame), color encoding, dithering (8 bits)",
+            "last": 0,
+            "avg": 0,
+            "peak": 0,
+            "count": 0
+          }
+        ]
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 0.2911732929764064,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 11.665374024589958,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.604618959178943,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.311002999597068,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.67217861922189,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.202467929235747,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 12,
+      "provider_errors": [
+        "[   1.074][e][stats] Subprocess failed: init"
+      ]
+    },
+    {
+      "implementation": "before",
+      "mode": "repeat",
+      "trial": 2,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 110840,
+            "avg": 110095,
+            "peak": 121440,
+            "count": 154
+          },
+          {
+            "desc": "merging planes",
+            "last": 13840,
+            "avg": 13896,
+            "peak": 15760,
+            "count": 154
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 109080,
+            "avg": 124844,
+            "peak": 1063440,
+            "count": 154
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223240,
+            "avg": 223027,
+            "peak": 227080,
+            "count": 154
+          }
+        ],
+        "redraw": []
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 0.2588278947725872,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 11.20602164835284,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.49835524140709,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.211242859530524,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.452773388756846,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.748034808751196,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 12,
+      "provider_errors": [
+        "[   1.044][e][stats] Subprocess failed: init"
+      ]
+    },
+    {
+      "implementation": "before",
+      "mode": "persistent",
+      "trial": 0,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 110120,
+            "avg": 108459,
+            "peak": 119320,
+            "count": 153
+          },
+          {
+            "desc": "merging planes",
+            "last": 14160,
+            "avg": 14039,
+            "peak": 15880,
+            "count": 153
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108960,
+            "avg": 137026,
+            "peak": 1039440,
+            "count": 153
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223120,
+            "avg": 223398,
+            "peak": 227960,
+            "count": 153
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 30360,
+            "avg": 29760,
+            "peak": 31200,
+            "count": 142
+          }
+        ],
+        "redraw": []
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 0.5826944364215596,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 13.875619576233808,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.485577244077415,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.995546340592272,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.011556840024234,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 9.41224150344576,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 18,
+      "provider_errors": [
+        "[   1.128][e][stats] Subprocess failed: init",
+        "[   1.992][e][stats] Subprocess failed: init",
+        "[   4.753][e][stats] Subprocess failed: init"
+      ]
+    },
+    {
+      "implementation": "before",
+      "mode": "persistent",
+      "trial": 1,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 109720,
+            "avg": 109047,
+            "peak": 119680,
+            "count": 155
+          },
+          {
+            "desc": "merging planes",
+            "last": 13520,
+            "avg": 13965,
+            "peak": 15920,
+            "count": 156
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108840,
+            "avg": 137388,
+            "peak": 1078500,
+            "count": 156
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223040,
+            "avg": 223493,
+            "peak": 225440,
+            "count": 155
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 30480,
+            "avg": 29730,
+            "peak": 30600,
+            "count": 144
+          }
+        ],
+        "redraw": [
+          {
+            "desc": "frame mixing (1 frame), color encoding, dithering (8 bits)",
+            "last": 0,
+            "avg": 0,
+            "peak": 0,
+            "count": 0
+          }
+        ]
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 0.20937979421748087,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 12.355016227738062,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.923488324441506,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.11443154763001,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 9.6349275222368,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.36626453235458,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 22,
+      "provider_errors": [
+        "[   1.086][e][stats] Subprocess failed: init",
+        "[   1.881][e][stats] Subprocess failed: init",
+        "[   3.666][e][stats] Subprocess failed: init",
+        "[   6.706][e][stats] Subprocess failed: init"
+      ]
+    },
+    {
+      "implementation": "before",
+      "mode": "persistent",
+      "trial": 2,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 109640,
+            "avg": 109046,
+            "peak": 137920,
+            "count": 153
+          },
+          {
+            "desc": "merging planes",
+            "last": 14080,
+            "avg": 13956,
+            "peak": 15720,
+            "count": 153
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108760,
+            "avg": 139732,
+            "peak": 1043340,
+            "count": 153
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223160,
+            "avg": 235090,
+            "peak": 1166690,
+            "count": 153
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 30280,
+            "avg": 29767,
+            "peak": 31920,
+            "count": 142
+          }
+        ],
+        "redraw": []
+      },
+      "pending": null,
+      "fallback_queries": null,
+      "mpv_cpu_percent": 0.4533644404137175,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 11.716772616916375,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.466858977798088,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.985802778747598,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.314035433607398,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.446477034787177,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 18,
+      "provider_errors": [
+        "[   1.047][e][stats] Subprocess failed: init",
+        "[   1.804][e][stats] Subprocess failed: init",
+        "[   4.684][e][stats] Subprocess failed: init"
+      ]
+    },
+    {
+      "implementation": "after",
+      "mode": "closed",
+      "trial": 0,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 113000,
+            "avg": 112410,
+            "peak": 136560,
+            "count": 154
+          },
+          {
+            "desc": "merging planes",
+            "last": 13720,
+            "avg": 13859,
+            "peak": 15960,
+            "count": 154
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 109320,
+            "avg": 115953,
+            "peak": 418880,
+            "count": 154
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 246960,
+            "avg": 222591,
+            "peak": 246960,
+            "count": 154
+          }
+        ],
+        "redraw": []
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 0.9551902635597969,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 9.807334857310469,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 7.452988033136556,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.993798772886025,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.975038021956948,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.066232152682211,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "after",
+      "mode": "closed",
+      "trial": 1,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 112880,
+            "avg": 112827,
+            "peak": 137240,
+            "count": 154
+          },
+          {
+            "desc": "merging planes",
+            "last": 14000,
+            "avg": 13846,
+            "peak": 15440,
+            "count": 154
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 109240,
+            "avg": 115978,
+            "peak": 796070,
+            "count": 154
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 222960,
+            "avg": 222577,
+            "peak": 225640,
+            "count": 154
+          }
+        ],
+        "redraw": []
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 0.016179441234147475,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 14.245207449163884,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.656684479216592,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 7.478746655599801,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 13.667372158351998,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 17.154933741127174,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "after",
+      "mode": "closed",
+      "trial": 2,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 134720,
+            "avg": 114370,
+            "peak": 439220,
+            "count": 154
+          },
+          {
+            "desc": "merging planes",
+            "last": 14000,
+            "avg": 13937,
+            "peak": 15640,
+            "count": 154
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108920,
+            "avg": 124312,
+            "peak": 344680,
+            "count": 154
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223160,
+            "avg": 228912,
+            "peak": 1230090,
+            "count": 154
+          }
+        ],
+        "redraw": []
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 0.0,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 11.479677693179589,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 13.825634135788178,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 9.862662037014013,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 9.94857274703679,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 6.227355457822921,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "after",
+      "mode": "first-open",
+      "trial": 0,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 110280,
+            "avg": 110058,
+            "peak": 134440,
+            "count": 157
+          },
+          {
+            "desc": "merging planes",
+            "last": 13400,
+            "avg": 13814,
+            "peak": 16120,
+            "count": 157
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108240,
+            "avg": 127037,
+            "peak": 589030,
+            "count": 157
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 222880,
+            "avg": 223203,
+            "peak": 227360,
+            "count": 157
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 32560,
+            "avg": 25666,
+            "peak": 32680,
+            "count": 179
+          }
+        ],
+        "redraw": []
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 0.712241869457104,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 7.530729179522745,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 6.272087380354996,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 6.416539106786656,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 6.072778717494187,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 7.028543976701717,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "after",
+      "mode": "first-open",
+      "trial": 1,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 108120,
+            "avg": 109680,
+            "peak": 132400,
+            "count": 155
+          },
+          {
+            "desc": "merging planes",
+            "last": 13520,
+            "avg": 13853,
+            "peak": 15880,
+            "count": 156
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108240,
+            "avg": 116724,
+            "peak": 445200,
+            "count": 156
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 224920,
+            "avg": 223231,
+            "peak": 224920,
+            "count": 155
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 32400,
+            "avg": 30904,
+            "peak": 32680,
+            "count": 144
+          }
+        ],
+        "redraw": [
+          {
+            "desc": "frame mixing (1 frame), color encoding, dithering (8 bits)",
+            "last": 0,
+            "avg": 0,
+            "peak": 0,
+            "count": 0
+          }
+        ]
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 1.1594114429295768,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 8.420704962715186,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 7.474308371617618,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 5.447343757373363,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 8.37261574063939,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 7.561542778449977,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "after",
+      "mode": "first-open",
+      "trial": 2,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 108640,
+            "avg": 109383,
+            "peak": 131920,
+            "count": 154
+          },
+          {
+            "desc": "merging planes",
+            "last": 13720,
+            "avg": 14940,
+            "peak": 178610,
+            "count": 154
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 109360,
+            "avg": 116348,
+            "peak": 405010,
+            "count": 154
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223920,
+            "avg": 223278,
+            "peak": 225160,
+            "count": 154
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 32520,
+            "avg": 30762,
+            "peak": 32600,
+            "count": 144
+          }
+        ],
+        "redraw": []
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 1.1616730901164338,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 11.785103960048774,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 9.741574009685959,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 12.092193219558164,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 17.192775214920886,
+          "0x00000000_0x0000FB5E/0": 0.03810532255424087
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.927459358285159,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "after",
+      "mode": "repeat",
+      "trial": 0,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 113000,
+            "avg": 111125,
+            "peak": 132240,
+            "count": 154
+          },
+          {
+            "desc": "merging planes",
+            "last": 13760,
+            "avg": 13845,
+            "peak": 15640,
+            "count": 154
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 109480,
+            "avg": 112119,
+            "peak": 286210,
+            "count": 154
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223280,
+            "avg": 227387,
+            "peak": 904270,
+            "count": 154
+          }
+        ],
+        "redraw": []
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 0.7920676657615986,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 14.61563362617528,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 13.47301979343462,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 13.904707689696245,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 14.027867714060744,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.421811025047663,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "after",
+      "mode": "repeat",
+      "trial": 1,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 111960,
+            "avg": 110872,
+            "peak": 136360,
+            "count": 157
+          },
+          {
+            "desc": "merging planes",
+            "last": 13920,
+            "avg": 13928,
+            "peak": 16360,
+            "count": 157
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108920,
+            "avg": 140587,
+            "peak": 1054760,
+            "count": 157
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 222160,
+            "avg": 222872,
+            "peak": 225320,
+            "count": 157
+          }
+        ],
+        "redraw": []
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 0.760321827853436,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 14.878386192532368,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 13.392457100167002,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 13.094114309525782,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.552875224250466,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 14.993132857041715,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "after",
+      "mode": "repeat",
+      "trial": 2,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 109880,
+            "avg": 110248,
+            "peak": 122840,
+            "count": 153
+          },
+          {
+            "desc": "merging planes",
+            "last": 14400,
+            "avg": 13915,
+            "peak": 15720,
+            "count": 153
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108760,
+            "avg": 135133,
+            "peak": 1398460,
+            "count": 153
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 221960,
+            "avg": 223075,
+            "peak": 225640,
+            "count": 153
+          }
+        ],
+        "redraw": []
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 0.9387430667363886,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 18.208457151831883,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 15.229029003938392,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 11.572501530040602,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 12.736478187491265,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 13.362473332317418,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "after",
+      "mode": "persistent",
+      "trial": 0,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 109040,
+            "avg": 109616,
+            "peak": 131360,
+            "count": 155
+          },
+          {
+            "desc": "merging planes",
+            "last": 13360,
+            "avg": 13901,
+            "peak": 15720,
+            "count": 156
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108720,
+            "avg": 132292,
+            "peak": 1043710,
+            "count": 156
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223360,
+            "avg": 229492,
+            "peak": 1172170,
+            "count": 155
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 32200,
+            "avg": 30887,
+            "peak": 32640,
+            "count": 144
+          }
+        ],
+        "redraw": [
+          {
+            "desc": "frame mixing (1 frame), color encoding, dithering (8 bits)",
+            "last": 0,
+            "avg": 0,
+            "peak": 0,
+            "count": 0
+          }
+        ]
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 0.966716652018743,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 15.076732585806274,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 13.18794881470844,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 15.98740000085339,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 14.650308955792042,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 14.144315298205274,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "after",
+      "mode": "persistent",
+      "trial": 1,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 108800,
+            "avg": 109439,
+            "peak": 132800,
+            "count": 154
+          },
+          {
+            "desc": "merging planes",
+            "last": 13640,
+            "avg": 13945,
+            "peak": 15880,
+            "count": 154
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 109080,
+            "avg": 136250,
+            "peak": 1271190,
+            "count": 154
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 224440,
+            "avg": 223439,
+            "peak": 225440,
+            "count": 154
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 32280,
+            "avg": 30850,
+            "peak": 32560,
+            "count": 143
+          }
+        ],
+        "redraw": []
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 0.7922017592695644,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 14.472104014885907,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 10.912402346450135,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 12.517560820967699,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 16.15962293275999,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 13.768100422392763,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    },
+    {
+      "implementation": "after",
+      "mode": "persistent",
+      "trial": 2,
+      "duration": 6.0,
+      "counters": {
+        "frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "vo_passes": {
+        "fresh": [
+          {
+            "desc": "upload frame",
+            "last": 110480,
+            "avg": 109950,
+            "peak": 132800,
+            "count": 155
+          },
+          {
+            "desc": "merging planes",
+            "last": 13160,
+            "avg": 13892,
+            "peak": 15600,
+            "count": 155
+          },
+          {
+            "desc": "ortho (vert) upscaling (lanczos)",
+            "last": 108800,
+            "avg": 120912,
+            "peak": 1325380,
+            "count": 155
+          },
+          {
+            "desc": "ortho (horiz) upscaling (lanczos), color decoding, color encoding, dithering (8 bits)",
+            "last": 223400,
+            "avg": 223567,
+            "peak": 246960,
+            "count": 155
+          },
+          {
+            "desc": "overlay, color decoding, color encoding",
+            "last": 32680,
+            "avg": 30881,
+            "peak": 32680,
+            "count": 144
+          }
+        ],
+        "redraw": []
+      },
+      "pending": false,
+      "fallback_queries": 0,
+      "mpv_cpu_percent": 1.1263395073043536,
+      "system_gpu_samples": [
+        {
+          "0x00000000_0x0000E15F/0": 15.884834667596582,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 14.064736843354787,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 14.833480651277078,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 13.490952987508484,
+          "0x00000000_0x0000FB5E/0": 0
+        },
+        {
+          "0x00000000_0x0000E15F/0": 13.880916034160856,
+          "0x00000000_0x0000FB5E/0": 0
+        }
+      ],
+      "logged_subprocesses": 0,
+      "provider_errors": []
+    }
+  ]
+}

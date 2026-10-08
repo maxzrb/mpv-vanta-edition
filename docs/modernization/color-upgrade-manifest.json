@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-04",
+  "core": "shinchiro 20261004；色彩阶段未再次替换",
+  "files": [
+    {
+      "path": "portable_config/profiles.conf",
+      "before_sha256": "91fb37195cc77f743d4dc7c0e79660ec0581d37fcf6ffb7f6b5a4ea9fcf8283d",
+      "after_sha256": "2eb7584eb8bfdffb5d3daaffc4fc0f16c8f11b5308ac24730a6ec6a4eba57b20",
+      "backup": "backup/color-accuracy-20261004-203559/portable_config/profiles.conf",
+      "note": "当前值包含 2026-10-05 硬解初始化修正；见 hwdec-upgrade-manifest.json"
+    },
+    {
+      "path": "portable_config/input.conf",
+      "before_sha256": "ff9fce1023a307e7f96aabce4296d57c94ee27ef717c7bb85a2e38ab26f3c4ee",
+      "after_sha256": "429a1c1eb4c40bb9b6d7e6f9d6c544f3f8a64ea627764015d410f29337b7a0af",
+      "backup": "backup/color-accuracy-20261004-203559/portable_config/input.conf",
+      "note": "恢复前核对后来个人修改"
+    },
+    {
+      "path": "portable_config/scripts/hdr-mode.lua",
+      "before_sha256": "e954ae1f96e9719f7f442343c08110411eaecb20df9d7b06aac179327cd2fb00",
+      "after_sha256": "4700625249cb71d9ca66f5863169daae5c742b6649ec335848bdeae58c07f06b",
+      "backup": "backup/color-accuracy-20261004-203559/portable_config/scripts/hdr-mode.lua",
+      "note": "恢复前核对后来个人修改"
+    },
+    {
+      "path": "portable_config/scripts/quality_status.lua",
+      "before_sha256": "51b7a97e8d8a752b2cde9a33580b93b1e3b4484e1be3bfa6b12e7393993141f0",
+      "after_sha256": "660461480d0f35d36965011c36c7b23fe2db6eed0856c45e5cbd67a8ba2080c3",
+      "backup": "backup/color-accuracy-20261004-203559/portable_config/scripts/quality_status.lua",
+      "note": "恢复前核对后来个人修改"
+    },
+    {
+      "path": "portable_config/script-opts/hdr_mode.conf",
+      "before_sha256": "b83c63b39a16321368e297dbffe34e26e8468aa9ce832bf8138d10b57f391e3b",
+      "after_sha256": "bdc9a0d911c74755bc69005ea1c3119d339157dc84f887ade5c84671f78b029c",
+      "backup": "backup/color-accuracy-20261004-203559/portable_config/script-opts/hdr_mode.conf",
+      "note": "恢复前核对后来个人修改"
+    },
+    {
+      "path": "portable_config/scripts/color-target.lua",
+      "before_sha256": null,
+      "after_sha256": "a5cac2bf802c2ac7c9868854669f56df802ac62cbe2fc6f240b84377b6130501",
+      "backup": null,
+      "note": "新增文件，回退移出活动目录"
+    },
+    {
+      "path": "portable_config/script-opts/color-target.conf",
+      "before_sha256": null,
+      "after_sha256": "d282d6ff2ff00c7cda16a5ff8d3d6fd2789a7b4db973710835efcf63ee3002f5",
+      "backup": null,
+      "note": "新增文件，回退移出活动目录"
+    },
+    {
+      "path": "portable_config/components.lock.json",
+      "before_sha256": null,
+      "after_sha256": "8b25f646fda1b12cbc2604afbe4d913bf2364ba9c9292d27eccce244f492ddb0",
+      "backup": null,
+      "note": "组件锁只新增 color_management；回退删除该字段"
+    }
+  ]
+}

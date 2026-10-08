@@ -1,0 +1,670 @@
+{
+  "date": "2026-10-08",
+  "version": "1.5.7",
+  "environment": "Windows 11／RX6600／165Hz SDR桌面／1920×1080窗口；WASAPI静音，正常GPU表面复制",
+  "performance_scope": "增强预热5秒，三轮至少20秒；关闭后5秒状态回归；54次启停暂停跳转，18组采样；SVP／CCD无音轨，音频另作AV组合回归",
+  "signature": "309bc046f45dd3c2a1ca1f75c21455af0d3308e3041ee3dc5a8f472cee6edbd7",
+  "performance": [
+    {
+      "preset": "svp",
+      "route": "d3d11va",
+      "cpu_core_percent_median": 99.48239686497341,
+      "clock_ratios": [
+        0.9995950413335023,
+        0.9996577127433927,
+        0.9992859023765129
+      ],
+      "display_drops": [
+        0,
+        0,
+        0
+      ],
+      "decoder_drops": [
+        0,
+        0,
+        0
+      ],
+      "steady_audio_events": [
+        null,
+        null,
+        null
+      ],
+      "transition_audio_events": [
+        0,
+        0,
+        0
+      ],
+      "load_seconds": [
+        1.4949558000007528,
+        2.5744457999999213,
+        3.092436099999759
+      ],
+      "output_formats": [
+        "yuv420p",
+        "yuv420p",
+        "yuv420p"
+      ]
+    },
+    {
+      "preset": "svp",
+      "route": "d3d11va-copy",
+      "cpu_core_percent_median": 80.6632934757454,
+      "clock_ratios": [
+        0.9993090811005343,
+        0.9994602613845414,
+        1.0001325887791193
+      ],
+      "display_drops": [
+        0,
+        0,
+        0
+      ],
+      "decoder_drops": [
+        0,
+        0,
+        0
+      ],
+      "steady_audio_events": [
+        null,
+        null,
+        null
+      ],
+      "transition_audio_events": [
+        0,
+        0,
+        0
+      ],
+      "load_seconds": [
+        1.546943299999839,
+        3.2382815000000846,
+        2.279315300000235
+      ],
+      "output_formats": [
+        "yuv420p",
+        "yuv420p",
+        "yuv420p"
+      ]
+    },
+    {
+      "preset": "ccd",
+      "route": "d3d11va",
+      "cpu_core_percent_median": 405.0122400022969,
+      "clock_ratios": [
+        0.6849059741474024,
+        0.43787309212121056,
+        0.5100826451749011
+      ],
+      "display_drops": [
+        205,
+        96,
+        131
+      ],
+      "decoder_drops": [
+        0,
+        0,
+        0
+      ],
+      "steady_audio_events": [
+        null,
+        null,
+        null
+      ],
+      "transition_audio_events": [
+        0,
+        0,
+        0
+      ],
+      "load_seconds": [
+        0.452937900001416,
+        0.7128485999999157,
+        0.5261721000001671
+      ],
+      "output_formats": [
+        "yuv420p",
+        "yuv420p",
+        "yuv420p"
+      ]
+    },
+    {
+      "preset": "ccd",
+      "route": "d3d11va-copy",
+      "cpu_core_percent_median": 397.0548673155051,
+      "clock_ratios": [
+        0.6309103796188998,
+        0.44629697351609954,
+        0.4952907770628696
+      ],
+      "display_drops": [
+        170,
+        99,
+        112
+      ],
+      "decoder_drops": [
+        0,
+        0,
+        0
+      ],
+      "steady_audio_events": [
+        null,
+        null,
+        null
+      ],
+      "transition_audio_events": [
+        0,
+        0,
+        0
+      ],
+      "load_seconds": [
+        0.46147950000158744,
+        0.7328460999999606,
+        0.5142679999999018
+      ],
+      "output_formats": [
+        "yuv420p",
+        "yuv420p",
+        "yuv420p"
+      ]
+    },
+    {
+      "preset": "rife-dml-426",
+      "route": "d3d11va",
+      "cpu_core_percent_median": 27.164764895522946,
+      "clock_ratios": [
+        0.9994214351197667,
+        0.99882200103357,
+        0.9996881845117203
+      ],
+      "display_drops": [
+        0,
+        0,
+        0
+      ],
+      "decoder_drops": [
+        0,
+        0,
+        0
+      ],
+      "steady_audio_events": [
+        0,
+        0,
+        0
+      ],
+      "transition_audio_events": [
+        4,
+        4,
+        4
+      ],
+      "load_seconds": [
+        2.2739208999998937,
+        1.502155500000299,
+        1.4194595999997546
+      ],
+      "output_formats": [
+        "yuv420p10",
+        "yuv420p10",
+        "yuv420p10"
+      ]
+    },
+    {
+      "preset": "rife-dml-426",
+      "route": "d3d11va-copy",
+      "cpu_core_percent_median": 28.921759966560874,
+      "clock_ratios": [
+        1.0001794176072363,
+        0.9996617988907309,
+        0.9992373833012101
+      ],
+      "display_drops": [
+        0,
+        0,
+        0
+      ],
+      "decoder_drops": [
+        0,
+        0,
+        0
+      ],
+      "steady_audio_events": [
+        0,
+        0,
+        0
+      ],
+      "transition_audio_events": [
+        4,
+        4,
+        4
+      ],
+      "load_seconds": [
+        1.542254400000047,
+        1.5954983999999968,
+        1.388025799999923
+      ],
+      "output_formats": [
+        "yuv420p10",
+        "yuv420p10",
+        "yuv420p10"
+      ]
+    }
+  ],
+  "restored_clock_range": [
+    0.9919016905489383,
+    1.0050489288754971
+  ],
+  "default_change": "无：未满足一致收益与兼容推广条件",
+  "hdr_reference_scope": "受控GPU HDR转换，正负分离16bitPNG读回；非原始FP16／物理面板／默认色调映射验收",
+  "hdr_reference": [
+    {
+      "source": "pq",
+      "max_absolute_error_nits": 0.5386864716247146,
+      "passed": true
+    },
+    {
+      "source": "hlg",
+      "max_absolute_error_nits": 0.6097797549224424,
+      "passed": true
+    }
+  ],
+  "excluded_scope": "重叠菜单运行的2轮已排除并串行重测；旧配置、最小化、短诊断未混入三轮结果",
+  "memory_scope": "进程PDH GPU内存计数，未采样或不存在实例时为空；缓存保留不等同泄漏",
+  "memory": [
+    {
+      "preset": "svp",
+      "before": {
+        "preset": "svp",
+        "phase": "before",
+        "cycle": 0,
+        "gpu_process_memory": {
+          "dedicated_mb": 129.9609375,
+          "shared_mb": 12.80078125
+        },
+        "process_memory": {
+          "working_mb": 845.140625,
+          "private_mb": 1014.19140625
+        }
+      },
+      "on_third": {
+        "preset": "svp",
+        "phase": "on",
+        "cycle": 3,
+        "gpu_process_memory": {
+          "dedicated_mb": 309.55078125,
+          "shared_mb": 49.57421875
+        },
+        "process_memory": {
+          "working_mb": 1324.6171875,
+          "private_mb": 1721.11328125
+        }
+      },
+      "off": [
+        {
+          "preset": "svp",
+          "phase": "off",
+          "cycle": 1,
+          "gpu_process_memory": {
+            "dedicated_mb": 187.83984375,
+            "shared_mb": 45.09765625
+          },
+          "process_memory": {
+            "working_mb": 978.78515625,
+            "private_mb": 1306.80078125
+          }
+        },
+        {
+          "preset": "svp",
+          "phase": "off",
+          "cycle": 2,
+          "gpu_process_memory": {
+            "dedicated_mb": 187.83203125,
+            "shared_mb": 45.09765625
+          },
+          "process_memory": {
+            "working_mb": 994.36328125,
+            "private_mb": 1352.6875
+          }
+        },
+        {
+          "preset": "svp",
+          "phase": "off",
+          "cycle": 3,
+          "gpu_process_memory": {
+            "dedicated_mb": 187.83203125,
+            "shared_mb": 45.09765625
+          },
+          "process_memory": {
+            "working_mb": 993.95703125,
+            "private_mb": 1357.73046875
+          }
+        }
+      ],
+      "exit": {
+        "preset": "svp",
+        "phase": "exit",
+        "gpu_process_memory": {}
+      }
+    },
+    {
+      "preset": "rife-dml-426",
+      "before": {
+        "preset": "rife-dml-426",
+        "phase": "before",
+        "cycle": 0,
+        "gpu_process_memory": {
+          "dedicated_mb": 46.3359375,
+          "shared_mb": 4.890625
+        },
+        "process_memory": {
+          "working_mb": 800.56640625,
+          "private_mb": 829.21875
+        }
+      },
+      "on_third": {
+        "preset": "rife-dml-426",
+        "phase": "on",
+        "cycle": 3,
+        "gpu_process_memory": {
+          "dedicated_mb": 717.62890625,
+          "shared_mb": 102.96875
+        },
+        "process_memory": {
+          "working_mb": 1226.47265625,
+          "private_mb": 1929.234375
+        }
+      },
+      "off": [
+        {
+          "preset": "rife-dml-426",
+          "phase": "off",
+          "cycle": 1,
+          "gpu_process_memory": {
+            "dedicated_mb": 77.65625,
+            "shared_mb": 10.140625
+          },
+          "process_memory": {
+            "working_mb": 894.8359375,
+            "private_mb": 1199.58203125
+          }
+        },
+        {
+          "preset": "rife-dml-426",
+          "phase": "off",
+          "cycle": 2,
+          "gpu_process_memory": {
+            "dedicated_mb": 77.6484375,
+            "shared_mb": 10.140625
+          },
+          "process_memory": {
+            "working_mb": 903.1171875,
+            "private_mb": 1174.86328125
+          }
+        },
+        {
+          "preset": "rife-dml-426",
+          "phase": "off",
+          "cycle": 3,
+          "gpu_process_memory": {
+            "dedicated_mb": 77.6484375,
+            "shared_mb": 10.140625
+          },
+          "process_memory": {
+            "working_mb": 911.23828125,
+            "private_mb": 1228.99609375
+          }
+        }
+      ],
+      "exit": {
+        "preset": "rife-dml-426",
+        "phase": "exit",
+        "gpu_process_memory": {}
+      }
+    },
+    {
+      "preset": "ccd",
+      "before": {
+        "preset": "ccd",
+        "phase": "before",
+        "cycle": 0,
+        "gpu_process_memory": {
+          "dedicated_mb": 385.296875,
+          "shared_mb": 36.53125
+        },
+        "process_memory": {
+          "working_mb": 1089.43359375,
+          "private_mb": 1752.59375
+        }
+      },
+      "on_third": {
+        "preset": "ccd",
+        "phase": "on",
+        "cycle": 3,
+        "gpu_process_memory": {
+          "dedicated_mb": 469.2578125,
+          "shared_mb": 72.6484375
+        },
+        "process_memory": {
+          "working_mb": 3936.6640625,
+          "private_mb": 4661.375
+        }
+      },
+      "off": [
+        {
+          "preset": "ccd",
+          "phase": "off",
+          "cycle": 1,
+          "gpu_process_memory": {
+            "dedicated_mb": 469.265625,
+            "shared_mb": 72.6484375
+          },
+          "process_memory": {
+            "working_mb": 1196.3359375,
+            "private_mb": 1920.2890625
+          }
+        },
+        {
+          "preset": "ccd",
+          "phase": "off",
+          "cycle": 2,
+          "gpu_process_memory": {
+            "dedicated_mb": 469.265625,
+            "shared_mb": 72.6484375
+          },
+          "process_memory": {
+            "working_mb": 1143.3984375,
+            "private_mb": 1867.44140625
+          }
+        },
+        {
+          "preset": "ccd",
+          "phase": "off",
+          "cycle": 3,
+          "gpu_process_memory": {
+            "dedicated_mb": 469.265625,
+            "shared_mb": 72.6484375
+          },
+          "process_memory": {
+            "working_mb": 1153.38671875,
+            "private_mb": 1877.44140625
+          }
+        }
+      ],
+      "exit": {
+        "preset": "ccd",
+        "phase": "exit",
+        "gpu_process_memory": {}
+      }
+    }
+  ],
+  "av_scope": "640×360 HEVC10+AAC，预热后5秒兼容回归，非三轮20秒性能结论",
+  "av_compatibility": [
+    {
+      "route": "d3d11va",
+      "case": "svp",
+      "clock_ratio": 0.9963776536051111,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      },
+      "audio_underrun_events": 0,
+      "audio_output": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      }
+    },
+    {
+      "route": "d3d11va",
+      "case": "ccd+svp",
+      "clock_ratio": 0.9973145428989985,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      },
+      "audio_underrun_events": 0,
+      "audio_output": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      }
+    },
+    {
+      "route": "d3d11va",
+      "case": "ccd+rife",
+      "clock_ratio": 0.9980523007380812,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      },
+      "audio_underrun_events": 0,
+      "audio_output": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      }
+    },
+    {
+      "route": "d3d11va",
+      "case": "missing-std-rollback+seek+file-change",
+      "clock_ratio": 0.9955168432587054,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      },
+      "audio_underrun_events": 0,
+      "audio_output": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      }
+    },
+    {
+      "route": "d3d11va-copy",
+      "case": "svp",
+      "clock_ratio": 0.9982377859658623,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      },
+      "audio_underrun_events": 0,
+      "audio_output": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      }
+    },
+    {
+      "route": "d3d11va-copy",
+      "case": "ccd+svp",
+      "clock_ratio": 0.9976860066382587,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      },
+      "audio_underrun_events": 0,
+      "audio_output": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      }
+    },
+    {
+      "route": "d3d11va-copy",
+      "case": "ccd+rife",
+      "clock_ratio": 1.0000043910385776,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      },
+      "audio_underrun_events": 0,
+      "audio_output": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      }
+    },
+    {
+      "route": "d3d11va-copy",
+      "case": "missing-std-rollback+seek+file-change",
+      "clock_ratio": 0.9974918671931192,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      },
+      "audio_underrun_events": 0,
+      "audio_output": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      }
+    }
+  ],
+  "hdr_configuration_scope": "完整配置静态HDR像素一致性与真实输出协商；隔离副本暂停显示检测并模拟能力，非面板测量",
+  "hdr_configuration": [
+    {
+      "source": "hdr10",
+      "gamma": "pq",
+      "hdr_to_sdr_ccd_max_code_difference": 0,
+      "hdr_to_sdr_combination_max_code_difference": 0,
+      "precision_target": "渲染目标：bt.709 / scrgb / rgb / full / 浮点存储 16bit [rgba16hf]",
+      "passed": true
+    },
+    {
+      "source": "hlg",
+      "gamma": "hlg",
+      "hdr_to_sdr_ccd_max_code_difference": 0,
+      "hdr_to_sdr_combination_max_code_difference": 7,
+      "precision_target": "渲染目标：bt.709 / scrgb / rgb / full / 浮点存储 16bit [rgba16hf]",
+      "passed": true
+    }
+  ],
+  "checks": {
+    "lua_syntax": 134,
+    "python_syntax": 67,
+    "color_state": true,
+    "quality_state": true,
+    "precision_descriptions": true,
+    "known_upstream_patch_reapplication": true,
+    "unknown_upstream_rejected_before_writes": true,
+    "same_target_no_vo_rebuild": true,
+    "display_specific_preferences": true,
+    "compact_scrollable_menu": true,
+    "gpu_crop_direct_copy_software_hdr10": true,
+    "ordinary_filter_flow_no_preflight": true,
+    "restored_gpu_copy_format_all_18": true,
+    "ui_screenshots_reviewed": true
+  }
+}

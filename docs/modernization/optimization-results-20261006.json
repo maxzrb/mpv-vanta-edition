@@ -1,0 +1,3439 @@
+{
+  "date": "2026-10-06",
+  "environment": {
+    "gpu": "AMD RX 6600",
+    "display": "ASUS VG249Q1A / SDR / 1920x1080 165Hz",
+    "core": "mpv 0.41.0-1095 / FFmpeg N-127165 / libplacebo 7.374"
+  },
+  "limits": [
+    "真实 HDR 面板色准未验收",
+    "NVIDIA／Intel 实机未验收",
+    "动态 HDR／DV 执行与光度测量未验收",
+    "小尺寸滤镜功能通过不代表 1080p／4K 实时性能"
+  ],
+  "performance": [
+    {
+      "case": "direct",
+      "trial": 1,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-Balanced",
+      "sample_seconds": 20.41494700000021,
+      "media_advance": 20.4,
+      "clock_ratio": 0.9992678403720464,
+      "cpu_core_percent": 5.051445884233691,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "copy",
+      "trial": 1,
+      "hwdec": "d3d11va-copy",
+      "actual_hwdec": "d3d11va-copy",
+      "profile": "Performance-Balanced",
+      "sample_seconds": 20.185285499999736,
+      "media_advance": 20.166999999999998,
+      "clock_ratio": 0.9990941173460371,
+      "cpu_core_percent": 18.810112940934374,
+      "counters": {
+        "frame-drop-count": 42,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "low-power",
+      "trial": 1,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-LowPower",
+      "sample_seconds": 20.363814099999217,
+      "media_advance": 20.334,
+      "clock_ratio": 0.9985359275107889,
+      "cpu_core_percent": 5.6779638348792645,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "high-quality",
+      "trial": 1,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-HighQuality",
+      "sample_seconds": 20.488341299999774,
+      "media_advance": 20.467000000000002,
+      "clock_ratio": 0.9989583685820496,
+      "cpu_core_percent": 5.567190546557385,
+      "counters": {
+        "frame-drop-count": 6,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "high-quality",
+      "trial": 2,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-HighQuality",
+      "sample_seconds": 20.446789000000535,
+      "media_advance": 20.466,
+      "clock_ratio": 1.0009395607300229,
+      "cpu_core_percent": 7.412533087713481,
+      "counters": {
+        "frame-drop-count": 26,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "low-power",
+      "trial": 2,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-LowPower",
+      "sample_seconds": 20.384073900000658,
+      "media_advance": 20.367,
+      "clock_ratio": 0.9991623902030371,
+      "cpu_core_percent": 6.132238364775354,
+      "counters": {
+        "frame-drop-count": 1,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "copy",
+      "trial": 2,
+      "hwdec": "d3d11va-copy",
+      "actual_hwdec": "d3d11va-copy",
+      "profile": "Performance-Balanced",
+      "sample_seconds": 20.131994100000156,
+      "media_advance": 20.166,
+      "clock_ratio": 1.0016891471272507,
+      "cpu_core_percent": 15.755394047130062,
+      "counters": {
+        "frame-drop-count": 300,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": [
+        "[  14.871][w][cplayer] Audio device underrun detected.",
+        "[  14.871][v][cplayer] restarting audio after underrun"
+      ]
+    },
+    {
+      "case": "direct",
+      "trial": 2,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-Balanced",
+      "sample_seconds": 20.403054499999598,
+      "media_advance": 20.400000000000002,
+      "clock_ratio": 0.9998502920236969,
+      "cpu_core_percent": 6.586023676013935,
+      "counters": {
+        "frame-drop-count": 10,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "direct",
+      "trial": 3,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-Balanced",
+      "sample_seconds": 20.370853800000077,
+      "media_advance": 20.366,
+      "clock_ratio": 0.9997617282001171,
+      "cpu_core_percent": 7.670272514547201,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "copy",
+      "trial": 3,
+      "hwdec": "d3d11va-copy",
+      "actual_hwdec": "d3d11va-copy",
+      "profile": "Performance-Balanced",
+      "sample_seconds": 20.2802042000003,
+      "media_advance": 20.3,
+      "clock_ratio": 1.0009761144318114,
+      "cpu_core_percent": 17.104117718893328,
+      "counters": {
+        "frame-drop-count": 56,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "low-power",
+      "trial": 3,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-LowPower",
+      "sample_seconds": 20.38190349999968,
+      "media_advance": 20.366999999999997,
+      "clock_ratio": 0.9992687876282172,
+      "cpu_core_percent": 4.7529908087339106,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "high-quality",
+      "trial": 3,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-HighQuality",
+      "sample_seconds": 20.509069799999452,
+      "media_advance": 20.466,
+      "clock_ratio": 0.9978999632640847,
+      "cpu_core_percent": 6.094864429200165,
+      "counters": {
+        "frame-drop-count": 21,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "errors": [],
+      "audio_underruns": []
+    }
+  ],
+  "peak_seek": [
+    {
+      "case": "peak-auto",
+      "trial": 1,
+      "seconds": 20.384722199999487,
+      "clock_ratio": 1.0056551077257516,
+      "cpu_core_percent": 6.361994965033336,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      }
+    },
+    {
+      "case": "peak-off",
+      "trial": 1,
+      "seconds": 20.385200200000327,
+      "clock_ratio": 1.0056315267386813,
+      "cpu_core_percent": 0.3832437220802901,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      }
+    },
+    {
+      "case": "peak-auto",
+      "trial": 2,
+      "seconds": 20.352127199999813,
+      "clock_ratio": 1.0052511857335578,
+      "cpu_core_percent": 1.4586927306547235,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      }
+    },
+    {
+      "case": "peak-off",
+      "trial": 2,
+      "seconds": 20.34505689999969,
+      "clock_ratio": 1.0056005299252968,
+      "cpu_core_percent": 0.6143998545415811,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      }
+    },
+    {
+      "case": "peak-auto",
+      "trial": 3,
+      "seconds": 20.405392000000575,
+      "clock_ratio": 1.0066947010868217,
+      "cpu_core_percent": 8.040154288630935,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      }
+    },
+    {
+      "case": "peak-off",
+      "trial": 3,
+      "seconds": 20.37154660000033,
+      "clock_ratio": 1.0042438309519253,
+      "cpu_core_percent": 5.982609096552249,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0
+      }
+    },
+    {
+      "case": "seek-no",
+      "trial": 1,
+      "seek_seconds": [
+        0.2104855999996289,
+        0.13694219999979396,
+        0.22178489999987505,
+        0.05324139999993349,
+        0.28511360000084096
+      ]
+    },
+    {
+      "case": "seek-yes",
+      "trial": 1,
+      "seek_seconds": [
+        0.04165770000054181,
+        0.07387050000033923,
+        0.11646319999999832,
+        0.04223900000033609,
+        0.18852390000029118
+      ]
+    },
+    {
+      "case": "seek-no",
+      "trial": 2,
+      "seek_seconds": [
+        0.03231080000023212,
+        0.13751500000034866,
+        0.20165189999988797,
+        0.053131600000597246,
+        0.31152210000072955
+      ]
+    },
+    {
+      "case": "seek-yes",
+      "trial": 2,
+      "seek_seconds": [
+        0.04304130000036821,
+        0.08400329999949463,
+        0.11729710000054183,
+        0.02141979999942123,
+        0.18917559999954392
+      ]
+    },
+    {
+      "case": "seek-no",
+      "trial": 3,
+      "seek_seconds": [
+        0.05302579999988666,
+        0.12585260000014387,
+        0.2002332000001843,
+        0.042384600000332284,
+        0.3168033000001742
+      ]
+    },
+    {
+      "case": "seek-yes",
+      "trial": 3,
+      "seek_seconds": [
+        0.021803100000397535,
+        0.07487399999990885,
+        0.12475300000005518,
+        0.0414558999991641,
+        0.1871926000003441
+      ]
+    }
+  ],
+  "startup": [
+    {
+      "case": "managed",
+      "trial": 1,
+      "ipc_video_ready_seconds": 0.976025999999365,
+      "first_video_frame_log_seconds": 2.089
+    },
+    {
+      "case": "without-managers",
+      "trial": 1,
+      "ipc_video_ready_seconds": 0.8325613999995767,
+      "first_video_frame_log_seconds": 1.598
+    },
+    {
+      "case": "without-managers",
+      "trial": 2,
+      "ipc_video_ready_seconds": 0.5347957999993014,
+      "first_video_frame_log_seconds": 0.587
+    },
+    {
+      "case": "managed",
+      "trial": 2,
+      "ipc_video_ready_seconds": 0.5078108999996402,
+      "first_video_frame_log_seconds": 0.597
+    },
+    {
+      "case": "managed",
+      "trial": 3,
+      "ipc_video_ready_seconds": 0.5858203999996476,
+      "first_video_frame_log_seconds": 0.665
+    },
+    {
+      "case": "without-managers",
+      "trial": 3,
+      "ipc_video_ready_seconds": 0.5850937000004706,
+      "first_video_frame_log_seconds": 0.637
+    }
+  ],
+  "validation": {
+    "quality": [
+      {
+        "id": "mvt",
+        "state": {
+          "error": "",
+          "warning": "",
+          "restore_pending": [
+            "interpolation"
+          ],
+          "preparing": "",
+          "active": {
+            "memc": "mvt"
+          },
+          "state": "已添加",
+          "capabilities": [],
+          "performance": "balanced",
+          "chain": [
+            {
+              "title": "MVTools 二倍帧",
+              "id": "mvt",
+              "group": "memc"
+            }
+          ]
+        },
+        "fps": 48.0,
+        "output": {
+          "pixelformat": "yuv420p10",
+          "average-bpp": 24,
+          "w": 320,
+          "h": 180,
+          "dw": 320,
+          "dh": 180,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 320,
+          "crop-h": 180,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        }
+      },
+      {
+        "id": "rife-dml",
+        "state": {
+          "error": "",
+          "warning": "",
+          "restore_pending": [
+            "interpolation"
+          ],
+          "preparing": "",
+          "active": {
+            "memc": "rife-dml"
+          },
+          "state": "已添加",
+          "capabilities": [],
+          "performance": "balanced",
+          "chain": [
+            {
+              "title": "RIFE 4.25 Lite · DirectML 二倍帧",
+              "id": "rife-dml",
+              "group": "memc"
+            }
+          ]
+        },
+        "fps": 47.995323,
+        "output": {
+          "pixelformat": "yuv420p10",
+          "average-bpp": 24,
+          "w": 320,
+          "h": 180,
+          "dw": 320,
+          "dh": 180,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 320,
+          "crop-h": 180,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        }
+      },
+      {
+        "id": "rife-dml-426",
+        "state": {
+          "error": "",
+          "warning": "",
+          "restore_pending": [
+            "interpolation"
+          ],
+          "preparing": "",
+          "active": {
+            "memc": "rife-dml-426"
+          },
+          "state": "已添加",
+          "capabilities": [],
+          "performance": "balanced",
+          "chain": [
+            {
+              "title": "RIFE 4.26 · DirectML 二倍帧",
+              "id": "rife-dml-426",
+              "group": "memc"
+            }
+          ]
+        },
+        "fps": 48.004791,
+        "output": {
+          "pixelformat": "yuv420p10",
+          "average-bpp": 24,
+          "w": 320,
+          "h": 180,
+          "dw": 320,
+          "dh": 180,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 320,
+          "crop-h": 180,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        }
+      },
+      {
+        "id": "rife-dml-heavy",
+        "state": {
+          "error": "",
+          "warning": "",
+          "restore_pending": [
+            "interpolation"
+          ],
+          "preparing": "",
+          "active": {
+            "memc": "rife-dml-heavy"
+          },
+          "state": "已添加",
+          "capabilities": [],
+          "performance": "balanced",
+          "chain": [
+            {
+              "title": "RIFE 4.26 Heavy · DirectML 二倍帧",
+              "id": "rife-dml-heavy",
+              "group": "memc"
+            }
+          ]
+        },
+        "fps": 47.995369,
+        "output": {
+          "pixelformat": "yuv420p10",
+          "average-bpp": 24,
+          "w": 320,
+          "h": 180,
+          "dw": 320,
+          "dh": 180,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 320,
+          "crop-h": 180,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        }
+      },
+      {
+        "id": "drba-dml",
+        "state": {
+          "error": "",
+          "warning": "",
+          "restore_pending": [
+            "interpolation"
+          ],
+          "preparing": "",
+          "active": {
+            "memc": "drba-dml"
+          },
+          "state": "已添加",
+          "capabilities": [],
+          "performance": "balanced",
+          "chain": [
+            {
+              "title": "DRBA · DirectML",
+              "id": "drba-dml",
+              "group": "memc"
+            }
+          ]
+        },
+        "fps": 47.997678,
+        "output": {
+          "pixelformat": "yuv420p10",
+          "average-bpp": 24,
+          "w": 320,
+          "h": 180,
+          "dw": 320,
+          "dh": 180,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 320,
+          "crop-h": 180,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        }
+      },
+      {
+        "id": "svp",
+        "state": {
+          "error": "",
+          "warning": "",
+          "restore_pending": [
+            "interpolation"
+          ],
+          "preparing": "",
+          "active": {
+            "memc": "svp"
+          },
+          "state": "已添加",
+          "capabilities": [],
+          "performance": "balanced",
+          "chain": [
+            {
+              "title": "SVP",
+              "id": "svp",
+              "group": "memc"
+            }
+          ]
+        },
+        "fps": 59.941358,
+        "output": {
+          "pixelformat": "yuv420p10",
+          "average-bpp": 24,
+          "w": 320,
+          "h": 180,
+          "dw": 320,
+          "dh": 180,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 320,
+          "crop-h": 180,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        }
+      },
+      {
+        "id": "ccd",
+        "state": {
+          "error": "",
+          "warning": "",
+          "restore_pending": [],
+          "preparing": "",
+          "active": {
+            "denoise": "ccd"
+          },
+          "state": "已添加",
+          "capabilities": [],
+          "performance": "balanced",
+          "chain": [
+            {
+              "title": "CCD 彩噪降低",
+              "id": "ccd",
+              "group": "denoise"
+            }
+          ]
+        },
+        "fps": 26.464529,
+        "output": {
+          "pixelformat": "yuv420p10",
+          "average-bpp": 24,
+          "w": 320,
+          "h": 180,
+          "dw": 320,
+          "dh": 180,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 320,
+          "crop-h": 180,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        }
+      },
+      {
+        "id": "rife-std",
+        "expected_failure": {
+          "error": "RIFE-STD · NCNN（独立后端）：Script evaluation failed:\nPython exception: 模块 RIFE_STD 依赖错误：缺失插件，检查项目 rife\n\nTraceback (most recent call last):\n  File \"src/cython/vapoursynth.pyx\", line 3393, in vapoursynth._vpy_evaluate\n  File \"src/cython/vapoursynth.pyx\", line 3394, in vapoursynth._vpy_evaluate\n  File \"C:\\Program portable\\mpv2\\portable_config\\scripts\\../vs/MEMC_RIFE_STD.vpy\", line 35, in <module>\n    clip = k7f.RIFE_STD(clip, model=Model, turbo=2, fps_num=Fps_Num, fps_den=Fps_Den, sc_mode=Sc_Mode, stat_th=Stat_Th, gpu=Gpu, gpu_t=Gpu_T)\n  File \"C:\\Program portable\\mpv2\\Lib\\site-packages\\k7sfunc\\mod_memc.py\", line 385, in RIFE_STD\n    _check_plugin(func_name, \"rife\")\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program portable\\mpv2\\Lib\\site-packages\\k7sfunc\\_internal.py\", line 229, in _check_plugin\n    raise ModuleNotFoundError(f\"模块 {func_name} 依赖错误：缺失插件，检查项目 {plugin_name}\")\nModuleNotFoundError: 模块 RIFE_STD 依赖错误：缺失插件，检查项目 rife\n\ncould not init VS",
+          "warning": "",
+          "restore_pending": [
+            "interpolation"
+          ],
+          "preparing": "",
+          "active": {
+            "memc": "rife-dml-426"
+          },
+          "state": "失败",
+          "capabilities": [],
+          "performance": "balanced",
+          "chain": [
+            {
+              "title": "RIFE 4.26 · DirectML 二倍帧",
+              "id": "rife-dml-426",
+              "group": "memc"
+            }
+          ]
+        }
+      },
+      {
+        "id": "denoise+upscale+memc+shader",
+        "state": {
+          "error": "CCD 彩噪降低：No PTS after filter at frame 579!",
+          "warning": "",
+          "restore_pending": [
+            "interpolation"
+          ],
+          "preparing": "",
+          "active": {
+            "upscale": "uai-dml",
+            "memc": "rife-dml-426",
+            "shader": "artcnn"
+          },
+          "state": "失败",
+          "capabilities": [],
+          "performance": "balanced",
+          "chain": [
+            {
+              "title": "AI 超分 · DirectML",
+              "id": "uai-dml",
+              "group": "upscale"
+            },
+            {
+              "title": "RIFE 4.26 · DirectML 二倍帧",
+              "id": "rife-dml-426",
+              "group": "memc"
+            }
+          ]
+        },
+        "output": {
+          "pixelformat": "yuv420p10",
+          "average-bpp": 24,
+          "w": 640,
+          "h": 360,
+          "dw": 640,
+          "dh": 360,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 640,
+          "crop-h": 360,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        }
+      },
+      {
+        "id": "hdr-warning-only",
+        "state": {
+          "error": "",
+          "warning": "本增强的 HDR／广色域色彩保真尚未验证",
+          "restore_pending": [],
+          "preparing": "",
+          "active": {
+            "shader": "artcnn"
+          },
+          "state": "已添加",
+          "capabilities": [],
+          "performance": "balanced",
+          "chain": []
+        }
+      },
+      {
+        "id": "direct-hwdec+cpu-filter",
+        "fps": 60.0
+      }
+    ],
+    "quality-menu": {
+      "passed": [
+        "原菜单结构保留；滤镜一次启用／性能档位／自动匹配入口正常",
+        "原有推荐／Anime4K 方案实际应用，外部 VF 保持",
+        "分别清空：另一类处理保持",
+        "缺失 Shader 请求交给实际加载器报告",
+        "十二组 Anime4K 应用；倍率不再限制菜单",
+        "VS 菜单打开；切片清除会话增强",
+        "广色域增强可用，色彩未验证只提示"
+      ],
+      "limits": "320×180 功能回归；非显卡性能与色准验收"
+    },
+    "compat": {
+      "local": {
+        "hwdec-current": "d3d11va",
+        "video-dec-params": {
+          "pixelformat": "d3d11",
+          "hw-pixelformat": "p010",
+          "average-bpp": 24,
+          "w": 640,
+          "h": 360,
+          "dw": 640,
+          "dh": 360,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 640,
+          "crop-h": 360,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "auto",
+          "gamma": "auto",
+          "sig-peak": 0.0,
+          "light": "auto",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        },
+        "audio-params": {
+          "samplerate": 48000,
+          "channel-count": 1,
+          "channels": "mono",
+          "hr-channels": "mono",
+          "format": "floatp"
+        },
+        "current-ao": "wasapi"
+      },
+      "http": "passed",
+      "subtitles": "primary + secondary passed"
+    },
+    "color-target": [
+      {
+        "source": "sdr8",
+        "source_params": {
+          "pixelformat": "d3d11",
+          "hw-pixelformat": "nv12",
+          "average-bpp": 12,
+          "w": 640,
+          "h": 360,
+          "dw": 640,
+          "dh": 360,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 640,
+          "crop-h": 360,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        },
+        "state": {
+          "status": "可用",
+          "display": "未知",
+          "peak_source": "未知",
+          "mode": "sdr",
+          "requested": "hdr",
+          "hdr_supported": false,
+          "hdr_status": "未知",
+          "reported_bits": "未知",
+          "hdr_active": false,
+          "manual": true,
+          "reference_white": "auto",
+          "actual_settings": {
+            "target-contrast": "auto",
+            "target-colorspace-hint": false,
+            "target-colorspace-hint-mode": "target",
+            "target-colorspace-hint-strict": true,
+            "d3d11-output-format": "auto",
+            "d3d11-output-csp": "srgb",
+            "hdr-reference-white": "auto",
+            "inverse-tone-mapping": false,
+            "hdr-contrast-recovery": 0,
+            "treat-srgb-as-power22": false,
+            "icc-profile": "",
+            "icc-profile-auto": false,
+            "icc-intent": 1,
+            "target-prim": "bt.709",
+            "target-trc": "srgb",
+            "target-peak": "auto"
+          },
+          "external_overrides": [],
+          "restore_pending": [
+            "icc-profile",
+            "icc-profile-auto",
+            "icc-intent",
+            "target-prim",
+            "target-trc",
+            "target-peak",
+            "target-contrast",
+            "target-colorspace-hint",
+            "target-colorspace-hint-mode",
+            "target-colorspace-hint-strict",
+            "d3d11-output-format",
+            "d3d11-output-csp",
+            "hdr-reference-white",
+            "inverse-tone-mapping",
+            "hdr-contrast-recovery",
+            "treat-srgb-as-power22"
+          ],
+          "actual_target": {
+            "colorlevels": "full",
+            "w": 640,
+            "h": 360,
+            "aspect": 1.777778,
+            "dw": 640,
+            "rotate": 0,
+            "alpha": "premul",
+            "min-luma": 0.08,
+            "max-luma": 80,
+            "max-cll": 0,
+            "max-fall": 0,
+            "stereo-in": "mono",
+            "chroma-location": "unknown",
+            "light": "auto",
+            "sig-peak": 0.394089,
+            "gamma": "srgb",
+            "pixelformat": "rgb10a2",
+            "dh": 360,
+            "aspect-name": "16:9",
+            "primaries": "bt.709",
+            "par": "-nan(ind)",
+            "sar": 1.777778,
+            "sar-name": "16:9",
+            "colormatrix": "rgb"
+          },
+          "display_id": "未知",
+          "swapchain": "未知",
+          "reason": "Windows HDR 未开启或状态未知，使用 SDR 基线",
+          "intermediate": "gpu-next 自动选择；实际纹理格式见日志"
+        },
+        "passed": true
+      },
+      {
+        "source": "quality-sdr10",
+        "source_params": {
+          "pixelformat": "yuv420p10",
+          "average-bpp": 24,
+          "w": 320,
+          "h": 180,
+          "dw": 320,
+          "dh": 180,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 320,
+          "crop-h": 180,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        },
+        "state": {
+          "reference_white": "auto",
+          "external_overrides": [],
+          "restore_pending": [
+            "icc-profile",
+            "icc-profile-auto",
+            "icc-intent",
+            "target-prim",
+            "target-trc",
+            "target-peak",
+            "target-contrast",
+            "target-colorspace-hint",
+            "target-colorspace-hint-mode",
+            "target-colorspace-hint-strict",
+            "d3d11-output-format",
+            "d3d11-output-csp",
+            "hdr-reference-white",
+            "inverse-tone-mapping",
+            "hdr-contrast-recovery",
+            "treat-srgb-as-power22"
+          ],
+          "actual_target": {
+            "dw": 320,
+            "dh": 180,
+            "pixelformat": "rgb10a2",
+            "par": "-nan(ind)",
+            "sar": 1.777778,
+            "sar-name": "16:9",
+            "colormatrix": "rgb",
+            "colorlevels": "full",
+            "sig-peak": 0.394089,
+            "light": "auto",
+            "chroma-location": "unknown",
+            "stereo-in": "mono",
+            "rotate": 0,
+            "w": 320,
+            "h": 180,
+            "aspect": 1.777778,
+            "max-luma": 80,
+            "max-cll": 0,
+            "max-fall": 0,
+            "min-luma": 0.08,
+            "alpha": "premul",
+            "gamma": "srgb",
+            "primaries": "bt.709",
+            "aspect-name": "16:9"
+          },
+          "swapchain": "未知",
+          "intermediate": "gpu-next 自动选择；实际纹理格式见日志",
+          "status": "可用",
+          "actual_settings": {
+            "inverse-tone-mapping": false,
+            "hdr-contrast-recovery": 0,
+            "treat-srgb-as-power22": false,
+            "target-peak": "auto",
+            "target-prim": "bt.709",
+            "icc-profile-auto": false,
+            "icc-profile": "",
+            "target-trc": "srgb",
+            "icc-intent": 1,
+            "target-contrast": "auto",
+            "target-colorspace-hint": false,
+            "target-colorspace-hint-mode": "target",
+            "target-colorspace-hint-strict": true,
+            "d3d11-output-format": "auto",
+            "d3d11-output-csp": "srgb",
+            "hdr-reference-white": "auto"
+          },
+          "requested": "hdr",
+          "hdr_active": false,
+          "display": "未知",
+          "mode": "sdr",
+          "display_id": "未知",
+          "reason": "Windows HDR 未开启或状态未知，使用 SDR 基线",
+          "hdr_supported": false,
+          "hdr_status": "未知",
+          "reported_bits": "未知",
+          "manual": true,
+          "peak_source": "未知"
+        },
+        "passed": true
+      },
+      {
+        "source": "wide-sdr",
+        "source_params": {
+          "pixelformat": "d3d11",
+          "hw-pixelformat": "p010",
+          "average-bpp": 24,
+          "w": 640,
+          "h": 360,
+          "dw": 640,
+          "dh": 360,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 640,
+          "crop-h": 360,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.2020-ncl",
+          "colorlevels": "limited",
+          "primaries": "bt.2020",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        },
+        "state": {
+          "reference_white": "auto",
+          "status": "可用",
+          "external_overrides": [],
+          "restore_pending": [
+            "icc-profile",
+            "icc-profile-auto",
+            "icc-intent",
+            "target-prim",
+            "target-trc",
+            "target-peak",
+            "target-contrast",
+            "target-colorspace-hint",
+            "target-colorspace-hint-mode",
+            "target-colorspace-hint-strict",
+            "d3d11-output-format",
+            "d3d11-output-csp",
+            "hdr-reference-white",
+            "inverse-tone-mapping",
+            "hdr-contrast-recovery",
+            "treat-srgb-as-power22"
+          ],
+          "swapchain": "未知",
+          "intermediate": "gpu-next 自动选择；实际纹理格式见日志",
+          "actual_target": {
+            "max-luma": 80,
+            "gamma": "srgb",
+            "pixelformat": "rgb10a2",
+            "max-fall": 0,
+            "max-cll": 0,
+            "dw": 640,
+            "dh": 360,
+            "aspect-name": "16:9",
+            "colorlevels": "full",
+            "par": "-nan(ind)",
+            "sar": 1.777778,
+            "sar-name": "16:9",
+            "colormatrix": "rgb",
+            "w": 640,
+            "h": 360,
+            "aspect": 1.777778,
+            "light": "auto",
+            "chroma-location": "unknown",
+            "stereo-in": "mono",
+            "sig-peak": 0.394089,
+            "rotate": 0,
+            "alpha": "premul",
+            "primaries": "bt.709",
+            "min-luma": 0.08
+          },
+          "actual_settings": {
+            "target-colorspace-hint-mode": "target",
+            "target-colorspace-hint-strict": true,
+            "treat-srgb-as-power22": false,
+            "hdr-contrast-recovery": 0,
+            "inverse-tone-mapping": false,
+            "hdr-reference-white": "auto",
+            "d3d11-output-csp": "srgb",
+            "d3d11-output-format": "auto",
+            "icc-profile": "",
+            "icc-profile-auto": false,
+            "icc-intent": 1,
+            "target-prim": "bt.709",
+            "target-trc": "srgb",
+            "target-peak": "auto",
+            "target-contrast": "auto",
+            "target-colorspace-hint": false
+          },
+          "requested": "hdr",
+          "reason": "Windows HDR 未开启或状态未知，使用 SDR 基线",
+          "display": "未知",
+          "mode": "sdr",
+          "display_id": "未知",
+          "hdr_active": false,
+          "hdr_supported": false,
+          "hdr_status": "未知",
+          "reported_bits": "未知",
+          "manual": true,
+          "peak_source": "未知"
+        },
+        "passed": true
+      },
+      {
+        "source": "hdr10",
+        "source_params": {
+          "pixelformat": "d3d11",
+          "hw-pixelformat": "p010",
+          "average-bpp": 24,
+          "w": 640,
+          "h": 360,
+          "dw": 640,
+          "dh": 360,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 640,
+          "crop-h": 360,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.2020-ncl",
+          "colorlevels": "limited",
+          "primaries": "bt.2020",
+          "gamma": "pq",
+          "sig-peak": 4.926108,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none",
+          "min-luma": 0.005,
+          "max-luma": 1000.0,
+          "max-cll": 1000.0,
+          "max-fall": 400.0,
+          "prim-red-x": 0.68,
+          "prim-red-y": 0.32,
+          "prim-green-x": 0.265,
+          "prim-green-y": 0.69,
+          "prim-blue-x": 0.15,
+          "prim-blue-y": 0.06,
+          "prim-white-x": 0.3127,
+          "prim-white-y": 0.329
+        },
+        "state": {
+          "status": "可用",
+          "display": "未知",
+          "mode": "sdr",
+          "requested": "hdr",
+          "reason": "Windows HDR 未开启或状态未知，使用 SDR 基线",
+          "hdr_supported": false,
+          "hdr_status": "未知",
+          "reported_bits": "未知",
+          "manual": true,
+          "peak_source": "未知",
+          "reference_white": "auto",
+          "actual_settings": {
+            "icc-profile": "",
+            "icc-profile-auto": false,
+            "icc-intent": 1,
+            "target-prim": "bt.709",
+            "target-trc": "srgb",
+            "target-peak": "auto",
+            "target-contrast": "auto",
+            "target-colorspace-hint": false,
+            "target-colorspace-hint-mode": "target",
+            "target-colorspace-hint-strict": true,
+            "d3d11-output-format": "auto",
+            "d3d11-output-csp": "srgb",
+            "hdr-reference-white": "auto",
+            "inverse-tone-mapping": false,
+            "hdr-contrast-recovery": 0,
+            "treat-srgb-as-power22": false
+          },
+          "external_overrides": [],
+          "restore_pending": [
+            "icc-profile",
+            "icc-profile-auto",
+            "icc-intent",
+            "target-prim",
+            "target-trc",
+            "target-peak",
+            "target-contrast",
+            "target-colorspace-hint",
+            "target-colorspace-hint-mode",
+            "target-colorspace-hint-strict",
+            "d3d11-output-format",
+            "d3d11-output-csp",
+            "hdr-reference-white",
+            "inverse-tone-mapping",
+            "hdr-contrast-recovery",
+            "treat-srgb-as-power22"
+          ],
+          "actual_target": {
+            "stereo-in": "mono",
+            "rotate": 0,
+            "alpha": "premul",
+            "min-luma": 0.08,
+            "max-luma": 80,
+            "gamma": "srgb",
+            "pixelformat": "rgb10a2",
+            "primaries": "bt.709",
+            "max-fall": 0,
+            "max-cll": 0,
+            "dh": 360,
+            "dw": 640,
+            "w": 640,
+            "h": 360,
+            "aspect": 1.777778,
+            "par": "-nan(ind)",
+            "sar": 1.777778,
+            "sar-name": "16:9",
+            "colormatrix": "rgb",
+            "aspect-name": "16:9",
+            "colorlevels": "full",
+            "sig-peak": 0.394089,
+            "light": "auto",
+            "chroma-location": "unknown"
+          },
+          "swapchain": "未知",
+          "intermediate": "gpu-next 自动选择；实际纹理格式见日志",
+          "hdr_active": false,
+          "display_id": "未知"
+        },
+        "passed": true
+      },
+      {
+        "source": "hlg",
+        "source_params": {
+          "pixelformat": "d3d11",
+          "hw-pixelformat": "p010",
+          "average-bpp": 24,
+          "w": 640,
+          "h": 360,
+          "dw": 640,
+          "dh": 360,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 640,
+          "crop-h": 360,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.2020-ncl",
+          "colorlevels": "limited",
+          "primaries": "bt.2020",
+          "gamma": "hlg",
+          "sig-peak": 4.926108,
+          "light": "hlg",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none",
+          "min-luma": 1e-06,
+          "max-luma": 1000.0,
+          "max-cll": 0.0,
+          "max-fall": 0.0
+        },
+        "state": {
+          "mode": "sdr",
+          "requested": "hdr",
+          "reason": "Windows HDR 未开启或状态未知，使用 SDR 基线",
+          "manual": true,
+          "display": "未知",
+          "display_id": "未知",
+          "hdr_active": false,
+          "hdr_supported": false,
+          "hdr_status": "未知",
+          "reported_bits": "未知",
+          "peak_source": "未知",
+          "reference_white": "auto",
+          "external_overrides": [],
+          "restore_pending": [
+            "icc-profile",
+            "icc-profile-auto",
+            "icc-intent",
+            "target-prim",
+            "target-trc",
+            "target-peak",
+            "target-contrast",
+            "target-colorspace-hint",
+            "target-colorspace-hint-mode",
+            "target-colorspace-hint-strict",
+            "d3d11-output-format",
+            "d3d11-output-csp",
+            "hdr-reference-white",
+            "inverse-tone-mapping",
+            "hdr-contrast-recovery",
+            "treat-srgb-as-power22"
+          ],
+          "actual_target": {
+            "sar-name": "16:9",
+            "colormatrix": "rgb",
+            "colorlevels": "full",
+            "sig-peak": 0.394089,
+            "light": "auto",
+            "chroma-location": "unknown",
+            "stereo-in": "mono",
+            "rotate": 0,
+            "alpha": "premul",
+            "min-luma": 0.08,
+            "max-luma": 80,
+            "max-cll": 0,
+            "max-fall": 0,
+            "w": 640,
+            "h": 360,
+            "aspect": 1.777778,
+            "pixelformat": "rgb10a2",
+            "primaries": "bt.709",
+            "dw": 640,
+            "dh": 360,
+            "aspect-name": "16:9",
+            "gamma": "srgb",
+            "par": "-nan(ind)",
+            "sar": 1.777778
+          },
+          "swapchain": "未知",
+          "status": "可用",
+          "intermediate": "gpu-next 自动选择；实际纹理格式见日志",
+          "actual_settings": {
+            "target-trc": "srgb",
+            "target-peak": "auto",
+            "target-contrast": "auto",
+            "target-colorspace-hint": false,
+            "target-colorspace-hint-mode": "target",
+            "target-colorspace-hint-strict": true,
+            "d3d11-output-format": "auto",
+            "d3d11-output-csp": "srgb",
+            "hdr-reference-white": "auto",
+            "inverse-tone-mapping": false,
+            "hdr-contrast-recovery": 0,
+            "treat-srgb-as-power22": false,
+            "icc-profile": "",
+            "icc-profile-auto": false,
+            "icc-intent": 1,
+            "target-prim": "bt.709"
+          }
+        },
+        "passed": true
+      },
+      {
+        "source": "模拟 HDR 能力，非 HDR 面板验收",
+        "state": {
+          "display": "未知",
+          "mode": "hdr-scrgb",
+          "requested": "auto",
+          "hdr_active": true,
+          "hdr_supported": true,
+          "hdr_status": "on",
+          "reported_bits": 10,
+          "manual": false,
+          "peak_source": "驱动／系统报告，非实测",
+          "reference_white": "auto",
+          "actual_settings": {
+            "icc-intent": 1,
+            "target-prim": "auto",
+            "target-trc": "scrgb",
+            "target-peak": 1000,
+            "target-contrast": 100000,
+            "target-colorspace-hint": true,
+            "target-colorspace-hint-mode": "target",
+            "target-colorspace-hint-strict": true,
+            "d3d11-output-format": "rgba16f",
+            "d3d11-output-csp": "linear",
+            "hdr-reference-white": "auto",
+            "inverse-tone-mapping": false,
+            "hdr-contrast-recovery": 0,
+            "treat-srgb-as-power22": false,
+            "icc-profile": "",
+            "icc-profile-auto": false
+          },
+          "external_overrides": [],
+          "restore_pending": [
+            "icc-profile",
+            "icc-profile-auto",
+            "icc-intent",
+            "target-prim",
+            "target-trc",
+            "target-peak",
+            "target-contrast",
+            "target-colorspace-hint",
+            "target-colorspace-hint-mode",
+            "target-colorspace-hint-strict",
+            "d3d11-output-format",
+            "d3d11-output-csp",
+            "hdr-reference-white",
+            "inverse-tone-mapping",
+            "hdr-contrast-recovery",
+            "treat-srgb-as-power22"
+          ],
+          "actual_target": {
+            "prim-white-y": 0.329102,
+            "prim-green-x": 0.316406,
+            "w": 640,
+            "h": 360,
+            "aspect": 1.777778,
+            "prim-blue-y": 0.056641,
+            "prim-blue-x": 0.149414,
+            "dh": 360,
+            "aspect-name": "16:9",
+            "prim-green-y": 0.611328,
+            "dw": 640,
+            "sar": 1.777778,
+            "sar-name": "16:9",
+            "pixelformat": "rgba16hf",
+            "prim-red-x": 0.651367,
+            "colorlevels": "full",
+            "sig-peak": 0.394089,
+            "light": "auto",
+            "chroma-location": "unknown",
+            "stereo-in": "mono",
+            "prim-white-x": 0.313477,
+            "rotate": 0,
+            "alpha": "premul",
+            "prim-red-y": 0.334961,
+            "min-luma": 0.0008,
+            "max-luma": 80,
+            "max-cll": 80,
+            "max-fall": 0,
+            "gamma": "scrgb",
+            "par": "-nan(ind)",
+            "colormatrix": "rgb",
+            "primaries": "bt.709"
+          },
+          "swapchain": "未知",
+          "status": "可用（HDR 实机色准待测）",
+          "intermediate": "gpu-next 自动选择；实际纹理格式见日志",
+          "reason": "",
+          "display_id": "fixture",
+          "peak": 1000
+        },
+        "target": {
+          "pixelformat": "rgba16hf",
+          "w": 640,
+          "h": 360,
+          "dw": 640,
+          "dh": 360,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": "-nan(ind)",
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "rgb",
+          "colorlevels": "full",
+          "primaries": "bt.709",
+          "gamma": "scrgb",
+          "sig-peak": 0.394089,
+          "light": "auto",
+          "chroma-location": "unknown",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "premul",
+          "min-luma": 0.0008,
+          "max-luma": 80.0,
+          "max-cll": 80.0,
+          "max-fall": 0.0,
+          "prim-red-x": 0.651367,
+          "prim-red-y": 0.334961,
+          "prim-green-x": 0.316406,
+          "prim-green-y": 0.611328,
+          "prim-blue-x": 0.149414,
+          "prim-blue-y": 0.056641,
+          "prim-white-x": 0.313477,
+          "prim-white-y": 0.329102
+        },
+        "passed": true
+      }
+    ],
+    "color-ramp": {
+      "scope": "sRGB 编码的 16bit GPU 截图；线性误差为截图逆 EOTF 推导，非中间纹理回读／面板测量",
+      "source": {
+        "pixelformat": "rgb48",
+        "average-bpp": 48,
+        "w": 1024,
+        "h": 32,
+        "dw": 1024,
+        "dh": 32,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 1024,
+        "crop-h": 32,
+        "aspect": 32.0,
+        "par": 1.0,
+        "sar": 32.0,
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg1/jpeg",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "maximum_code_error": 0,
+      "maximum_derived_linear_error": 0.0,
+      "unique_gray_levels": 1024,
+      "threshold_code_error": 128
+    },
+    "color-range": [
+      {
+        "range": "tv",
+        "decoded": {
+          "pixelformat": "yuv420p10",
+          "average-bpp": 24,
+          "w": 64,
+          "h": 32,
+          "dw": 64,
+          "dh": 32,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 64,
+          "crop-h": 32,
+          "aspect": 2.0,
+          "aspect-name": "Univisium",
+          "par": 1.0,
+          "sar": 2.0,
+          "sar-name": "Univisium",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        },
+        "screenshot_values": [
+          0,
+          0,
+          65534,
+          65535
+        ],
+        "passed": true
+      },
+      {
+        "range": "pc",
+        "decoded": {
+          "pixelformat": "yuv420p10",
+          "average-bpp": 24,
+          "w": 64,
+          "h": 32,
+          "dw": 64,
+          "dh": 32,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 64,
+          "crop-h": 32,
+          "aspect": 2.0,
+          "aspect-name": "Univisium",
+          "par": 1.0,
+          "sar": 2.0,
+          "sar-name": "Univisium",
+          "colormatrix": "bt.709",
+          "colorlevels": "full",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg1/jpeg",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        },
+        "screenshot_values": [
+          50,
+          4150,
+          60268,
+          65535
+        ],
+        "passed": true
+      }
+    ],
+    "color-preferences": {
+      "passed": true,
+      "scope": "模拟显示身份／真实输出协商；ICC 文件为流程夹具，非面板校准",
+      "preferences": {
+        "fixture-A|on": {
+          "peak": 900
+        },
+        "fixture-A|off": {
+          "icc": "C:\\Program portable\\mpv2\\portable_config\\icc\\ITU-RBT709ReferenceDisplay.icc"
+        }
+      }
+    },
+    "sizes": [
+      {
+        "video-params": {
+          "pixelformat": "d3d11",
+          "hw-pixelformat": "nv12",
+          "average-bpp": 12,
+          "w": 1280,
+          "h": 720,
+          "dw": 1280,
+          "dh": 720,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 1280,
+          "crop-h": 720,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        },
+        "container-fps": 60.000004,
+        "hwdec-current": "d3d11va",
+        "frame-drop-count": 1,
+        "mistimed-frame-count": null,
+        "vo-delayed-frame-count": 0
+      },
+      {
+        "video-params": {
+          "pixelformat": "d3d11",
+          "hw-pixelformat": "nv12",
+          "average-bpp": 12,
+          "w": 1920,
+          "h": 1080,
+          "dw": 1920,
+          "dh": 1080,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 1920,
+          "crop-h": 1080,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        },
+        "container-fps": 23.976025,
+        "hwdec-current": "d3d11va",
+        "frame-drop-count": 0,
+        "mistimed-frame-count": null,
+        "vo-delayed-frame-count": 0
+      },
+      {
+        "video-params": {
+          "pixelformat": "d3d11",
+          "hw-pixelformat": "nv12",
+          "average-bpp": 12,
+          "w": 3840,
+          "h": 2160,
+          "dw": 3840,
+          "dh": 2160,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 3840,
+          "crop-h": 2160,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        },
+        "container-fps": 30.0,
+        "hwdec-current": "d3d11va",
+        "frame-drop-count": 1,
+        "mistimed-frame-count": null,
+        "vo-delayed-frame-count": 0
+      }
+    ]
+  },
+  "direct_stability": [
+    {
+      "case": "direct",
+      "trial": 1,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-Balanced",
+      "sample_seconds": 20.325747699999738,
+      "media_advance": 20.3,
+      "clock_ratio": 0.9987332470923204,
+      "cpu_core_percent": 6.226708206163635,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "samples": [
+        {
+          "wall": 0.5325864999995247,
+          "media": 5.3,
+          "drops": 0
+        },
+        {
+          "wall": 1.0537144999998418,
+          "media": 5.833,
+          "drops": 0
+        },
+        {
+          "wall": 1.5748048999994353,
+          "media": 6.367,
+          "drops": 0
+        },
+        {
+          "wall": 2.096551599999657,
+          "media": 6.867,
+          "drops": 0
+        },
+        {
+          "wall": 2.6077245999995284,
+          "media": 7.4,
+          "drops": 0
+        },
+        {
+          "wall": 3.129201199999443,
+          "media": 7.933,
+          "drops": 0
+        },
+        {
+          "wall": 3.650021200000083,
+          "media": 8.433,
+          "drops": 0
+        },
+        {
+          "wall": 4.171698799999831,
+          "media": 8.967,
+          "drops": 0
+        },
+        {
+          "wall": 4.692997099999957,
+          "media": 9.467,
+          "drops": 0
+        },
+        {
+          "wall": 5.214205700000093,
+          "media": 10.0,
+          "drops": 0
+        },
+        {
+          "wall": 5.734968099999605,
+          "media": 10.5,
+          "drops": 0
+        },
+        {
+          "wall": 6.256473800000094,
+          "media": 11.033,
+          "drops": 0
+        },
+        {
+          "wall": 6.777912599999581,
+          "media": 11.567,
+          "drops": 0
+        },
+        {
+          "wall": 7.299318800000037,
+          "media": 12.067,
+          "drops": 0
+        },
+        {
+          "wall": 7.8213270999995075,
+          "media": 12.6,
+          "drops": 0
+        },
+        {
+          "wall": 8.342623900000035,
+          "media": 13.133,
+          "drops": 0
+        },
+        {
+          "wall": 8.86444709999978,
+          "media": 13.667,
+          "drops": 0
+        },
+        {
+          "wall": 9.385972399999446,
+          "media": 14.167,
+          "drops": 0
+        },
+        {
+          "wall": 9.90780899999936,
+          "media": 14.7,
+          "drops": 0
+        },
+        {
+          "wall": 10.429297299999234,
+          "media": 15.233,
+          "drops": 0
+        },
+        {
+          "wall": 10.950559999999314,
+          "media": 15.733,
+          "drops": 0
+        },
+        {
+          "wall": 11.472034099999291,
+          "media": 16.267,
+          "drops": 0
+        },
+        {
+          "wall": 11.993343299999651,
+          "media": 16.8,
+          "drops": 0
+        },
+        {
+          "wall": 12.514887699999235,
+          "media": 17.3,
+          "drops": 0
+        },
+        {
+          "wall": 13.036354399999254,
+          "media": 17.833,
+          "drops": 0
+        },
+        {
+          "wall": 13.558204500000102,
+          "media": 18.333,
+          "drops": 0
+        },
+        {
+          "wall": 14.079697999999553,
+          "media": 18.867,
+          "drops": 0
+        },
+        {
+          "wall": 14.601125899999715,
+          "media": 19.4,
+          "drops": 0
+        },
+        {
+          "wall": 15.122447199999442,
+          "media": 19.9,
+          "drops": 0
+        },
+        {
+          "wall": 15.643461099999513,
+          "media": 20.433,
+          "drops": 0
+        },
+        {
+          "wall": 16.15452969999933,
+          "media": 20.933,
+          "drops": 0
+        },
+        {
+          "wall": 16.665614099999402,
+          "media": 21.467,
+          "drops": 0
+        },
+        {
+          "wall": 17.18741609999961,
+          "media": 21.967,
+          "drops": 0
+        },
+        {
+          "wall": 17.70854009999948,
+          "media": 22.5,
+          "drops": 0
+        },
+        {
+          "wall": 18.23028279999926,
+          "media": 23.033,
+          "drops": 0
+        },
+        {
+          "wall": 18.75158039999951,
+          "media": 23.533,
+          "drops": 0
+        },
+        {
+          "wall": 19.272602499999266,
+          "media": 24.067,
+          "drops": 0
+        },
+        {
+          "wall": 19.793765899999926,
+          "media": 24.567,
+          "drops": 0
+        },
+        {
+          "wall": 20.315096799999992,
+          "media": 25.1,
+          "drops": 0
+        }
+      ],
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "direct",
+      "trial": 2,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-Balanced",
+      "sample_seconds": 20.350860300000022,
+      "media_advance": 20.334000000000003,
+      "clock_ratio": 0.9991715190536677,
+      "cpu_core_percent": 5.297687587192561,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "samples": [
+        {
+          "wall": 0.5321893000000273,
+          "media": 5.367,
+          "drops": 0
+        },
+        {
+          "wall": 1.0530453999999736,
+          "media": 5.867,
+          "drops": 0
+        },
+        {
+          "wall": 1.574716900000567,
+          "media": 6.4,
+          "drops": 0
+        },
+        {
+          "wall": 2.0960943000000043,
+          "media": 6.933,
+          "drops": 0
+        },
+        {
+          "wall": 2.616981200000737,
+          "media": 7.433,
+          "drops": 0
+        },
+        {
+          "wall": 3.138385800000833,
+          "media": 7.967,
+          "drops": 0
+        },
+        {
+          "wall": 3.6602850000008402,
+          "media": 8.467,
+          "drops": 0
+        },
+        {
+          "wall": 4.180954400000701,
+          "media": 9.0,
+          "drops": 0
+        },
+        {
+          "wall": 4.702062900000783,
+          "media": 9.533,
+          "drops": 0
+        },
+        {
+          "wall": 5.223359300000084,
+          "media": 10.033,
+          "drops": 0
+        },
+        {
+          "wall": 5.744919600000685,
+          "media": 10.567,
+          "drops": 0
+        },
+        {
+          "wall": 6.266123900000821,
+          "media": 11.067,
+          "drops": 0
+        },
+        {
+          "wall": 6.787741300000562,
+          "media": 11.6,
+          "drops": 0
+        },
+        {
+          "wall": 7.3094315000007555,
+          "media": 12.133,
+          "drops": 0
+        },
+        {
+          "wall": 7.8309156000004805,
+          "media": 12.667,
+          "drops": 0
+        },
+        {
+          "wall": 8.352703700000347,
+          "media": 13.167,
+          "drops": 0
+        },
+        {
+          "wall": 8.874499800000194,
+          "media": 13.7,
+          "drops": 0
+        },
+        {
+          "wall": 9.395921799999996,
+          "media": 14.2,
+          "drops": 0
+        },
+        {
+          "wall": 9.916774700000133,
+          "media": 14.733,
+          "drops": 0
+        },
+        {
+          "wall": 10.43815530000029,
+          "media": 15.267,
+          "drops": 0
+        },
+        {
+          "wall": 10.959084500000245,
+          "media": 15.767,
+          "drops": 0
+        },
+        {
+          "wall": 11.480316099999982,
+          "media": 16.3,
+          "drops": 0
+        },
+        {
+          "wall": 12.001867500000117,
+          "media": 16.833,
+          "drops": 0
+        },
+        {
+          "wall": 12.523086200000762,
+          "media": 17.333,
+          "drops": 0
+        },
+        {
+          "wall": 13.044167600000037,
+          "media": 17.867,
+          "drops": 0
+        },
+        {
+          "wall": 13.565965900000265,
+          "media": 18.4,
+          "drops": 0
+        },
+        {
+          "wall": 14.087248900000304,
+          "media": 18.9,
+          "drops": 0
+        },
+        {
+          "wall": 14.608671500000128,
+          "media": 19.433,
+          "drops": 0
+        },
+        {
+          "wall": 15.129413700000441,
+          "media": 19.933,
+          "drops": 0
+        },
+        {
+          "wall": 15.650498100000732,
+          "media": 20.467,
+          "drops": 0
+        },
+        {
+          "wall": 16.171774400000686,
+          "media": 21.0,
+          "drops": 0
+        },
+        {
+          "wall": 16.692977200000314,
+          "media": 21.5,
+          "drops": 0
+        },
+        {
+          "wall": 17.21395190000021,
+          "media": 22.033,
+          "drops": 0
+        },
+        {
+          "wall": 17.735241400000632,
+          "media": 22.533,
+          "drops": 0
+        },
+        {
+          "wall": 18.25685070000054,
+          "media": 23.067,
+          "drops": 0
+        },
+        {
+          "wall": 18.777957799999967,
+          "media": 23.6,
+          "drops": 0
+        },
+        {
+          "wall": 19.299150499999996,
+          "media": 24.1,
+          "drops": 0
+        },
+        {
+          "wall": 19.81949970000005,
+          "media": 24.633,
+          "drops": 0
+        },
+        {
+          "wall": 20.34038740000051,
+          "media": 25.167,
+          "drops": 0
+        }
+      ],
+      "errors": [],
+      "audio_underruns": []
+    },
+    {
+      "case": "direct",
+      "trial": 3,
+      "hwdec": "d3d11va",
+      "actual_hwdec": "d3d11va",
+      "profile": "Performance-Balanced",
+      "sample_seconds": 20.33203549999962,
+      "media_advance": 20.3,
+      "clock_ratio": 0.9984243830383033,
+      "cpu_core_percent": 4.457251709992425,
+      "counters": {
+        "frame-drop-count": 0,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "output": {
+        "pixelformat": "rgb10a2",
+        "w": 1777,
+        "h": 1000,
+        "dw": 1777,
+        "dh": 1000,
+        "aspect": 1.777,
+        "aspect-name": "16:9",
+        "par": "-nan(ind)",
+        "sar": 1.777,
+        "sar-name": "16:9",
+        "colormatrix": "rgb",
+        "colorlevels": "full",
+        "primaries": "bt.709",
+        "gamma": "srgb",
+        "sig-peak": 0.394089,
+        "light": "auto",
+        "chroma-location": "unknown",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "premul",
+        "min-luma": 0.203,
+        "max-luma": 80.0,
+        "max-cll": 0.0,
+        "max-fall": 0.0
+      },
+      "video_output": {
+        "pixelformat": "d3d11",
+        "hw-pixelformat": "nv12",
+        "average-bpp": 12,
+        "w": 3840,
+        "h": 2160,
+        "dw": 3840,
+        "dh": 2160,
+        "crop-x": 0,
+        "crop-y": 0,
+        "crop-w": 3840,
+        "crop-h": 2160,
+        "aspect": 1.777778,
+        "aspect-name": "16:9",
+        "par": 1.0,
+        "sar": 1.777778,
+        "sar-name": "16:9",
+        "colormatrix": "bt.709",
+        "colorlevels": "limited",
+        "primaries": "bt.709",
+        "gamma": "bt.1886",
+        "sig-peak": 0.0,
+        "light": "display",
+        "chroma-location": "mpeg2/4/h264",
+        "stereo-in": "mono",
+        "rotate": 0,
+        "alpha": "none"
+      },
+      "audio": {
+        "samplerate": 48000,
+        "channel-count": 2,
+        "channels": "stereo",
+        "hr-channels": "stereo",
+        "format": "float"
+      },
+      "samples": [
+        {
+          "wall": 0.5315590999998676,
+          "media": 5.333,
+          "drops": 0
+        },
+        {
+          "wall": 1.053280099999938,
+          "media": 5.833,
+          "drops": 0
+        },
+        {
+          "wall": 1.5740639999994528,
+          "media": 6.367,
+          "drops": 0
+        },
+        {
+          "wall": 2.0947220999996716,
+          "media": 6.867,
+          "drops": 0
+        },
+        {
+          "wall": 2.6052437999996982,
+          "media": 7.4,
+          "drops": 0
+        },
+        {
+          "wall": 3.1268872999999076,
+          "media": 7.933,
+          "drops": 0
+        },
+        {
+          "wall": 3.6485900999996375,
+          "media": 8.433,
+          "drops": 0
+        },
+        {
+          "wall": 4.1701044999999795,
+          "media": 8.967,
+          "drops": 0
+        },
+        {
+          "wall": 4.691570899999533,
+          "media": 9.467,
+          "drops": 0
+        },
+        {
+          "wall": 5.21353629999976,
+          "media": 10.0,
+          "drops": 0
+        },
+        {
+          "wall": 5.735706799999207,
+          "media": 10.533,
+          "drops": 0
+        },
+        {
+          "wall": 6.256561999999576,
+          "media": 11.033,
+          "drops": 0
+        },
+        {
+          "wall": 6.777609099999609,
+          "media": 11.567,
+          "drops": 0
+        },
+        {
+          "wall": 7.299718199999916,
+          "media": 12.067,
+          "drops": 0
+        },
+        {
+          "wall": 7.820945099999335,
+          "media": 12.6,
+          "drops": 0
+        },
+        {
+          "wall": 8.342525399999431,
+          "media": 13.133,
+          "drops": 0
+        },
+        {
+          "wall": 8.863445599999977,
+          "media": 13.633,
+          "drops": 0
+        },
+        {
+          "wall": 9.384957699999177,
+          "media": 14.167,
+          "drops": 0
+        },
+        {
+          "wall": 9.90688019999925,
+          "media": 14.7,
+          "drops": 0
+        },
+        {
+          "wall": 10.428922399999465,
+          "media": 15.233,
+          "drops": 0
+        },
+        {
+          "wall": 10.94960009999977,
+          "media": 15.733,
+          "drops": 0
+        },
+        {
+          "wall": 11.470733299999665,
+          "media": 16.267,
+          "drops": 0
+        },
+        {
+          "wall": 11.991699499999413,
+          "media": 16.767,
+          "drops": 0
+        },
+        {
+          "wall": 12.512820299999476,
+          "media": 17.3,
+          "drops": 0
+        },
+        {
+          "wall": 13.03439789999993,
+          "media": 17.833,
+          "drops": 0
+        },
+        {
+          "wall": 13.555413999999473,
+          "media": 18.333,
+          "drops": 0
+        },
+        {
+          "wall": 14.076727199999368,
+          "media": 18.867,
+          "drops": 0
+        },
+        {
+          "wall": 14.597851599999558,
+          "media": 19.367,
+          "drops": 0
+        },
+        {
+          "wall": 15.11916729999939,
+          "media": 19.9,
+          "drops": 0
+        },
+        {
+          "wall": 15.640914399999929,
+          "media": 20.433,
+          "drops": 0
+        },
+        {
+          "wall": 16.16205599999921,
+          "media": 20.933,
+          "drops": 0
+        },
+        {
+          "wall": 16.68337639999936,
+          "media": 21.467,
+          "drops": 0
+        },
+        {
+          "wall": 17.20474909999939,
+          "media": 21.967,
+          "drops": 0
+        },
+        {
+          "wall": 17.72588689999975,
+          "media": 22.5,
+          "drops": 0
+        },
+        {
+          "wall": 18.246598099999574,
+          "media": 23.033,
+          "drops": 0
+        },
+        {
+          "wall": 18.75727459999962,
+          "media": 23.567,
+          "drops": 0
+        },
+        {
+          "wall": 19.278538099999423,
+          "media": 24.067,
+          "drops": 0
+        },
+        {
+          "wall": 19.800010899999506,
+          "media": 24.6,
+          "drops": 0
+        },
+        {
+          "wall": 20.321789399999943,
+          "media": 25.1,
+          "drops": 0
+        }
+      ],
+      "errors": [],
+      "audio_underruns": []
+    }
+  ],
+  "decoder_compatibility": {
+    "av1": "libdav1d and built-in listed",
+    "av2": "not present in bundled decoder list"
+  }
+}

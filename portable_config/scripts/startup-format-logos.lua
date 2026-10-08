@@ -1,6 +1,8 @@
--- Professional startup format logos for mpv.
--- Shows at most one picture-standard logo and one audio-standard logo.
+-- 起播最多显示一个画面标准和一个音频标准徽标。
+-- 跟进杳知 1.0.6-2：DRA、视频徽标不等待迟到音轨、首帧几何就绪。
+-- MIT 授权与原作者署名见 script-assets/startup-format-logos/LICENSE.Yaozhi.md。
 
+local mp = require 'mp'
 local msg = require 'mp.msg'
 local options = require 'mp.options'
 local utils = require 'mp.utils'
@@ -778,6 +780,7 @@ local function detect_pair()
         DTS = 'dts',
         ['Dolby AC-4'] = 'ac4',
         ['MPEG-H Audio'] = 'mpeg-h',
+        DRA = 'dra',
         FLAC = 'flac', ALAC = 'alac', PCM = 'pcm', MLP = 'mlp',
         WavPack = 'wavpack', APE = 'ape', WMA = 'wma', Opus = 'opus',
         AAC = 'aac', Vorbis = 'vorbis', MP3 = 'mp3',
@@ -1127,7 +1130,14 @@ local function detect_and_show(file_generation, attempt, reason)
     end
     local video, audio, audio_pending = detect_pair()
     local max_attempts = math.max(1, math.floor(tonumber(o.retry_count) or 1))
-    if (video or audio) and not (audio_pending and attempt < max_attempts) then
+    if (video or audio) and audio_pending and attempt < max_attempts then
+        -- 视频已知时先显示，迟到音轨随后补齐；不让音轨等待拖延整个徽标。
+        if attempt == 1 then show_pair(video, audio, reason .. '-video-ready') end
+        schedule('retry', tonumber(o.retry_interval) or 0.25, function()
+            detect_and_show(file_generation, attempt + 1, reason)
+        end)
+        return
+    elseif video or audio then
         show_pair(video, audio, reason)
         return
     end
@@ -1947,6 +1957,16 @@ local function on_playback_restart()
 end
 
 
+local function on_video_geometry_ready()
+    -- 在视频输出已配置时开始准备，保留当前模式的黑边确认与位置冻结规则。
+    -- 同尺寸切集没有重配事件时，playback-restart 继续作为回退。
+    if state.loaded and state.waiting_for_frame and not state.frame_ready
+        and has_real_video_track() and has_video_geometry() then
+        mark_frame_ready('video-geometry-ready')
+    end
+end
+
+
 local function on_file_loaded()
     state.file_generation = state.file_generation + 1
     state.loaded = true
@@ -2160,6 +2180,7 @@ end
 
 mp.register_event('file-loaded', on_file_loaded)
 mp.register_event('playback-restart', on_playback_restart)
+mp.register_event('video-reconfig', on_video_geometry_ready)
 mp.register_event('end-file', on_end_file)
 mp.observe_property('aid', 'native', on_audio_track_change)
 mp.observe_property('vid', 'native', on_video_track_change)

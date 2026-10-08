@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "id": "k7sfunc-1.8.1-source-matrix-and-format",
+  "files": [
+    {
+      "path": "Lib/site-packages/k7sfunc/_internal.py",
+      "base_sha256": "1d8aa3c81065191bf47a511bb5cbd1664f03a2ccd51e1c1fc9cd66518899f536",
+      "result_sha256": "e43e0ef4268f97beb02fa633f30492f38ddfa3197e1c1dd49d08357a3ed85dde",
+      "replacements": [
+        {
+          "old": "\t\t\traise ImportError(f\"模块 {func_name} 依赖错误：缺失脚本 {script_name} 的版本号过低，至少 {min_version}\")\n\treturn script_var\n",
+          "new": "\t\t\traise ImportError(f\"模块 {func_name} 依赖错误：缺失脚本 {script_name} 的版本号过低，至少 {min_version}\")\n\treturn script_var\n\n\ndef _mpv_color_spec(input):\n\t\"\"\"兼容 mpv 旧帧属性，保持源矩阵与像素范围。\"\"\"\n\tprops = input.get_frame(0).props\n\tmatrix = props.get(\"_Matrix\", 2)\n\tif matrix == 2:\n\t\tmatrix = props.get(\"_ColorSpace\", 2)\n\tif matrix == 2:\n\t\t# 未标记的 YUV 沿用分辨率推断；RGB 使用恒等矩阵。\n\t\tmatrix = 0 if input.format.color_family == vs.RGB else (6 if input.height <= 576 and input.width <= 1024 else 1)\n\tcolor_range = props.get(\"_ColorRange\", 1)\n\treturn matrix, color_range\n"
+        }
+      ]
+    },
+    {
+      "path": "Lib/site-packages/k7sfunc/mod_helper.py",
+      "base_sha256": "bdfc8c1c7505aa5633c9b37c7cf70aff458730c202b75cbb543b3ead4947cb00",
+      "result_sha256": "40c915944a5f061197ac9bb7e3b9e4de3dac6442b0233db58d21dc7eebc21651",
+      "replacements": [
+        {
+          "old": "import math\nfrom ._internal import (\n\t_validate_input_clip,\n\t_validate_bool,\n",
+          "new": "import math\nfrom ._internal import (\n\t_mpv_color_spec,\n\t_validate_input_clip,\n\t_validate_bool,\n"
+        },
+        {
+          "old": "\t_check_plugin(func_name, \"fmtc\")\n\n\tcolorlv = input.get_frame(0).props._ColorRange\n\n\tcut = core.resize.Bilinear(clip=input, format=vs.RGB48, matrix_in_s=\"709\")\n\tif linear :\n\t\tcut = core.fmtc.transfer(clip=cut, transs=\"1886\", transd=\"linear\")\n",
+          "new": "\t_check_plugin(func_name, \"fmtc\")\n\n\tmatrix_src, colorlv = _mpv_color_spec(input)\n\n\tcut = core.resize.Bilinear(clip=input, format=vs.RGB48, matrix_in=matrix_src)\n\tif linear :\n\t\tcut = core.fmtc.transfer(clip=cut, transs=\"1886\", transd=\"linear\")\n"
+        },
+        {
+          "old": "\t\tcut = core.fmtc.transfer(clip=cut, transs=\"linear\", transd=\"1886\")\n\n\toutput = core.resize.Bilinear(clip=cut, format=vs.YUV420P8, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\n\treturn output\n",
+          "new": "\t\tcut = core.fmtc.transfer(clip=cut, transs=\"linear\", transd=\"1886\")\n\n\toutput = core.resize.Bilinear(clip=cut, format=vs.YUV420P8, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\n\treturn output\n"
+        }
+      ]
+    },
+    {
+      "path": "Lib/site-packages/k7sfunc/mod_memc.py",
+      "base_sha256": "74e97e73ffa444a52862916a123f695bc73fc6639feb6ce68e3438931123f636",
+      "result_sha256": "23b5cf0f8ad4dff68065a86a89d7911c32b4d73049f16300d366f0da43cabad3",
+      "replacements": [
+        {
+          "old": "import vapoursynth as vs\nfrom ._internal import (\n\tcore,\n\t_validate_input_clip,\n\t_validate_bool,\n\t_validate_literal,\n\t_validate_numeric,\n\t_check_plugin,\n",
+          "new": "import vapoursynth as vs\nfrom ._internal import (\n\t_mpv_color_spec,\n\tcore,\n\t_validate_input_clip,\n\t_validate_bool,\n\t_validate_literal,\n\t_validate_numeric,\n\t_check_plugin,\n"
+        },
+        {
+          "old": "\tmdl_pth = plg_dir + \"/models/\" + mdl_pname + mdl_fname + mdl_var + \".onnx\"\n\tif not os.path.exists(mdl_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\n\tw_in, h_in = input.width, input.height\n\tsize_in = w_in * h_in\n\tcolorlv = getattr(input.get_frame(0).props, \"_ColorRange\", 0)\n\tfmt_in = input.format.id\n\tfps_factor = fps_num/fps_den\n\n\tif (size_in > 4096 * 2176) :\n\t\traise Exception(\"源分辨率超过限制的范围，已临时中止。\")\n\n",
+          "new": "\tmdl_pth = plg_dir + \"/models/\" + mdl_pname + mdl_fname + mdl_var + \".onnx\"\n\tif not os.path.exists(mdl_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\n\tw_in, h_in = input.width, input.height\n\tsize_in = w_in * h_in\n\tmatrix_src, colorlv = _mpv_color_spec(input)\n\tfmt_in = input.format.id\n\tfps_factor = fps_num/fps_den\n\n\tif (size_in > 4096 * 2176) :\n\t\traise Exception(\"源分辨率超过限制的范围，已临时中止。\")\n\n"
+        },
+        {
+          "old": "\t\ttile_size = 128\n\t\tscale = 0.5\n\tw_tmp = math.ceil(w_in / tile_size) * tile_size - w_in\n\th_tmp = math.ceil(h_in / tile_size) * tile_size - h_in\n\n\tcut0 = SCENE_DETECT(input=input, sc_mode=sc_mode)\n\tcut1 = core.resize.Bilinear(clip=cut0, format=vs.RGBH, matrix_in_s=\"709\")\n\n\tbackend = backend_param(model_ap, scale, w_in, h_in, w_tmp, h_tmp, tile_size)\n\tif model_ap :\n\t\tfin = vsmlrt.DRBA(clip=cut1, multi=fractions.Fraction(fps_num, fps_den),\n\t\t                  scale=scale, ap=model_ap, sp_layer=True,\n\t\t                  model=model, video_player=True, **backend)\n",
+          "new": "\t\ttile_size = 128\n\t\tscale = 0.5\n\tw_tmp = math.ceil(w_in / tile_size) * tile_size - w_in\n\th_tmp = math.ceil(h_in / tile_size) * tile_size - h_in\n\n\tcut0 = SCENE_DETECT(input=input, sc_mode=sc_mode)\n\tcut1 = core.resize.Bilinear(clip=cut0, format=vs.RGBH, matrix_in=matrix_src)\n\n\tbackend = backend_param(model_ap, scale, w_in, h_in, w_tmp, h_tmp, tile_size)\n\tif model_ap :\n\t\tfin = vsmlrt.DRBA(clip=cut1, multi=fractions.Fraction(fps_num, fps_den),\n\t\t                  scale=scale, ap=model_ap, sp_layer=True,\n\t\t                  model=model, video_player=True, **backend)\n"
+        },
+        {
+          "old": "\t\tfin = vsmlrt.DRBA(clip=cut1, multi=fractions.Fraction(fps_num, fps_den),\n\t\t                  scale=scale, ap=model_ap, sp_layer=True,\n\t\t                  model=model, video_player=True, **backend)\n\t\tif w_tmp + h_tmp > 0 :\n\t\t\tfin = core.std.Crop(clip=fin, right=w_tmp, bottom=h_tmp)\n\n\toutput = core.resize.Bilinear(clip=fin, format=fmt_in, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\tif not fps_factor.is_integer() :\n\t\toutput = core.std.AssumeFPS(clip=output, fpsnum=fps_in * fps_num * 1e6, fpsden=fps_den * 1e6)\n\n\treturn output\n\n##################################################\n",
+          "new": "\t\tfin = vsmlrt.DRBA(clip=cut1, multi=fractions.Fraction(fps_num, fps_den),\n\t\t                  scale=scale, ap=model_ap, sp_layer=True,\n\t\t                  model=model, video_player=True, **backend)\n\t\tif w_tmp + h_tmp > 0 :\n\t\t\tfin = core.std.Crop(clip=fin, right=w_tmp, bottom=h_tmp)\n\n\toutput = core.resize.Bilinear(clip=fin, format=fmt_in, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\tif not fps_factor.is_integer() :\n\t\toutput = core.std.AssumeFPS(clip=output, fpsnum=fps_in * fps_num * 1e6, fpsden=fps_den * 1e6)\n\n\treturn output\n\n##################################################\n"
+        },
+        {
+          "old": "\tif skip :\n\t\t_check_plugin(func_name, \"vmaf\")\n\tif sc_mode == 2 :\n\t\t_check_plugin(func_name, \"mv\")\n\n\tfmt_in = input.format.id\n\tcolorlv = getattr(input.get_frame(0).props, \"_ColorRange\", 0)\n\n\tif turbo == 0 :\n\t\tskip = False\n\t\ts_tta = True\n\telif turbo == 1 :\n\t\tskip = False\n",
+          "new": "\tif skip :\n\t\t_check_plugin(func_name, \"vmaf\")\n\tif sc_mode == 2 :\n\t\t_check_plugin(func_name, \"mv\")\n\n\tfmt_in = input.format.id\n\tmatrix_src, colorlv = _mpv_color_spec(input)\n\n\tif turbo == 0 :\n\t\tskip = False\n\t\ts_tta = True\n\telif turbo == 1 :\n\t\tskip = False\n"
+        },
+        {
+          "old": "\t\ts_tta = False\n\tif model >= 63 :\n\t\ts_tta = False\n\n\tcut0 = SCENE_DETECT(input=input, sc_mode=sc_mode)\n\n\tcut1 = core.resize.Bilinear(clip=cut0, format=vs.RGBS, matrix_in_s=\"709\")\n\tcut2 = core.rife.RIFE(clip=cut1, model=(model+1) if s_tta else model,\n\t\tfactor_num=fps_num, factor_den=fps_den, gpu_id=gpu, gpu_thread=gpu_t,\n\t\tsc=True if sc_mode else False, skip=skip, skip_threshold=stat_th)\n\toutput = core.resize.Bilinear(clip=cut2, format=fmt_in, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\n\treturn output\n\n##################################################\n## RIFE补帧 # helper\n##################################################\n",
+          "new": "\t\ts_tta = False\n\tif model >= 63 :\n\t\ts_tta = False\n\n\tcut0 = SCENE_DETECT(input=input, sc_mode=sc_mode)\n\n\tcut1 = core.resize.Bilinear(clip=cut0, format=vs.RGBS, matrix_in=matrix_src)\n\tcut2 = core.rife.RIFE(clip=cut1, model=(model+1) if s_tta else model,\n\t\tfactor_num=fps_num, factor_den=fps_den, gpu_id=gpu, gpu_thread=gpu_t,\n\t\tsc=True if sc_mode else False, skip=skip, skip_threshold=stat_th)\n\toutput = core.resize.Bilinear(clip=cut2, format=fmt_in, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\n\treturn output\n\n##################################################\n## RIFE补帧 # helper\n##################################################\n"
+        },
+        {
+          "old": "\tmdl_pth = plg_dir + \"/models/\" + mdl_pname + mdl_fname + \".onnx\"\n\tif not os.path.exists(mdl_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\n\tw_in, h_in = input.width, input.height\n\tsize_in = w_in * h_in\n\tcolorlv = getattr(input.get_frame(0).props, \"_ColorRange\", 0)\n\tfmt_in = input.format.id\n\tfps_factor = fps_num/fps_den\n\n\tif (size_in > 4096 * 2176) :\n\t\traise Exception(\"源分辨率超过限制的范围，已临时中止。\")\n\n",
+          "new": "\tmdl_pth = plg_dir + \"/models/\" + mdl_pname + mdl_fname + \".onnx\"\n\tif not os.path.exists(mdl_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\n\tw_in, h_in = input.width, input.height\n\tsize_in = w_in * h_in\n\tmatrix_src, colorlv = _mpv_color_spec(input)\n\tfmt_in = input.format.id\n\tfps_factor = fps_num/fps_den\n\n\tif (size_in > 4096 * 2176) :\n\t\traise Exception(\"源分辨率超过限制的范围，已临时中止。\")\n\n"
+        },
+        {
+          "old": "\t\ttile_size = 64\n\ttile_size = tile_size / scale_model\n\tw_tmp = math.ceil(w_in / tile_size) * tile_size - w_in\n\th_tmp = math.ceil(h_in / tile_size) * tile_size - h_in\n\n\tcut0 = SCENE_DETECT(input=input, sc_mode=sc_mode)\n\tcut1 = core.resize.Bilinear(clip=cut0, format=vs.RGBS, matrix_in_s=\"709\")\n\n\tbackend = backend_param(ext_proc)\n\tif ext_proc :\n\t\tif w_tmp + h_tmp > 0 :\n\t\t\tcut1 = core.std.AddBorders(clip=cut1, right=w_tmp, bottom=h_tmp)\n\t\tfin = vsmlrt.RIFE(clip=cut1, multi=fractions.Fraction(fps_num, fps_den),\n",
+          "new": "\t\ttile_size = 64\n\ttile_size = tile_size / scale_model\n\tw_tmp = math.ceil(w_in / tile_size) * tile_size - w_in\n\th_tmp = math.ceil(h_in / tile_size) * tile_size - h_in\n\n\tcut0 = SCENE_DETECT(input=input, sc_mode=sc_mode)\n\tcut1 = core.resize.Bilinear(clip=cut0, format=vs.RGBS, matrix_in=matrix_src)\n\n\tbackend = backend_param(ext_proc)\n\tif ext_proc :\n\t\tif w_tmp + h_tmp > 0 :\n\t\t\tcut1 = core.std.AddBorders(clip=cut1, right=w_tmp, bottom=h_tmp)\n\t\tfin = vsmlrt.RIFE(clip=cut1, multi=fractions.Fraction(fps_num, fps_den),\n"
+        },
+        {
+          "old": "\t\t\tfin = core.std.Crop(clip=fin, right=w_tmp, bottom=h_tmp)\n\telse :\n\t\tfin = vsmlrt.RIFE(clip=cut1, multi=fractions.Fraction(fps_num, fps_den),\n\t\t\t\t\t\t  scale=scale_model, model=model, ensemble=s_tta,\n\t\t\t\t\t\t  _implementation=2, video_player=True, backend=backend)\n\n\toutput = core.resize.Bilinear(clip=fin, format=fmt_in, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\tif not fps_factor.is_integer() :\n\t\toutput = core.std.AssumeFPS(clip=output, fpsnum=fps_in * fps_num * 1e6, fpsden=fps_den * 1e6)\n\n\treturn output\n\n##################################################\n",
+          "new": "\t\t\tfin = core.std.Crop(clip=fin, right=w_tmp, bottom=h_tmp)\n\telse :\n\t\tfin = vsmlrt.RIFE(clip=cut1, multi=fractions.Fraction(fps_num, fps_den),\n\t\t\t\t\t\t  scale=scale_model, model=model, ensemble=s_tta,\n\t\t\t\t\t\t  _implementation=2, video_player=True, backend=backend)\n\n\toutput = core.resize.Bilinear(clip=fin, format=fmt_in, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\tif not fps_factor.is_integer() :\n\t\toutput = core.std.AssumeFPS(clip=output, fpsnum=fps_in * fps_num * 1e6, fpsden=fps_den * 1e6)\n\n\treturn output\n\n##################################################\n"
+        },
+        {
+          "old": "\tmdl_pth = plg_dir + \"/models/\" + mdl_pname + mdl_fname + \".onnx\"\n\tif not os.path.exists(mdl_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\n\tw_in, h_in = input.width, input.height\n\tsize_in = w_in * h_in\n\tcolorlv = getattr(input.get_frame(0).props, \"_ColorRange\", 0)\n\tfmt_in = input.format.id\n\tfps_factor = fps_num/fps_den\n\n\tst_eng = False\n\tif not ext_proc and model >= 47 : # https://github.com/AmusementClub/vs-mlrt/issues/72\n\t\tst_eng = True\n",
+          "new": "\tmdl_pth = plg_dir + \"/models/\" + mdl_pname + mdl_fname + \".onnx\"\n\tif not os.path.exists(mdl_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\n\tw_in, h_in = input.width, input.height\n\tsize_in = w_in * h_in\n\tmatrix_src, colorlv = _mpv_color_spec(input)\n\tfmt_in = input.format.id\n\tfps_factor = fps_num/fps_den\n\n\tst_eng = False\n\tif not ext_proc and model >= 47 : # https://github.com/AmusementClub/vs-mlrt/issues/72\n\t\tst_eng = True\n"
+        },
+        {
+          "old": "\topt_shapes = [tile_size * x for x in shape_cfg[\"opt\"]]\n\tmax_shapes1 = [tile_size * x for x in shape_cfg[\"max1\"]]\n\tmax_shapes2 = [tile_size * x for x in shape_cfg[\"max2\"]]\n\n\tcut0 = SCENE_DETECT(input=input, sc_mode=sc_mode)\n\n\tcut1 = core.resize.Bilinear(clip=cut0, format=vs.RGBH, matrix_in_s=\"709\")\n\tif ext_proc :\n\t\tif w_tmp + h_tmp > 0 :\n\t\t\tcut1 = core.std.AddBorders(clip=cut1, right=w_tmp, bottom=h_tmp)\n\t\tfin = vsmlrt.RIFE(clip=cut1, multi=fractions.Fraction(fps_num, fps_den), scale=scale_model, model=model, ensemble=s_tta, _implementation=1, video_player=True, backend=vsmlrt.BackendV2.TRT(\n\t\t\tnum_streams=gpu_t, int8=int8_qnt, fp16=True, output_format=1,\n\t\t\tworkspace=None if ws_size < 128 else (ws_size if st_eng else ws_size * 2),\n",
+          "new": "\topt_shapes = [tile_size * x for x in shape_cfg[\"opt\"]]\n\tmax_shapes1 = [tile_size * x for x in shape_cfg[\"max1\"]]\n\tmax_shapes2 = [tile_size * x for x in shape_cfg[\"max2\"]]\n\n\tcut0 = SCENE_DETECT(input=input, sc_mode=sc_mode)\n\n\tcut1 = core.resize.Bilinear(clip=cut0, format=vs.RGBH, matrix_in=matrix_src)\n\tif ext_proc :\n\t\tif w_tmp + h_tmp > 0 :\n\t\t\tcut1 = core.std.AddBorders(clip=cut1, right=w_tmp, bottom=h_tmp)\n\t\tfin = vsmlrt.RIFE(clip=cut1, multi=fractions.Fraction(fps_num, fps_den), scale=scale_model, model=model, ensemble=s_tta, _implementation=1, video_player=True, backend=vsmlrt.BackendV2.TRT(\n\t\t\tnum_streams=gpu_t, int8=int8_qnt, fp16=True, output_format=1,\n\t\t\tworkspace=None if ws_size < 128 else (ws_size if st_eng else ws_size * 2),\n"
+        },
+        {
+          "old": "\t\t\tnum_streams=gpu_t, int8=int8_qnt, fp16=True, output_format=1,\n\t\t\tworkspace=None if ws_size < 128 else ws_size,\n\t\t\tuse_cuda_graph=True, use_cublas=False, use_cudnn=False,\n\t\t\tstatic_shape=st_eng, min_shapes=[0, 0],\n\t\t\topt_shapes=None, max_shapes=None,\n\t\t\tdevice_id=gpu, short_path=True))\n\toutput = core.resize.Bilinear(clip=fin, format=fmt_in, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\tif not fps_factor.is_integer() :\n\t\toutput = core.std.AssumeFPS(clip=output, fpsnum=fps_in * fps_num * 1e6, fpsden=fps_den * 1e6)\n",
+          "new": "\t\t\tnum_streams=gpu_t, int8=int8_qnt, fp16=True, output_format=1,\n\t\t\tworkspace=None if ws_size < 128 else ws_size,\n\t\t\tuse_cuda_graph=True, use_cublas=False, use_cudnn=False,\n\t\t\tstatic_shape=st_eng, min_shapes=[0, 0],\n\t\t\topt_shapes=None, max_shapes=None,\n\t\t\tdevice_id=gpu, short_path=True))\n\toutput = core.resize.Bilinear(clip=fin, format=fmt_in, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\tif not fps_factor.is_integer() :\n\t\toutput = core.std.AssumeFPS(clip=output, fpsnum=fps_in * fps_num * 1e6, fpsden=fps_den * 1e6)\n"
+        }
+      ]
+    },
+    {
+      "path": "Lib/site-packages/k7sfunc/mod_mix.py",
+      "base_sha256": "6b705a3ff33e8bd0d5040e7cfbeca4dfa1fec62e0c13326a10347c43999b295d",
+      "result_sha256": "29df46026414b91ad58a47469609c8660b922deadbf8c7a4184e3b54502270be",
+      "replacements": [
+        {
+          "old": "import vapoursynth as vs\nfrom ._internal import (\n\tcore,\n\t_validate_input_clip,\n\t_validate_bool,\n\t_validate_literal,\n\t_validate_numeric,\n\t_validate_string_length,\n\t_check_plugin,\n",
+          "new": "import vapoursynth as vs\nfrom ._internal import (\n\t_mpv_color_spec,\n\tcore,\n\t_validate_input_clip,\n\t_validate_bool,\n\t_validate_literal,\n\t_validate_numeric,\n\t_validate_string_length,\n\t_check_plugin,\n"
+        },
+        {
+          "old": "\tplg_dir = os.path.dirname(core.ort.Version()[\"path\"]).decode()\n\tmdl_pth_rel = plg_dir + \"/models/\" + model_pth\n\tif not os.path.exists(mdl_pth_rel) and not os.path.exists(model_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\tmdl_pth = mdl_pth_rel if os.path.exists(mdl_pth_rel) else model_pth\n\n\tfmt_in = input.format.id\n\tcolorlv = getattr(input.get_frame(0).props, \"_ColorRange\", 0)\n\n\tmdl_info = ONNX_ANZ(input=mdl_pth)\n\tif not mdl_info[\"valid\"] :\n\t\traise vs.Error(f\"模块 {func_name} 的输入模型无效: {mdl_info['error']}\")\n\tfp16_mdl = mdl_info[\"elem_type_name\"] == \"fp16\"\n\tif fp16_mdl :\n\t\tfp16_qnt = False ## ort对于fp16模型自动使用对应的IO\n",
+          "new": "\tplg_dir = os.path.dirname(core.ort.Version()[\"path\"]).decode()\n\tmdl_pth_rel = plg_dir + \"/models/\" + model_pth\n\tif not os.path.exists(mdl_pth_rel) and not os.path.exists(model_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\tmdl_pth = mdl_pth_rel if os.path.exists(mdl_pth_rel) else model_pth\n\n\tfmt_in = input.format.id\n\tmatrix_src, colorlv = _mpv_color_spec(input)\n\n\tmdl_info = ONNX_ANZ(input=mdl_pth)\n\tif not mdl_info[\"valid\"] :\n\t\traise vs.Error(f\"模块 {func_name} 的输入模型无效: {mdl_info['error']}\")\n\tfp16_mdl = mdl_info[\"elem_type_name\"] == \"fp16\"\n\tif fp16_mdl :\n\t\tfp16_qnt = False ## ort对于fp16模型自动使用对应的IO\n"
+        },
+        {
+          "old": "\tif gray_mdl :\n\t\tclip_y = core.resize.Point(clip=input, format=gray_fmt)\n\t\tbe_param = backend_param(fp16_qnt)\n\t\tinfer_clips = GEN_TCLIPS(input=clip_y, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tclip_uv = core.resize.Bilinear(clip=input, format=yuv_fmt)\n\t\toutput = core.std.ShufflePlanes([infer, clip_uv], [0, 1, 2], vs.YUV)\n\t\toutput = core.resize.Bilinear(clip=output, format=fmt_in, range=1 if colorlv==0 else None)\n\telse :\n\t\tclip = core.resize.Bilinear(clip=input, format=rgb_fmt, matrix_in_s=\"709\")\n\t\tbe_param = backend_param(fp16_qnt)\n\t\tinfer_clips = GEN_TCLIPS(input=clip, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tif crc :\n\t\t\tinfer = DCF(input=infer, ref=clip)\n\t\toutput = core.resize.Bilinear(clip=infer, format=fmt_in, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\n\treturn output\n\n##################################################\n## 自定义ONNX模型 CoreML\n##################################################\n\n",
+          "new": "\tif gray_mdl :\n\t\tclip_y = core.resize.Point(clip=input, format=gray_fmt)\n\t\tbe_param = backend_param(fp16_qnt)\n\t\tinfer_clips = GEN_TCLIPS(input=clip_y, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tclip_uv = core.resize.Bilinear(clip=input, format=yuv_fmt)\n\t\toutput = core.std.ShufflePlanes([infer, clip_uv], [0, 1, 2], vs.YUV)\n\t\toutput = core.resize.Bilinear(clip=output, format=fmt_in, range=1 if colorlv==0 else 0)\n\telse :\n\t\tclip = core.resize.Bilinear(clip=input, format=rgb_fmt, matrix_in=matrix_src)\n\t\tbe_param = backend_param(fp16_qnt)\n\t\tinfer_clips = GEN_TCLIPS(input=clip, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tif crc :\n\t\t\tinfer = DCF(input=infer, ref=clip)\n\t\toutput = core.resize.Bilinear(clip=infer, format=fmt_in, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\n\treturn output\n\n##################################################\n## 自定义ONNX模型 CoreML\n##################################################\n\n"
+        },
+        {
+          "old": "\tplg_dir = os.path.dirname(core.migx.Version()[\"path\"]).decode()\n\tmdl_pth_rel = plg_dir + \"/models/\" + model_pth\n\tif not os.path.exists(mdl_pth_rel) and not os.path.exists(model_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\tmdl_pth = mdl_pth_rel if os.path.exists(mdl_pth_rel) else model_pth\n\n\tfmt_in = input.format.id\n\tcolorlv = getattr(input.get_frame(0).props, \"_ColorRange\", 0)\n\n\tmdl_info = ONNX_ANZ(input=mdl_pth)\n\tif not mdl_info[\"valid\"] :\n\t\traise vs.Error(f\"模块 {func_name} 的输入模型无效: {mdl_info['error']}\")\n\tfp16_mdl = mdl_info[\"elem_type_name\"] == \"fp16\"\n\tif fp16_mdl :\n\t\tfp16_qnt = True   ### 量化精度与模型精度匹配\n",
+          "new": "\tplg_dir = os.path.dirname(core.migx.Version()[\"path\"]).decode()\n\tmdl_pth_rel = plg_dir + \"/models/\" + model_pth\n\tif not os.path.exists(mdl_pth_rel) and not os.path.exists(model_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\tmdl_pth = mdl_pth_rel if os.path.exists(mdl_pth_rel) else model_pth\n\n\tfmt_in = input.format.id\n\tmatrix_src, colorlv = _mpv_color_spec(input)\n\n\tmdl_info = ONNX_ANZ(input=mdl_pth)\n\tif not mdl_info[\"valid\"] :\n\t\traise vs.Error(f\"模块 {func_name} 的输入模型无效: {mdl_info['error']}\")\n\tfp16_mdl = mdl_info[\"elem_type_name\"] == \"fp16\"\n\tif fp16_mdl :\n\t\tfp16_qnt = True   ### 量化精度与模型精度匹配\n"
+        },
+        {
+          "old": "\t\tbe_param = vsmlrt.BackendV2.MIGX(\n\t\t\tfp16=fp16_qnt, exhaustive_tune=exh_tune, opt_shapes=[clip_y.width, clip_y.height],\n\t\t\tdevice_id=gpu, num_streams=gpu_t, short_path=True)\n\t\tinfer_clips = GEN_TCLIPS(input=clip_y, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tclip_uv = core.resize.Bilinear(clip=input, format=yuv_fmt)\n\t\toutput = core.std.ShufflePlanes([infer, clip_uv], [0, 1, 2], vs.YUV)\n\t\toutput = core.resize.Bilinear(clip=output, format=fmt_in, range=1 if colorlv==0 else None)\n\telse :\n\t\tclip = core.resize.Bilinear(clip=input, format=rgb_fmt, matrix_in_s=\"709\")\n\t\tbe_param = vsmlrt.BackendV2.MIGX(\n\t\t\tfp16=fp16_qnt, exhaustive_tune=exh_tune, opt_shapes=[clip.width, clip.height],\n\t\t\tdevice_id=gpu, num_streams=gpu_t, short_path=True)\n\t\tinfer_clips = GEN_TCLIPS(input=clip, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tif crc :\n\t\t\tinfer = DCF(input=infer, ref=clip)\n\t\toutput = core.resize.Bilinear(clip=infer, format=fmt_in, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\n\treturn output\n\n##################################################\n## 自定义ONNX模型 TensorRT\n##################################################\n\n",
+          "new": "\t\tbe_param = vsmlrt.BackendV2.MIGX(\n\t\t\tfp16=fp16_qnt, exhaustive_tune=exh_tune, opt_shapes=[clip_y.width, clip_y.height],\n\t\t\tdevice_id=gpu, num_streams=gpu_t, short_path=True)\n\t\tinfer_clips = GEN_TCLIPS(input=clip_y, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tclip_uv = core.resize.Bilinear(clip=input, format=yuv_fmt)\n\t\toutput = core.std.ShufflePlanes([infer, clip_uv], [0, 1, 2], vs.YUV)\n\t\toutput = core.resize.Bilinear(clip=output, format=fmt_in, range=1 if colorlv==0 else 0)\n\telse :\n\t\tclip = core.resize.Bilinear(clip=input, format=rgb_fmt, matrix_in=matrix_src)\n\t\tbe_param = vsmlrt.BackendV2.MIGX(\n\t\t\tfp16=fp16_qnt, exhaustive_tune=exh_tune, opt_shapes=[clip.width, clip.height],\n\t\t\tdevice_id=gpu, num_streams=gpu_t, short_path=True)\n\t\tinfer_clips = GEN_TCLIPS(input=clip, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tif crc :\n\t\t\tinfer = DCF(input=infer, ref=clip)\n\t\toutput = core.resize.Bilinear(clip=infer, format=fmt_in, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\n\treturn output\n\n##################################################\n## 自定义ONNX模型 TensorRT\n##################################################\n\n"
+        },
+        {
+          "old": "\tplg_dir = os.path.dirname(core.trt.Version()[\"path\"]).decode()\n\tmdl_pth_rel = plg_dir + \"/models/\" + model_pth\n\tif not os.path.exists(mdl_pth_rel) and not os.path.exists(model_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\tmdl_pth = mdl_pth_rel if os.path.exists(mdl_pth_rel) else model_pth\n\n\tfmt_in = input.format.id\n\tcolorlv = getattr(input.get_frame(0).props, \"_ColorRange\", 0)\n\n\tmdl_info = ONNX_ANZ(input=mdl_pth)\n\tif not mdl_info[\"valid\"] :\n\t\traise vs.Error(f\"模块 {func_name} 的输入模型无效: {mdl_info['error']}\")\n\tfp16_mdl = mdl_info[\"elem_type_name\"] == \"fp16\" or mdl_info[\"weight_dtype\"] in [\"fp16\", \"mixed\"]\n\tif fp16_mdl :\n\t\tfp16_qnt = True   ### 量化精度与模型精度匹配\n",
+          "new": "\tplg_dir = os.path.dirname(core.trt.Version()[\"path\"]).decode()\n\tmdl_pth_rel = plg_dir + \"/models/\" + model_pth\n\tif not os.path.exists(mdl_pth_rel) and not os.path.exists(model_pth) :\n\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\tmdl_pth = mdl_pth_rel if os.path.exists(mdl_pth_rel) else model_pth\n\n\tfmt_in = input.format.id\n\tmatrix_src, colorlv = _mpv_color_spec(input)\n\n\tmdl_info = ONNX_ANZ(input=mdl_pth)\n\tif not mdl_info[\"valid\"] :\n\t\traise vs.Error(f\"模块 {func_name} 的输入模型无效: {mdl_info['error']}\")\n\tfp16_mdl = mdl_info[\"elem_type_name\"] == \"fp16\" or mdl_info[\"weight_dtype\"] in [\"fp16\", \"mixed\"]\n\tif fp16_mdl :\n\t\tfp16_qnt = True   ### 量化精度与模型精度匹配\n"
+        },
+        {
+          "old": "\n\tif gray_mdl :\n\t\tclip_y = core.resize.Point(clip=input, format=gray_fmt)\n\t\tinfer_clips = GEN_TCLIPS(input=clip_y, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tclip_uv = core.resize.Bilinear(clip=input, format=yuv_fmt)\n\t\toutput = core.std.ShufflePlanes([infer, clip_uv], [0, 1, 2], vs.YUV)\n\t\toutput = core.resize.Bilinear(clip=output, format=fmt_in, range=1 if colorlv==0 else None)\n\telse :\n\t\tclip = core.resize.Bilinear(clip=input, format=rgb_fmt, matrix_in_s=\"709\")\n\t\tinfer_clips = GEN_TCLIPS(input=clip, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tif crc :\n\t\t\tinfer = DCF(input=infer, ref=clip)\n\t\toutput = core.resize.Bilinear(clip=infer, format=fmt_in, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\n\treturn output\n",
+          "new": "\n\tif gray_mdl :\n\t\tclip_y = core.resize.Point(clip=input, format=gray_fmt)\n\t\tinfer_clips = GEN_TCLIPS(input=clip_y, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tclip_uv = core.resize.Bilinear(clip=input, format=yuv_fmt)\n\t\toutput = core.std.ShufflePlanes([infer, clip_uv], [0, 1, 2], vs.YUV)\n\t\toutput = core.resize.Bilinear(clip=output, format=fmt_in, range=1 if colorlv==0 else 0)\n\telse :\n\t\tclip = core.resize.Bilinear(clip=input, format=rgb_fmt, matrix_in=matrix_src)\n\t\tinfer_clips = GEN_TCLIPS(input=clip, num_frames=num_frames)\n\t\tinfer = vsmlrt.inference(clips=infer_clips, network_path=mdl_pth, backend=be_param)\n\t\tif crc :\n\t\t\tinfer = DCF(input=infer, ref=clip)\n\t\toutput = core.resize.Bilinear(clip=infer, format=fmt_in, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\n\treturn output\n"
+        }
+      ]
+    },
+    {
+      "path": "Lib/site-packages/k7sfunc/mod_scale.py",
+      "base_sha256": "7083fe9f9c67b6c646bf65c3af52655bc4a1e828419310ea9d263895661dfb79",
+      "result_sha256": "9d509af6415dc4de77347508976d8223b0c2da44898004bbf54a546391f02a53",
+      "replacements": [
+        {
+          "old": "import vapoursynth as vs\nfrom ._internal import (\n\tcore,\n\t_validate_input_clip,\n\t_validate_bool,\n\t_validate_literal,\n",
+          "new": "import vapoursynth as vs\nfrom ._internal import (\n\t_mpv_color_spec,\n\tcore,\n\t_validate_input_clip,\n\t_validate_bool,\n\t_validate_literal,\n"
+        },
+        {
+          "old": "\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\n\tw_in, h_in = input.width, input.height\n\tsize_in = w_in * h_in\n\tcolorlv = getattr(input.get_frame(0).props, \"_ColorRange\", 0)\n\tfmt_in = input.format.id\n\n\tif (not lt_hd and (size_in > 1280 * 720)) or (size_in > 2048 * 1080) :\n\t\traise Exception(\"源分辨率超过限制的范围，已临时中止。\")\n\tif not st_eng and (((w_in > 2048) or (h_in > 1080)) or ((w_in < 64) or (h_in < 64))) :\n\t\traise Exception(\"源分辨率不属于动态引擎支持的范围，已临时中止。\")\n\n\tcut1 = core.resize.Bilinear(clip=input, format=vs.RGBH, matrix_in_s=\"709\")\n\tcut2 = vsmlrt.CUGAN(clip=cut1, noise=nr_lv, scale=2, alpha=sharp_lv, version=2, backend=vsmlrt.BackendV2.TRT(\n\t\tnum_streams=gpu_t, force_fp16=True, output_format=1,\n\t\tworkspace=None if ws_size < 128 else (ws_size if st_eng else ws_size * 2),\n\t\tuse_cuda_graph=True, use_cublas=False, use_cudnn=False,\n\t\tstatic_shape=st_eng, min_shapes=[0, 0] if st_eng else [384, 384],\n\t\topt_shapes=None if st_eng else ([1920, 1080] if lt_hd else [1280, 720]),\n\t\tmax_shapes=None if st_eng else ([2048, 1080] if lt_hd else [1280, 720]),\n\t\tdevice_id=gpu, short_path=True))\n\toutput = core.resize.Bilinear(clip=cut2, format=fmt_in, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\n\treturn output\n",
+          "new": "\t\traise vs.Error(f\"模块 {func_name} 所请求的模型缺失\")\n\n\tw_in, h_in = input.width, input.height\n\tsize_in = w_in * h_in\n\tmatrix_src, colorlv = _mpv_color_spec(input)\n\tfmt_in = input.format.id\n\n\tif (not lt_hd and (size_in > 1280 * 720)) or (size_in > 2048 * 1080) :\n\t\traise Exception(\"源分辨率超过限制的范围，已临时中止。\")\n\tif not st_eng and (((w_in > 2048) or (h_in > 1080)) or ((w_in < 64) or (h_in < 64))) :\n\t\traise Exception(\"源分辨率不属于动态引擎支持的范围，已临时中止。\")\n\n\tcut1 = core.resize.Bilinear(clip=input, format=vs.RGBH, matrix_in=matrix_src)\n\tcut2 = vsmlrt.CUGAN(clip=cut1, noise=nr_lv, scale=2, alpha=sharp_lv, version=2, backend=vsmlrt.BackendV2.TRT(\n\t\tnum_streams=gpu_t, force_fp16=True, output_format=1,\n\t\tworkspace=None if ws_size < 128 else (ws_size if st_eng else ws_size * 2),\n\t\tuse_cuda_graph=True, use_cublas=False, use_cudnn=False,\n\t\tstatic_shape=st_eng, min_shapes=[0, 0] if st_eng else [384, 384],\n\t\topt_shapes=None if st_eng else ([1920, 1080] if lt_hd else [1280, 720]),\n\t\tmax_shapes=None if st_eng else ([2048, 1080] if lt_hd else [1280, 720]),\n\t\tdevice_id=gpu, short_path=True))\n\toutput = core.resize.Bilinear(clip=cut2, format=fmt_in, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\n\treturn output\n"
+        }
+      ]
+    },
+    {
+      "path": "Lib/site-packages/k7sfunc/mod_dbdn.py",
+      "base_sha256": "e055136049cfe33d8602f35d96c53bde4581d9ef675f863d1ad17f1520974831",
+      "result_sha256": "26862ba63f6f5fcd67d6ebabc564bbfe08906bf0696e4091f6b98a91666d08a5",
+      "replacements": [
+        {
+          "old": "import vapoursynth as vs\nfrom ._internal import (\n\tcore,\n\t_validate_input_clip,\n",
+          "new": "import vapoursynth as vs\nfrom ._internal import (\n\t_mpv_color_spec,\n\tcore,\n\t_validate_input_clip,\n"
+        },
+        {
+          "old": "\tw_in, h_in = input.width, input.height\n\tsize_in = w_in * h_in\n\tcolorlv = getattr(input.get_frame(0).props, \"_ColorRange\", 0)\n\tfmt_src = input.format\n\tfmt_in = fmt_src.id\n",
+          "new": "\tw_in, h_in = input.width, input.height\n\tsize_in = w_in * h_in\n\tmatrix_src, colorlv = _mpv_color_spec(input)\n\tfmt_src = input.format\n\tfmt_in = fmt_src.id\n"
+        },
+        {
+          "old": "\n\tif is_gray :\n\t##\tcut1 = core.resize.Point(clip=cut0, format=vs.GRAYH, matrix_in_s=\"709\")\n\t##\tcut2 = core.std.ShufflePlanes(clips=cut1, planes=0, colorfamily=vs.GRAY)\n\t\tcut1 = core.std.ShufflePlanes(clips=cut0, planes=0, colorfamily=vs.GRAY)\n\t\tcut2 = core.resize.Point(clip=cut1, format=vs.GRAYH, matrix_in_s=\"709\")\n\telse :\n\t\tcut2 = core.resize.Bilinear(clip=cut0, format=vs.RGBH, matrix_in_s=\"709\")\n\n\tfin = vsmlrt.DPIR(clip=cut2, strength=nr_lv, model=model, backend=vsmlrt.BackendV2.TRT(\n",
+          "new": "\n\tif is_gray :\n\t##\tcut1 = core.resize.Point(clip=cut0, format=vs.GRAYH, matrix_in=matrix_src)\n\t##\tcut2 = core.std.ShufflePlanes(clips=cut1, planes=0, colorfamily=vs.GRAY)\n\t\tcut1 = core.std.ShufflePlanes(clips=cut0, planes=0, colorfamily=vs.GRAY)\n\t\tcut2 = core.resize.Point(clip=cut1, format=vs.GRAYH, matrix_in=matrix_src)\n\telse :\n\t\tcut2 = core.resize.Bilinear(clip=cut0, format=vs.RGBH, matrix_in=matrix_src)\n\n\tfin = vsmlrt.DPIR(clip=cut2, strength=nr_lv, model=model, backend=vsmlrt.BackendV2.TRT(\n"
+        },
+        {
+          "old": "\tif is_gray :\n\t\tpre_mg = core.resize.Point(clip=fin, format=fin.format.replace(bits_per_sample=fmt_bit_in, sample_type=0))\n\t##\tpre_mg = core.resize.Bilinear(clip=fin, format=fmt_in, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\t\toutput = core.std.ShufflePlanes(clips=[pre_mg, cut0, cut0], planes=[0, 1, 2], colorfamily=fmt_cf_in)\n\telse :\n\t\toutput = core.resize.Bilinear(clip=fin, format=fmt_in, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\n\tif w_tmp + h_tmp > 0 :\n",
+          "new": "\tif is_gray :\n\t\tpre_mg = core.resize.Point(clip=fin, format=fin.format.replace(bits_per_sample=fmt_bit_in, sample_type=0))\n\t##\tpre_mg = core.resize.Bilinear(clip=fin, format=fmt_in, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\t\toutput = core.std.ShufflePlanes(clips=[pre_mg, cut0, cut0], planes=[0, 1, 2], colorfamily=fmt_cf_in)\n\telse :\n\t\toutput = core.resize.Bilinear(clip=fin, format=fmt_in, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\n\tif w_tmp + h_tmp > 0 :\n"
+        },
+        {
+          "old": "\t_check_plugin(func_name, \"akarin\")\n\n\tcolorlv = getattr(input.get_frame(0).props, \"_ColorRange\", 0)\n\tfmt_in = input.format.id\n\n",
+          "new": "\t_check_plugin(func_name, \"akarin\")\n\n\tmatrix_src, colorlv = _mpv_color_spec(input)\n\tfmt_in = input.format.id\n\n"
+        },
+        {
+          "old": "\t\treturn ex_ccd\n\n\tcut = core.resize.Bilinear(clip=input, format=vs.RGBS, matrix_in_s=\"709\")\n\tfin = _ccd(src=cut, threshold=nr_lv)\n\toutput = core.resize.Bilinear(clip=fin, format=fmt_in, matrix_s=\"709\", range=1 if colorlv==0 else None)\n\n\treturn output\n",
+          "new": "\t\treturn ex_ccd\n\n\tcut = core.resize.Bilinear(clip=input, format=vs.RGBS, matrix_in=matrix_src)\n\tfin = _ccd(src=cut, threshold=nr_lv)\n\toutput = core.resize.Bilinear(clip=fin, format=fmt_in, matrix=matrix_src, range=1 if colorlv==0 else 0)\n\n\treturn output\n"
+        }
+      ]
+    },
+    {
+      "path": "Lib/site-packages/k7sfunc/mod_fmt.py",
+      "base_sha256": "b48900b865a5331c5b3cd65644902b37fd1b59b54982ccebed722a56c5a08705",
+      "result_sha256": "29f140058b1ebd0448262fba27888ead0da491fc94ee35773e92d9d58d8f63d4",
+      "replacements": [
+        {
+          "old": "\t\t\t\tclip = core.resize.Bilinear(clip=input, format=fmt_out)\n\telse :\n\t\tif fmt_in not in fmt_mpv :\n\t\t\tfmt_out = vs.YUV420P10\n\t\t\tif (fmt_out not in fmt_safe) and (fmt_in in fmt_safe) :\n",
+          "new": "\t\t\t\tclip = core.resize.Bilinear(clip=input, format=fmt_out)\n\telse :\n\t\t# 新核心可桥接整数 YUV 高位深；常规模式不为旧白名单主动降格式。\n\t\tcan_preserve = (fmt_src.color_family == vs.YUV and fmt_src.sample_type == vs.INTEGER\n\t\t\tand 8 <= fmt_src.bits_per_sample <= 16)\n\t\tif fmt_in not in fmt_mpv and not can_preserve :\n\t\t\tfmt_out = vs.YUV420P10\n\t\t\tif (fmt_out not in fmt_safe) and (fmt_in in fmt_safe) :\n"
+        }
+      ]
+    }
+  ],
+  "license": "GPL-3.0-or-later",
+  "copyright": "Copyright (C) 2025 hooke007",
+  "upstream": "https://github.com/LumeCraft-Labs/K7sfunc/releases/tag/1.8.1",
+  "patch_date": "2026-10-07",
+  "description": "本机1.8.1源矩阵、范围和通用整数YUV格式保留补丁；不修改模型IO和SVP兼容格式"
+}

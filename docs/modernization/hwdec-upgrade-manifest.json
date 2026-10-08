@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-05",
+  "files": [
+    {
+      "path": "portable_config/profiles.conf",
+      "before_sha256": "b9d033f289bd0000e5a3729092640c114a53fed22e2b2bf58cfcdfdc8e2633e0",
+      "after_sha256": "2eb7584eb8bfdffb5d3daaffc4fc0f16c8f11b5308ac24730a6ec6a4eba57b20",
+      "backup": "backup/hwdec-startup-20261005-002656/profiles.conf"
+    },
+    {
+      "path": "portable_config/scripts/hwdec-select.lua",
+      "before_sha256": null,
+      "after_sha256": "ef16c92e7a33df98212b161464eb6ecac1a962386639bcaee156f91393290955",
+      "backup": null
+    }
+  ]
+}

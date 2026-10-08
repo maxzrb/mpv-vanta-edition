@@ -1,0 +1,268 @@
+[
+  {
+    "name": "evafast",
+    "repository": "po5/evafast",
+    "branch": "rewrite",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "92af3e2e1c756ce83f9d0129c780caeef1131a0b",
+    "commit_date": "2024-02-09T17:57:21Z",
+    "license": "未找到独立许可证，需逐文件审阅",
+    "identical_files": 0,
+    "differences": [
+      {
+        "local": "portable_config/scripts/evafast.lua",
+        "upstream": "evafast.lua",
+        "local_blob": "6c942f6f1747c344fa9d6a8b2f21d7123a987327",
+        "upstream_blob": "011c9ad54bf96426ffb6f25a26e1006edfe655bc"
+      }
+    ]
+  },
+  {
+    "name": "delete-current-file",
+    "repository": "stax76/mpv-scripts",
+    "branch": "main",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "93ecede23195c281669df98fcacc4e7919c8f2fb",
+    "commit_date": "2025-11-26T15:31:24Z",
+    "license": "GPL-2.0",
+    "license_url": "https://github.com/stax76/mpv-scripts/blob/main/LICENSE.txt",
+    "identical_files": 1,
+    "differences": []
+  },
+  {
+    "name": "dyphire-scripts",
+    "repository": "dyphire/mpv-scripts",
+    "branch": "main",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "1905c279123937776acf4901c57e3f4feba10d0a",
+    "commit_date": "2026-08-17T07:06:52Z",
+    "license": "MIT",
+    "license_url": "https://github.com/dyphire/mpv-scripts/blob/main/LICENSE",
+    "identical_files": 11,
+    "differences": [
+      {
+        "local": "portable_config/scripts/hdr-mode.lua",
+        "upstream": "hdr-mode.lua",
+        "local_blob": "b9d3359ce360cb5f3cf7c447e5e32a2cf78d193c",
+        "upstream_blob": "585748fc7446cb31317c6f2221be0f8cafa614cd"
+      },
+      {
+        "local": "portable_config/scripts/trackselect.lua",
+        "upstream": "trackselect.lua",
+        "local_blob": "c9eb932e7366c513934c2d6241f8d746a534ee41",
+        "upstream_blob": "3fa8c2b9768dd7cd6fdbce19df1cfe87ecf5b864"
+      }
+    ]
+  },
+  {
+    "name": "playlistmanager",
+    "repository": "dyphire/mpv-playlistmanager",
+    "branch": "dev",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "cedb4066b9803b45c81ef22f2fd7fff9bfc8ede5",
+    "commit_date": "2025-03-14T13:15:20Z",
+    "license": "Unlicense",
+    "license_url": "https://github.com/dyphire/mpv-playlistmanager/blob/dev/LICENSE",
+    "identical_files": 1,
+    "differences": []
+  },
+  {
+    "name": "sub-assrt",
+    "repository": "dyphire/mpv-sub-assrt",
+    "branch": "master",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "2e4a924365ec9b89bc383c7efd4aad3f6218fd17",
+    "commit_date": "2026-04-30T18:57:43Z",
+    "license": "MIT",
+    "license_url": "https://github.com/dyphire/mpv-sub-assrt/blob/master/LICENSE",
+    "identical_files": 1,
+    "differences": []
+  },
+  {
+    "name": "sub-fastwhisper",
+    "repository": "dyphire/mpv-sub-fastwhisper",
+    "branch": "master",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "a627d1ace85be53fdcfd5451b101881a3ce4a3dd",
+    "commit_date": "2026-05-30T02:58:30Z",
+    "license": "MIT",
+    "license_url": "https://github.com/dyphire/mpv-sub-fastwhisper/blob/master/LICENSE",
+    "identical_files": 0,
+    "differences": [
+      {
+        "local": "portable_config/scripts/sub-fastwhisper.lua",
+        "upstream": "sub-fastwhisper.lua",
+        "local_blob": "451f2d0334b18d98c52335f654a6fa9b3d3237d8",
+        "upstream_blob": "917b59a546508626978855e1a6c62d649c094cae"
+      }
+    ]
+  },
+  {
+    "name": "chapter-title-skip",
+    "repository": "dyphire/chapterskip",
+    "branch": "dev",
+    "enabled": false,
+    "policy": "review-before-merge",
+    "commit": "89498018c6d615775397fcad87e81c6fc802cbc9",
+    "commit_date": "2022-04-19T04:50:47Z",
+    "license": "未找到独立许可证，需逐文件审阅",
+    "identical_files": 0,
+    "differences": [
+      {
+        "local": "portable_config/scripts/chapterskip.lua",
+        "upstream": "chapterskip.lua",
+        "local_blob": "3ddd1c55b5e65b1551fdc7c0e1836590a882be08",
+        "upstream_blob": "88b7a953a502b323c2ed905b0c0c4628ad2d9737"
+      }
+    ]
+  },
+  {
+    "name": "eisa-scripts",
+    "repository": "dyphire/Eisa01_mpv-scripts",
+    "branch": "dev",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "4eead126d24d91f8d73edde056e97674dd1edeec",
+    "commit_date": "2025-06-27T13:09:32Z",
+    "license": "BSD-2-Clause",
+    "license_url": "https://github.com/dyphire/Eisa01_mpv-scripts/blob/dev/LICENSE",
+    "identical_files": 4,
+    "differences": []
+  },
+  {
+    "name": "autosubsync",
+    "repository": "dyphire/autosubsync-mpv",
+    "branch": "v0.33_CM",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "510535c7299ebf122508dd1a7eaa3538eacbf1ff",
+    "commit_date": "2024-03-09T16:23:14Z",
+    "license": "MIT",
+    "license_url": "https://github.com/dyphire/autosubsync-mpv/blob/v0.33_CM/LICENSE",
+    "identical_files": 4,
+    "differences": []
+  },
+  {
+    "name": "trakt-scrobble",
+    "repository": "dyphire/trakt-scrobble",
+    "branch": "main",
+    "enabled": false,
+    "policy": "review-before-merge",
+    "commit": "66371799edc4502ee289653606b03cb16af1077e",
+    "commit_date": "2026-04-30T18:57:05Z",
+    "license": "MIT",
+    "license_url": "https://github.com/dyphire/trakt-scrobble/blob/main/LICENSE",
+    "identical_files": 0,
+    "differences": []
+  },
+  {
+    "name": "simple-mpv-webui",
+    "repository": "open-dynaMIX/simple-mpv-webui",
+    "branch": "main",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "3c753450dd827d11eb6b6b8ff926e55af850478d",
+    "commit_date": "2023-11-07T11:03:55Z",
+    "license": "NOASSERTION",
+    "license_url": "https://github.com/open-dynaMIX/simple-mpv-webui/blob/main/LICENSE",
+    "identical_files": 16,
+    "differences": [
+      {
+        "local": "portable_config/scripts/simple-mpv-webui/main.lua",
+        "upstream": "main.lua",
+        "local_blob": "eb388439e344a3419b2ae73b0bbe529b8db0cc40",
+        "upstream_blob": "06ba45ab2c62bbe8e35e04c138f6fd2dc5fba7cd"
+      },
+      {
+        "local": "portable_config/scripts/simple-mpv-webui/webui-page/static/favicons/site.webmanifest",
+        "upstream": "webui-page/static/favicons/site.webmanifest",
+        "local_blob": "43b13ccf4bc439569c754d6ea178f45a8eeab3e7",
+        "upstream_blob": "bef25ecd474166bb2532946f2bbcddc4800df196"
+      }
+    ]
+  },
+  {
+    "name": "quality-menu",
+    "repository": "christoph-heinrich/mpv-quality-menu",
+    "branch": "master",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "7dc5631c014f4936a7fd50b3a66a1222c6504af5",
+    "commit_date": "2026-01-30T01:29:55Z",
+    "license": "GPL-2.0",
+    "license_url": "https://github.com/christoph-heinrich/mpv-quality-menu/blob/master/LICENSE.md",
+    "identical_files": 1,
+    "differences": []
+  },
+  {
+    "name": "file-browser",
+    "repository": "CogentRedTester/mpv-file-browser",
+    "branch": "master",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "e07ab168fbba24063cd81c9b6f3fb8b85d5fe24d",
+    "commit_date": "2026-03-27T01:54:33Z",
+    "license": "MIT",
+    "license_url": "https://github.com/CogentRedTester/mpv-file-browser/blob/master/LICENSE",
+    "identical_files": 42,
+    "differences": []
+  },
+  {
+    "name": "sub-select",
+    "repository": "CogentRedTester/mpv-sub-select",
+    "branch": "master",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "26d24a0fd1d69988eaedda6056a2c87d0a55b6cb",
+    "commit_date": "2025-04-04T12:21:04Z",
+    "license": "MIT",
+    "license_url": "https://github.com/CogentRedTester/mpv-sub-select/blob/master/LICENSE",
+    "identical_files": 1,
+    "differences": []
+  },
+  {
+    "name": "cycle-commands",
+    "repository": "CogentRedTester/mpv-scripts",
+    "branch": "master",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "cdfbd28f86f269551ce893357fdd3962f7551d07",
+    "commit_date": "2026-01-10T05:12:14Z",
+    "license": "MIT",
+    "license_url": "https://github.com/CogentRedTester/mpv-scripts/blob/master/LICENSE",
+    "identical_files": 1,
+    "differences": []
+  },
+  {
+    "name": "file-browser-addons",
+    "repository": "CogentRedTester/mpv-file-browser",
+    "branch": "master",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "e07ab168fbba24063cd81c9b6f3fb8b85d5fe24d",
+    "commit_date": "2026-03-27T01:54:33Z",
+    "license": "MIT",
+    "license_url": "https://github.com/CogentRedTester/mpv-file-browser/blob/master/LICENSE",
+    "identical_files": 2,
+    "differences": []
+  },
+  {
+    "name": "mpv-playkit-shaders",
+    "repository": "hooke007/mpv_PlayKit",
+    "branch": "main",
+    "enabled": true,
+    "policy": "review-before-merge",
+    "commit": "4921c6796620a13c2c03266f368d59d354a67b72",
+    "commit_date": "2026-05-30T10:10:37Z",
+    "license": "NOASSERTION",
+    "license_url": "https://github.com/hooke007/mpv_PlayKit/blob/main/LICENSE.MD",
+    "identical_files": 366,
+    "differences": []
+  }
+]

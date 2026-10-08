@@ -6,7 +6,7 @@
 
 **Structure:**
 ```
-mpv/
+<项目根>/
 ├── portable_config/       # Main configuration directory
 │   ├── scripts/           # Lua scripts (.lua)
 │   ├── script-opts/       # Script configuration files (.conf)
@@ -18,8 +18,18 @@ mpv/
 │   ├── input.conf         # Key bindings
 │   └── MAINTAINER-ONLY-WARNING-upstream-sources.json # 维护者上游审计源，普通用户勿运行
 ├── lua/                   # Lua runtime libraries
-└── doc/                   # Documentation
+├── mpv/fonts.conf         # 当前核心随附字体配置，不是第二套活动配置
+├── installer/             # 更新与关联入口
+├── VantaInstaller/        # 安装器源码
+├── tools/                 # 维护审计与回归工具
+├── docs/                  # 项目架构、专项报告与 HandShake
+├── version/               # 中文进度与版本记录
+├── backup/                # 用户级本地归档，不跟踪不进包
+├── trash/                 # 退役文件，不跟踪不进包
+└── doc/                   # 核心上游手册
 ```
+
+完整目录职责与归档规则见 [docs/项目架构.md](docs/项目架构.md)。根目录运行库不要为整理目录而移动；旧临时产物在根 backup 保留源路径清单。
 
 ## Build / Test / Validation
 
