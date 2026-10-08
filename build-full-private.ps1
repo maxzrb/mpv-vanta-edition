@@ -76,6 +76,14 @@ Expand-Package $BaseArchive
 Expand-Package $ExtrasArchive
 Expand-Package $ConfigArchive
 
+# 个人 SVPflow2 不进入公开增量包，仅从本机原路径保留到本地私用备份。
+$PrivateSvpSource = Join-Path $Root 'vs-plugins/svpflow2_vs.dll'
+if (Test-Path -LiteralPath $PrivateSvpSource) {
+    $PrivateSvpTarget = Join-Path $Stage 'vs-plugins/svpflow2_vs.dll'
+    $null = New-Item -ItemType Directory -Force -Path (Split-Path $PrivateSvpTarget -Parent)
+    Copy-Item -LiteralPath $PrivateSvpSource -Destination $PrivateSvpTarget
+}
+
 # Faster-Whisper 占位：私包不携带约 1.4GB 的 AI 字幕运行时。
 # 需要时下载 03-mpv-fasterwhisper-addon-v${Version}.7z，解压覆盖到 mpv 根目录即可
 # （03 包解压内容恰好落在 Faster-Whisper-XXL/，与占位目录同名合并）。
