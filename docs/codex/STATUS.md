@@ -5,15 +5,15 @@
 | 项目 | 状态 |
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
-| **用户核心优先级** | SDR／HDR 色彩显示准确优先；用户对超分／补帧不感兴趣，增强仅作为现有可选模块维护，不以模型数量或增强效果定义项目价值 |
-| **分支** | `master` 与 `origin/master` 同步；v1.6.0标签与发布结果均已推送，最终工作树检查干净 |
+| **用户核心优先级** | 软件层面完整验证 SDR／HDR 路线准确性，不以校色仪／真实HDR屏幕为条件；性能不重编译、不再增加线程，默认 D3D11、跨片源／后端通用；不推广 OP 单片参数，用户不关注超分／补帧 |
+| **分支** | master；功能12b5dcc及诊断修正83c38b6本地提交，构建核验完成，待构建记录／标签推送 |
 | **最新发布提交** | `fe1f511`（tag: `v1.6.0`，已推送）；发布结果另以docs提交推送 |
-| **工作区** | v1.6.0正式Release与ModelScope六公开附件全部核对通过；707项清理可回退；根build归档；最终结果记录已提交，工作树干净 |
+| **工作区** | 保留此前全部改动及709 scRGB／全范围修复；用户要求首次默认继承标准色彩模式，当前准确管线与96／64／256表移入可记忆的HQ高色准模式。缩放HQ、核心与线程未改；未提交／发布 |
 | **MPV 核心版本** | v0.41.0-1107-g36bf3d529（shinchiro 20261008；FFmpeg N-127242-g5d4755f7d；libplacebo 0d043c7，含99e80abd浮点截断修复）；已纳入v1.6.0候选 |
 | **项目版本** | v1.6.0已正式发布（非草稿／非预发布）；安装器独立0.3.13，GitHub与ModelScope均完成 |
-| **上次操作** | 2026-10-08 17:13 发布v1.6.0、GitHub六附件SHA一致、ModelScope匿名HTTP200及大小一致；私包仅本地 |
-| **当前排查** | 发布任务完成，优先开箱即用，完整SVP及既有滤镜保留；8K48软解优化按用户要求搁置，无自动续测 |
-| **自定义脚本** | quality.lua、quality_status.lua、color-target.lua、display-color.lua＋display-color-native.lua、hdr-mode.lua、stats.lua＋system_metrics.lua、startup-format-logos.lua（保留用户定制） |
+| **上次操作** | 2026-10-13 00:04 v1.6.1本地构建及实际包核验通过，待正式发布／镜像核验／收尾关机 |
+| **当前排查** | 默认标准恢复原有效auto目标及HDR对比度恢复0.30；原gamma2.2为注释。HQ保持FP32运算／FP16主纹理、经典sRGB／ACMscRGB／可信ICC／HDR分工及加密表，原精度结论保留。OP原速整片零丢帧未达成，8K48搁置 |
+| **自定义脚本** | quality.lua、quality_status.lua、color-target.lua、color-range-fix.lua、display-color.lua＋display-color-native.lua、hdr-mode.lua、stats.lua＋system_metrics.lua、startup-format-logos.lua（保留用户定制） |
 
 ## 环境
 
@@ -39,6 +39,23 @@ c:\Program portable\mpv2\
 
 ## TODO
 
+- [x] 菜单噪点偏好标准：校正HQ线性材质并修复过渡参考；双后端实际菜单与视频隔离验证通过（2026-10-12）
+
+- [x] 标准／HQ色彩主模式：首次默认继承auto；主模式记忆、菜单状态、静态基线与HQ原数值等值、事务回滚通过（2026-10-12）
+
+- [x] 实际GPU源／主图像写回／交换链／编译Shader逐阶段验证及反例定位，修正709 scRGB冗余映射（2026-10-11；总验收失败）
+- [x] 全范围10/12bit中点默认单线程配置修复，实际GPU／全码阶／HDR／ICC／硬解／既有滤镜交接／播放代价验证（2026-10-11；核心本体未改）
+- [x] 3FP当前固定公开提交／预编译字节码精度对照，以及默认perceptual表／静态自适应HDR／两者组合独立数值参考（2026-10-12）
+- [x] 广覆盖1646颜色×四类×三档×双后端、8组生产参数复测；PQ动态峰值31帧×双后端；48轮冷热缓存／软硬解／独立实片；加密表默认落地（2026-10-12）
+- [ ] 可继续扩展：更多黑点和输出目标、HLG／DV动态元数据时序；实际CPU上传／解码独占耗时需单独探针。不得把项目门槛通过写成全部算法／全部显示目标的认证
+
+- [x] 固定线程的双后端队列／呈现反例、跨 AV1／HEVC／VVC／HLG 的通用后台预算与独立小队列验证（2026-10-11）
+- [ ] 通用持续吞吐提升及 OP 整片原速同步零丢帧仍未达成；后续区分解码、CPU 上传、GPU 渲染／呈现耗时，先验证独立片源及硬解，禁止按单片最优参数／历史非同轮基线宣传全局提速
+
+- [x] 不重编译的 Vulkan＋异步队列优化、SDR ACM 原始 FP16 参考、手动软解徽标修正及整片对照（2026-10-11）
+
+- [x] VSPlayer 1.0.10 Native API18及固定源码核查、本机与mpv完整字幕对照；可选异步软解profile和像素／色彩验收（2026-10-11）
+- [x] 群友样片评估及无降质 AV1 软解并行优化，默认开启；像素一致性／色彩及播放状态回归完成（2026-10-11）
 - [x] 下一版本发布准备、可回退清理及起播前台显示修复（2026-10-08）
 - [x] v1.6.0正式Release、ModelScope六附件及实际包验收完成；私包仅本地（2026-10-08）
 - [ ] 搁置：本机8K48 AV1软解性能优化；仅用户明确恢复后继续
@@ -3439,3 +3456,189 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - 第8节：release保留公开候选与本地私包，VantaInstaller/publish保留单文件产物；根build已安全归档至backup/release-v1.6.0-build-staging，删除操作被自动审核拒绝后使用可回退同盘移动，无绕过删除审核。
 - README下载指引在结果提交更新为安装器0.3.13；归档内原README前段可能仍标旧0.3.12，新增迁移段已明确0.3.13要求，实际公开／私用附件安装器均为已验证0.3.13。该文档指引更新不改变已发布二进制或配置。
 - STATUS快照／中文进度／当前版本更新；历史条目保留。发布结果提交并推送，收尾命令验证master／origin差异0／0、工作树干净、发布流程未改。用户要求开箱即用已由实际解压目录和九滤镜实播确认；不宣称未做的NVIDIA／Intel或真实HDR仪器验证，8K48优化继续搁置。
+## 2026-10-10 20:06 — 群友 AV1 12-bit 4:4:4 软解性能评估
+
+- 用户询问本项目能否满足 dav1d 增加帧并行的性能目标；本轮仅评估指定 OP-yuv444p12-SWTest.mkv，不恢复此前搁置的8K48优化、不改活动配置。读取根AGENTS、STATUS与既有基准工具，INDEX不存在；git pull --ff-only Already up to date，HEAD 0c9ca8e。开工已有8个跟踪修改／2个未跟踪工具，全部保留。
+- ffprobe：AV1 Professional、3840×2160、yuv444p12le、约47.952fps、limited、92.09秒；本机i5-12600KF／10核16逻辑处理器、RX6600。mpv36bf3d529／FFmpeg5d4755f7d，日志dav1d1.5.4-31-g99f3354；按对应固定提交核对源码，默认16线程4帧／32线程6帧，max_frame_delay可通过vd-lavc-o配置。默认auto-safe日志出现硬解失败并转软件解码。
+- 复用benchmark-av1-software.py，临时UTF8包装脚本位于忽略tmp，12组串行纯解码（每组上限960帧，两轮反序，vo=null／framedrop=no／不降低源格式）平均估算fps：16／默认23.75，16／8为32.73，16／16为42.60，32／默认29.11，32／16为42.83，32／32为46.63；对默认约+96.35%，对32线程默认深度约+60.19%。不能将null控制吞吐等同真实呈现帧率，未宣称全局最优。
+- 4组约20秒完整HQ／ACM／WASAPI实播，1280×720窗口、4K12bit444源解码、静音／无字幕、无增强，隔离持久化配置：默认媒体推进比0.5716／0.5783，显示丢帧456／454；32／32推进比1.0079／1.0089，显示丢267／573，第一轮音频欠载1次。解码丢帧均0，实测段错误级日志均无；起播有既有截图不可用错误，报告据实列出。不能承诺本机本片稳定48fps，也不推断群友机器表现。
+- 新增docs/modernization/AV1-12bit444软解性能评估.md，写明候选单次播放命令、延迟／内存取舍与测试边界。原始media/version/decode/play JSON和日志在tmp/modernization/op-swtest-20261010及validation；同参数纯解码底层日志第二轮覆盖第一轮，decode.json保留两轮详情。默认探针属性抓取较早、仅有w/h，回退结论以完整日志为证据。
+- 核验12条纯解码／4条实播数据、纯解码无错误、实播稳态无错误、4组源pixelformat均yuv444p12；测试播放器已全部退出。仅报告／STATUS／中文进度纳入本轮修改，版本未改、未提交／推送／打包／发布；工作树非干净，建议完成既有改动审查后按主题分别提交。
+
+
+### 2026-10-11 00:31 — 完成无降质播放性能优化
+
+- 用户授权在画质和色彩准确性不妥协的前提下优化；沿用当前核心、HQ、线性缩小及 ACM／ICC／HDR 策略。新增 `decode-performance.lua`／同名选项：至少4K的AV1、硬解优先，确认dav1d回退后本地单视频保留选项重播；本机内存充足时32工作线程／32帧。明确软解直接在解码器创建前设置，用户显式参数不覆盖。
+- 预算取8GiB／总内存三分之一／加载前可用内存一半的最小值，按实际格式估算深度；不是分配器硬上限。网络不额外重连、多视频／外挂主视频跳过。解码菜单走事务，原生空键值表用空字符串清除，避免误传专用参数；实际playlist-play-index第二参为Boolean。保留进度、播放列表、暂停、文件局部设置及运行时外部字幕／音轨，未占用CTRL+h色彩键。
+- 起播徽标完整检测流程等到可显示首帧才开始，避免截图错误和兜底计时提前耗尽；繁忙AV1先用当前画面定位，黑屏／稀疏场景仍后瞻、探针单线程；生成4K黑屏短片的按需后瞻实机验证通过；其它播放保持预启动。后瞻控制组及停止／切换模式取消回归通过，保留用户模式、素材和此前修改。更多队列、优先级、DR关闭、48／64帧没有稳定收益，均未采用。
+- 最终脚本两轮纯解码估算20.77／18.55→44.68／45.85fps。首帧修复后补跑完整配置，20秒观测媒体推进率 0.535／0.524→1.008／1.002，最大绝对A/V差 16.273／15.976→0.323／0.287秒；优化后呈现丢帧 437／444，音频欠载 1／2次，不能承诺本机稳定满48fps。进程峰值工作集 2.65～2.67→6.46～6.49GiB。先前23.75→46.63fps为另一组评估，未混为同轮数据。
+- 两个精确时间点的源PNG和原始RGBA16F输出逐字节一致；明确软解及实际auto-safe回退均通过，源像素／色彩元数据保持。test-color-output.py重新通过FP16扩展值、真实SDR ACM灰阶／白点、广色域SDR、PQ／HLG独立数值参考及线性缩小；不是物理面板测量。
+- 验证：luajit.exe tools/test-decode-performance.lua；python tools/test-decode-performance.py <样片>；python tools/test-logo-probe-lifecycle.py <8K样片>；全部通过。覆盖隔离／手动参数／低内存／空表清除、真实回退／seek／HEVC恢复／手动跨文件解码／播放列表外挂字幕暂停保留；无Lua、解码及不可截图错误。4K／8K AV1起播保持D3D11VA、无dav1d帧选项，仅短时兼容检查。
+- check-modernization.py --options-baseline-ref=0c9ca8e通过138 Lua／75 Python语法、Shader引用、徽标与用户选项逐字节检查；历史备份已不在原位置，新增显式Git基线参数完成检查，未声称重跑旧统计性能实验。git diff --check通过。
+- 报告：docs/modernization/无降质播放性能优化.md；本地数据tmp/modernization/performance-lossless-20261010/（final-results、pixel-proof、pixel-proof-auto、lifecycle、hardware、logo-lifecycle、color-output）；原用户文件备份backup/performance-lossless-20261010/。关闭自动调优设同名选项enabled=no后重启。
+- Git：master／origin/master同步HEAD0c9ca8e；有原用户与本轮修改，无提交、打包、发布或版本号变化。原8个跟踪改动和2个未跟踪工具保留，原8K48软解专项仍搁置。建议审阅后单独提交，没有自动续测或发布任务。
+
+
+### 2026-10-11 11:13 — VSPlayer 1.0.10软解思路核查与可选方案
+
+- 用户提供的1.0.8Test活动包实际为1.0.10、相邻previous为1.0.9。克隆并固定VS-Renderer-GUI v1.0.10提交7042772f009e4fcfbbf2e570919ce9224b066e41；核对完整API18／差量／上传补丁及验收。两包avcodec-63.dll大小和SHA相同；32／32、持久异步dav1d线程、有界包与帧队列、R8／R16动态平面上传和字幕裁剪／静态缓存是主要思路。1.0.10关闭默认上传前降分辨率，未采用无收益实验。
+- 作者近48fps的1.0.10完整GUI数据来自Ryzen9 7940HX＋RTX4070Laptop；1.0.9的7840HS记录尚未满帧，不能把硬件差异全算为软件升级。本机独立Native API18探针（按固定头文件生成112B配置／392B快照，Snapshot版本8）软件解码、Jinc、1280×720、无GUI字幕：20.196s中提交40.21fps、丢弃159帧、欠载0；最终显示10-bit，与本机mpv HQ／ACM FP16不同，未改低精度来比数字。
+- 核对本机mpv36bf3d529059a947d6700adefeab3b421e537c19及libplacebo0d043c7f6f79cd3687c023454bdacbe615e4d96f源码：独立decoder thread／引用帧队列已存在，D3D11 CPU纹理上传用UpdateSubresource；动态Map上传需要核心实现实验，本轮没有重编译或替换核心。D3D11未声明映射缓冲支持，DR关闭单次结果不能视为有效上传改动。libass已有变化标记与位图打包，未照搬其它GUI的整屏透明画布假设。Raw GitHub HTTP超时后通过官方Git获取固定源码。
+- 完整配置／HQ／线性缩小／SDR ACM FP16／FLAC＋ASS sid=1、明确软解32／32，媒体10秒开始，15秒后测20秒。三轮当前默认丢帧290／286／264、音频欠载1／1／0、峰值工作集6.64～6.71GiB；16帧／768MiB异步队列丢帧322／289／282、欠载0／0／0、内存7.24～7.39GiB。未证明视频吞吐提升，因此不默认开启；三轮短窗口也不承诺整片无欠载。8帧队列、DR关闭及P-only候选未采用；P-only掉帧840／欠载4，全部逻辑处理器对照224／1。
+- 仅新增portable_config/profiles.conf中的AV1-SoftDecode-Async可选profile：hwdec=no、独立视频解码、16帧／768MiB；不改任何画质或色彩参数、没有播放中应用菜单。通过启动参数在播放前选择，正常重新启动恢复硬解优先；初始profile备份backup/vs110-study-20261011/profiles.conf。此前所有未提交修改保留。
+- 验证：常规与profile在10.010／25.004秒精确跳转后的高位深PNG及原始RGBA16F有效像素逐字节一致；可选profile字幕选择、暂停跳转、停止后restore并恢复HEVC硬解／标准队列通过。profile下重跑SDR ACM参考白／1024灰阶、广SDR、PQ／HLG独立软件数值及线性缩小通过；仍非物理面板测量。
+- 报告docs/modernization/VSPlayer-1.0.10软解优化借鉴.md；本地数据／测试脚本及固定源码在tmp/modernization/vs110-study/（packages、native20、queues、affinity、pixel-proof、profile-lifecycle、color-profile/results）。无用户媒体／依赖上传。Git启动pull --ff-only为Already up to date，master同步origin/master HEAD0c9ca8e，有原用户与本轮待提交修改；无提交／发布／版本变化，原8K48软解专项不自动恢复。建议审阅后按主题提交。
+
+## 2026-10-11 12:05 — 不重编译的 Vulkan 软解优化与整片边界
+
+- 用户要求继续研究播放性能，约束不损失画质／色彩、不重编译核心；从既有 HandShake／AGENTS 接续，git pull --ff-only Already up to date，HEAD 0c9ca8e，保留全部旧脏工作；未提交／发布。
+- 修正 startup-format-logos.lua：以当前 AV1／≥4K／hwdec-current=no 判断繁忙软解，消除手动线程或调优关闭时依赖 userdata 的遗漏；亮场不额外后瞻，暗场仍单线程按需后瞻，停止／模式取消通过。修改前源码备份 backup/performance-followup-20261011。
+- 资源变化使初轮自动深度24／28，作废其固定32／32比较用途。修正徽标后完整字幕／音频、HQ／线性缩小／FP16 SDR ACM 的32／32三轮D3D11掉帧548／579／636；Vulkan＋16帧／768MiB队列55／65／56，均无音频欠载，约7.3GiB。交换链8、删UI无稳定收益，未采用。
+- 48／48＋Vulkan队列单短窗7掉帧、约9.5GiB；整片扩展被窗口退出按键打断，未计入、未推广48／48。首次整片受autoload连播进入其它文件，作废；随后副本禁用autoload、核对单条列表和路径。最终有效整片：默认D3D11固定32／32 93.112s／2974掉帧／10欠载／最大AV2.211s；实际新预设自动选择32／32 92.408s／1953掉帧／0欠载／最大AV1.483s，减少34.3%，两者解码跳帧0。仍未全片稳定48fps，不能用实时进度或短窗90%外推。
+- color-target.lua 在SDR WCG下支持Vulkan协商FP16/scRGB，忽略无效D3D11输出配对，避免不必要VO重建；保留浮点协商失败回退及真实HDR的D3D11限制。profiles.conf新增AV1-SoftDecode-Vulkan（gpu-next／vulkan／hwdec=no／队列16与768MiB），播放前可选；并行仍使用内存预算，不全局切换。
+- 新tools/gpu-readback-vulkan.py／.js仅附加自有暂停诊断进程，在表面允许时增加TRANSFER_SRC读回用途，不参与性能测试／日常播放。test-vulkan-sdr-output.py通过真实FP16标尺（负值／>1）、SDR参考白1024灰阶、广SDR独立参考、线性缩小；PQ／HLG源在真实SDR ACM的16色块对照D3D11误差0，非真实HDR桌面／物理屏测量。
+- 新预设开启队列后的样片10.010／25.004s：软件高位深源截图一致，yuv444p12与ASS sid1保留；实际FP16输出跨后端不逐位一致，最大绝对差0.0009765625、RMS约1.83e-5／2.43e-5，数值参考通过。未降位深、未换缩放算法、未关闭色彩管理或解码跳帧。
+- FFmpeg固定5d4755f7d源码确认libdav1d自己的AVBufferPool allocator，不调用get_buffer2_direct；不能称为Vulkan零复制解码，DR=no/auto差别未作为收益依据，缺少upload统计也不代表零成本。固定源码链接写入docs/modernization/Vulkan软解播放性能优化.md，并在此前两份报告追加后续链接。
+- 验证：test-logo-software-budget.py亮场／暗场／手动32且调优关闭／停止与切模式；test-color-state.lua含Vulkan成功免撤轨与协商失败不误报；test-decode-performance.lua与test-startup-logos.lua通过；新profile暂停精确跳转／字幕／停止后restore恢复D3D11 HEVC硬解与队列关闭通过。check-modernization.py --options-baseline-ref 0c9ca8e：Lua138／Python78、Shader引用、既有统计记录校验、用户Logo/window选项逐字节保留、素材、发布流程未改通过。UTF-8/LF与原BOM状态保留、git diff --check通过。
+- 证据在tmp/modernization/performance-followup-20261011（fixed-sweep.json／fullclip.json／vulkan-color.json／vulkan-pixels.json／vulkan-profile-lifecycle.json／logo-budget.json及日志）；维护依赖Frida沿用既有忽略目录，不新增播放器日常依赖。原8K48专项不恢复。
+
+## 2026-10-11 13:11 — 通用性能研究，固定线程与跨片源验证
+
+- 用户要求继续研究，后明确不再增加线程，兼顾应用广泛的 D3D11，要求通用方案而非 OP 样片过拟合。startup 已按 HandShake／AGENTS 接续，pull --ff-only Already up to date，master／origin HEAD0c9ca8e；旧待提交修改全部保留，无提交／发布／核心替换。
+- 纯解码通过无校验和 showinfo 实际计数（含启动与定位预卷）：32／32 重场景1259帧／27.858s＝45.19fps，整片4415帧／95.507s＝46.23fps；不是可见呈现帧率，不宣称硬件绝对上限。用户限制之前的48／48重场景43.17fps未采用；此后无加线程实验。
+- 完整可见32／32／ASS／原音轨静音／HQ线性缩小／FP16 SDR ACM：Vulkan96帧4608MiB/3s＋暂停12s，整片169掉帧、AV峰0.123s、11.15GiB；160帧7680MiB/4s＋暂停15s反而572、AV0.586s、14.05GiB；D3D11同96帧＋暂停8s为1557、AV0.980s、11.22GiB。均欠载0、92.2～92.4s原速进度，仍非同步零丢帧。不拿上轮1953作同轮因果基线；未写入大队列默认。
+- D3D11呈现深度2/4/4/2短窗掉帧299/201/194/198，无稳定收益，未采用。暂停线程CPU：D3D11完整0.026核/无配置0，Vulkan完整0.513/无配置0.980；未栈采样，不定位到驱动函数，不能冒充播放吞吐。
+- startup-format-logos.lua 的前台判断改为 hwdec-current=no 的真实视频，去掉AV1/4K条件，排除图片和封面。软解先用现有画面，暗场按需单线程后瞻，硬解保留四线程预启动；不改前台线程、视频像素、缩放、色彩、字幕或同步。备份 backup/general-performance-20261011。
+- 独立D3D11原线程vd-lavc-threads=0对照：4K HEVC60旧探针4→0，丢帧840/833→825/827，提升小；1080p VVC24仍需后瞻4线程→1线程，两者0掉帧；4K HLG/DV P8.4 24fps探针1→0，两者0掉帧。8轮源格式、输出目标、缩放、滤镜、同步、线程选项一致；不宣称统计显著或大幅主吞吐提升。
+- 独立小队列16帧768MiB，D3D11同新徽标策略、相同原线程，HEVC60按关/开/开/关：818/782/802/818掉帧，24.89/24.64/24.54/24.86s（20s内容），AV仍3.4～3.9s，不达标；VVC/HLG有队列仍0掉帧。未全局启队列，保留硬解适用边界。
+- 新 tools/benchmark-av1-buffering.py 支持两后端、队列三上限、显式预缓冲、真实路径与色彩检查、低于1.5GiB可用内存仅终止自有测试进程。tools/test-logo-software-budget.py 增加HEVC跨后端与D3D11实际硬解回归；初次硬解测试错误禁止正常后续深探针，修正断言并完整重跑通过。临时对照属性的EOF/自动暂停读取竞态已修正，作废失败轮并重测，无用户按键导致暂停。
+- 验证：AV1手动亮场、黑场单线程/停止/换模式、HEVC软件D3D11/Vulkan、HEVC真实D3D11硬解策略六例通过；test-startup-logos.lua通过；check-modernization.py --options-baseline-ref=0c9ca8e，Lua138/Python79、用户既有选项逐字节、Shader与既有统计记录、发布流程通过。统计性能与色彩数值本轮未重跑，只验证现有记录及保持同处理选项。
+- 报告 docs/modernization/通用播放性能优化研究.md，并在既有 Vulkan 报告追加后续通用要求；原始数据 tmp/modernization/zero-drop-study-20261011（decode／q96／q160／d3d11-q96／depth对照／paused／general-policy／queue-general／logo-general-final）。本轮维护进程结束，未触动用户其它应用。通用大幅提速和OP同步零丢帧尚未实现；下一步需实际定位解码与上传／呈现耗时，不能借后台任务减少夸大主吞吐。原8K48专项不恢复。
+
+## 2026-10-11 20:34 — 逐阶段软件色彩验证，保留失败并修正 709 scRGB 冗余映射
+
+- 用户明确只要求软件层面证明路线准确性，不要求校色仪或真实 HDR 显示器。后续不得再次把硬件测量设为本轮完成条件。仍禁止继续加线程、重编译／替换核心；默认 D3D11 与 HQ 保留，8K48 专项继续搁置。
+- 当前总软件验收 **FAIL**，不能宣传已完整证明所有片源准确。48 组（8/10/12/16bit × 601/709/2020 × full/limited × D3D11/Vulkan）所有源整数上传和同尺寸复制逐像素一致；42 组独立参考通过，6 组全范围 10bit 数值失败。已修改测试使其完整保存结果后返回 exit 1，不把 FAIL 日志当作成功退出。
+- 实际 D3D11 Shader／DXBC 与 Vulkan SPIR-V 证明被测算术 FP32，主图像中间及 scRGB 交换链实际 RGBA16F；不是整链 FP32 或整数无损。Vulkan 无 RelaxedPrecision。成功 SetColorSpace1／实际 Vulkan colorSpace 与输出编码匹配；旧交换链读回器对照 65,536 RGBA 像素逐字节一致。源 R8/R16 与 RGB16 上传均原码值保持。
+- 生产仅在 color-target.lua 的 SDR ACM／HDR scRGB 源色域白名单补入 bt.709，去掉重复 perceptual 3D LUT；新增 SDR/HDR 709 管理器回归。65,536 灰阶最大线性误差 D3D11/Vulkan 0.0015995/0.0015801→0.000488305；灰阶 ΔL* 0.06667→0.02955；不同输出值 9,387→10,870，仍有 FP16 量化。D3D11 色彩 Shader 80→13 指令槽，不能当作整播放器开销比。
+- 无插桩 ABBA 各两轮，固定 AV1 32、HEVC 16 线程，1024×576：GPU 色彩末段 AV1 D3D11 0.33165→0.29780ms、Vulkan 0.33673→0.30174；HEVC D3D11 0.64212→0.61991、Vulkan 0.19128→0.17178。此段可能合并横向缩放，收益约3.46～10.39%，不是全片 FPS 或零丢帧证明。
+- 全范围中点实际 GPU 常量：10/12bit 均用了 0.500007645，而正确整数中点分别 512/1023=0.500488759、2048/4095=0.500122100。8/16bit 对照正确；独立偏差模型复现输出。定位到 renderer 采样归一化改变 repr.bits 后再进入 decode；上游 d992 直接 decode 修正不能证明 renderer 路径正确。12bit 未越统一阈值也确有该偏差。核心未修。
+- 单线程 lavfi zscale full→limited16 候选：12 个色块组、两个 API 的10bit全1,024码和12bit全4,096码（三平面）、全灰阶、709/2020的PQ/HLG八组通过。全码阶可逆，但最终FP16仍量化：12bit全范围灰阶4,096→4,001。已纠正候选逆算式为 MAX_CODE，穷举证明；没有因为色块通过而声称全码阶通过。
+- 候选性能单独 FFmpeg 原始4K帧至null，96帧ABBA各两轮、解码/编码/滤镜线程均1：每帧总时长增加10bit1.19271ms/12bit0.76042ms，进程 user+system CPU增加7.0/7.81771ms。初轮与GPU诊断重叠的数据舍弃，后续独立重测入报告。非mpv滤镜精确计时或全播放器FPS；候选未加入生产，硬解／既有滤镜交接与真实播放代价仍待验证。
+- 15组灰阶/RGB16/广SDR/PQ/HLG/线性缩小实测通过；实际12bit TV全3,505灰阶输出3,498，不能称整链不丢码。HDR是目标峰值覆盖源峰值、黑位0的受控数学验证，非默认自适应HDR→SDR完整算法验收。Vulkan当前管理器HDR未支持，不把SDR证据当HDR验收。
+- 显式ICC Gamma2非恒等四组通过，709/2020两API色块平均编码误差约0.001217/0.001953。经典SDR709/601 RGB10+抖动通过；广2020纯矩阵与默认perceptual有约0.002078平均差，算法独立参考尚未建立，不能据此判默认perceptual错误或全面通过。
+- OP首帧黑场不得充当色彩证明，改测5秒有颜色帧：独立FFmpeg vs dav1d GPU三个平面全24,883,200整数样本逐字节相同，两API缩小前矩阵/BT.1886最大误差0.000239753（线性工作单位203nit、受控白80nit，含80/203比例）；有限范围不触发中点缺陷。
+- 新增主链读回 D3D11/Vulkan JS+Python、矩阵/HDR/经典SDR/ICC/插桩不变性/OP/中点/候选/全码阶工具、两种分段基准和结果汇总；旧Vulkan最终读回补RGB10。原始Shader/常量/清单/大图在忽略tmp目录，摘要和《色彩管线软件闭环验证-20261011》报告入docs/modernization，含核心二进制与源结果SHA256。
+- 验证：test-color-state.lua、test-hdr-lifecycle.lua、test-render-precision.lua通过；check-modernization.py --options-baseline-ref=0c9ca8e通过（Lua138/Python93，既有选项逐字节、Shader/徽标、历史统计记录、发布流程检查）。git diff --check通过；无残留自建mpv/ffmpeg/python进程。历史统计结果是核查既有记录，未宣称本轮全片性能测试。
+- 后续：默认perceptual及自适应HDR→SDR完整独立算法参考；全范围候选实际播放/硬解/已有滤镜交接，或上游renderer真正修正后的失败回归。当前不能签发全路线准确或OP整片零丢帧结论。所有既有修改保留，master/origin仍0c9ca8e；未提交、打包或发布，版本仍v1.6.0。
+
+## 2026-10-11 22:10 — 全范围色度中点配置修复与实际交接验收
+
+- 用户要求“能否修复／继续”，按已确认软件缺陷继续实现。HandShake及AGENTS接续，startup git pull --ff-only为Already up to date；master/origin/master仍0c9ca8e，所有此前脏工作保留。未重编译、更换核心、增加解码线程、提交、打包或发布；版本仍v1.6.0，8K48专项不恢复。
+- 新增 portable_config/scripts/color-range-fix.lua 和 script-opts/color-range-fix.conf，默认enabled=yes；仅当前36bf3d529 gpu-next、full 10/12bit YUV420/422/444、601/709/2020NCL命中。实际滤镜输出符合格式时追加单线程lavfi zscale full→limited16；分辨率／色度采样／矩阵／原色／传递函数保留。有限范围／RGB／8/16bit及未验证格式旁路，OP为有限范围无需转换。
+- 对硬解表面明确hwdownload+原表面format，保留硬解器；D3D11实际d3d11va、Vulkan实际d3d11va-copy通过。受影响硬解增加CPU下载／上传，不宣称零复制。外部滤镜保留；用户删除／禁用／改写自身标签尊重本文件决定，同名外部滤镜不删除。改链后重审实际输出，RGB48自动旁路。修正file-loaded旧VO参数竞态，等待新输出通知，full→limited→full及同文件三次重载通过；状态去重减少重复userdata广播。
+- 自动脚本12组矩阵色块通过：full10最大线性误差0.000395062、full12为0.000460672，中性灰色块通道差0，全部3×65536源样本逆算可恢复。16组全码阶／灰阶／PQ／HLG通过，10/12bit每平面1024/4096原码阶均保留；FP16最终写回仍量化，12bit4096→4001不同灰值，未声称整链整数无损。
+- 420硬解双API、422软解双API、非恒等ICC Gamma2四组通过；ICC709全10／2020全12平均编码误差0.001226085／0.001887504。真实外部null／RGB48改链、主动删除／暂停跳转／切片／重复重载通过。Lua所有权／故障回滚测试通过。D3D11读回重新钩住GetImmediateContext返回的新方法表；双API逐阶段与最终读回全部65536 RGBA像素逐字节一致。
+- 无GPU插桩实际mpv 4K24 FFV1 full12，1024×576，固定16解码线程、校正滤镜1线程，1.5秒预热+2秒ABBA窗口各两轮：D3D11进程CPU毫秒/媒体帧204.838→213.346（+8.508）；Vulkan187.475→199.219（+11.744）。CPU是所有线程总时间，短窗波动明显，不是单帧延迟／通用恒定代价。八窗口呈现及解码丢帧均0，非OP整片零丢帧证明；有限范围旁路，不施加此转换成本。
+- 新工具 test-color-range-fix.py／dense.py／integration.py／formats.py、test-color-range-lifecycle.lua、benchmark-color-range-fix.py、summarize-color-range-fix.py；既有test-gpu-pipeline.py增加独立OUT／硬解／实际校正状态，gpu-pipeline-readback.py增加诊断重绘，原历史工具默认排除此修复，保留修复前失败可复现性。
+- 运行上述新测试、test-gpu-readback-invariance.py及色彩状态／HDR生命周期／渲染精度Lua回归均通过；check-modernization.py --options-baseline-ref 0c9ca8e通过（Lua139/Python99，用户选项逐字节、Shader/素材与发布流程检查）；git diff --check通过。原始证据 tmp/modernization/color-range-fix-20261011，结果摘要含SHA256，核心与旧审计SHA256相同；维护探针不参与日常播放。
+- 文档 docs/modernization/全范围色度中点配置修复-20261011.md、color-range-fix-results-20261011.json；原审计报告顶部加后续链接，历史FAIL JSON不重写。默认perceptual／自适应HDR→SDR完整独立算法参考仍未完成，整体色准验收不能签全面通过。重启mpv载入新脚本；回退conf enabled=no后重启。Git有未提交变更，跨设备前建议按主题审阅并提交，本轮不擅自提交。
+
+## 2026-10-12 17:55 — 3FP精度对照与默认映射独立数值验证
+
+- 接续用户“整体管线高色彩准确度／3FP要求是否达标／继续”。软件层面验证，不要求硬件；不重编译／替换核心、不增解码线程，默认D3D11/HQ、此前范围修复及所有脏工作保留；8K48仍搁置。HandShake已读取，startup git pull --ff-only为Already up to date；master/origin/master仍0c9ca8e，未提交／发布，版本仍v1.6.0。
+- 新固定3FP源码20bcc001b24f6b6de4575bddf9b93ec452795b0d，忽略目录tmp/modernization/3fp-current-20261011；反汇编10组公开DXBC，常规SM5 FP32运算，无min16/min10。3FP缩放R16F/RG16F/RGBA16F、HDR/scRGB交换链RGBA16F，动态曲线R32_FLOAT；没有全程RGBA32F要求。我们的实际主图像精度等级相同。公开kernel对照检验优化前后等价，未给绝对整链ΔE合格线，float32导出不等于32位纹理。
+- HLG同源16bit有限范围BT2020、黑位0、峰值1000nit，mpv实际GPU与BT2100独立公式参考通过。红色(.75,.25,.25)最大等效BT2020通道误差0.0883895nit；3FP公开基础Shader逐通道pow(scene,1.2)*1000复算41.3315851nit，后者不是3FP实播。mpv16块全体最大0.570021nit。不得用此反例宣布所有3FP路径排名。
+- 独立float64模型补PQ/IPT、perceptual连续和离散表、整数峰值统计、虚拟目标曝光、spline膝点及LMS film响应。PQ1000/PQ4000灰阶、PQ4000彩色、HLG目标80nit适配×两API×256/1024节点，共16组通过，最大线性scRGB误差0.000672304。默认256点各场景最大0.000482347/0.000485650/0.000654481/0.000488301。1024没有一致改善，未启用。
+- 初版参考漏掉编码域FP16向零写回、HLG误用固定1000nit，纠正模型后重跑16组完整通过。PQ中间16块实际向零结果与源码整数推导的半精度预测完全一致，未拿实测值拟合曲线；HLG80nit使用低亮度系统gamma、无额外spline。保留表示损失事实，不将分项PASS称源信号无损。
+- 默认perceptual48×32×256独立表模型与实际输出最大编码差0.00114767，加密96×64×256为0.00131086，四组按预设0.002容差通过。相对连续算法默认最大sRGB差0.0420323/ΔE76 2.21835、平均0.20640；加密为0.0191828/0.94610、平均约0.1235。D65 Lab的ΔE76，非ΔE00/面板/源2020原色比较。表约3→12MiB，性能未量测，未改默认。tricubic产生灰色偏差拒绝；ICC上限128³八组最大误差未改善，拒绝。
+- 彩色PQ4000→经典SDRRGB10的HDR/perceptual组合四组通过，默认表最大编码差0.000831504、加密0.000649819，两API相同；参考包括所选离散表，不冒充相对连续算法零误差。仍非场景切换IIR／延迟峰值时序或全部颜色阶梯验证。
+- Vulkan检测模块2个RelaxedPrecision逐ID确认为整数；gpu-pipeline-vulkan.js增加完整类型分类及执行阶段，浮点32位且浮点/未知降精度数必须0。历史无任何RelaxedPrecision仅对历史样本适用。test-gpu-pipeline.py增加后置目标控制及读回后实际目标刷新。重新运行双API读回不变性，65,536 RGBA像素全部逐字节相等。
+- 新工具audit-3fp-precision.py、color-map-reference.py、test-3fp-hlg-comparison.py、test-color-lut-accuracy.py、test-gamut-continuous.py、calibrate-gamut-reference.py、test-hdr-adaptive-reference.py、test-hdr-gamut-composition.py、summarize-color-accuracy.py。报告docs/modernization/3FP精度对照与映射数值验证-20261012.md及color-accuracy-results-20261012.json（含原始证据与工具SHA），3fp-precision-comparison-20261011.json、gamut-reference-calibration-20261012.json；原始大图/Shader/源码保留忽略tmp；历史FAIL审计不重写。
+- check-modernization.py --options-baseline-ref 0c9ca8e通过（Lua139/Python108，用户既有选项逐字节、Shader/素材、历史统计记录、发布流程未改）；统计只核查既有记录，不是本轮性能重测。核心SHA256仍172beb5f27cf8cbd663683380857d92103eea496b221a69de025a9dc8f828279。自建mpv/ffmpeg/python已退出。
+- 后续：更多颜色/连续阶梯、动态峰值时序、加密表成本；不得回到“无独立默认映射参考”的旧状态，也不得签全部色彩算法全局通过或新增OP零丢帧结论。工作区有既有/本轮未提交内容，跨设备前建议按主题审阅提交。
+
+
+## 2026-10-12 19:45 — 广覆盖精度／缓存性能验收与加密色域表默认落地
+
+- 用户授权继续上轮下一轮计划。采用HandShake；读取AGENTS／STATUS，INDEX不存在；git pull --ff-only为Already up to date，master/origin/master仍0c9ca8e，保留此前所有修改，未创建分支／提交／推送／发布。
+- 新工具：color-metrics.py（CIEDE2000作者34对自测）、gamut-study-fixture.py、test-gamut-general.py、benchmark-gamut-density.py、test-hdr-temporal-reference.py、test-gamut-unaffected.py、summarize-gamut-density.py。GPU读回器新增不seek的逐帧推进；旧色域／HDR组合工具显式固定历史48／32／256基线，防止生产新默认改变历史对照含义。
+- 四夹具1646色，含257灰阶、84近中性、576HSV、729RGB；24组原／中／密表×双API＋8组无CLI覆盖的生产默认，GPU源整图整数精确，全部灰阶单调。最大ΔE00：SDR1.24244→0.71412，HLG0.84763→0.33294，PQ0.67913→0.41992，ICC1.19043→0.72660；最大局部误差增加0.15506，无>0.25增加。
+- 独立参考补入HLG经典SDR1000nit源／95%母版软折返、峰值前后FP16编码量化，以及ICC真实S15.16 XYZ矩阵。ICC解析转换与其17阶四面体／黑点近似有0.12683ΔE00残差，采用物理色差门槛0.25；原0.004068编码残差继续记录，未把解析矩阵当逐节点ICC表等值证明。
+- 双API各31帧PQ峰值时序：稳定／渐变／亮场突切／黑帧／恢复，源整图整数一致，独立IIR／滞回及当帧映射最大线性误差0.00077689。突切使用上一帧峰值模型会错0.73950，实际同帧约0.00064；实际编译浮点FP32核对通过。
+- 48轮无GPU读回插桩ABBA：FFV1网格、4K24 HEVC10软／硬解、独立4K HLG、1080p VVC、4K60 HEVC，固定线程16且禁解码脚本改写。672秒窗口；前40轮计数增量0，4K60八轮仍丢帧且无一致改善（该片和VVC无色域表）。CPU有波动，未宣称吞吐提速。
+- 色域所在融合GPU阶段的最大平均增量3.15微秒。表逻辑资源3→12MiB，冷生成约22～52→64～87ms，部分起播两张表；热缓存成功复用12MiB，热就绪最大正差约0.076秒。4K／HLG私有提交差约27～44MiB，不能只说额外9MiB。采样环256并非累计计数；最终使用长片窗口覆盖，弃用早期短片循环负计数结果。
+- 生产mpv.conf新增libplacebo-opts=lut3d_size_I=96,lut3d_size_C=64,lut3d_size_h=256，保留三线性、HDR曲线、默认D3D11／HQ；核心哈希172beb5f27cf8cbd663683380857d92103eea496b221a69de025a9dc8f828279未变，不再加线程。回退只移除这一行。
+- 六组非压缩路线（709经典SDR、709／2020源色域scRGB×双API）每组430080 RGBA像素整帧逐字节相同；读回不变性每API65536 RGBA相同。完整脚本配置起播D3D11VA及HQ／线性缩小通过。Lua139／Python115、Shader／既有选项字节保留／徽标／发布流程未修改检查通过。两个测试工具适配错误（Vulkan像素步长字段、gpu-api原生节点数组类型）修正重测，非生产问题。自有播放器／编码器／Python均已退出。
+- 报告docs/modernization/色域表通用精度与性能验收-20261012.md；结构化gamut-density-results-20261012.json保存所有测量向量、48轮分段及时序和输入文件哈希。历史报告不覆写，临时数据在tmp/modernization/gamut-general-20261012。建议按逻辑整理本轮改动单独提交，工作区仍含此前待提交内容。
+- TODO：继续分离CPU上传和解码的独占时间，再选减少复制／同步等待的通用候选；扩展更多黑点／输出目标与HLG／DV动态元数据。OP原速同步整片零丢帧仍未达成，8K48保持搁置；不签所有算法和场景的全局色准认证。
+
+### 2026-10-12 20:45 — 标准／HQ色彩主模式与首次默认
+
+- 用户明确要求原整合包继承色彩模式作为首次默认、当前管线作为HQ高色准；读取AGENTS与HandShake、STATUS，git pull --ff-only为Already up to date，保留全部此前未提交工作。
+- 历史92085e5核查：gamma2.2原为注释，有效值auto；标准恢复auto目标／输出、48／32／256及hdr-contrast-recovery=0.30。HQ保留当前自动分工与96／64／256，存储主模式偏好独立于ICC／峰值。缩放、线程、范围错误修复、核心保留。
+- 修改color-target.lua/conf、profiles.conf、mpv.conf、input.conf、quality_status.lua与README；新增两项模式/静态输出工具和报告JSON。既有HQ验证／基准工具明确选择HQ，避免首次默认改变测试含义。Vulkan不写D3D选项，避免设备重建；主模式失败回滚、重复选择免撤轨、其他libplacebo选项与显式表尺寸覆盖保留。
+- 验证：双后端各三次全脚本启动与菜单勾选；十组标准输出与继承参数静态基线整帧字节相同；四类双后端13168色HQ向量与19:45冻结结果逐值相同；Lua事务故障注入及ICC／峰值持久化回归通过。check-modernization（0c9ca8e）139 Lua／117 Python、用户选项、资源和发布流程检查通过；git diff --check通过。
+- 结果：docs/modernization/标准与HQ色彩模式-20261012.md及color-mode-results-20261012.json；原色域表报告添加后续模式说明。工作区仍有此前及本轮未提交改动，未提交／推送／打包／发布，版本不变。
+
+### 2026-10-12 21:00 — 色彩菜单合并与文案简化
+
+- 用户要求合并色彩模式和色彩目标菜单，去掉“继承设置”“首次默认”等设置标签。统一为画面 > 色彩：标准、HQ 高色准、自动匹配、SDR · sRGB、SDR · 系统 ICC、HDR、恢复切换前设置、查看状态；标准状态及OSD同样简化。
+- 修改input.conf、color-target.lua、既有菜单回归匹配及README／模式说明；未改色彩参数、切换逻辑及偏好格式。既有test-color-pipeline-modes.py双后端六次全脚本启动通过；实际menu-data确认仅一个色彩菜单、八项顺序和无旧菜单。git diff --check通过。
+- 保留全部此前未提交工作，未提交／推送／发布。
+
+### 2026-10-12 21:02 — WebUI 起播提示上移
+
+定位8060端口WebUI提示，将webui.conf的startup_osd_offset_y与脚本默认值由42改为37，左侧偏移20保持。按用户要求上移5个逻辑像素，沿用HiDPI缩放。Lua加载语法／UTF-8 LF／git diff --check通过；未改网络服务或其他OSD。未提交／发布。
+
+### 2026-10-12 21:08 — 色彩去重与工具画质入口移除
+
+按用户截图将色彩菜单收敛为标准、HQ 高色准、系统 ICC、查看状态；删除自动匹配／SDR／HDR／恢复重复项，HQ覆盖自动目标。HQ与显式／实际ICC勾选互斥。工具中的画质处理三项整组移除，处理入口保留在着色器／视频滤镜。
+
+- 修改input.conf、README、模式说明与既有静态／菜单回归要求，没有修改色彩参数及管理器逻辑。实际原生menu-data检查四项顺序、三项互斥勾选和无重复工具子菜单通过；check-modernization（139 Lua／117 Python）、git diff --check通过。双后端六次启动回归通过；首次即时源参数比较曾失败，增加比较值诊断后重跑未再现，本轮未改源处理参数，暂不推断原因。
+- color-mode-results更新菜单结果，保留之前数值等值结论；保留全部既有未提交工作，未提交／推送／发布。
+
+
+### 2026-10-12 23:16 — 菜单磨砂匹配标准观感
+
+- 用户偏好标准下的菜单噪点；保留标准材质原参数，在 HQ 的 BT.709线性输出校正 ASS 面板、噪点、高光和遮罩。仅 UI 图层，不修改视频色彩目标／精度／线程／核心。
+- 新增 uosc/lib/frosted.lua 与工具 test-menu-grain.py；调整 Menu.lua、Curtain.lua、main.lua 和 uosc.conf，默认 menu_frosted_noise=0.05、menu_frosted_match=yes；可设 no 回退。未知／非线性参考保留原材质。
+- 中途实际菜单热切换发现标准参考被 HQ过渡输出覆盖；核对当前输出选项与已发布标准设置后修正。D3D11／Vulkan 实际级联菜单均通过往返字节一致和即时匹配检查。
+- 72次静态诊断覆盖双后端四种灰背景及本机系统 ICC（实际 SDR ACM/scRGB）。标准16帧640万 RGBA像素逐字节不变；18组无菜单视频比较通过。黑背景 HQ噪点 RMS／标准由3.998降至1.004；亮背景校正后0.859／0.613／0.490，不声称全场景材质精确等值。
+- 1728组材质边界有效，缓存微基准1.070µs／对。全脚本双后端六启动模式记忆／源参数／缩放／外部覆盖回归通过；check-modernization（基线0c9ca8e）140Lua／118Python与保护项通过。
+- Vulkan早期完整无菜单帧包含动态页脚，未沿用其整帧相等假设；改为700×400实际视频区域并复核。报告 docs/modernization/菜单磨砂噪点匹配-20261012.md 与 menu-grain-results-20261012.json 保存范围、量化差异及哈希。
+- 保留全部此前未提交工作；未提交／推送／发布。OP原速整片零丢帧仍未达成，8K48继续搁置。
+
+- 收尾复核：本轮11文件UTF-8／LF、git diff --check及最新140Lua／118Python检查通过；实际菜单诊断日志无Lua错误，诊断播放器均已关闭。
+
+
+## 2026-10-12 23:29 — v1.6.1 发布准备
+
+用户明确指定1.6.1、批准发布Gate，并授权发布核验全部完成后关机。完整阅读《发布流程.md》、AGENTS及HandShake；发布流程不修改。沿用01～04结构和安装器0.3.13；01／04重建，02／03需先核验全部输入再按4.1.1复用，否则重建。功能含标准／HQ与加密表、全范围色度修复、启动检测预算／取消回调、AV1解码任务管理、菜单材质与入口整理；不宣称OP原速整片零掉帧。Git fetch＋pull ff-only确认master与origin/master同步，基线0c9ca8e；v1.6.1不存在。工作区此前改动将逐项审阅整理为功能提交，记录与构建／发布结果分阶段提交。完整包覆盖、真实播放、归档门禁、SHA、远端六资产与ModelScope匿名直链核验后才执行关机。私包本次不另行生成，现有私包不上传。
+
+### 2026-10-12 23:41 — v1.6.1 前置核验
+
+- 3.1 Git fetch／pull ff-only通过，无远端新改动；功能改动已审阅，按功能／构建／结果顺序提交。
+- 3.2 用户本轮明确批准发布Gate，沿用既定包结构与入口；核心SHA172beb5f27cf8cbd663683380857d92103eea496b221a69de025a9dc8f828279与1.6.0相同。
+- 3.3 STATUS／进度／版本记录已建立1.6.1准备记录，README已覆盖功能；发布流程不改。
+- 3.4 140Lua／118Python语法及保护检查、范围所有权／解码任务生命周期、git diff --check通过。D3D11完整SDR／PQ／HLG实际播放正常。Vulkan初测无配置也出现GetPhysicalDeviceSurfaceCapabilities2KHR初始化错误；随后同媒体基线1.6.0与候选均正常、日志无error，重跑最终六组真实播放以检查环境恢复，不把音频进度当视频成功。
+- 4.1.1 02的10473文件／4603603173bytes逐一与旧归档解压内容比SHA，全部相同且无新增输入；03为5121文件／4714825519bytes、最新2025-04-13，与旧版记录相同。拟原样复用1.6.0，README保留02=1.6.0、03=1.5.7；来源与新名分别7z t／SHA核验。安装器源码无改动，沿用0.3.13。临时维护SDK仅安装到tmp，不改变公开Python运行时。
+
+### 2026-10-12 23:54 — 发布故障排查与严格回归
+
+用户追加要求有bug先解决，禁止发布有已知问题版本，故暂停标签与上传。用户确认测试期间切换了远程连接／显示设置；失败日志报告1920×1080，后续系统实际主屏2736×988，ACM状态同时改变。Vulkan无配置也曾初始化失败；状态稳定后1.6.0与候选基线都正常、无error，不能把此前音频时钟前进当视频成功。没有擅自改核心或视频精度来掩盖初始化异常。
+
+新增tools/test-release-playback.py修正诊断：实际VO及video-out-params存在、非暂停／非定位且连续时钟前进才通过，不再用起播后固定一秒阈值。完整配置双后端SDR／PQ／HLG六次独立启动、标准→HQ→标准、窗口大小改变和暂停恢复均通过、日志无error；追加Vulkan六次独立冷启动复核当前稳定显示环境。依据真实通过记录继续本地构建，上传仍须实际包验证和全部Gate通过。
+
+
+## 2026-10-13 00:04 — v1.6.1 构建核验全部通过
+
+- 3.1 前置Git同步、清单审阅完成；功能提交12b5dcc、发布诊断修正83c38b6已本地提交，构建记录待提交推送。
+- 3.2 用户Gate批准有效，未改发布流程／包结构／核心／运行时。用户“禁止发布已知问题”优先：显示切换异常已核对、诊断误判已修正，稳定环境无发布阻断错误后才继续。
+- 3.3 STATUS／中文进度／版本记录／README同步；日期跨日2026-10-13。
+- 3.4 源配置与实际包双后端各6组SDR／PQ／HLG真实播放及模式往返／窗口变化／暂停恢复无error，Vulkan6独立冷启动无error；语法及UTF8／LF／diff门禁收尾复核。
+- 4 01／04由既有入口重建；02／03按4.1.1从1.6.0逐字节复用，来源／新名分别7z t及SHA核验。安装器源码无改动，0.3.13同SHA候选实际启动有效窗口通过。
+- 5 四归档7z t通过、6附件SHA齐全且<2GiB；01=1311文件／430547890bytes，02=10474／4603603770，03=5122／4714826233，04=266／10891839。实际合并1415个配置／资源逐字节覆盖；所有新模块和核心／FFmpeg／Python／VS运行时完整。
+- 5 公开归档无根backup／trash／tmp／build／release／缓存／日志／Lossless／LSFG；portable开发backup保留。01含素材／ffmpeg／纯1.6.1标记，04排除素材／字体／授权／版本标记／个人窗口状态；本地标记同字节。私包本次不生成，私包检查为不适用，绝不上传既有私包。
+- 6～8 计划提交构建记录、v1.6.1标签，先草稿上传六白名单资产并核对后转正式；再同步ModelScope及匿名直链核验、结果提交、清洁Git收尾，最后依用户授权关机。
+- 证据release-build-results-v1.6.1.json；本地release保留产物，build暂存目录核对绝对路径后安全移入根backup归档。
