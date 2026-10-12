@@ -13,7 +13,7 @@ def wait(p,key,predicate,seconds=8):
     raise AssertionError((key,p.get(key)))
 def main():
     rows=[]
-    args=['--no-config','--vo=gpu-next','--gpu-api=d3d11','--hwdec=auto-safe','--ao=null','--pause=yes',
+    args=['--no-config','--vo=gpu-next','--gpu-api=d3d11','--hwdec=auto-safe','--ao=null','--script-opts-append=color-target-pipeline=hq','--pause=yes',
         '--target-prim=bt.709','--target-trc=srgb','--d3d11-output-csp=srgb','--hdr-contrast-recovery=0',
         '--script='+str(ROOT/'portable_config/scripts/color-target.lua'),
         '--script='+str(ROOT/'portable_config/scripts/quality_status.lua')]

@@ -1,5 +1,5 @@
 -- 故障注入验证恢复重试、免重建、外部覆盖、能力变化与 HDR 软件协商。
-local props={['gpu-api']='d3d11',vid=1,pause=false,seekable=true,['time-pos']=12,
+local props={['libplacebo-opts']={},['gpu-api']='d3d11',vid=1,pause=false,seekable=true,['time-pos']=12,
     ['video-params']={gamma='pq'},['target-trc']='gamma2.2',['target-prim']='bt.709',
     ['target-peak']='auto',['target-contrast']='auto',['target-gamut']='',['dither-depth']='auto',['icc-profile']='',['icc-profile-auto']=false,
     ['icc-intent']=1,['target-colorspace-hint']=false,['target-colorspace-hint-mode']='target',
@@ -29,7 +29,7 @@ function mp.observe_property(k,_,f) observers[k]=f end
 function mp.register_event(k,f) events[k]=f end
 function mp.register_script_message(k,f) messages[k]=f end
 package.loaded.mp=mp;package.loaded['mp.msg']={error=function() end}
-package.loaded['mp.options']={read_options=function() end}
+package.loaded['mp.options']={read_options=function(o) o.pipeline='hq' end}
 package.loaded['mp.utils']={parse_json=function() return {} end,format_json=function(t)
     local r={};for k,v in pairs(t) do r[#r+1]=tostring(k)..'='..tostring(v) end;table.sort(r);return table.concat(r,'|')
 end}
@@ -67,8 +67,10 @@ messages['color-select']('restore')
 assert(status().status=='失败' and status().reason:find('target%-trc') and #status().restore_pending>0,'恢复失败须保留基线')
 fail_key=nil;messages['color-select']('restore')
 assert(props['target-trc']=='gamma2.2' and #status().restore_pending==0,'恢复重试成功')
+props['video-params']={gamma='pq',primaries='bt.709'}
 messages['color-select']('auto');display(true,true)
 assert(props['target-trc']=='scrgb' and status().status=='准备中')
+assert(props['target-gamut']=='bt.709','709 HDR scRGB 不能叠加终端色域映射')
 props['video-target-params']={gamma='scrgb',primaries='bt.709',pixelformat='rgba16hf'}
 tick(.2);assert(status().mode=='hdr-scrgb')
 local before=#writes
@@ -124,6 +126,10 @@ observers['user-data/display-color']()
 props['video-target-params']={gamma='scrgb',primaries='bt.709',pixelformat='rgba16hf'};tick(.2)
 assert(status().mode=='sdr-acm' and props['target-peak']==80 and props['hdr-reference-white']==80)
 assert(props['dither-depth']=='no','浮点输出不能提前量化')
+-- scRGB 的 709 交接也须保留源色域，不能额外按物理显示器色域映射。
+props['video-params']={gamma='srgb',primaries='bt.709'}
+messages['color-select']('sdr');tick(.2)
+assert(props['target-gamut']=='bt.709','709 ACM 不能叠加终端色域映射')
 messages['color-select']('icc');tick(.2)
 assert(status().mode=='sdr-acm' and props['icc-profile-auto']==false,'ACM 不叠加显示 ICC')
 local acm_before=#writes
@@ -162,5 +168,38 @@ assert(props.vid==1 and props.pause==false,'配对失败不能丢掉播放状态
 partial_profile=false
 messages['color-select']('sdr');tick(.2)
 assert(status().mode=='sdr-acm' and props['d3d11-output-format']=='rgba16f' and props['d3d11-output-csp']=='linear')
+-- Vulkan 的 SDR ACM 依赖真实 FP16/scRGB 协商，不设置 D3D11 输出开关或撤视频轨。
+messages['color-select']('restore')
+props['gpu-api']='vulkan'
+props['video-target-params']={gamma='scrgb',pixelformat='rgba16hf',primaries='bt.709'}
+local vulkan_writes=#writes
+messages['color-select']('sdr');tick(.2)
+assert(status().mode=='sdr-acm')
+for i=vulkan_writes+1,#writes do
+    local key= writes[i][1]
+    assert(key~='d3d11-output-format' and key~='d3d11-output-csp' and key~='vid',key)
+end
+-- 协商未成功时不得把 10bit sRGB 输出误报为浮点 ACM。
+props['video-target-params']={gamma='srgb',pixelformat='rgb10a2',primaries='bt.709'}
+messages['color-select']('sdr');tick(4)
+assert(status().mode=='sdr' and status().reason:find('未协商成功',1,true))
+assert(props.vid==1 and props.pause==false)
+props['gpu-api']='d3d11'
+-- 主模式使用同一事务；失败保持 HQ，成功恢复继承目标且不被旧通知切走。
+messages['color-pipeline']('hq');tick(.2)
+fail_key,fail_value='hdr-contrast-recovery',.30
+messages['color-pipeline']('standard')
+assert(status().pipeline=='hq' and props['target-trc']=='scrgb','切换失败不能提交新主模式')
+assert(props['libplacebo-opts'].lut3d_size_I=='96','失败需恢复整个表配置')
+fail_key=nil
+messages['color-pipeline']('standard')
+assert(status().pipeline=='standard' and status().mode=='standard')
+assert(props['target-trc']=='auto' and props['target-prim']=='auto' and props['hdr-contrast-recovery']==.30)
+assert(props['libplacebo-opts'].lut3d_size_C=='32')
+messages['color-select']('hdr','legacy')
+assert(status().pipeline=='standard' and props['target-trc']=='auto','旧 HDR 脚本不得覆盖标准主模式')
+props['libplacebo-opts'].tone_map_metadata='cie_y'
+messages['color-pipeline']('hq');tick(.2)
+assert(props['libplacebo-opts'].tone_map_metadata=='cie_y','主模式不能丢弃用户其他 libplacebo 选项')
 events['shutdown']()
 io.write('色彩恢复重试／事务／免重建／覆盖／HDR 软件协商 PASS\n')

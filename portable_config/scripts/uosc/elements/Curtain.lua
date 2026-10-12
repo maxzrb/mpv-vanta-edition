@@ -1,4 +1,5 @@
 local Element = require('elements/Element')
+local Frosted = require('lib/frosted')
 
 ---@class Curtain : Element
 local Curtain = class(Element)
@@ -26,8 +27,13 @@ end
 function Curtain:render()
 	if self.opacity == 0 or config.opacity.curtain == 0 then return end
 	local ass = assdraw.ass_new()
+	local color, opacity = config.color.curtain, config.opacity.curtain * self.opacity
+	if options.menu_frosted_match and options.menu_frosted then
+		color, opacity = Frosted.background_style(color, opacity, state.menu_target, state.menu_standard_target,
+			0, {1, 1, 1}, true)
+	end
 	ass:rect(0, 0, display.width, display.height, {
-		color = config.color.curtain, opacity = config.opacity.curtain * self.opacity,
+		color = color, opacity = opacity,
 	})
 	return ass
 end

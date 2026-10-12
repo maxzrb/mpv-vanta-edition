@@ -114,7 +114,7 @@ def main():
            ('full-2020-16',16,9,True,True)]
     for name,bits,matrix,full,wide in cases:
         media,expected=fixture('color-config-'+name,bits,matrix,full,wide)
-        p=Player(['--config-dir='+str(config),'--ao=null','--hwdec=no',
+        p=Player(['--config-dir='+str(config),'--ao=null','--script-opts-append=color-target-pipeline=hq','--hwdec=no',
                   '--input-cursor=no','--input-vo-keyboard=no','--input-media-keys=no','--terminal=no',
                   '--geometry=512x512','--screenshot-sw=no','--screenshot-high-bit-depth=yes',
                   '--screenshot-format=png','--loop-file=inf',str(media)],'color-config-'+name)

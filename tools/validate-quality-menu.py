@@ -28,7 +28,8 @@ def run():
         assert '画质增强' not in text and '专家库' in text
         assert all(tier not in text for tier in ['3050级参考', '4060级参考', '5060Ti级参考'])
         assert all(section in text for section in ['片源修复', '帧率改写', '修复错误标记'])
-        assert all(x in text for x in ['播放性能', 'HQ · 默认', '恢复自动匹配', 'RIFE 4.26'])
+        assert all(x in text for x in ['播放性能', 'HQ · 默认', 'HQ 高色准', 'RIFE 4.26'])
+        assert '画质处理' not in text
         def performance_paths(items, parents=()):
             paths=[]
             for item in items:
@@ -48,7 +49,7 @@ def run():
         assert player.get('user-data/quality')['performance']=='balanced'
         assert player.get('linear-downscaling') is True
         assert '解锁' not in text and '尚未开放' not in text
-        results.append('原菜单结构保留；滤镜一次启用／性能档位／自动匹配入口正常')
+        results.append('滤镜一次启用／性能档位／色彩主模式入口正常；工具没有重复画质处理')
 
         # 用轻量外部滤镜检查独立性，不要求本机能运行任何 AI 模型。
         player.command('vf', 'add', '@menu-external:lavfi=[hflip]')

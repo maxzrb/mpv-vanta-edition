@@ -1,4 +1,5 @@
 local Element = require('elements/Element')
+local Frosted = require('lib/frosted')
 
 ---@alias MenuAction {name: string; icon: string; label?: string; filter_hidden?: boolean;}
 ---@alias MenuSearchAction {name: string; icon: string; label?: string;}
@@ -1846,10 +1847,16 @@ function Menu:render()
 		local frosted = options.menu_frosted and not force_opaque
 		local bg_opacity = force_opaque and 1
 			or (menu_opacity * config.opacity.menu * (frosted and 0.82 or 1))
+		local draw_bg, draw_opacity = menu_bg, bg_opacity
+		if frosted and options.menu_frosted_match then
+			local lower, upper = Frosted.curtain_range(config.color.curtain, config.opacity.curtain, state.menu_standard_target)
+			draw_bg, draw_opacity = Frosted.background_style(menu_bg, bg_opacity, state.menu_target,
+				state.menu_standard_target, lower, upper)
+		end
 		ass:rect(bg_rect.ax, bg_rect.ay, bg_rect.bx, bg_rect.by, {
-			color = menu_bg,
+			color = draw_bg,
 			opacity = {
-				main = bg_opacity,
+				main = draw_opacity,
 				border = force_opaque and 1 or menu_opacity * 0.55,
 			},
 			radius = state.radius > 0 and math.min(state.radius + self.padding, state.radius * 3) or 0,
@@ -1859,18 +1866,29 @@ function Menu:render()
 		if frosted then
 			-- 磨砂噪点：细颗粒铺满面板内部（内缩避开边缘条与圆角），模拟玻璃磨砂面
 			local noise_inset = edge_border + round(state.radius * 0.5)
+			local noise_strength = menu_opacity * clamp(0, tonumber(options.menu_frosted_noise) or 0.05, 1)
+			local noise_color = fg
+			if options.menu_frosted_match then
+				noise_color, noise_strength = Frosted.noise_style(fg, menu_bg, bg_opacity, noise_strength,
+					state.menu_target, state.menu_standard_target, draw_bg, draw_opacity)
+			end
 			ass:texture(
 				bg_rect.ax + noise_inset, bg_rect.ay + noise_inset,
 				bg_rect.bx - noise_inset, bg_rect.by - noise_inset,
 				'n',
-				{size = math.max(16, round(22 * state.scale)), color = fg, opacity = menu_opacity * 0.05}
+				{size = math.max(16, round(22 * state.scale)), color = noise_color, opacity = noise_strength}
 			)
 			-- 顶部高光条：模拟玻璃边缘反光
 			local highlight_h = math.max(2, round(3 * state.scale))
+			local highlight_color, highlight_opacity = 'FFFFFF', menu_opacity * 0.10
+			if options.menu_frosted_match then
+				highlight_color, highlight_opacity = Frosted.noise_style('FFFFFF', menu_bg, bg_opacity,
+					highlight_opacity, state.menu_target, state.menu_standard_target, draw_bg, draw_opacity)
+			end
 			ass:rect(
 				bg_rect.ax + edge_border + round(state.radius), bg_rect.ay + edge_border,
 				bg_rect.bx - edge_border - round(state.radius), bg_rect.ay + edge_border + highlight_h,
-				{color = 'FFFFFF', opacity = menu_opacity * 0.10}
+				{color = highlight_color, opacity = highlight_opacity}
 			)
 		end
 		-- Every visible cascade panel owns its wheel input. The recursive submenus

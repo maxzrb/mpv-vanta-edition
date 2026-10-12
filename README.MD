@@ -196,7 +196,7 @@
 
 「其它 → 播放性能」默认使用 HQ，另有高质量手动档位。普通播放默认 `auto-safe` 直接硬解，需要 CPU 滤镜时使用兼容路径；实验零复制为独立手动选项。
 
-默认 HQ 使用线性缩小，保持亮度平均。Windows SDR ACM 与 HDR 分别识别：SDR ACM 输出线性 BT.709 FP16 scRGB，由 Windows 负责显示校色，不重复套用显示 ICC；经典 SDR 保留 sRGB／可信 ICC 路线。可信 ICC 偏好同时检查显示身份、桌面模式和系统 ICC 报告路径。视频滤镜的直属「清空全部视频滤镜」会清除全部 VF，包括外部 VF；着色器仍单独清空。
+首次使用默认「标准」色彩模式，继承原整合包的自动目标及 HDR 映射设置；「HQ 高色准」保留已验证的自动色彩管线和加密色域表。缩放档位独立，默认仍使用 HQ 线性缩小。HQ 分别识别 Windows SDR ACM 与 HDR：SDR ACM 输出线性 BT.709 FP16 scRGB，由 Windows 负责显示校色；经典 SDR 保留 sRGB／可信 ICC 路线。可信 ICC 偏好同时检查显示身份、桌面模式和系统 ICC 报告路径。视频滤镜的直属「清空全部视频滤镜」会清除全部 VF，包括外部 VF；着色器仍单独清空。
 
 本地核心已更新为 shinchiro 20261008，修复了 libplacebo 最终浮点输出错误截断到 0～1 的问题，保留 scRGB 高光及广色域负值。原始 FP16 GPU 读回与色彩软件验证见[SDR ACM 与 FP16 输出优化](docs/modernization/SDR-ACM与FP16输出优化-20261008.md)。FP16 指浮点存储格式，不表示所有源、增强模型和显示面板都具有 16bit 有效精度。
 
@@ -242,9 +242,11 @@ gaoxing64/MPV-lazy-full (v2.0.0)
 
 ## 本地色彩准确优化（未发布）
 
-色彩入口位于「画面 > 色彩目标」：恢复自动匹配、SDR sRGB、用户明确信任的 ICC、HDR 目标、恢复切换前目标与状态查看。ICC 和指定峰值按显示器身份及桌面模式保存；临时滤镜、调色与片源修正不跨启动恢复，已有历史记录保留。
+「画面 > 色彩」按标准、HQ 高色准、系统 ICC、查看状态排列；HQ 自动匹配 SDR／HDR，系统 ICC 为显式校色选择。主模式会记住选择，ICC 和指定峰值按显示器身份及桌面模式保存；临时滤镜、调色与片源修正不跨启动恢复，已有历史记录保留。画质处理统一使用「着色器」「视频滤镜」菜单。详见[标准与 HQ 色彩模式](docs/modernization/标准与HQ色彩模式-20261012.md)。
 
-默认不切换 Windows HDR，不启用额外对比度恢复。HDR 采用 scRGB → PQ → SDR 回退，未知能力使用 SDR 并说明原因；真实 HDR 面板色准与 NVIDIA／Intel 实机仍待验收。详见[本轮结果报告](docs/modernization/滤镜恢复与色彩性能优化结果-20261006.md)。
+菜单保留标准模式的磨砂噪点；HQ 的线性输出采用材质校正，让噪点更细腻。该调整只作用于菜单图层。`uosc.conf` 的 `menu_frosted_noise` 控制强度，`menu_frosted_match=no` 恢复原材质行为。实测及亮背景差异见[菜单磨砂验证](docs/modernization/菜单磨砂噪点匹配-20261012.md)。
+
+默认不切换 Windows HDR。标准模式继承 `hdr-contrast-recovery=0.30`；HQ 高色准模式使用 0，HDR 采用 scRGB → PQ → SDR 回退。原整合包的 `target-trc=gamma2.2` 是注释项，标准模式恢复的是原有效值 `auto`。模式切换和 HQ 数值等值验证见[本轮模式验收](docs/modernization/标准与HQ色彩模式-20261012.md)。
 
 ## 项目目录与维护
 

@@ -4,12 +4,12 @@ local mp = require 'mp'
 local msg = require 'mp.msg'
 local utils = require 'mp.utils'
 local options = require 'mp.options'
-local o = {verify_timeout=3, hdr_backend='scrgb', hdr_peak=0, hdr_contrast='auto'}
+local o = {verify_timeout=3, hdr_backend='scrgb', hdr_peak=0, hdr_contrast='auto', pipeline='standard'}
 options.read_options(o,'color-target')
 local keys={'icc-profile','icc-profile-auto','icc-intent','target-prim','target-trc','target-gamut',
     'target-peak','target-contrast','target-colorspace-hint','target-colorspace-hint-mode',
     'target-colorspace-hint-strict','d3d11-output-format','d3d11-output-csp',
-    'hdr-reference-white','inverse-tone-mapping','hdr-contrast-recovery','treat-srgb-as-power22','dither-depth'}
+    'hdr-reference-white','inverse-tone-mapping','hdr-contrast-recovery','treat-srgb-as-power22','dither-depth','libplacebo-opts'}
 local baseline, owned, drift, observed = {},{},{},{}
 local playback_retry
 local mode, requested, reason, status_text = '配置目标','auto','','可用'
@@ -17,6 +17,24 @@ local manual, writing, generation, timer = false,false,0,nil
 local Select, Publish
 local preferences, legacy_peak_display = {},nil
 local preference_path=mp.command_native({'expand-path','~~/files/color-target-preferences.json'})
+local pipeline_path=mp.command_native({'expand-path','~~/files/color-pipeline-preferences.json'})
+local pipeline=o.pipeline=='hq' and 'hq' or 'standard'
+-- 启动时显式指定的表尺寸属于用户覆盖；保留诊断／高级命令行的可重复性。
+local hq_sizes={}
+local initial_gamut=mp.get_property_native('libplacebo-opts',{}) or {}
+for _,key in ipairs({'lut3d_size_I','lut3d_size_C','lut3d_size_h'}) do hq_sizes[key]=initial_gamut[key] end
+local pipeline_file=io.open(pipeline_path,'r')
+if pipeline_file then
+    local saved=utils.parse_json(pipeline_file:read('*a'));pipeline_file:close()
+    if type(saved)=='table' and (saved.pipeline=='standard' or saved.pipeline=='hq') then pipeline=saved.pipeline
+    else msg.error('色彩模式偏好格式错误，使用配置默认模式') end
+end
+local function SavePipeline()
+    local file,err=io.open(pipeline_path,'w')
+    if not file then return false,'保存色彩模式失败：'..tostring(err) end
+    local ok,write_err=file:write(utils.format_json({pipeline=pipeline}));file:close()
+    return ok~=nil,write_err
+end
 local f=io.open(preference_path,'r')
 if f then
     local saved=utils.parse_json(f:read('*a'));f:close()
@@ -64,20 +82,22 @@ local function Peak()
     local id=DisplayKey()
     if not legacy_peak_display and id and tonumber(o.hdr_peak)>0 then legacy_peak_display=id end
     if id and id==legacy_peak_display and tonumber(o.hdr_peak)>0 then return tonumber(o.hdr_peak),'配置指定（仅绑定首次识别的显示器及模式）' end
-    return tonumber(d['max-luminance']),'驱动／系统报告，非实测'
+    return tonumber(d['max-luminance']),'驱动／系统'
 end
 local function Cancel()
     generation=generation+1
     if timer then timer:kill();timer=nil end
 end
+local SameNative
 local function Same(a,b)
+    if type(a)=='table' or type(b)=='table' then return SameNative(a,b) end
     if a==b then return true end
     if (a==false and b=='no') or (a=='no' and b==false)
         or (a==true and b=='yes') or (a=='yes' and b==true) then return true end
     -- mpv 数字选项有时以字符串返回。
     return tonumber(a)~=nil and tonumber(a)==tonumber(b)
 end
-local function SameNative(a,b)
+SameNative=function(a,b)
     -- 未知像素比例等字段可能为 NaN；两个未知值相同，不应每帧重复发布状态。
     if type(a)=='number' and type(b)=='number' and a~=a and b~=b then return true end
     if type(a)~='table' or type(b)~='table' then return a==b end
@@ -98,7 +118,7 @@ local function Read(key)
     return value
 end
 local function OutputProfile(format,csp)
-    local names={['auto|srgb']='Color-Output-SDR',['rgba16f|linear']='Color-Output-scRGB',
+    local names={['auto|auto']='Color-Output-Auto',['auto|srgb']='Color-Output-SDR',['rgba16f|linear']='Color-Output-scRGB',
         ['rgb10_a2|pq']='Color-Output-PQ'}
     local name=names[tostring(format)..'|'..tostring(csp)]
     if not name then return nil end
@@ -277,12 +297,13 @@ Publish=function(status)
     end
     if playback_retry then pending[#pending+1]='视频轨／播放位置／暂停' end
     local payload={
+        pipeline=pipeline,pipeline_name=pipeline=='hq' and 'HQ 高色准' or '标准',
         mode=mode,requested=requested,status=status_text,reason=reason,manual=manual,
         display=d.name or '未知',display_id=d.uid or '未知',hdr_active=active,hdr_supported=supported,
         hdr_status=d['hdr-status'] or '未知',reported_bits=d['bit-depth'] or '未知',
         peak=peak,peak_source=peak and source or '未知',reference_white=actual['hdr-reference-white'],
         system_color=SystemColor(),
-        display_color_owner=SystemColor().mode=='wcg' and 'Windows ACM（不叠加显示 ICC）' or '播放器目标／显式 ICC',
+        display_color_owner=pipeline=='standard' and '继承的自动输出' or SystemColor().mode=='wcg' and 'Windows ACM' or '播放器目标／显式 ICC',
         actual_settings=actual,external_overrides=drift,restore_pending=pending,
         actual_target=mp.get_property_native('video-target-params',{}) or {},
         swapchain=mp.get_property_native('display-swapchain') or '未知',
@@ -293,13 +314,38 @@ Publish=function(status)
     local ok,err=mp.set_property_native('user-data/color-target',payload)
     if ok then last_published=payload else msg.error('发布色彩状态失败：'..tostring(err)) end
 end
+local function GamutOptions()
+    -- 保留用户的其他 libplacebo 选项；仅切换本模式负责的三个采样维度。
+    local values={}
+    for key,value in pairs(mp.get_property_native('libplacebo-opts',{}) or {}) do values[key]=value end
+    values.lut3d_size_I=pipeline=='hq' and (hq_sizes.lut3d_size_I or '96') or '48'
+    values.lut3d_size_C=pipeline=='hq' and (hq_sizes.lut3d_size_C or '64') or '32'
+    values.lut3d_size_h=pipeline=='hq' and (hq_sizes.lut3d_size_h or '256') or '256'
+    return values
+end
+local function BackendValues(v)
+    if mp.get_property('gpu-api')~='d3d11' then
+        -- D3D11 输出选项在 Vulkan 无效，写入仍可能重建 VO／设备，不能参与其事务。
+        v['d3d11-output-format'],v['d3d11-output-csp']=nil,nil
+    end
+    return v
+end
+local function StandardValues()
+    -- 原整合包的 gamma2.2 是注释项；有效目标是 auto，不能误恢复为强制 2.2。
+    return BackendValues({['icc-profile']='',['icc-profile-auto']=false,['icc-intent']=1,
+        ['target-prim']='auto',['target-trc']='auto',['target-gamut']='auto',['target-peak']='auto',['target-contrast']='auto',
+        ['target-colorspace-hint']='auto',['target-colorspace-hint-mode']='target',['target-colorspace-hint-strict']=true,
+        ['d3d11-output-format']='auto',['d3d11-output-csp']='auto',['hdr-reference-white']='auto',
+        ['inverse-tone-mapping']=false,['hdr-contrast-recovery']=.30,['treat-srgb-as-power22']='auto',
+        ['dither-depth']='auto',['libplacebo-opts']=GamutOptions()})
+end
 local function SdrValues(icc)
-    return {['icc-profile']='',['icc-profile-auto']=icc==true,['icc-intent']=1,
+    return BackendValues({['icc-profile']='',['icc-profile-auto']=icc==true,['icc-intent']=1,
         ['target-prim']='bt.709',['target-trc']='srgb',['target-gamut']='auto',['target-peak']='auto',['target-contrast']='auto',
         ['target-colorspace-hint']=false,['target-colorspace-hint-mode']='target',['target-colorspace-hint-strict']=true,
         ['d3d11-output-format']='auto',['d3d11-output-csp']='srgb',['hdr-reference-white']='auto',
         ['inverse-tone-mapping']=false,['hdr-contrast-recovery']=0,['treat-srgb-as-power22']='no',
-        ['dither-depth']='auto'}
+        ['dither-depth']='auto',['libplacebo-opts']=GamutOptions()})
 end
 local function HdrValues(backend,peak,contrast)
     local v=SdrValues(false)
@@ -313,7 +359,8 @@ local function HdrValues(backend,peak,contrast)
         -- 浮点输出不提前量化到物理连接位深；最终量化由 Windows／驱动处理。
         v['dither-depth']='no'
         local source=mp.get_property_native('video-params',{}) or {}
-        if source.primaries=='bt.2020' or source.primaries=='display-p3' or source.primaries=='dci-p3' then
+        if source.primaries=='bt.709' or source.primaries=='bt.2020' or source.primaries=='display-p3' or source.primaries=='dci-p3' then
+            -- HDR scRGB 同样交给系统做终端色域映射，保留 709 源色域。
             v['target-gamut']=source.primaries
         end
     end
@@ -329,25 +376,31 @@ local function Sdr(failure,icc)
     return ok
 end
 local function SdrManaged(failure,icc)
-    if SystemColor().mode~='wcg' or mp.get_property('gpu-api')~='d3d11' then return Sdr(failure,icc) end
+    local api=mp.get_property('gpu-api')
+    if SystemColor().mode~='wcg' or (api~='d3d11' and api~='vulkan') then return Sdr(failure,icc) end
     -- SDR ACM 的线性 1.0 是显示参考白，不使用 HDR 桌面的绝对亮度比例。
     local v=SdrValues(false)
     v['target-prim'],v['target-trc']='bt.709','scrgb'
     v['target-peak'],v['hdr-reference-white']=80,80
     -- 此处是交给系统的标准工作色彩空间，不再次做物理面板黑位补偿。
     v['target-contrast']='inf'
-    v['d3d11-output-format'],v['d3d11-output-csp']='rgba16f','linear'
+    if api=='d3d11' then
+        v['d3d11-output-format'],v['d3d11-output-csp']='rgba16f','linear'
+    else
+        -- Vulkan 通过色彩提示协商 FP16/scRGB；不写无效的 D3D11 选项，避免重建 VO。
+        v['d3d11-output-format'],v['d3d11-output-csp']=nil,nil
+    end
     v['target-colorspace-hint']=true
     v['dither-depth']='no'
     local source=mp.get_property_native('video-params',{}) or {}
     local primaries=source.primaries
-    if primaries=='bt.2020' or primaries=='display-p3' or primaries=='dci-p3' then
-        -- 广色域在线性 scRGB 中保留负分量，终端校色交给 Windows。
+    if primaries=='bt.709' or primaries=='bt.2020' or primaries=='display-p3' or primaries=='dci-p3' then
+        -- scRGB 保留源色域，终端校色交给 Windows；709 也不能先按显示器色域重复映射。
         v['target-gamut']=primaries
     end
     local ok,err=Update(v)
     reason=failure or ''
-    if icc then reason='Windows ACM 已启用，显示校色由系统处理，不叠加显示 ICC' end
+    if icc then reason='Windows ACM 已启用，显示 ICC 由系统管理' end
     if not ok then reason=err;Publish('失败');msg.error(err);return false end
     mode='准备 SDR ACM 输出';Publish('准备中')
     local token,started=generation,mp.get_time()
@@ -401,7 +454,13 @@ Select=function(choice,origin)
     if choice=='restore' then
         local ok,err=Update()
         if ok then mode='原目标';drift={} else reason=err;msg.error(err) end
-        Publish(ok and '可用' or '失败');return
+        Publish(ok and '可用' or '失败');return ok
+    end
+    if pipeline=='standard' then
+        local ok,err=Update(StandardValues())
+        if ok then mode='standard';Publish('可用')
+        else reason=err;Publish('失败');msg.error(err) end
+        return ok
     end
     local d,active,supported=Display();local peak=Peak()
     if choice=='auto' then
@@ -416,7 +475,7 @@ Select=function(choice,origin)
             local why=not active and 'Windows HDR 未开启或状态未知' or not supported and '显示器 HDR 能力未知'
                 or (not peak or peak<=203) and 'HDR 峰值未知或不足；可按此显示器保存可信峰值'
                 or '当前 HDR 输出路线需要 D3D11'
-            SdrManaged(why..'，使用 SDR 基线');return
+            return SdrManaged(why..'，使用 SDR 基线')
         end
         local backend=o.hdr_backend=='pq' and 'pq' or 'scrgb'
         local contrast=o.hdr_contrast;local minimum=tonumber(d['min-luminance'])
@@ -430,8 +489,9 @@ Select=function(choice,origin)
         -- 同一有效目标只更新发生变化的选项，不撤轨重建。
         if mode=='hdr-pq' and origin=='internal' then backend='pq' end
         local ok,err=Update(HdrValues(backend,peak,contrast))
-        if not ok then reason='应用失败：'..err;Publish('失败');msg.error(reason);return end
+        if not ok then reason='应用失败：'..err;Publish('失败');msg.error(reason);return false end
         mode='准备 HDR 输出';Publish('准备中');Verify(backend,peak,contrast)
+        return true
     else
         local icc
         if choice=='icc' then
@@ -441,22 +501,46 @@ Select=function(choice,origin)
         elseif requested=='auto' then
             local why;icc,why=TrustedICC();reason=why or reason
         end
-        SdrManaged(reason,icc)
+        return SdrManaged(reason,icc)
     end
 end
-mp.register_script_message('color-select',Select)
+local function SetPipeline(value)
+    if value~='standard' and value~='hq' then return end
+    local previous,previous_manual,previous_requested,previous_drift=pipeline,manual,requested,drift
+    pipeline=value
+    -- 主模式切换是主动重选；清除本次会话目标覆盖，交给统一事务重建输出。
+    if not Select('auto') then
+        pipeline,manual,requested,drift=previous,previous_manual,previous_requested,previous_drift
+        Publish();return false
+    end
+    local ok,err=SavePipeline()
+    if not ok then msg.error(tostring(err));mp.osd_message(tostring(err),4)
+    else mp.osd_message('色彩模式：'..(pipeline=='hq' and 'HQ 高色准' or '标准'),3) end
+    return true
+end
+mp.register_script_message('color-pipeline',SetPipeline)
+mp.register_script_message('color-select',function(choice,origin)
+    -- 显式选择显示目标属于 HQ 管线；旧脚本通知不改变用户的主模式。
+    if pipeline=='standard' and origin~='internal' and origin~='legacy' and origin~='display'
+        and (choice=='sdr' or choice=='icc' or choice=='hdr') then
+        if not SetPipeline('hq') then return end
+    end
+    Select(choice,origin)
+end)
 mp.register_script_message('color-status',function() Publish();mp.commandv('script-message','show-color-status') end)
 mp.register_script_message('color-peak',function(value)
     local peak=tonumber(value)
     if not peak or peak<0 or peak>10000 then mp.osd_message('请输入 0～10000 nits 的可信峰值，0 使用系统报告',4);return end
     local ok,err=SavePreference('peak',peak>0 and peak or nil)
     if not ok then msg.error(err);mp.osd_message(err,4);return end
+    if pipeline=='standard' and not SetPipeline('hq') then return end
     Select(requested=='auto' and 'auto' or 'hdr');Publish()
 end)
 mp.register_script_message('color-icc',function(path)
     if not path or path=='' then return end
     local ok,err=SavePreference('icc',mp.command_native({'expand-path',path}))
     if not ok then msg.error(err);mp.osd_message(err,4);return end
+    if pipeline=='standard' and not SetPipeline('hq') then return end
     Select('icc')
 end)
 for _,key in ipairs(keys) do
@@ -478,7 +562,9 @@ local function DisplayChanged()
     local signature={display=d,system=SystemColor()}
     if SameNative(signature,last_display_info) then return end
     last_display_info=signature
-    if not manual and requested=='auto' then Select('auto','internal')
+    if pipeline=='standard' then
+        if not manual and requested=='auto' then Select('auto','internal') else Publish() end
+    elseif not manual and requested=='auto' then Select('auto','internal')
     elseif requested=='hdr' and not next(drift) then Select('hdr','display')
     elseif requested=='sdr' and not next(drift) then
         -- 手动 SDR 选择保持；桌面 ACM 状态改变时仍需切换相应的输出编码。
@@ -517,4 +603,5 @@ mp.register_event('file-loaded',function()
 end)
 mp.register_event('end-file',Cancel)
 mp.register_event('shutdown',function() Cancel();local ok,err=Update();if not ok then msg.error(err) end end)
-Publish()
+-- 首次使用标准模式；已有主模式偏好在打开第一帧前恢复。
+Select('auto','internal')

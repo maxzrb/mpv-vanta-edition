@@ -63,6 +63,8 @@ defaults = {
 	menu_min_width = 260,
 	menu_padding = 4,
 	menu_frosted = false,
+	menu_frosted_noise = 0.05,
+	menu_frosted_match = true,
 	menu_open_file_mode = 'replace',
 	menu_submenu_delay = 0.5,
 	menu_font = '',
@@ -818,6 +820,35 @@ mp.observe_property('chapter-list', 'native', function(_, chapters)
 end)
 mp.observe_property('border', 'bool', create_state_setter('border'))
 mp.observe_property('title-bar', 'bool', create_state_setter('title_bar'))
+local function update_menu_target()
+	local p = mp.get_property_native('video-target-params', {}) or {}
+	local pipeline = mp.get_property_native('user-data/color-target/pipeline')
+	local minimum, maximum = tonumber(p['min-luma']), tonumber(p['max-luma'])
+	if not minimum or minimum ~= minimum or minimum == math.huge then minimum = 0 end
+	if not maximum or maximum ~= maximum or maximum == math.huge or maximum <= 0 then maximum = 80 end
+	local target = {gamma=p.gamma, pipeline=pipeline, primaries=p.primaries,
+		black=math.max(0, minimum) / maximum}
+	local old = state.menu_target or {}
+	-- 目标可能每帧通知，只有相关标量变化才刷新菜单。
+	if target.gamma == old.gamma and target.pipeline == old.pipeline and target.black == old.black
+		and target.primaries == old.primaries then return end
+	state.menu_target = target
+	if pipeline == 'standard' and target.gamma then
+		-- 切换输出先于色彩状态发布；核对当前选项，防止把 HQ 的过渡帧记成标准参考。
+		local settings = mp.get_property_native('user-data/color-target/actual_settings') or {}
+		if mp.get_property('target-trc') == settings['target-trc']
+			and mp.get_property('target-prim') == settings['target-prim'] then
+			state.menu_standard_target = target
+		end
+	end
+	request_render()
+end
+-- 观察标量，避免完整目标表逐帧通知给空闲 UI 增加属性读取。
+mp.observe_property('video-target-params/gamma', 'string', update_menu_target)
+mp.observe_property('video-target-params/primaries', 'string', update_menu_target)
+mp.observe_property('video-target-params/min-luma', 'number', update_menu_target)
+mp.observe_property('video-target-params/max-luma', 'number', update_menu_target)
+mp.observe_property('user-data/color-target/pipeline', 'string', update_menu_target)
 mp.observe_property('loop-file', 'native', create_state_setter('loop_file'))
 mp.observe_property('ontop', 'bool', create_state_setter('ontop'))
 mp.observe_property('ab-loop-a', 'number', create_state_setter('ab_loop_a'))

@@ -12,6 +12,6 @@ assert(precision.format({pixelformat='d3d11',['hw-pixelformat']='p010'}):find('�
 assert(precision.handoff('d3d11va',{pixelformat='d3d11'},{{name='lavfi'}}):find('保持 GPU',1,true))
 assert(precision.handoff('d3d11va',{pixelformat='yuv420p10'},{{name='vapoursynth'}}):find('下载帧',1,true))
 assert(precision.handoff('d3d11va-copy',{pixelformat='yuv420p10'},{}):find('复制到系统内存',1,true))
-assert(precision.handoff('d3d11va',{pixelformat='yuv420p10'},{{name='vapoursynth',enabled=false}}):find('未完整确认',1,true))
+assert(precision.handoff('d3d11va',{pixelformat='yuv420p10'},{{name='vapoursynth',enabled=false}}):find('输出格式 yuv420p10',1,true))
 assert(precision.handoff('no',{},{}):find('软件解码',1,true))
 io.write('格式精度／交接说明 PASS\n')

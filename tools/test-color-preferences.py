@@ -15,7 +15,7 @@ icc = str(ROOT / 'portable_config/icc/ITU-RBT709ReferenceDisplay.icc')
 fixture = {'uid': 'fixture-A', 'hdr-status': 'off', 'hdr-supported': True,
            'max-luminance': '1000', 'min-luminance': '0.01', 'bit-depth': 10}
 args = ['--config-dir=' + str(config), '--vo=gpu-next', '--gpu-api=d3d11',
-        '--ao=null', '--pause=yes', '--script=' + str(ROOT / 'portable_config/scripts/color-target.lua'),
+        '--ao=null','--script-opts-append=color-target-pipeline=hq', '--pause=yes', '--script=' + str(ROOT / 'portable_config/scripts/color-target.lua'),
         str(OUT / 'hdr10.mkv')]
 for launch in range(2):
     p = Player(args, 'color-preferences-' + str(launch))

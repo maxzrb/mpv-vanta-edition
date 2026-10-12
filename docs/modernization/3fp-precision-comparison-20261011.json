@@ -1,0 +1,148 @@
+{
+  "commit": "20bcc001b24f6b6de4575bddf9b93ec452795b0d",
+  "public_shader_bytecode": [
+    {
+      "name": "FFFVertexShaderBytecode",
+      "profile": "vs_5_0",
+      "bytes": 736,
+      "sha256": "a174a158a51b830af3819634e9639ecfa2610cf79305b48d96c097b3d6e00ee2",
+      "reduced_precision_declarations": false
+    },
+    {
+      "name": "FFFPixelShaderBytecode",
+      "profile": "ps_5_0",
+      "bytes": 144828,
+      "sha256": "5fb54b0370530e9753f2a53295f57703456b88825cfee1c9a504255aa45966ba",
+      "reduced_precision_declarations": false
+    },
+    {
+      "name": "FFFScalePixelShaderBytecode",
+      "profile": "ps_5_0",
+      "bytes": 2792,
+      "sha256": "bce342381dbe7b7407e2b70984824fcbe18a179e901269634d90833cd962893f",
+      "reduced_precision_declarations": false
+    },
+    {
+      "name": "FFFCoverBackdropPixelShaderBytecode",
+      "profile": "ps_5_0",
+      "bytes": 2500,
+      "sha256": "84f10d0fd8c1a07449034446b56dc79b5e72afae78e7fe030c956058fbea6d1f",
+      "reduced_precision_declarations": false
+    },
+    {
+      "name": "FFFTimedTextPixelShaderBytecode",
+      "profile": "ps_5_0",
+      "bytes": 1960,
+      "sha256": "bc827b894d0f5e3bee4818980b2fd34e0d3a8569f95c491c7d2997fa15e9505d",
+      "reduced_precision_declarations": false
+    },
+    {
+      "name": "FFFTimedTextSpriteVertexShaderBytecode",
+      "profile": "vs_5_0",
+      "bytes": 1244,
+      "sha256": "e12748ddf5436941da7f09bf1f647931f4efd5d5d5ed89bbffcca894bdd2c9b5",
+      "reduced_precision_declarations": false
+    },
+    {
+      "name": "FFFTimedTextSpritePixelShaderBytecode",
+      "profile": "ps_5_0",
+      "bytes": 660,
+      "sha256": "4d11a6be057f44ccb0312241b27aeb1e824f686a463617e450f046e6eb9f8b5d",
+      "reduced_precision_declarations": false
+    },
+    {
+      "name": "FFFSdrRgbShaderBytecode",
+      "profile": "ps_5_0",
+      "bytes": 14528,
+      "sha256": "971c76e3fd7f0f429f18c76201277a4c0166a9bfbd69791be4b0d93e019ead01",
+      "reduced_precision_declarations": false
+    },
+    {
+      "name": "FFFSdrPlanarShaderBytecode",
+      "profile": "ps_5_0",
+      "bytes": 38664,
+      "sha256": "f42c90ab4a83afe026192bbe9fb38977c2c56172fa8a813797e69b9b17a7dfa1",
+      "reduced_precision_declarations": false
+    },
+    {
+      "name": "FFFSdrSemiPlanarShaderBytecode",
+      "profile": "ps_5_0",
+      "bytes": 26816,
+      "sha256": "900c7b401c3c12bf77eed769682e72728f92bac523a12a974b95cb30bf0c72e4",
+      "reduced_precision_declarations": false
+    }
+  ],
+  "hdr_swapchain": "R16G16B16A16_FLOAT",
+  "dynamic_tone_curve_auxiliary_texture": "R32_FLOAT",
+  "scrgb_primaries": "BT.709",
+  "scrgb_unit_nits": 80,
+  "public_hdr_or_source_precision_output_bits": [
+    8,
+    10,
+    16
+  ],
+  "all_fp32_storage_required": false,
+  "current_public_source_checked": true,
+  "physical_or_3fp_playback_measurement": false,
+  "hlg_base_formula_comparison": [
+    {
+      "encoded": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "bt2100_reference_nits": [
+        203.1521453536661,
+        203.1521453536661,
+        203.1521453536661
+      ],
+      "public_base_shader_nits": [
+        203.1521453536661,
+        203.1521453536661,
+        203.1521453536661
+      ],
+      "max_absolute_difference_nits": 0.0
+    },
+    {
+      "encoded": [
+        0.75,
+        0.25,
+        0.25
+      ],
+      "bt2100_reference_nits": [
+        161.8205334001155,
+        12.723537677248254,
+        12.723537677248254
+      ],
+      "public_base_shader_nits": [
+        203.1521453536661,
+        9.605290744601332,
+        9.605290744601332
+      ],
+      "max_absolute_difference_nits": 41.331611953550606
+    },
+    {
+      "encoded": [
+        0.25,
+        0.75,
+        0.25
+      ],
+      "bt2100_reference_nits": [
+        14.88764541626263,
+        189.34409465689026,
+        14.88764541626263
+      ],
+      "public_base_shader_nits": [
+        9.605290744601332,
+        203.1521453536661,
+        9.605290744601332
+      ],
+      "max_absolute_difference_nits": 13.808050696775837
+    }
+  ],
+  "source_sha256": {
+    "FFF.Native/3FP/Render/VideoRenderer.cpp": "69363e42998f86630e0216e82f0879246d8907480a4333dbf73c1a92315bf6e0",
+    "tools/compare-kernel-pixels.py": "e16452a3c451fdd862e246988210092ffb8f29197c656149b41facfa6ddae051",
+    "tools/generate_shader_bytecode.py": "54a8f97122f03667de15715651cadcb4d4767d0d188ac356da7b8e3142894f6e"
+  }
+}

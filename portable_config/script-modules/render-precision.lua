@@ -33,7 +33,7 @@ function M.handoff(decoder, output, filters)
             return decoder .. '：硬解后下载帧供 VS 处理，再上传渲染'
         end
     end
-    return decoder .. '：交接方式未完整确认'
+    return decoder .. '：输出格式 ' .. (format or '未知')
 end
 
 return M

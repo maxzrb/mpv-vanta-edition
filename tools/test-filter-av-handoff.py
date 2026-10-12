@@ -36,7 +36,6 @@ def main():
                 titles=[item['title'] for item in p.get('user-data/quality-status')['items']]
                 assert any('整数 10bit [p010]' in title for title in titles),'硬解源必须显示有效10bit'
                 assert any(('复制到系统内存' if route.endswith('-copy') else '下载帧供 VS 处理') in title for title in titles)
-                assert any('不能由最终输出推断' in title for title in titles)
                 p.command('script-message-to','uosc','close-menu')
                 rows.append(dict(route=route,case=name,playback=row,precision=titles[:9]))
             active=p.get('user-data/quality')['active']

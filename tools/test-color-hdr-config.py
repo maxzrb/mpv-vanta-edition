@@ -83,7 +83,6 @@ def main():
             titles=[item['title'] for item in p.get('user-data/quality-status')['items']]
             precision_target=next(title for title in titles if title.startswith('渲染目标：'))
             assert '浮点存储 16bit [rgba16hf]' in precision_target,precision_target
-            assert any('不能由最终输出推断' in title for title in titles)
             p.command('script-message-to','uosc','close-menu')
             p.command('set_property','user-data/display-info',{**fixture,'hdr-status':'off'})
             deadline=time.monotonic()+8

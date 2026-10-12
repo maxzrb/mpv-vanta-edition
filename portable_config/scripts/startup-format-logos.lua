@@ -109,6 +109,7 @@ local state = {
     last_aid = nil,
     last_vid = nil,
     frame_ready = false,
+    frame_presented = false,
     waiting_for_frame = false,
     content_insets = nil,
     -- 当前 content_insets 是否命中画幅白名单；false=纯视觉兜底，nil=无结果
@@ -121,6 +122,7 @@ local state = {
     -- 后瞻 ffmpeg 解码是否进行中（防重入）
     lookahead_busy = false,
     lookahead_requests = {},
+    lookahead_generation = 0,
     bar_request = nil,
     overlay_error_logged = false,
 }
@@ -139,12 +141,23 @@ local function clamp(value, low, high)
 end
 
 
+local function foreground_software_video()
+    -- 按前台实际解码方式分配后台预算；不依赖编解码器、片名或调优脚本。
+    if mp.get_property('hwdec-current') ~= 'no' then return false end
+    local track = mp.get_property_native('current-tracks/video', {}) or {}
+    return track.type == 'video' and not track.image and not track.albumart
+end
+
+
 local function cancel_lookahead_requests()
-    for request in pairs(state.lookahead_requests) do
-        pcall(mp.abort_async_command, request)
-    end
+    -- 先使旧回调失效，防止取消后的失败回调继续启动下一批解码。
+    state.lookahead_generation = state.lookahead_generation + 1
+    local requests = state.lookahead_requests
     state.lookahead_requests = {}
     state.lookahead_busy = false
+    for request in pairs(requests) do
+        pcall(mp.abort_async_command, request)
+    end
 end
 
 
@@ -1401,6 +1414,14 @@ local function find_ffmpeg()
     if ffmpeg_path ~= nil then return ffmpeg_path end
     local names = { 'ffmpeg.exe', 'ffmpeg' }
     local candidates = {}
+    -- 自定义配置目录仍优先使用播放器随附工具，不误选系统 PATH 里的另一版本。
+    local executable_path_ok, executable_ffmpeg = pcall(mp.command_native, {
+        'expand-path', '~~exe_dir/ffmpeg/ffmpeg.exe',
+    })
+    if executable_path_ok and type(executable_ffmpeg) == 'string'
+        and not executable_ffmpeg:find('~~', 1, true) then
+        candidates[#candidates + 1] = executable_ffmpeg
+    end
     -- 优先随包自带的检测专用 ffmpeg：mpv 根目录 ffmpeg/ffmpeg.exe
     -- （01 Base 随包分发，解压即用，不依赖 PATH 或系统安装）。
     -- 本脚本位于 portable_config/scripts/，向上两级即 mpv 根目录。
@@ -1508,6 +1529,8 @@ end
 -- 前段，避免必须耗尽三个近端黑屏样本后才寻找正片。任一可信黑边立即采用；
 -- 确认窗仍无黑边才确认右上角；全部不可信则回退常规复检。
 local function start_bar_lookahead(file_generation)
+    -- 首帧前不启动额外解码；先让主播放器完成起播与软硬解选择。
+    if not state.frame_presented then return false end
     -- 后瞻仅两种后瞻模式启用；杳知视觉方案与不检测模式不依赖 ffmpeg
     if o.mode ~= 'current' and o.mode ~= 'parallel' then return false end
     local offsets = random_lookahead_offsets(
@@ -1532,6 +1555,12 @@ local function start_bar_lookahead(file_generation)
     local confirm_results = {}
     local tmp_files = {}  -- 所有临时文件，结算后统一清理
     local settled = false
+    local lookahead_generation = state.lookahead_generation
+    local function active()
+        return not settled and state.loaded and o.enabled
+            and file_generation == state.file_generation
+            and lookahead_generation == state.lookahead_generation
+    end
 
     local function pick_bars(results)
         for _, r in ipairs(results) do
@@ -1617,20 +1646,23 @@ local function start_bar_lookahead(file_generation)
     end
 
     local function launch_probe(item, serial, completed)
-            if settled then return end
+            if not active() then return end
             local offset = item.offset
             local target = now + offset
             local tmp_file = join_path(tmp_dir, string.format(
                 'vanta-la-%s-%d.raw', stamp, serial
             ))
             tmp_files[#tmp_files + 1] = tmp_file
+            local probe_threads = clamp(math.floor(tonumber(o.encoded_bar_ffmpeg_threads) or 4), 0, 16)
+            -- 前台软解优先；后台定位只需单帧，统一限制线程以减少争抢。
+            if foreground_software_video() then
+                probe_threads = 1
+            end
             -- args[0] 必须是可执行文件路径（mpv subprocess 按此启动进程）
             local args = {
                 ffmpeg,
                 '-hide_banner', '-loglevel', 'error',
-                '-threads', tostring(clamp(
-                    math.floor(tonumber(o.encoded_bar_ffmpeg_threads) or 4), 0, 16
-                )),
+                '-threads', tostring(probe_threads),
                 '-ss', string.format('%.3f', target),
                 '-i', path,
                 '-map', '0:v:0',
@@ -1646,9 +1678,16 @@ local function start_bar_lookahead(file_generation)
                 name = 'subprocess',
                 args = args,
                 capture_stderr = true,
-            }, function(success, result)
+            }, function(success, result, error)
                 if request then state.lookahead_requests[request] = nil end
-                if settled then
+                if not active() then
+                    pcall(os.remove, tmp_file)
+                    return
+                end
+                -- 播放结束时核心可能先终止子进程，再发送 end-file；取消不进入补测。
+                if error == 'killed' or (result and (result.killed_by_us or result.error_string == 'killed')) then
+                    settled = true
+                    cancel_lookahead_requests()
                     pcall(os.remove, tmp_file)
                     return
                 end
@@ -1791,6 +1830,15 @@ end
 
 local function prepare_display_after_frame(reason)
     local file_generation = state.file_generation
+    -- 几何事件可能先到；完整检测流程从首帧开始，避免兜底计时提前耗尽。
+    if has_real_video_track() and not state.frame_presented then
+        schedule('bar-detect', 0.05, function()
+            if file_generation == state.file_generation and state.loaded then
+                prepare_display_after_frame(reason)
+            end
+        end)
+        return
+    end
     local function continue_detection(insets, suffix, followup, matched, show_now)
         if file_generation ~= state.file_generation or not state.loaded then return end
         local yz_mode = o.mode == 'yaozhi'
@@ -1840,9 +1888,10 @@ local function prepare_display_after_frame(reason)
         return
     end
 
-    -- 两种后瞻模式都在首帧稳定后立即预启动固定深探针，不再等待三次
-    -- screenshot-raw 判断片头是否稀疏。困难场景的补测并发度仍由模式决定。
-    if o.mode == 'current' or o.mode == 'parallel' then
+    -- 前台软解先用已有画面定位；黑屏／稀疏画面仍按需启动后瞻。
+    -- 硬解保持预启动行为；后台解码预算与图形后端、片源格式和分辨率无关。
+    local busy_soft = foreground_software_video()
+    if not busy_soft and (o.mode == 'current' or o.mode == 'parallel') then
         start_bar_lookahead(file_generation)
     end
 
@@ -1894,6 +1943,13 @@ local function prepare_display_after_frame(reason)
 
         local function request_sample(index)
             if completed or file_generation ~= state.file_generation or not state.loaded then return end
+            -- 几何就绪可能早于首帧；先等待可截图画面，避免无效的高分辨率读回。
+            if not state.frame_presented then
+                schedule('bar-detect-sample', sample_interval, function()
+                    request_sample(index)
+                end)
+                return
+            end
             local ok, request = pcall(mp.command_native_async, {
                 name = 'screenshot-raw', flags = 'video', format = 'bgr0',
             }, function(success, frame)
@@ -1948,6 +2004,7 @@ end
 
 
 local function on_playback_restart()
+    if state.loaded then state.frame_presented = true end
     -- The first playback-restart arrives only after mpv has a presentable
     -- video frame. Waiting for it prevents the badges from appearing against
     -- the empty window and then jumping when letterbox/pillarbox bounds land.
@@ -1971,6 +2028,7 @@ local function on_file_loaded()
     state.file_generation = state.file_generation + 1
     state.loaded = true
     state.frame_ready = false
+    state.frame_presented = false
     state.waiting_for_frame = true
     state.content_insets = nil
     state.content_insets_matched = nil
@@ -2181,6 +2239,10 @@ end
 mp.register_event('file-loaded', on_file_loaded)
 mp.register_event('playback-restart', on_playback_restart)
 mp.register_event('video-reconfig', on_video_geometry_ready)
+mp.add_hook('on_unload', 0, function()
+    state.loaded = false
+    cancel_lookahead_requests()
+end)
 mp.register_event('end-file', on_end_file)
 mp.observe_property('aid', 'native', on_audio_track_change)
 mp.observe_property('vid', 'native', on_video_track_change)

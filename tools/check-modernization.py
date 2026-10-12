@@ -1,10 +1,14 @@
 """检查活动脚本语法、Shader 引用、回归记录和用户配置保留。"""
+import argparse
 import json
 from pathlib import Path
 import re
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser()
+parser.add_argument('--options-baseline-ref', help='使用指定 Git 提交核对用户选项；默认仍使用历史备份')
+args = parser.parse_args()
 paths = [path for base in ['scripts', 'script-modules', 'osc-style']
          for path in (ROOT / 'portable_config' / base).rglob('*.lua') if 'backup' not in path.parts]
 destination = ROOT / 'tmp/modernization/lua-files.txt'
@@ -24,7 +28,8 @@ assert not missing, missing
 assert 'danmaku' not in input_text and '弹幕' not in input_text
 assert len(re.findall(r'^CTRL\+0\s+script-message quality-clear-shaders\b', input_text, re.M)) == 1
 assert len(re.findall(r'^Ctrl\+1\s+script-message quality-shader-command .*apply-profile FSRCNNX;', input_text, re.M)) == 1
-assert 'script-message quality-reset #menu: 工具 > 画质处理' in input_text
+assert '工具 > 画质处理' not in input_text and '工具 > 画质增强' not in input_text
+assert 'script-message quality-clear-filters #menu: 视频滤镜 > 清空全部视频滤镜' in input_text
 assert not (ROOT / 'portable_config/scripts/uosc_danmaku').exists()
 print('Shader 引用／弹幕活动入口 PASS')
 stats = json.loads((ROOT / 'docs/modernization/stats-results.json').read_text(encoding='utf-8'))
@@ -34,7 +39,10 @@ assert all(trial['logged_subprocesses'] == 0 for trial in stats['trials'] if tri
 print('统计掉帧／外部查询 PASS')
 for name in ['startup_format_logos.conf', 'window_size_position.conf']:
     relative = Path('portable_config/script-opts') / name
-    assert (ROOT / relative).read_bytes() == (ROOT / 'backup/modernization-20261004' / relative).read_bytes()
+    # 旧快照已清理时，显式指定本轮起始提交，不跳过逐字节保留检查。
+    baseline = (subprocess.check_output(['git', 'show', args.options_baseline_ref + ':' + relative.as_posix()], cwd=ROOT)
+                if args.options_baseline_ref else (ROOT / 'backup/modernization-20261004' / relative).read_bytes())
+    assert (ROOT / relative).read_bytes() == baseline
 print('用户既有选项逐字节保留 PASS')
 manifest_path = ROOT / 'portable_config/script-assets/startup-format-logos/runtime/manifest.json'
 manifest = json.loads(manifest_path.read_text(encoding='utf-8'))

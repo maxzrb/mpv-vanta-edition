@@ -111,7 +111,6 @@ def run():
         assert len(details['items']) > 20 and any('实际设置' in i['title'] for i in details['items'])
         assert any('整数 8bit [nv12]' in i['title'] for i in details['items']), '硬解源格式须明确整数精度'
         assert any('主输出保持 GPU 表面' in i['title'] for i in details['items']), '无 VS 时应标注实际 GPU 交接'
-        assert any('不能由最终输出推断' in i['title'] for i in details['items']), '最终输出不能证明中间链路'
         time.sleep(1)
         player.command('screenshot-to-file', str(OUT / 'color-details-top.png'), 'window')
         # 键盘 PageDown 必须可查看信息列表，不能把只读列表困在首屏。

@@ -47,7 +47,7 @@ def launch(media, name, simulated_hdr=False, size='256x256'):
     if simulated_hdr:
         excluded += ['display-info.dll', 'display-color.lua']
     config = create_config(name, exclude_scripts=excluded)
-    p, probe = create_player(['--config-dir=' + str(config), '--ao=null', '--hwdec=no', '--pause=yes',
+    p, probe = create_player(['--config-dir=' + str(config), '--ao=null','--script-opts-append=color-target-pipeline=hq', '--hwdec=no', '--pause=yes',
         '--geometry=' + size, '--autofit=' + size, '--autofit-smaller=' + size,
         '--osd-level=0', '--input-default-bindings=no', '--input-vo-keyboard=no', '--input-media-keys=no',
         '--image-display-duration=inf', '--loop-file=inf', str(media)], name,
@@ -81,7 +81,7 @@ def run_calibration():
             'vec4 hook() { return vec4(%s, 1.0); }\n' % ', '.join(map(str, values)),
             encoding='utf-8', newline='\n')
     write_shader([.25,.5,.75])
-    p,probe = create_player(['--no-config','--vo=gpu-next','--gpu-api=d3d11','--ao=null',
+    p,probe = create_player(['--no-config','--vo=gpu-next','--gpu-api=d3d11','--ao=null','--script-opts-append=color-target-pipeline=hq',
         '--geometry=256x256','--border=no','--osc=no','--osd-level=0','--pause=yes',
         '--target-trc=scrgb','--target-prim=bt.709','--d3d11-output-format=rgba16f',
         '--d3d11-output-csp=linear','--dither-depth=no','--loop-file=inf',

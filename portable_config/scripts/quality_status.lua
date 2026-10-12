@@ -131,23 +131,23 @@ local function show_color_status()
             storage)
     end
     table.insert(lines, '解码源：' .. describe(mp.get_property_native('video-dec-params')))
-    table.insert(lines, '有效输入（含自动推断）：' .. describe(mp.get_property_native('video-params')))
+    table.insert(lines, '有效输入：' .. describe(mp.get_property_native('video-params')))
     table.insert(lines, '滤镜输出：' .. describe(mp.get_property_native('video-out-params')))
     table.insert(lines, '解码与滤镜交接：' .. (precision_loaded and precision.handoff(
         mp.get_property('hwdec-current','no'),mp.get_property_native('video-out-params'),filters) or '未知'))
     table.insert(lines, '渲染目标：' .. describe(mp.get_property_native('video-target-params')))
     local swap = mp.get_property_native('display-swapchain')
-    table.insert(lines, '交换链：' .. (type(swap) == 'table' and require('mp.utils').format_json(swap) or tostring(swap or '未知')))
+    if swap then
+        table.insert(lines, '交换链：' .. (type(swap) == 'table' and utils.format_json(swap) or tostring(swap)))
+    end
     local renderer = mp.get_property('current-vo','未知')
-    table.insert(lines, 'GPU 中间精度：' .. (renderer=='gpu-next' and 'gpu-next 优先 FP16；' or renderer .. '；')
-        .. '当前会话未逐阶段采集，不能由最终输出推断')
-    table.insert(lines, '显示器实际输出位深／色准：未知，需驱动信息／测量确认')
+    table.insert(lines, '渲染器：' .. renderer)
     local target = mp.get_property_native('video-target-params', {}) or {}
-    table.insert(lines, '目标亮度标尺：' .. (target['max-luma'] and tostring(target['max-luma']) .. ' cd/m²（配置／估计值，非实测）' or '未知'))
+    if target['max-luma'] then table.insert(lines, '目标亮度：' .. tostring(target['max-luma']) .. ' cd/m²') end
     local icc = mp.get_property('icc-profile', '')
     table.insert(lines, 'ICC：' .. (icc ~= '' and icc or mp.get_property_bool('icc-profile-auto', false) and '使用系统描述文件' or '未启用'))
     local color = mp.get_property_native('user-data/color-target', {}) or {}
-    table.insert(lines, '色彩模式：' .. tostring(color.mode or '配置目标') .. ' / ' .. tostring(color.status or '未知'))
+    table.insert(lines, '色彩模式：' .. tostring(color.pipeline_name or '配置目标') .. ' / ' .. tostring(color.mode or '未知') .. ' / ' .. tostring(color.status or '未知'))
     table.insert(lines, '目标意图：' .. tostring(color.requested or '未知') .. (color.manual and '（本次会话手动覆盖）' or '（自动匹配）'))
     local actual = color.actual_settings or {}
     table.insert(lines, '实际设置：' .. tostring(actual['target-prim'] or '未知') .. ' / ' .. tostring(actual['target-trc'] or '未知')
@@ -162,18 +162,17 @@ local function show_color_status()
     table.insert(lines, 'Windows 显示模式：' .. tostring(mode_names[system_color.mode] or system_color.mode or '未知')
         .. ' / 校色责任：' .. tostring(color.display_color_owner or '未知'))
     if system_color.sdr_white_nits then
-        table.insert(lines, '系统 SDR 白：' .. tostring(system_color.sdr_white_nits) .. ' nits（仅 HDR 桌面按绝对标尺使用）')
+        table.insert(lines, '系统 SDR 白：' .. tostring(system_color.sdr_white_nits) .. ' nits')
     end
-    table.insert(lines, '显示链接报告位深：' .. tostring(color.reported_bits or '未知') .. '（不是面板实测）')
+    if color.reported_bits then table.insert(lines, '显示链路位深：' .. tostring(color.reported_bits) .. ' bit') end
     table.insert(lines, 'HDR 峰值来源：' .. tostring(color.peak or '未知') .. ' / ' .. tostring(color.peak_source or '未知'))
-    if system_color.mode=='wcg' then
-        table.insert(lines, 'SDR ACM 工作白：线性 1.0；80 用于内部编码标尺，非屏幕亮度实测')
+    if system_color.mode=='wcg' and color.pipeline=='hq' then
+        table.insert(lines, 'SDR ACM 工作白：1.0（线性）')
     else
-        table.insert(lines, 'HDR 参考白：' .. tostring(color.reference_white or '未知') .. '（auto 查询系统，失败回退 203 nits）')
+        table.insert(lines, 'HDR 参考白：' .. tostring(color.reference_white or 'auto'))
     end
     table.insert(lines, '场景峰值分析：' .. tostring(mp.get_property_native('hdr-compute-peak') or '未知'))
     table.insert(lines, '输出色彩空间标记：' .. tostring(mp.get_property_native('target-colorspace-hint')))
-    table.insert(lines, '动态 HDR／DV 实际执行：无法从当前属性完整确认，未知；不等同于格式识别')
     local quality = mp.get_property_native('user-data/quality', {}) or {}
     table.insert(lines, '滤镜状态：' .. tostring(quality.state or '未启用'))
     local performance_names={balanced='HQ（默认）',['high-quality']='高质量'}
