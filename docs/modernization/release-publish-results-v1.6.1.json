@@ -1,0 +1,104 @@
+{
+  "version": "1.6.1",
+  "checked_at": "2026-10-13 00:28",
+  "github": {
+    "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.1",
+    "draft": false,
+    "prerelease": false,
+    "tag": "v1.6.1",
+    "published_at": "2026-10-12T16:21:51Z",
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.1.7z",
+        "bytes": 136900527,
+        "sha256": "363a103847c3b651b9efdfe434c1aa828fad949454d39f4d3074d3e11e276b97",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.1/01-mpv-base-v1.6.1.7z"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.1.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.1/02-mpv-extras-v1.6.1.7z.001"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.1.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.1/02-mpv-extras-v1.6.1.7z.002"
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.1.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.1/03-mpv-fasterwhisper-addon-v1.6.1.7z"
+      },
+      {
+        "name": "04-mpv-config-v1.6.1.7z",
+        "bytes": 5363091,
+        "sha256": "dec8d1f93df31751ef13d5b9c771d2d208838c9f08a00d518ebdf2d673d415c0",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.1/04-mpv-config-v1.6.1.7z"
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.13.exe",
+        "bytes": 69740725,
+        "sha256": "f7a37b450d9cc7725497fc0238ad089719b0f13404a2b10db8fb5df07163453a",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.1/VantaInstaller-win-x64-v0.3.13.exe"
+      }
+    ]
+  },
+  "modelscope": {
+    "dataset": "AerithDream/mpv-vanta-edition",
+    "revision": "master",
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.1.7z",
+        "anonymous_http": 200,
+        "bytes": 136900527,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.1/01-mpv-base-v1.6.1.7z"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.1.7z.001",
+        "anonymous_http": 200,
+        "bytes": 1992294400,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.1/02-mpv-extras-v1.6.1.7z.001"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.1.7z.002",
+        "anonymous_http": 200,
+        "bytes": 830172768,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.1/02-mpv-extras-v1.6.1.7z.002"
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.1.7z",
+        "anonymous_http": 200,
+        "bytes": 1476001942,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.1/03-mpv-fasterwhisper-addon-v1.6.1.7z"
+      },
+      {
+        "name": "04-mpv-config-v1.6.1.7z",
+        "anonymous_http": 200,
+        "bytes": 5363091,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.1/04-mpv-config-v1.6.1.7z"
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.13.exe",
+        "anonymous_http": 200,
+        "bytes": 69740725,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.1/VantaInstaller-win-x64-v0.3.13.exe"
+      }
+    ],
+    "complete": true
+  },
+  "tag_commit": "012d5f391737be63e30d16c7b3bb0c6fb001c6e2",
+  "private_uploaded": false,
+  "latest": true,
+  "checks": [
+    "正式／非草稿／非预发布",
+    "恰好六资产且无重复／私包",
+    "GitHub远端大小与SHA-256全部一致",
+    "ModelScope六同名文件匿名HTTP200及大小一致",
+    "tag指向构建核验提交",
+    "本地纯版本标记1.6.1",
+    "build已安全归档，release保留产物"
+  ]
+}
