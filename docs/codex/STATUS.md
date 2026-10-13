@@ -8,7 +8,7 @@
 - 从1.6.1或更早版本升级需覆盖新版01及04，补齐fonts/osd；02内README保留1.6.0、03内保留1.5.7，内容未改。
 - 142Lua／120Python／构建AST、归档门禁、1424项配置资源覆盖、源及实际包双后端实播、普通启动全部脚本／I面板／字号记忆通过。
 - 标签构建提交 c498aef，功能提交f87d24f；结果记录随master推送；最终同步／干净工作树凭据见tmp/release-v1.6.2/final-git-check.json。报告docs/modernization/release-build-results-v1.6.2.json及release-results-v1.6.2.json。
-- build已归档至根backup，release与安装器publish保留；本次未生成私包，既有私包未上传。原始证据留tmp／backup；HDR桌面／多屏边界未实测。
+- 个人私包已补齐：release/mpv-full-private-v1.6.2.7z，7z完整性／并集／安装器SHA／版本标记／普通启动与I键通过，仅本地保留。AGENTS及README已固化今后分包＋私包全部构建验收后才上传的要求；不得自行省略。原始证据留tmp／backup；HDR桌面／多屏边界未实测。
 
 ## 当前状态快照
 
@@ -16,9 +16,9 @@
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **用户核心优先级** | 软件层面完整验证 SDR／HDR 路线准确性，不以校色仪／真实HDR屏幕为条件；性能不重编译、不再增加线程，默认 D3D11、跨片源／后端通用；不推广 OP 单片参数，用户不关注超分／补帧 |
-| **分支** | master 与 origin/master 同步于 cc67ad9；v1.6.1 标签仍指向 012d5f3；本机 ACM 起播修复、OSD 缩放开关及交接记录未提交 |
-| **最新发布提交** | 012d5f3（tag v1.6.1）；正式Release与ModelScope六资产全部核验完成 |
-| **工作区** | 今日远端源码及 fonts/osd 已落地；本机 ACM 修复与 OSD 字号缩放开关待提交，正式版本仍 1.6.1 |
+| **分支** | master／origin/master随本轮补打记录同步；v1.6.2标签保留c498aef |
+| **最新发布提交** | c498aef（tag v1.6.2）；GitHub及ModelScope六公开资产已核验，个人私包只本地 |
+| **工作区** | v1.6.2分包及个人私包已落地；功能、发布和补打／顺序偏好记录随master保存 |
 | **MPV 核心版本** | v0.41.0-1107-g36bf3d529（shinchiro 20261008；FFmpeg N-127242-g5d4755f7d；libplacebo 0d043c7，含99e80abd浮点截断修复）；已纳入v1.6.0候选 |
 | **项目版本** | v1.6.1正式发布，latest；安装器独立0.3.13，GitHub与ModelScope均完成 |
 | **上次操作** | 2026-10-13 18:36 添加 OSD 字号自动缩放菜单持久化开关，双后端即时切换／跨启动记忆与原 I 键回归通过 |
@@ -3782,3 +3782,20 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - 第7.1节：ModelScope v1.6.2/ 六附件完成，逐项匿名HEAD重定向后HTTP200及Content-Length匹配；未输出SDK凭据或签名地址，未上传整个release目录。
 - 第8节：构建目录经绝对路径核验移入backup/release-v1.6.2-build-staging，build不存在；release保留四包／02两卷／安装器及SHA清单，VantaInstaller/publish保留。版本记录／工作进度／结果JSON已更新。
 - master同步／干净工作树及远端Latest的最终校验另存tmp/release-v1.6.2/final-git-check.json；当前正式版本标记精确1.6.2。当前请求未要求关机，未沿用上轮关机操作。
+
+## 2026-10-13 19:26 — 补打 v1.6.2 个人私包及发布顺序纠正（进行中）
+
+- 用户指出漏打个人私包，并要求今后先打分包及私包后开始上传。本轮直接补打已发布01→02→04，保留Faster-Whisper占位与安装器0.3.13；不上传私包，不重传正式资产，不移动v1.6.2标签。
+- Git pull --ff-only已同步，master／origin均27647c8、工作树原干净；已读AGENTS、发布流程和HandShake。原发布流程保持，用户新偏好是额外必做要求，不能再以未单独指定私包为由跳过。
+- AGENTS固化默认分包＋私包全部构建／验收后再上传，README发布入口使用-IncludePrivate，保留公开分包独立构建用途。未修改构建参数／包结构／运行时或I键绑定。
+- 构建暂存绝对路径已检查在根build内，且1.6.2私包及暂存先前不存在；正在运行build-full-private。完成后核验完整性、安装器SHA、版本标记、全部并集和占位目录，归档暂存并更新结果记录。
+
+## 2026-10-13 19:35 — v1.6.2 私包补齐／顺序要求落地
+
+- `release/mpv-full-private-v1.6.2.7z`构建和7z t通过，3038086699字节，SHA256 e2396d395677d8061bef438fc85ed27ba4d2e9a002a8cdbc6c8c8adcb7576947；校验清单release/SHA256SUMS-private-v1.6.2.txt。
+- 01→02→04完整并集11795项大小／CRC一致，无根备份／缓存／日志／调试或专有文件；新增安装器及两份私包说明。Faster-Whisper仅占位，未合并03运行时；空files目录已加入私包和build-full-private，首次启动不再抢建。
+- 首轮全新解压实播暴露SimpleBookmark并发创建files目录的旧竞争，日志报目录已存在；失败夹具归档backup/private-first-start-failure-v1.6.2。私包入口预建空files，不携带任何个人历史；当前候选仅更新空目录元数据，文件内容与公开包并集不变，完整重测通过。发布流程及公开分包保持；公开分包全新安装的目录竞争留待后续修复，不把预建files的早期隔离验收当作该边界已覆盖。
+- 实际解压版本标记1.6.2、安装器SHA、七字体及六核心运行时SHA通过；D3D11普通启动持续播放、I键打开关闭统计面板通过，日志无error／fatal。
+- 构建暂存经绝对路径核验归档至backup/release-v1.6.2-private-staging，根build清空；release与publish保留产物。本轮仅补本地私包，不上传／不替换公开资产，不改发布标签或发布流程原件。
+- 用户持久要求已写入AGENTS和README：默认分包＋私包全部构建验收成功后，才开始任何GitHub／ModelScope上传；沿用02／03也须先补私包。除用户当轮明确取消，agent不得自行跳过。
+- 本轮偏好说明和补打结果提交后推送master，最终同步／干净工作树检查另存tmp/release-v1.6.2/private-final-git-check.json。

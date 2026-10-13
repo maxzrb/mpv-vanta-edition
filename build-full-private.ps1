@@ -76,6 +76,9 @@ Expand-Package $BaseArchive
 Expand-Package $ExtrasArchive
 Expand-Package $ConfigArchive
 
+# 预建空数据目录，避免首次启动时多个脚本并发建目录而报错；不携带个人历史。
+$null = New-Item -ItemType Directory -Force -Path (Join-Path $Stage 'portable_config/files')
+
 # Faster-Whisper 占位：私包不携带约 1.4GB 的 AI 字幕运行时。
 # 需要时下载 03-mpv-fasterwhisper-addon-v${Version}.7z，解压覆盖到 mpv 根目录即可
 # （03 包解压内容恰好落在 Faster-Whisper-XXL/，与占位目录同名合并）。

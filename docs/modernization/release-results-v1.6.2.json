@@ -94,5 +94,15 @@
   "installer_version": "0.3.13",
   "private_uploaded": false,
   "build_staging": "backup/release-v1.6.2-build-staging",
-  "final_git_check": "tmp/release-v1.6.2/final-git-check.json：收尾提交推送后生成，验证 master 同步及干净工作树"
+  "final_git_check": "tmp/release-v1.6.2/final-git-check.json：收尾提交推送后生成，验证 master 同步及干净工作树",
+  "private_package_supplement": {
+    "checked_at": "2026-10-13 19:35 Asia/Shanghai",
+    "report": "docs/modernization/private-build-results-v1.6.2.json",
+    "name": "mpv-full-private-v1.6.2.7z",
+    "bytes": 3038086699,
+    "sha256": "e2396d395677d8061bef438fc85ed27ba4d2e9a002a8cdbc6c8c8adcb7576947",
+    "local_only": true,
+    "uploaded": false
+  },
+  "future_release_order": "用户2026-10-13明确要求：公开分包＋个人私包全部构建验收后，才开始上传；只有用户当轮取消私包才可省略。"
 }

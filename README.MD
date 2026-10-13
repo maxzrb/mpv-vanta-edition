@@ -126,19 +126,21 @@ Faster-Whisper 占位说明；AI 字幕运行时按需另行解压 03。
 
 所有脚本都位于项目根目录，建议在 PowerShell 中从该目录运行。
 
-### 一次构建四个公开包
+### 发布前构建分包及个人私包
 
 ```powershell
-.\build-all-packages.ps1 -Version '1.2.0'
+.\build-all-packages.ps1 -Version '1.6.2' -IncludePrivate
 ```
 
-输出 01 Base、02 Extras 分卷、03 FW 和 04 Config 公开包。
+输出 01 Base、02 Extras 分卷、03 FW、04 Config 公开包，以及仅本地保留的个人全量包。按维护者要求，全部构建和验收完成后，才开始上传公开资产；私包不上传。采用 02／03 原样复用流程时，也必须先补齐同版本私包并验收。
 
-### 同时构建个人私用全量包
+### 仅构建公开分包（独立构建用途）
 
 ```powershell
-.\build-all-packages.ps1 -Version '1.2.0' -IncludePrivate
+.\build-all-packages.ps1 -Version '1.6.2'
 ```
+
+该命令不会生成私包；不能据此认定本项目发布前的全部构建已完成。
 
 ### 分别构建
 

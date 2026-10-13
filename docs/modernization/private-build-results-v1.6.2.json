@@ -1,0 +1,36 @@
+{
+  "checked_at": "2026-10-13 19:35 Asia/Shanghai",
+  "name": "mpv-full-private-v1.6.2.7z",
+  "bytes": 3038086699,
+  "sha256": "e2396d395677d8061bef438fc85ed27ba4d2e9a002a8cdbc6c8c8adcb7576947",
+  "complete_archive": true,
+  "merged_files": 11795,
+  "size_crc_union_identical": true,
+  "installer": {
+    "name": "VantaInstaller-win-x64-v0.3.13.exe",
+    "sha256": "f7a37b450d9cc7725497fc0238ad089719b0f13404a2b10db8fb5df07163453a"
+  },
+  "marker": "1.6.2",
+  "fasterwhisper_placeholder_only": true,
+  "empty_data_directory": true,
+  "osd_fonts_verified": true,
+  "core_runtime_hash_identical": true,
+  "playback": {
+    "passed": true,
+    "backend": "d3d11",
+    "samples": [
+      0.367,
+      0.667,
+      0.9
+    ],
+    "stats_layout": {
+      "content_width": 379.545244,
+      "canvas_height": 350.440835,
+      "scale": 0.821822,
+      "content_height": 315.396752
+    },
+    "errors": []
+  },
+  "local_only": true,
+  "uploaded": false
+}

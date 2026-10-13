@@ -205,3 +205,4 @@ return M
 - 若本次改动命中《发布流程.md》第 3.2 节“大改动 Gate”（包结构、构建脚本、核心运行时、安装方式、版权边界等影响发布内容的变更），必须停止发布并向用户汇报，由用户决定是否修正发布流程；agent 不得自行修改《发布流程.md》。
 - 公开包不得包含任何第三方专有文件（如商业软件 Lossless Scaling 等）；已废弃的 LSFG 相关文件（含 Lossless.dll）统一移入根目录 `trash/`，不进仓库、不进公开包。
 - 个人私用全量包 `mpv-full-private-vX.Y.Z.7z` 仅限本地保留，禁止上传公开 GitHub Release。
+- 用户发布顺序要求（2026-10-13）：每次发布默认同时生成同版本公开分包和个人私包；必须在全部构建及验收完成后，才开始 GitHub 或 ModelScope 上传。总入口使用 `build-all-packages.ps1 -Version X.Y.Z -IncludePrivate`；复用 02／03 时，也须先构建并核验 `build-full-private.ps1` 的产物。只有用户当轮明确取消私包，才能省略；不得自行以“未另行要求”为由跳过。
