@@ -14,6 +14,7 @@ local baseline, owned, drift, observed = {},{},{},{}
 local playback_retry
 local mode, requested, reason, status_text = '配置目标','auto','','可用'
 local manual, writing, generation, timer = false,false,0,nil
+local stopping = false
 local Select, Publish
 local preferences, legacy_peak_display = {},nil
 local preference_path=mp.command_native({'expand-path','~~/files/color-target-preferences.json'})
@@ -445,6 +446,7 @@ local function Verify(backend,peak,contrast)
     timer=mp.add_timeout(.2,Check)
 end
 Select=function(choice,origin)
+    if stopping then return false end
     if choice~='auto' and choice~='sdr' and choice~='icc' and choice~='hdr' and choice~='restore' then return end
     if (origin=='internal' or origin=='legacy') and manual or origin=='display' and next(drift) then Publish();return end
     if origin~='internal' and origin~='legacy' and origin~='display' then
@@ -557,6 +559,7 @@ for _,key in ipairs(keys) do
 end
 local last_display_info
 local function DisplayChanged()
+    if stopping then return end
     local d=Display()
     -- JSON 对象键序不具有语义，不能用序列化顺序判断同一显示器信息变化。
     local signature={display=d,system=SystemColor()}
@@ -601,7 +604,15 @@ mp.register_event('file-loaded',function()
         local peak=Peak();if peak then Verify(o.hdr_backend=='pq' and 'pq' or 'scrgb',peak,o.hdr_contrast) end
     else Publish() end
 end)
-mp.register_event('end-file',Cancel)
-mp.register_event('shutdown',function() Cancel();local ok,err=Update();if not ok then msg.error(err) end end)
+mp.register_event('end-file',function(event)
+    if event.reason=='quit' then stopping=true end
+    Cancel()
+end)
+mp.register_event('shutdown',function()
+    stopping=true
+    Cancel()
+    -- 渲染选项属于当前进程，退出时无需恢复；写回输出格式会重新创建已经关闭的窗口。
+    playback_retry=nil
+end)
 -- 首次使用标准模式；已有主模式偏好在打开第一帧前恢复。
 Select('auto','internal')

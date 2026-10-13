@@ -1,0 +1,40 @@
+{
+  "description": "从现有运行包字体生成相同 OSD 精简目录；所有字体原样复制，不转换。",
+  "files": [
+    {
+      "name": "HarmonyOS_Sans_SC_Bold.ttf",
+      "size": 8158996,
+      "sha256": "43a424b85e47fb53a17b3b32026a71801f86f8e022ca6798d186b47d39fa5f01"
+    },
+    {
+      "name": "HarmonyOS_Sans_SC_Regular.ttf",
+      "size": 8261128,
+      "sha256": "297b088424be212207df2ce8b98e335468b782aa6b96832af0b8b773d711e2b1"
+    },
+    {
+      "name": "Material-Design-Iconic-Font.ttf",
+      "size": 99212,
+      "sha256": "18a45be2ecb66ce217c3bbccf219f8bdc05dc76d61a6e63673186efd1c7cda1a"
+    },
+    {
+      "name": "MaterialIconsRound-Regular.otf",
+      "size": 400360,
+      "sha256": "a853f50913597e67f76facd269ff230c2f3038f9acadec04dd653080785dee25"
+    },
+    {
+      "name": "modernx-osc-icon.ttf",
+      "size": 4784,
+      "sha256": "e14ba07c2a2491c9da03737320bfb1c60c99e4a49721eecd3bafeda08e828a0e"
+    },
+    {
+      "name": "NotoSansCJK-Bold.ttc",
+      "size": 20050760,
+      "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb"
+    },
+    {
+      "name": "uosc_textures.ttf",
+      "size": 37988,
+      "sha256": "c22c149d3d92b531f9460fc6af9bc6829a63a26454e53c30236cb55b77959c34"
+    }
+  ]
+}

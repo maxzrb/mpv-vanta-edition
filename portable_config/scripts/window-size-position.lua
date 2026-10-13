@@ -61,6 +61,8 @@ local SM_CYVIRTUALSCREEN = 79
 
 local state = nil
 local positioned = false
+local restore_timer, save_timer
+local stopping = false
 
 local function osd_show(text)
 	mp.osd_message(text, 2.5)
@@ -134,7 +136,7 @@ local function read_state()
 	local content = file:read('*a')
 	file:close()
 	if not content then return nil end
-	local rect, client, dpi = nil, nil, nil
+	local rect, client, dpi, frame = nil, nil, nil, nil
 	for line in content:gmatch('[^\r\n]+') do
 		local key, value = line:match('^([%w_]+)=(.*)$')
 		if key and value then
@@ -153,6 +155,9 @@ local function read_state()
 				if w and tonumber(w) > 0 and tonumber(h) > 0 then
 					client = { w = tonumber(w), h = tonumber(h) }
 				end
+			elseif key == 'frame' then
+				local x, y = value:match('^(%-?%d+),(%-?%d+)$')
+				if x then frame = { left = tonumber(x), top = tonumber(y) } end
 			elseif key == 'dpi' then
 				local v = tonumber(value)
 				if v and v > 0 then dpi = v end
@@ -160,7 +165,7 @@ local function read_state()
 		end
 	end
 	if rect and client then
-		return { rect = rect, client = client, dpi = dpi or 96 }
+		return { rect = rect, client = client, dpi = dpi or 96, frame = frame }
 	end
 	return nil
 end
@@ -187,13 +192,16 @@ local function persist()
 	return true
 end
 
-local function write_state(rect, client, dpi)
+local function write_state(rect, client, dpi, frame)
 	local file = state_path and io.open(state_path, 'wb')
 	if not file then return false end
 	file:write('# 上次关闭时的窗口状态（由 window-size-position.lua 自动维护）\n')
 	file:write(string.format('rect=%d,%d,%d,%d\n', rect.left, rect.top, rect.right, rect.bottom))
 	file:write(string.format('client=%d,%d\n', client.w, client.h))
 	file:write(string.format('dpi=%d\n', dpi or 96))
+	if frame then
+		file:write(string.format('frame=%d,%d\n', frame.left, frame.top))
+	end
 	file:close()
 	return true
 end
@@ -219,7 +227,14 @@ local function get_window_state()
 		local ok, v = pcall(user32.GetDpiForWindow, hwnd)
 		if ok and v and v > 0 then dpi = v end
 	end
+	-- 保存不可见边框偏移，下次创建窗口前即可还原可见位置。
+	local ext = ffi.new('RECT')
+	local frame
+	if dwmapi.DwmGetWindowAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS, ext, ffi.sizeof(ext)) == 0 then
+		frame = { left = ext.left - rect.left, top = ext.top - rect.top }
+	end
 	return {
+		frame = frame,
 		rect = {
 			left = rect.left,
 			top = rect.top,
@@ -235,7 +250,7 @@ local function save_current_state()
 	if not (o.remember_size or o.remember_position) then return end
 	local current = get_window_state()
 	if current then
-		write_state(current.rect, current.client, current.dpi)
+		write_state(current.rect, current.client, current.dpi, current.frame)
 	end
 end
 
@@ -260,7 +275,8 @@ end
 local function current_dpi()
 	if not win_api then return nil end
 	local wid = mp.get_property_number('window-id', 0)
-	if not wid or wid <= 0 then return nil end
+	-- 窗口尚未创建时沿用保存的 DPI，避免先按 96 DPI 缩小、显示后又放大。
+	if not wid or wid <= 0 then return state and state.dpi or user32.GetDpiForSystem() end
 	if not user32.GetDpiForWindow then return 96 end
 	local ok, v = pcall(user32.GetDpiForWindow, ffi.cast('void*', wid))
 	if ok and v and v > 0 then return v end
@@ -280,10 +296,14 @@ end
 -- 保存的外框矩形按 DPI 换算并补偿不可见边框，得到 geometry 位置
 local function saved_position_string()
 	if not (state and state.rect) then return nil end
-	local deltas = current_frame_deltas()
-	if not deltas then return nil end
 	local cur_dpi = current_dpi() or 96
 	local ratio = cur_dpi / (state.dpi and state.dpi > 0 and state.dpi or cur_dpi)
+	local deltas = current_frame_deltas()
+	if not deltas and state.frame then
+		deltas = { left = math.floor(state.frame.left * ratio + 0.5),
+			top = math.floor(state.frame.top * ratio + 0.5) }
+	end
+	if not deltas then return nil end
 	local left = math.floor(state.rect.left * ratio + 0.5)
 	local top = math.floor(state.rect.top * ratio + 0.5)
 	local right = math.floor(state.rect.right * ratio + 0.5)
@@ -316,15 +336,14 @@ local function default_position_string()
 	return o.position
 end
 
--- 组合恢复几何：with_deltas=false 时只返回可立即应用的部分（尺寸）
-local function build_combined_geometry(with_deltas)
+-- 优先用保存的边框补偿一次组合尺寸和位置；旧状态没有补偿值时仅延后位置。
+local function build_combined_geometry()
 	local size
 	if o.remember_size then size = saved_size_string() end
 	if not size then size = default_size_string() end
 	local position
 	if o.remember_position then
-		-- 位置需要窗口出现后才能测量边框，先延后
-		if with_deltas then position = saved_position_string() end
+		position = saved_position_string()
 	else
 		position = default_position_string()
 	end
@@ -333,9 +352,15 @@ local function build_combined_geometry(with_deltas)
 end
 
 local function apply_remembered()
-	local geometry = build_combined_geometry(true)
+	-- 不能把只恢复了尺寸误判为位置也已就绪。
+	if o.remember_position and not saved_position_string() then return false end
+	local geometry = build_combined_geometry()
 	if not geometry then return false end
-	local ok = pcall(mp.set_property, 'geometry', geometry)
+	local ok = true
+	-- 创建前已恢复且 DPI／边框未变时，不再写入同一 geometry。
+	if mp.get_property('geometry') ~= geometry then
+		ok = mp.set_property('geometry', geometry)
+	end
 	if ok then
 		positioned = true
 		msg.info('已恢复上次窗口状态：' .. geometry)
@@ -344,10 +369,14 @@ local function apply_remembered()
 end
 
 local function retry_apply_remembered(tries)
-	if positioned or not o.remember_position then return end
+	if stopping or positioned or not (o.remember_size or o.remember_position) then return end
 	if apply_remembered() then return end
 	if tries < 6 then
-		mp.add_timeout(0.5, function() retry_apply_remembered(tries + 1) end)
+		if restore_timer then restore_timer:kill() end
+		restore_timer = mp.add_timeout(0.5, function()
+			restore_timer = nil
+			retry_apply_remembered(tries + 1)
+		end)
 	end
 end
 
@@ -381,13 +410,14 @@ local function apply_defaults()
 end
 
 local function apply()
+	positioned = false
 	if win_api and state and (o.remember_size or o.remember_position) then
-		-- 启动时先应用尺寸，位置等窗口出现后测量边框再精确定位
-		local geometry = build_combined_geometry(false)
+		-- 在首次显示前恢复几何；窗口出现后仅校正实际发生变化的 DPI／边框。
+		local geometry = build_combined_geometry()
 		if geometry then
 			pcall(mp.set_property, 'geometry', geometry)
 		end
-		if not o.remember_position then
+		if not o.remember_position and mp.get_property_number('window-id', 0) > 0 then
 			positioned = true
 		end
 		return
@@ -505,15 +535,20 @@ mp.observe_property('ontop', 'bool', function(name, value)
 	persist()
 end)
 
--- 窗口出现后精确定位（记住状态需要先读取窗口边框）
+-- 窗口出现后检查 DPI／边框变化，旧记录只需首次补齐位置。
 mp.observe_property('window-id', 'number', function(name, value)
-	if o.remember_position and win_api and state and not positioned and value and value > 0 then
+	if (o.remember_size or o.remember_position) and win_api and state and not positioned and value and value > 0 then
 		retry_apply_remembered(0)
 	end
 end)
 
 -- 周期保存当前窗口状态，退出时再精确保存一次
-mp.add_periodic_timer(2.0, save_current_state)
-mp.register_event('shutdown', save_current_state)
+save_timer = mp.add_periodic_timer(2.0, save_current_state)
+mp.register_event('shutdown', function()
+	stopping = true
+	if restore_timer then restore_timer:kill(); restore_timer = nil end
+	save_timer:kill()
+	save_current_state()
+end)
 
 return {}

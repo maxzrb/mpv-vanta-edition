@@ -64,6 +64,7 @@ local o = {
     font = "",
     font_mono = "monospace",   -- monospaced digits are sufficient
     font_size = 20,
+    auto_fit = true,                -- 内容超出窗口安全区域时自动缩小字号
     font_color = "",
     border_size = 1.65,
     border_color = "",
@@ -185,7 +186,7 @@ local function text_style()
     if o.custom_header and o.custom_header ~= "" then
         return o.custom_header
     else
-        local style = "{\\r\\an7\\fs" .. font_size .. "\\bord" .. border_size
+        local style = "{\\r\\an7\\q2\\fs" .. font_size .. "\\bord" .. border_size
 
         if o.font ~= "" then
             style = style .. "\\fn" .. o.font
@@ -1534,16 +1535,49 @@ end
 local stats_overlay = mp.create_osd_overlay('ass-events')
 -- 与既有 288 高度的字体缩放保持一致，避免新覆盖层默认 720 导致文字过小。
 stats_overlay.res_x, stats_overlay.res_y = 0, 288
-local last_ass_content
+local last_ass_content, last_overlay_height
+-- 隐藏测量层使用更大的画布，避免超出底部的内容被裁剪后低估高度。
+local layout_probe = mp.create_osd_overlay('ass-events')
+layout_probe.res_x, layout_probe.res_y = 0, 1152
+layout_probe.hidden, layout_probe.compute_bounds = true, true
+local layout_cache, layout_order = {}, {}
+local function fitted_height(ass_content, measure_only)
+    if not o.use_ass or not o.auto_fit and not measure_only then return 288 end
+    local dimensions = mp.get_property_native('osd-dimensions', {})
+    if not dimensions.w or not dimensions.h or dimensions.h <= 0 then return 288 end
+    -- 保留文字长度和行结构；数值内容变化不重复测量，图表采样坐标不进入缓存键。
+    local shape = ass_content:gsub('\\p1.-\\p0', ''):gsub('%d', '0')
+    local key = table.concat({dimensions.w, dimensions.h, font_size, o.font, o.font_mono, shape}, '|')
+    local layout = layout_cache[key]
+    if not layout then
+        layout_probe.data = ass_content
+        local bounds = layout_probe:update()
+        layout_probe:remove()
+        if not bounds or not bounds.y1 then return 288 end
+        local available_width = 288 * dimensions.w / dimensions.h * 0.90
+        -- 留出底部及右侧余量，并补偿测量层较小字号的像素取整。
+        local ratio = min(1, 288 * 0.90 / max(1, bounds.y1),
+                          available_width / max(1, bounds.x1))
+        layout = {scale=ratio, canvas_height=288 / ratio,
+                  content_height=bounds.y1, content_width=bounds.x1}
+        layout_cache[key] = layout
+        layout_order[#layout_order + 1] = key
+        if #layout_order > 8 then layout_cache[table.remove(layout_order, 1)] = nil end
+    end
+    if not measure_only then mp.set_property_native('user-data/stats/layout', layout) end
+    return layout.canvas_height
+end
 local function print_page(page, after_scroll)
     -- the page functions assume we start in ass-enabled mode.
     -- that's true for mp.set_osd_ass, but not for mp.osd_message.
     local ass_content = pages[page].f(after_scroll)
     if o.persistent_overlay then
-        if ass_content ~= last_ass_content then
+        local height = fitted_height(ass_content)
+        if ass_content ~= last_ass_content or height ~= last_overlay_height then
+            stats_overlay.res_y = height
             stats_overlay.data = ass_content
             stats_overlay:update()
-            last_ass_content = ass_content
+            last_ass_content, last_overlay_height = ass_content, height
         end
     else
         mp.osd_message((o.use_ass and ass_start or "") .. ass_content,
@@ -1577,7 +1611,7 @@ update_scale = function ()
 end
 
 local function clear_screen()
-    last_ass_content = nil
+    last_ass_content, last_overlay_height = nil, nil
     if o.persistent_overlay then stats_overlay:remove() else mp.osd_message("", 0) end
 end
 
@@ -1848,6 +1882,7 @@ if o.bindlist ~= "no" then
 end
 
 mp.observe_property("osd-height", "native", update_scale)
+mp.observe_property("osd-width", "native", update_scale)
 mp.observe_property("osd-scale-by-window", "native", update_scale)
 
 local function update_property_cache(name, value)
@@ -2162,7 +2197,9 @@ local metrics_path = mp.find_config_file('script-modules/system_metrics.lua') or
 local metrics_ok, metrics = pcall(dofile, metrics_path)
 mp.set_property('user-data/stats/native-error', metrics_ok and '' or tostring(metrics))
 if not metrics_ok then metrics = nil end
+local gpu_catalog = metrics
 if not o.native_metrics then metrics = nil end
+local player_pid = mp.get_property_number('pid')
 mp.set_property('user-data/stats/provider', metrics and 'native' or 'compatibility')
 local system_cpu, system_gpu = nil, {}
 local generation, pending, query_deadline, sample_timer = 0, nil, nil, nil
@@ -2170,12 +2207,17 @@ local last_fallback = -math.huge
 local subprocess_count = 0
 mp.set_property_number('user-data/stats/subprocess-count', 0)
 local function visible() return display_timer:is_enabled() end
+local function publish_system_sample()
+    mp.set_property_native('user-data/stats/system-sample', {cpu=system_cpu, gpu=system_gpu})
+    -- 采样完成立即刷新可见面板，避免等待下一次显示计时器。
+    if visible() then print_page(curr_page) end
+end
 local function cancel_samples()
     generation = generation + 1
     if sample_timer then sample_timer:kill(); sample_timer = nil end
     if query_deadline then query_deadline:kill(); query_deadline = nil end
     if pending then mp.abort_async_command(pending); pending = nil end
-    if metrics then pcall(metrics.close) end
+    if gpu_catalog then pcall(gpu_catalog.close) end
     system_cpu, system_gpu = nil, {}
     mp.set_property_native('user-data/stats/system-pending', false)
 end
@@ -2185,10 +2227,10 @@ local function sample_system()
     if metrics then
         local ok, value, status = pcall(metrics.cpu)
         if ok then system_cpu, cpu_state = value, status end
-        ok, value, status = pcall(metrics.gpu)
+        ok, value, status = pcall(metrics.gpu, player_pid)
         if ok then system_gpu, gpu_state = value or {}, status end
     end
-    mp.set_property_native('user-data/stats/system-sample', {cpu=system_cpu, gpu=system_gpu})
+    publish_system_sample()
     if system_cpu and next(system_gpu) then return end
     if cpu_state == 'warming' or gpu_state == 'warming' then return end
     if pending or mp.get_time() - last_fallback < math.max(10, o.fallback_interval) then return end
@@ -2211,18 +2253,18 @@ local function sample_system()
             local data = utils.parse_json(result.stdout or '')
             if data and tonumber(data.cpu) then system_cpu = tonumber(data.cpu) end
             if data and type(data.gpu) == 'table' and not next(system_gpu) then
-                local engines = {}
+                local samples = {}
                 for _, item in ipairs(data.gpu) do
-                    local luid, physical, engine = (item.Name or ''):match('luid_(.-)_phys_(%d+)_eng_(%d+)')
-                    local value = tonumber(item.UtilizationPercentage)
-                    if luid and value then
-                        local adapter, key = luid .. '/' .. physical, luid .. '/' .. physical .. '/' .. engine
-                        engines[key] = math.min(100, (engines[key] or 0) + value)
-                        system_gpu[adapter] = math.max(system_gpu[adapter] or 0, engines[key])
-                    end
+                    samples[#samples + 1] = {name=item.Name, value=item.UtilizationPercentage}
+                end
+                -- 兼容查询沿用同一身份过滤，不能把虚拟设备重新加回面板。
+                if gpu_catalog then
+                    local ok, rows = pcall(gpu_catalog.aggregate, samples, player_pid)
+                    if ok and rows then system_gpu = rows end
                 end
             end
         end
+        publish_system_sample()
     end)
     query_deadline = mp.add_timeout(5, function()
         generation = generation + 1
@@ -2239,14 +2281,40 @@ end
 local base_add_file = add_file
 add_file = function(s, print_cache, print_tags)
     base_add_file(s, print_cache, print_tags)
-    append(s, 'CPU（整机）: ' .. (system_cpu and string.format('%.0f%%', system_cpu) or '不可用／采样中'), {nl=o.nl, prefix='', prefix_sep=''})
+    local cpu = system_cpu and string.format('%.0f%%', system_cpu) or '采样中'
     local keys = {}
     for key in pairs(system_gpu) do keys[#keys + 1] = key end
-    table.sort(keys)
-    if #keys == 0 then append(s, 'GPU（整机）: 不可用／采样中', {nl=o.nl, prefix='', prefix_sep=''}) end
-    for _, key in ipairs(keys) do
-        append(s, string.format('GPU（整机）: %.0f%%  LUID %s', system_gpu[key], key), {nl=o.nl, prefix='', prefix_sep=''})
+    table.sort(keys, function(a, b)
+        local left, right = system_gpu[a], system_gpu[b]
+        return left.order < right.order or left.order == right.order and left.physical < right.physical
+    end)
+    -- CPU 与 GPU 口径共用一行；显卡按实际文字宽度并排，窄窗口再换行。
+    local heading = 'CPU（整机）: ' .. cpu .. '    GPU（本播放器/整机）'
+    if #keys == 0 then heading = heading .. ': 采样中／不可用' end
+    append(s, heading, {nl=o.nl, prefix='', prefix_sep=''})
+    local line = ''
+    local function flush_line()
+        if line ~= '' then append(s, line, {nl=o.nl, prefix='', prefix_sep=''}) end
     end
+    for _, key in ipairs(keys) do
+        local gpu = system_gpu[key]
+        local own = gpu.process and string.format('%.0f%%', gpu.process) or '不可用'
+        local entry = string.format('%s: %s/%.0f%%', gpu.name, own, gpu.total)
+        if line == '' then
+            line = entry
+        else
+            local joined = line .. '    |    ' .. entry
+            local probe = {text_style()}
+            append(probe, joined, {nl='', indent='', prefix='', prefix_sep=''})
+            if fitted_height(table.concat(probe), true) == 288 then
+                line = joined
+            else
+                flush_line()
+                line = entry
+            end
+        end
+    end
+    flush_line()
 end
 local base_process = process_key_binding
 process_key_binding = function(oneshot)
