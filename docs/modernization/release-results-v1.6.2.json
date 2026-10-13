@@ -1,0 +1,98 @@
+{
+  "version": "1.6.2",
+  "checked_at": "2026-10-13 19:19 Asia/Shanghai",
+  "github": {
+    "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.2",
+    "draft": false,
+    "prerelease": false,
+    "tag": "v1.6.2",
+    "published_at": "2026-10-13T11:17:18Z",
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.2.7z",
+        "bytes": 136911296,
+        "sha256": "53044805017293d2de50f655cbebed75cf8ec29e82bf1d7e6b3f651025825004",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.2/01-mpv-base-v1.6.2.7z"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.2.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.2/02-mpv-extras-v1.6.2.7z.001"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.2.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.2/02-mpv-extras-v1.6.2.7z.002"
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.2.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.2/03-mpv-fasterwhisper-addon-v1.6.2.7z"
+      },
+      {
+        "name": "04-mpv-config-v1.6.2.7z",
+        "bytes": 5368071,
+        "sha256": "fddee3ceb7c173464ec7004b961e1896f979de95f0d2ab547748921ca5abf33d",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.2/04-mpv-config-v1.6.2.7z"
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.13.exe",
+        "bytes": 69740725,
+        "sha256": "f7a37b450d9cc7725497fc0238ad089719b0f13404a2b10db8fb5df07163453a",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.2/VantaInstaller-win-x64-v0.3.13.exe"
+      }
+    ]
+  },
+  "modelscope": {
+    "dataset": "AerithDream/mpv-vanta-edition",
+    "revision": "master",
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.2.7z",
+        "anonymous_http": 200,
+        "bytes": 136911296,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.2/01-mpv-base-v1.6.2.7z"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.2.7z.001",
+        "anonymous_http": 200,
+        "bytes": 1992294400,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.2/02-mpv-extras-v1.6.2.7z.001"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.2.7z.002",
+        "anonymous_http": 200,
+        "bytes": 830172768,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.2/02-mpv-extras-v1.6.2.7z.002"
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.2.7z",
+        "anonymous_http": 200,
+        "bytes": 1476001942,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.2/03-mpv-fasterwhisper-addon-v1.6.2.7z"
+      },
+      {
+        "name": "04-mpv-config-v1.6.2.7z",
+        "anonymous_http": 200,
+        "bytes": 5368071,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.2/04-mpv-config-v1.6.2.7z"
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.13.exe",
+        "anonymous_http": 200,
+        "bytes": 69740725,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.2/VantaInstaller-win-x64-v0.3.13.exe"
+      }
+    ],
+    "complete": true
+  },
+  "latest": true,
+  "tag_commit": "c498aef548aa6ba59ce65eda0a038130ae386852",
+  "installer_version": "0.3.13",
+  "private_uploaded": false,
+  "build_staging": "backup/release-v1.6.2-build-staging",
+  "final_git_check": "tmp/release-v1.6.2/final-git-check.json：收尾提交推送后生成，验证 master 同步及干净工作树"
+}

@@ -1,12 +1,14 @@
 # STATUS.md — MPV 便携配置项目
 
-## 本轮续接快照（v1.6.2 发布候选，Asia/Shanghai）
+## 本轮续接快照（v1.6.2 已发布，Asia/Shanghai）
 
-- 用户指定 v1.6.2 并批准 Gate；功能提交 f87d24f，发布流程原件未改，01～04 顺序／核心／运行时沿用。
-- 今日远端更新、ACM 起播／前台修复、OSD 持久化菜单及普通启动脚本发现修复均已入候选；原 i／I 绑定保留。
-- 01／04 重建，02／03 全输入 SHA 核验后复用 v1.6.1，安装器沿用 0.3.13；六资产完整性／内容门禁／全功能覆盖／实际包实播通过。
-- 正式发布及国内镜像待执行；详细验收和 SHA 见版本记录及 docs/modernization/release-build-results-v1.6.2.json。
-- 原始测试及回退备份留在本地 tmp／backup；HDR桌面及多屏边界未实测。未生成私包，既有私包不上传。
+- 已正式发布 [v1.6.2](https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.2)，为 Latest，非草稿／非预发布；用户版本及Gate授权已落实，发布流程原件未改。
+- 今日远端窗口／字体／GPU面板更新、ACM 起播／前台修复、OSD字号自动缩放持久化菜单及普通启动脚本发现修复均入包；原 i／I 绑定保留。
+- 01／04重建；02／03全输入SHA核验后原样复用v1.6.1，安装器沿用0.3.13。六附件GitHub远端SHA全匹配，ModelScope六项匿名直链HTTP200／大小一致。
+- 从1.6.1或更早版本升级需覆盖新版01及04，补齐fonts/osd；02内README保留1.6.0、03内保留1.5.7，内容未改。
+- 142Lua／120Python／构建AST、归档门禁、1424项配置资源覆盖、源及实际包双后端实播、普通启动全部脚本／I面板／字号记忆通过。
+- 标签构建提交 c498aef，功能提交f87d24f；结果记录随master推送；最终同步／干净工作树凭据见tmp/release-v1.6.2/final-git-check.json。报告docs/modernization/release-build-results-v1.6.2.json及release-results-v1.6.2.json。
+- build已归档至根backup，release与安装器publish保留；本次未生成私包，既有私包未上传。原始证据留tmp／backup；HDR桌面／多屏边界未实测。
 
 ## 当前状态快照
 
@@ -3772,3 +3774,11 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 
 - 独立构建暂存目录已按核验绝对路径移至根backup，build不存在；release及安装器publish产物保留。
 - 第6～8节待执行：构建记录提交、v1.6.2标签及master同步、六白名单附件远端SHA、转正式Latest、ModelScope六附件匿名直链、结果提交及干净工作树。
+
+## 2026-10-13 19:19 — v1.6.2 正式发布／镜像与收尾
+
+- 第6节：功能f87d24f→构建c498aef；annotated v1.6.2及master已精确推送，远端标签对象／剥离提交一致，不推无关标签。
+- 第7节：六白名单附件先传草稿，远端名称／数量／大小／SHA与本地全部匹配后转正式Latest；ReleaseNote与本地逐字一致，仅逐行新增／更改，无重复安装器或私包。链接 https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.2。
+- 第7.1节：ModelScope v1.6.2/ 六附件完成，逐项匿名HEAD重定向后HTTP200及Content-Length匹配；未输出SDK凭据或签名地址，未上传整个release目录。
+- 第8节：构建目录经绝对路径核验移入backup/release-v1.6.2-build-staging，build不存在；release保留四包／02两卷／安装器及SHA清单，VantaInstaller/publish保留。版本记录／工作进度／结果JSON已更新。
+- master同步／干净工作树及远端Latest的最终校验另存tmp/release-v1.6.2/final-git-check.json；当前正式版本标记精确1.6.2。当前请求未要求关机，未沿用上轮关机操作。
