@@ -153,7 +153,7 @@ Invoke-CopyConfig $BaseBuild
 
 # Vanta 安装标记：供安装器区分"Vanta 安装"与"任意 mpv"
 $vantaMarker = Join-Path $BaseBuild "portable_config/.vanta-version"
-Set-Content -Path $vantaMarker -Value $Version -Encoding UTF8 -NoNewline
+[System.IO.File]::WriteAllText($vantaMarker, $Version, [System.Text.UTF8Encoding]::new($false))
 Write-Host "       Vanta 标记: .vanta-version = $Version" -ForegroundColor Gray
 
 # MPV core

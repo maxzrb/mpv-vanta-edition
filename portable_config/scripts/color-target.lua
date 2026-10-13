@@ -45,8 +45,37 @@ local function Display()
     local d=mp.get_property_native('user-data/display-info',{}) or {}
     return d,d['hdr-status']=='on',d['hdr-supported']==true or d['hdr-supported']=='true'
 end
+local startup_reader, startup_attempted, startup_color, startup_signature
 local function SystemColor()
-    return mp.get_property_native('user-data/display-color',{}) or {}
+    local current=mp.get_property_native('user-data/display-color',{}) or {}
+    local window_id=mp.get_property_number('window-id',0)
+    if current.identity and (window_id==0 or not current.window_id or current.window_id==window_id) then return current end
+    -- HQ 不能先按未知显示器创建 sRGB 窗口，等 ACM 信息到达又撤轨重建。
+    -- 只在窗口尚未创建时预查，建立后仍使用窗口对应的实际显示状态。
+    if not startup_attempted then
+        startup_attempted=true
+        local path=mp.find_config_file('script-modules/display-color-native.lua')
+        if path then
+            local ok,reader=pcall(dofile,path)
+            if ok then startup_reader=reader else msg.warn('起播显示预查不可用：'..tostring(reader)) end
+        end
+    end
+    if startup_reader then
+        local fullscreen=mp.get_property_bool('fullscreen',false)
+        local geometry=fullscreen and '' or mp.get_property('geometry','')
+        local screen=mp.get_property_number(fullscreen and 'fs-screen' or 'screen',-1)
+        local signature=window_id>0 and 'window|'..tostring(window_id) or geometry..'|'..tostring(screen)
+        if signature~=startup_signature then
+            -- window-id 可能先于显示检测脚本通知到达，不能把这段空档误判为 ACM 关闭。
+            local ok,value
+            if window_id>0 then ok,value=pcall(startup_reader.read,window_id)
+            else ok,value=pcall(startup_reader.startup,geometry,screen) end
+            startup_color=ok and value or nil
+            startup_signature=startup_color and signature or nil
+            if not ok then msg.warn('起播显示预查失败：'..tostring(value)) end
+        end
+    end
+    return startup_color or current
 end
 local function IccContext()
     local c=SystemColor()
@@ -581,6 +610,14 @@ local function DisplayChanged()
 end
 mp.observe_property('user-data/display-info','native',DisplayChanged)
 mp.observe_property('user-data/display-color','native',DisplayChanged)
+mp.observe_property('geometry','string',function()
+    -- 窗口记忆脚本可能稍晚写入启动位置；在 VO 创建前重新匹配最终目标屏。
+    if mp.get_property_number('window-id',0)==0 and not manual and requested=='auto' then Select('auto','internal') end
+end)
+mp.add_hook('on_preloaded',90,function()
+    -- 此时初始化脚本已全部运行，且核心尚未创建第一条视频输出。
+    if mp.get_property_number('window-id',0)==0 and not manual and requested=='auto' then Select('auto','internal') end
+end)
 local last_source_primaries
 mp.observe_property('video-params/primaries','string',function(_,value)
     if value==last_source_primaries then return end

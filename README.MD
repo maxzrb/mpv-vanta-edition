@@ -13,7 +13,7 @@
    ↓ 追加
 03 Faster-Whisper 扩展包（AI 语音识别运行时）
    ↓ 最终覆盖
-04 Config（个人设置、OSC 主题、字体，最后安装）
+04 Config（个人设置、OSC 主题，最后安装）
 ```
 
 | 顺序 | 包 | 解压即用？ | 内容 |
@@ -21,7 +21,7 @@
 | **01** | **Base** | ✅ 基本播放 | mpv 核心 + 运行时 + 基础配置 + 启动 Logo 素材（启动页/起播格式 Logo）+ 随包检测专用 ffmpeg（起播徽章后瞻检测） |
 | **02** | **Extras** | ✗ 需要 Base | 着色器、VapourSynth 补帧/超分、Python、工具 |
 | **03** | **Faster-Whisper** | ✗ 需要 Base | AI 语音识别字幕运行时；语音模型首次选择时自动下载 |
-| **04** | **Config** | ✗ 需要 Base | 个人设置的最终覆盖层，最后安装；不含大型 Logo 素材（归 01） |
+| **04** | **Config** | ✗ 需要 Base | 个人设置的最终覆盖层，最后安装；字体、授权和启动 Logo 素材由 01 提供 |
 
 ## 安装与覆盖顺序
 
@@ -33,11 +33,11 @@
 4. `04-mpv-config-vX.Y.Z.7z`（个人设置，最后安装覆盖）
 
 包之间允许存在交集以保证各自可用性。04 作为最终覆盖层可覆盖前面所有包的同名文件。
-单独更新配置只需解压 04。
+已具备对应 Base 资源时，可以只更新 04。从 v1.6.1 或更早版本升级时，需先覆盖新版 01，再覆盖 04，以补齐 `fonts/osd` 字体目录。
 
 
-个人本地也可以生成 `mpv-full-private-vX.Y.Z.7z`。它会按 01～04 的顺序合并全部
-公开包，形成解压即用的一体包。
+个人本地也可以生成 `mpv-full-private-vX.Y.Z.7z`。它会合并 01、02、04，附安装器和
+Faster-Whisper 占位说明；AI 字幕运行时按需另行解压 03。
 该包含个人运行时状态与工具，只限本地备份和使用，不能公开上传。
 
 ## VantaInstaller（推荐）
@@ -106,16 +106,17 @@
 
 1. 下载 `04-mpv-config-vX.Y.Z.7z`
 2. 解压到 mpv 的配置目录（覆盖 `portable_config/`）
+3. 同时从 01 Base 获取 `portable_config/fonts/` 与 `licenses/`，保持 OSD 字体和图标完整
 
 ### 方案四：手动组装
 
 1. 下载任意标准 mpv Windows 构建
 2. 下载 `04-mpv-config-vX.Y.Z.7z`，解压到 mpv 目录
-3. 如需完整功能，再下载 `03-mpv-extras-vX.Y.Z.7z.00x` 解压
+3. 从 01 Base 补齐 `portable_config/fonts/` 与 `licenses/`；如需滤镜与工具，再下载 `02-mpv-extras-vX.Y.Z.7z.00x` 解压
 
 ## 更新方式
 
-- **仅更新配置**：下载最新 Config 包，解压覆盖即可
+- **仅更新配置**：已有对应 Base 资源时下载最新 Config 包；从 v1.6.1 或更早版本升级需同时覆盖新版 Base 和 Config
 - **更新核心**：下载最新 Base 包
 - **更新着色器/插件**：下载最新 Extras 包
 
@@ -154,8 +155,8 @@
 - `build-01-base.ps1`：构建 01，播放核心 + 运行时 + 基础配置（含 `.vanta-version` 版本标记与内置字体）。
 - `build-02-extras.ps1`：构建 02，着色器 + VapourSynth + Python + 工具（自动分卷）。
 - `build-03-fasterwhisper.ps1`：构建 03，AI 语音识别运行时。
-- `build-04-config.ps1`：构建 04，个人设置最终覆盖层（不含启动 Logo 素材，归 01）。
-- `build-full-private.ps1`：完整合并 01～04（仅本地）。
+- `build-04-config.ps1`：构建 04，个人设置最终覆盖层（字体、授权及启动 Logo 素材归 01）。
+- `build-full-private.ps1`：合并 01、02、04 与安装器，保留 Faster-Whisper 占位目录（仅本地）。
 - `build-all-packages.ps1`：按 01→04 顺序一次构建四个公开包，`-IncludePrivate` 追加个人全量包。
 - 所有脚本可用 `-OutputDir '目录名'` 修改输出目录，默认 `release`。
 
@@ -171,6 +172,7 @@
 - 在线字幕下载（Assrt.net）
 
 ### 字体
+- OSD 使用 `fonts/osd` 中的七个原样字体副本，减少界面重复加载完整字体库；字幕仍使用完整 `fonts`。维护者换机运行 `tools/prepare-osd-fonts.ps1` 后再打包，字体及授权由 01 Base 交付。
 - 便携包内置 HarmonyOS Sans SC Regular/Bold，mpv、uosc、纯文本字幕和相关脚本默认使用该字体，无需安装到 Windows。
 - Windows 使用 DirectWrite 处理字体缺字回退；在系统存在时，最终回退到 Microsoft YaHei。统计面板的普通文本使用 HarmonyOS Sans SC，数据列和控制台补全等需要列对齐的字段仍保留 Noto Sans Mono CJK SC。
 - HarmonyOS Sans SC 未被修改；原始版权与授权协议见 `portable_config/licenses/HarmonyOS-Sans-SC-LICENSE.md`。

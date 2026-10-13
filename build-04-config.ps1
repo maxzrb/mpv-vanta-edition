@@ -75,13 +75,21 @@ $cacheDirs = @(Get-ChildItem -LiteralPath $Stage -Recurse -Directory -Force `
 foreach ($dir in $cacheDirs) {
     Remove-Item -LiteralPath $dir.FullName -Recurse -Force
 }
+# 与 Base 相同，清除运行／编译生成文件；保留可回退的开发级备份源码。
+$generatedExtensions = @('.pyc', '.pyo', '.log', '.tmp', '.bak', '.pdb', '.obj', '.ilk', '.dmp')
+foreach ($file in @(Get-ChildItem -LiteralPath $Stage -Recurse -File -Force)) {
+    if ($file.Extension.ToLowerInvariant() -in $generatedExtensions) {
+        Remove-Item -LiteralPath $file.FullName -Force
+    }
+}
 
 $Readme = Join-Path $Stage 'README-Config包.txt'
 @"
 MPV Vanta Edition 04 Config v${Version}
 ==================================
 
-这是最终覆盖层，包含个人定制的脚本、OSC 主题、字体和设置。
+这是最终覆盖层，包含个人定制的脚本、OSC 主题和设置。
+字体、授权及启动 Logo 素材由 01 Base 提供，本包不重复携带。
 安装顺序上排最后，可覆盖前面所有包的同名文件。
 
 安装与覆盖顺序：
@@ -90,7 +98,8 @@ MPV Vanta Edition 04 Config v${Version}
   03. 03-mpv-fasterwhisper-addon-v${Version}.7z（可选）
   04. 04-mpv-config-v${Version}.7z（本包，最后安装）
 
-如果只更新配置，只需解压本包覆盖即可，无需重新安装 01～03。
+已具备对应 Base 资源时，可以只更新本包。
+从 v1.6.1 或更早版本升级，需同时覆盖新版 01 Base 和本包，补齐 fonts/osd。
 "@ | Set-Content -LiteralPath $Readme -Encoding UTF8
 
 if (Test-Path -LiteralPath $Archive) {

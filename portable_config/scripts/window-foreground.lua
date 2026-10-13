@@ -27,6 +27,8 @@ local first_window = true
 local automatic_next = false
 local retry_timer = nil
 local deadline = 0
+local eligible = false
+local last_window_id
 
 local function CancelRetry()
     if retry_timer then retry_timer:kill(); retry_timer = nil end
@@ -68,6 +70,7 @@ end
 
 local function RequestRaise()
     pending = true
+    eligible = true
     deadline = mp.get_time() + 2
     CancelRetry()
     RaiseWindow()
@@ -85,7 +88,15 @@ end
 
 mp.observe_property('window-id', 'number', function(_, id)
     if id and id ~= 0 then
-        if first_window then RequestRaise() else RaiseWindow() end
+        local changed = id ~= last_window_id
+        last_window_id = id
+        if first_window then
+            RequestRaise()
+        else
+            -- 主动起播的短窗口内若 VO 被重建，抬升新窗口；暂停／自动切集不续期抢前台。
+            if changed and eligible and mp.get_time() < deadline then pending = true end
+            RaiseWindow()
+        end
     end
 end)
 mp.register_event('start-file', function()
@@ -96,6 +107,7 @@ end)
 mp.register_event('end-file', function(event)
     automatic_next = event.reason == 'eof' or event.reason == 'error'
     pending = false
+    eligible = false
     CancelRetry()
 end)
 mp.observe_property('idle-active', 'bool', function(_, idle)

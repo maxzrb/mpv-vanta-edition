@@ -12,6 +12,7 @@
 -- ============================================================
 
 local mp = require 'mp'
+local msg = require 'mp.msg'
 local utils = require 'mp.utils'
 local input = require 'mp.input'
 
@@ -100,8 +101,9 @@ local o = {
     bindlist = "no",  -- print page 4 to the terminal on startup and quit mpv
 }
 
-local update_scale
+local update_scale, publish_auto_fit
 require "mp.options".read_options(o, nil, function ()
+    if publish_auto_fit then publish_auto_fit() end
     update_scale()
 end)
 
@@ -1542,7 +1544,10 @@ layout_probe.res_x, layout_probe.res_y = 0, 1152
 layout_probe.hidden, layout_probe.compute_bounds = true, true
 local layout_cache, layout_order = {}, {}
 local function fitted_height(ass_content, measure_only)
-    if not o.use_ass or not o.auto_fit and not measure_only then return 288 end
+    if not o.use_ass or not o.auto_fit and not measure_only then
+        if not measure_only then mp.set_property_native('user-data/stats/layout', {scale=1, canvas_height=288}) end
+        return 288
+    end
     local dimensions = mp.get_property_native('osd-dimensions', {})
     if not dimensions.w or not dimensions.h or dimensions.h <= 0 then return 288 end
     -- 保留文字长度和行结构；数值内容变化不重复测量，图表采样坐标不进入缓存键。
@@ -1609,6 +1614,53 @@ update_scale = function ()
         print_page(curr_page)
     end
 end
+
+local auto_fit_config = mp.command_native({'expand-path', '~~/script-opts/stats.conf'})
+local function save_auto_fit(enabled)
+    -- 只替换此开关，保留其它选项、注释、原 UTF-8 BOM 状态及换行。
+    local file, err = io.open(auto_fit_config, 'rb')
+    if not file and utils.file_info(auto_fit_config) then return false, err end
+    local content = ''
+    if file then
+        content, err = file:read('*a')
+        file:close()
+        if not content then return false, err end
+    end
+    local bom = content:sub(1, 3) == '\239\187\191' and content:sub(1, 3) or ''
+    local body = content:sub(#bom + 1)
+    local newline = body:find('\r\n', 1, true) and '\r\n' or '\n'
+    local value = enabled and 'yes' or 'no'
+    local updated, count = ('\n' .. body):gsub('(\n[ \t]*auto_fit[ \t]*=)[^\r\n]*', function(prefix)
+        return prefix .. value
+    end)
+    updated = updated:sub(2)
+    if count == 0 then
+        if updated ~= '' and updated:sub(-1) ~= '\n' then updated = updated .. newline end
+        updated = updated .. 'auto_fit=' .. value .. newline
+    end
+    file, err = io.open(auto_fit_config, 'wb')
+    if not file then return false, err end
+    local written, write_err = file:write(bom .. updated)
+    local closed, close_err = file:close()
+    return written ~= nil and closed ~= nil, write_err or close_err
+end
+publish_auto_fit = function()
+    mp.set_property_bool('user-data/stats/auto-fit', o.auto_fit)
+end
+mp.register_script_message('auto-fit-toggle', function()
+    local enabled = not o.auto_fit
+    local saved, err = save_auto_fit(enabled)
+    if not saved then
+        msg.error('保存 OSD 字号自动缩放失败：' .. tostring(err))
+        mp.osd_message('OSD字号自动缩放保存失败', 3)
+        return
+    end
+    o.auto_fit = enabled
+    publish_auto_fit()
+    update_scale()
+    mp.osd_message('OSD字号自动缩放：' .. (enabled and '开' or '关'), 2)
+end)
+publish_auto_fit()
 
 local function clear_screen()
     last_ass_content, last_overlay_height = nil, nil

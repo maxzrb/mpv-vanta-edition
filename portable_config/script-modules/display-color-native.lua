@@ -14,6 +14,8 @@ typedef struct { vanta_color_header header; uint16_t device[32]; } vanta_color_s
 typedef struct { vanta_color_header header; uint32_t flags, encoding, bits, mode; } vanta_color_info;
 typedef struct { vanta_color_header header; uint32_t level; } vanta_color_white;
 void * __stdcall MonitorFromWindow(void *, uint32_t);
+void * __stdcall MonitorFromRect(const vanta_color_rect *, uint32_t);
+int __stdcall EnumDisplayMonitors(void *, const vanta_color_rect *, int (__stdcall *)(void *, void *, vanta_color_rect *, intptr_t), intptr_t);
 int __stdcall GetMonitorInfoW(void *, vanta_color_monitor *);
 long __stdcall GetDisplayConfigBufferSizes(uint32_t, uint32_t *, uint32_t *);
 long __stdcall QueryDisplayConfig(uint32_t, uint32_t *, vanta_color_path *, uint32_t *, void *, void *);
@@ -43,9 +45,7 @@ end
 local function query(packet)
     return user.DisplayConfigGetDeviceInfo(ffi.cast('vanta_color_header *', packet)) == 0
 end
-function M.read(window_id)
-    if not window_id or tonumber(window_id) == 0 then return nil, '窗口尚未建立' end
-    local monitor = user.MonitorFromWindow(ffi.cast('void *', tonumber(window_id)), 2)
+local function read_monitor(monitor, window_id)
     local info = ffi.new('vanta_color_monitor')
     info.size = ffi.sizeof(info)
     if monitor == nil or user.GetMonitorInfoW(monitor, info) == 0 then return nil, '显示器查询失败' end
@@ -102,5 +102,41 @@ function M.read(window_id)
         elseif result ~= 122 then break end
     end
     return nil, '显示拓扑暂不可用'
+end
+function M.read(window_id)
+    if not window_id or tonumber(window_id) == 0 then return nil, '窗口尚未建立' end
+    return read_monitor(user.MonitorFromWindow(ffi.cast('void *', tonumber(window_id)), 2), window_id)
+end
+function M.startup(geometry, screen)
+    -- 窗口创建前按主屏／指定屏／明确的绝对位置只读预查；真实窗口建立后仍由 read 校验。
+    local monitor = user.MonitorFromWindow(nil, 1)
+    screen = tonumber(screen) or -1
+    if screen == -2 then return nil, '跨屏全屏目标尚未建立' end
+    if screen >= 0 then
+        local index, selected = 0, nil
+        local callback = ffi.cast('int (__stdcall *)(void *, void *, vanta_color_rect *, intptr_t)', function(value)
+            if index == screen then selected = value end
+            index = index + 1
+            return 1
+        end)
+        user.EnumDisplayMonitors(nil, nil, callback, 0)
+        callback:free()
+        if selected ~= nil then monitor = selected end
+    else
+        local x, y = (geometry or ''):match('(%+%-?%d+)(%+%-?%d+)$')
+        if x and y then
+            local info = ffi.new('vanta_color_monitor')
+            info.size = ffi.sizeof(info)
+            if monitor ~= nil and user.GetMonitorInfoW(monitor, info) ~= 0 then
+                local w, h = (geometry or ''):match('^(%d+)x(%d+)')
+                local left, top = tonumber(x:sub(2)) + info.work.left, tonumber(y:sub(2)) + info.work.top
+                local rect = ffi.new('vanta_color_rect', {left, top, left + (tonumber(w) or 1), top + (tonumber(h) or 1)})
+                monitor = user.MonitorFromRect(rect, 1)
+            end
+        end
+    end
+    local value, err = read_monitor(monitor, 0)
+    if value then value.startup = true end
+    return value, err
 end
 return M
