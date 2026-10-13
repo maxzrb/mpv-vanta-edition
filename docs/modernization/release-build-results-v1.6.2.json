@@ -1,0 +1,306 @@
+{
+  "version": "1.6.2",
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.2.7z",
+      "bytes": 136911296,
+      "sha256": "53044805017293d2de50f655cbebed75cf8ec29e82bf1d7e6b3f651025825004"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.2.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.2.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.2.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+    },
+    {
+      "name": "04-mpv-config-v1.6.2.7z",
+      "bytes": 5368071,
+      "sha256": "fddee3ceb7c173464ec7004b961e1896f979de95f0d2ab547748921ca5abf33d"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.13.exe",
+      "bytes": 69740725,
+      "sha256": "f7a37b450d9cc7725497fc0238ad089719b0f13404a2b10db8fb5df07163453a"
+    }
+  ],
+  "archives": {
+    "01-mpv-base-v1.6.2.7z": {
+      "files": 1320,
+      "entries": 1397,
+      "bytes": 467581900,
+      "forbidden": []
+    },
+    "02-mpv-extras-v1.6.2.7z.001": {
+      "files": 10474,
+      "entries": 14401,
+      "bytes": 4603603770,
+      "forbidden": []
+    },
+    "03-mpv-fasterwhisper-addon-v1.6.2.7z": {
+      "files": 5122,
+      "entries": 5697,
+      "bytes": 4714826233,
+      "forbidden": []
+    },
+    "04-mpv-config-v1.6.2.7z": {
+      "files": 268,
+      "entries": 303,
+      "bytes": 10912762,
+      "forbidden": []
+    }
+  },
+  "input_reuse": {
+    "source_version": "1.6.1",
+    "extras": {
+      "files": 10473,
+      "bytes": 4603603173,
+      "latest_input_time": 1791366824.1750202,
+      "byte_identical": true
+    },
+    "fasterwhisper": {
+      "files": 5121,
+      "bytes": 4714825519,
+      "latest_input_time": 1744549392.576642,
+      "byte_identical": true
+    },
+    "tracked_input_changes": [],
+    "ignored_input_hash_checks": true,
+    "internal_readme_versions": {
+      "extras": "1.6.0",
+      "fasterwhisper": "1.5.7"
+    },
+    "source_archives": [
+      {
+        "name": "02-mpv-extras-v1.6.1.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5",
+        "source_7z_test": true,
+        "copy_hash_identical": true
+      },
+      {
+        "name": "02-mpv-extras-v1.6.1.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9",
+        "source_7z_test": true,
+        "copy_hash_identical": true
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.1.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2",
+        "source_7z_test": true,
+        "copy_hash_identical": true
+      }
+    ]
+  },
+  "covered_config_files": 1424,
+  "checks": [
+    "来源02／03及新四公开归档7z t全部通过",
+    "六附件均小于2GiB",
+    "01版本标记与本地逐字节1.6.2",
+    "04排除版本标记／字体／授权／Logo素材",
+    "无根备份／缓存／日志／Lossless／LSFG泄漏",
+    "实际01→02→04全功能逐字节覆盖",
+    "核心及解码运行时未变",
+    "02／03原样复用1.6.1；包内README02=1.6.0／03=1.5.7",
+    "安装器0.3.13沿用同SHA候选",
+    "本次不另行生成私包，既有私包不上传"
+  ],
+  "source_playback": {
+    "passed": true,
+    "trials": [
+      {
+        "backend": "d3d11",
+        "source": "compat-hevc10",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      },
+      {
+        "backend": "d3d11",
+        "source": "hdr10",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      },
+      {
+        "backend": "d3d11",
+        "source": "hlg",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      },
+      {
+        "backend": "vulkan",
+        "source": "compat-hevc10",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      },
+      {
+        "backend": "vulkan",
+        "source": "hdr10",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      },
+      {
+        "backend": "vulkan",
+        "source": "hlg",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      }
+    ]
+  },
+  "package_playback": {
+    "passed": true,
+    "trials": [
+      {
+        "backend": "d3d11",
+        "source": "compat-hevc10",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      },
+      {
+        "backend": "d3d11",
+        "source": "hdr10",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      },
+      {
+        "backend": "d3d11",
+        "source": "hlg",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      },
+      {
+        "backend": "vulkan",
+        "source": "compat-hevc10",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      },
+      {
+        "backend": "vulkan",
+        "source": "hdr10",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      },
+      {
+        "backend": "vulkan",
+        "source": "hlg",
+        "modes": [
+          "standard",
+          "hq",
+          "standard"
+        ],
+        "errors": []
+      }
+    ]
+  },
+  "ordinary_startup": {
+    "passed": true,
+    "no_config_dir": true,
+    "trials": [
+      {
+        "backend": "d3d11",
+        "launch": 0,
+        "loaded_scripts": 52,
+        "layout": {
+          "canvas_height": 288,
+          "scale": 1
+        },
+        "gamma": "scrgb",
+        "pixelformat": "rgba16hf"
+      },
+      {
+        "backend": "d3d11",
+        "launch": 1,
+        "loaded_scripts": 52,
+        "layout": {
+          "scale": 1,
+          "canvas_height": 288
+        },
+        "gamma": "scrgb",
+        "pixelformat": "rgba16hf"
+      },
+      {
+        "backend": "vulkan",
+        "launch": 0,
+        "loaded_scripts": 52,
+        "layout": {
+          "canvas_height": 288,
+          "scale": 1
+        },
+        "gamma": "scrgb",
+        "pixelformat": "rgba16hf"
+      },
+      {
+        "backend": "vulkan",
+        "launch": 1,
+        "loaded_scripts": 52,
+        "layout": {
+          "canvas_height": 288,
+          "scale": 1
+        },
+        "gamma": "scrgb",
+        "pixelformat": "rgba16hf"
+      }
+    ]
+  },
+  "installer_startup": {
+    "version": "0.3.13",
+    "started": true,
+    "visible_windows": 1
+  },
+  "functional_commit": "f87d24fac0d2e649b8a8337da140e74b8c89881a",
+  "gate_approval": "用户：发布1.6.2release，gate批准",
+  "checked_at": "2026-10-13 19:04 Asia/Shanghai"
+}
