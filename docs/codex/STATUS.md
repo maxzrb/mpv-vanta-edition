@@ -1,11 +1,13 @@
 # STATUS.md — MPV 便携配置项目
 
-## 本轮续接快照（v1.6.3菜单层级覆盖候选已验收，Asia/Shanghai）
+## 本轮续接快照（v1.6.3菜单层级覆盖已发布，Asia/Shanghai）
 
-- 用户要求同版本覆盖，跳转方式已归入“导航 > 跳转 > 跳转方式”，功能提交0925dc1，只调整菜单／说明；无Gate，发布流程原件未改。
-- 新01／04及私包全部重建验收通过，02／03／安装器未变沿用；新资产尚未上传，旧正式v1.6.3仍保持Latest。下一步提交构建记录、带租约更新本次标签、覆盖01／04并核对六SHA，再同步镜像。
-- 本地用户keyframes偏好已恢复且不提交；公开包仍默认exact。工作区允许仅此个人差异，勿为清理工作树覆盖用户选择。
-- 报告docs/modernization/release-build-results-v1.6.3.json，原始证据tmp/release-v1.6.3-r3。
+- 已按用户要求完成同版本覆盖：[v1.6.3](https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.3)仍为正式Latest。最终菜单“导航 > 跳转 > 跳转方式”，原同级入口移除；行为与记忆保持，公开默认精确。
+- 01／04及同版本私包重新构建并全部验收后才覆盖上传；六公开资产GitHub远端SHA匹配，ModelScope六项匿名HTTP200／大小一致。02／03及安装器未改，私包只本地。
+- 源及实际包层级、撤销／重做保留、双向勾选、真实播放、实际包方向键落点、双后端SDR／HDR10／HLG及普通启动通过；全配置1424项按发行默认完整覆盖。
+- 用户本地keyframes偏好已恢复，不提交、不写入公开包；最终工作树允许仅uosc.conf这一行个人差异，不得清理覆盖。master与origin/master在结果提交后同步，不能称完全干净工作树。
+- 用户明确授权已发布同版本覆盖，标签已带租约更新到6359153，功能0925dc1；旧产物及旧对象保留。发布流程未改，无Gate；DV细分信息仍搁置。
+- 记录docs/modernization/release-build-results-v1.6.3.json与release-results-v1.6.3.json；原始证据tmp/release-v1.6.3-r3，build已归档至backup/release-v1.6.3-r3-build-staging，私包及公开产物保留release。
 
 ## 当前状态快照
 
@@ -13,12 +15,12 @@
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **用户核心优先级** | 软件层面完整验证 SDR／HDR 路线准确性，不以校色仪／真实HDR屏幕为条件；性能不重编译、不再增加线程，默认 D3D11、跨片源／后端通用；不推广 OP 单片参数，用户不关注超分／补帧 |
-| **分支** | master／origin/master在收尾提交后同步；v1.6.3标签保留构建提交7f8525f |
-| **最新发布提交** | 7f8525f（tag v1.6.3）；GitHub及ModelScope六公开资产已核验，个人私包只本地 |
-| **工作区** | v1.6.3分包及私包全部构建验收后发布；结果记录随master保存 |
+| **分支** | master／origin/master收尾后同步；v1.6.3覆盖标签指向6359153 |
+| **最新发布提交** | 6359153（tag v1.6.3菜单层级覆盖）；六公开资产与国内镜像已核验 |
+| **工作区** | v1.6.3菜单层级覆盖已发布；仅保留uosc.conf的个人keyframes选择，不纳入提交 |
 | **MPV 核心版本** | v0.41.0-1107-g36bf3d529（shinchiro 20261008；FFmpeg N-127242-g5d4755f7d；libplacebo 0d043c7，含99e80abd浮点截断修复）；已纳入v1.6.0候选 |
 | **项目版本** | v1.6.3正式发布，Latest；安装器独立0.3.13 |
-| **上次操作** | 2026-10-17 16:56完成v1.6.3正式发布、国内镜像、私包验收和暂存归档 |
+| **上次操作** | 2026-10-17 17:15完成菜单归入跳转次级、同版本覆盖及镜像验收 |
 | **当前排查** | 默认标准恢复原有效auto目标及HDR对比度恢复0.30；原gamma2.2为注释。HQ保持FP32运算／FP16主纹理、经典sRGB／ACMscRGB／可信ICC／HDR分工及加密表，原精度结论保留。OP原速整片零丢帧未达成，8K48搁置 |
 | **自定义脚本** | quality.lua、quality_status.lua、color-target.lua、color-range-fix.lua、display-color.lua＋display-color-native.lua、hdr-mode.lua、stats.lua＋system_metrics.lua、startup-format-logos.lua（保留用户定制） |
 
@@ -3987,3 +3989,12 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 | mpv-full-private-v1.6.3.7z | 3037933024 | `3210c4e7ccab2e9d19271f698ed06bfdfa8793ad3fb4e9c76e5c9ae6cda35177` |
 
 - 第6～8节待更新标签与同名资产、远端SHA、国内镜像及收尾。
+
+## 2026-10-17 17:15 — v1.6.3菜单层级覆盖完成／收尾
+
+- 第3节：用户版本与同版本覆盖授权明确，pull／fetch无未合并修改，个人偏好隔离；仅菜单和说明不触发3.2 Gate，UTF-8／LF、真实菜单和diff检查通过。
+- 第4～5节：既有01／04及私包入口重新构建，全部验收先于本轮上传。02／03／安装器SHA与归档完整性复核，源及实际包6组实播、4轮普通启动及菜单层级／勾选／方向键通过，私包7z t／11795项并集／标记／安装器／空数据／FW占位／实播及I键通过。
+- 第6节：功能0925dc1→构建6359153；依据用户覆盖授权，以旧对象租约更新发布标签和master，旧对象记录保留。
+- 第7节：GitHub正式Release同名覆盖01／04并更新说明，六资产集合／大小／SHA一致，无重复或私包，保持Latest。
+- 第7.1节：ModelScope六项同步完成，逐项匿名HTTP200／大小匹配，未上传私包。
+- 第8节：build经绝对路径核验移入backup/release-v1.6.3-r3-build-staging，release及安装器publish保留，三类记录及结果报告更新。最后提交推送后核对master同步，唯一允许差异为用户uosc.conf的keyframes选择；凭据tmp/release-v1.6.3-r3/final-git-check.json。

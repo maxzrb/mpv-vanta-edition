@@ -1,17 +1,18 @@
 {
   "version": "1.6.3",
-  "checked_at": "2026-10-17 16:56 Asia/Shanghai",
+  "checked_at": "2026-10-17 17:15 Asia/Shanghai",
+  "overwritten_at": "2026-10-17 17:15 Asia/Shanghai",
   "github": {
+    "tag": "v1.6.3",
     "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.3",
     "draft": false,
     "prerelease": false,
-    "tag": "v1.6.3",
     "published_at": "2026-10-17T08:55:22Z",
     "assets": [
       {
         "name": "01-mpv-base-v1.6.3.7z",
-        "bytes": 136909928,
-        "sha256": "07a3a7aff0f756f3b815ab893e7e811292f0bb161680aac1f8bd1fb78d07497a",
+        "bytes": 136913378,
+        "sha256": "09a03de629a2ed60288be4b7697e3ac288fb87094913203005dbcfbb556cc9c3",
         "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.3/01-mpv-base-v1.6.3.7z"
       },
       {
@@ -34,8 +35,8 @@
       },
       {
         "name": "04-mpv-config-v1.6.3.7z",
-        "bytes": 5369114,
-        "sha256": "33a45d52bc06fcc07a0aea74ab2985886eacac587bb632c23dd4e5385040d12d",
+        "bytes": 5369064,
+        "sha256": "983c777f79c6fc0501551a939edc47b407176c545682d881c0a08f369f3c008c",
         "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.3/04-mpv-config-v1.6.3.7z"
       },
       {
@@ -53,7 +54,7 @@
       {
         "name": "01-mpv-base-v1.6.3.7z",
         "anonymous_http": 200,
-        "bytes": 136909928,
+        "bytes": 136913378,
         "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.3/01-mpv-base-v1.6.3.7z"
       },
       {
@@ -77,7 +78,7 @@
       {
         "name": "04-mpv-config-v1.6.3.7z",
         "anonymous_http": 200,
-        "bytes": 5369114,
+        "bytes": 5369064,
         "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.3/04-mpv-config-v1.6.3.7z"
       },
       {
@@ -90,13 +91,13 @@
     "complete": true
   },
   "latest": true,
-  "tag_commit": "7f8525fd25c9353a907c97c57e3bf11224c6b070",
-  "functional_commit": "d46a4f9",
+  "tag_commit": "635915333751938c98e9ffac15c1f89cc0d422fa",
+  "functional_commit": "0925dc1",
   "installer_version": "0.3.13",
   "private": {
     "name": "mpv-full-private-v1.6.3.7z",
-    "bytes": 3037964562,
-    "sha256": "4dc461049b0c16d7593e980e932f379ef2e6d87db0ae51e629cd2861cd32bc9a",
+    "bytes": 3037933024,
+    "sha256": "3210c4e7ccab2e9d19271f698ed06bfdfa8793ad3fb4e9c76e5c9ae6cda35177",
     "complete_archive": true,
     "merged_files": 11795,
     "size_crc_union_identical": true,
@@ -113,15 +114,15 @@
       "passed": true,
       "backend": "d3d11",
       "samples": [
-        0.3,
-        0.567,
-        0.8
+        0.033,
+        0.333,
+        0.6
       ],
       "stats_layout": {
+        "canvas_height": 350.440835,
         "content_width": 379.545244,
         "content_height": 315.396752,
-        "scale": 0.821822,
-        "canvas_height": 350.440835
+        "scale": 0.821822
       },
       "errors": []
     },
@@ -130,6 +131,71 @@
   },
   "private_uploaded": false,
   "dv_feature_included": false,
-  "build_staging": "backup/release-v1.6.3-r2-build-staging",
-  "final_git_check": "tmp/release-v1.6.3-r2/final-git-check.json：收尾提交推送后生成"
+  "overwrite_existing_release": true,
+  "user_authorized": true,
+  "menu_path": [
+    "导航",
+    "跳转",
+    "跳转方式"
+  ],
+  "overwrite_history": [
+    {
+      "checked_at": "2026-10-17 16:56 Asia/Shanghai",
+      "tag_commit": "7f8525fd25c9353a907c97c57e3bf11224c6b070",
+      "github": {
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.3",
+        "draft": false,
+        "prerelease": false,
+        "tag": "v1.6.3",
+        "published_at": "2026-10-17T08:55:22Z",
+        "assets": [
+          {
+            "name": "01-mpv-base-v1.6.3.7z",
+            "bytes": 136909928,
+            "sha256": "07a3a7aff0f756f3b815ab893e7e811292f0bb161680aac1f8bd1fb78d07497a",
+            "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.3/01-mpv-base-v1.6.3.7z"
+          },
+          {
+            "name": "02-mpv-extras-v1.6.3.7z.001",
+            "bytes": 1992294400,
+            "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5",
+            "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.3/02-mpv-extras-v1.6.3.7z.001"
+          },
+          {
+            "name": "02-mpv-extras-v1.6.3.7z.002",
+            "bytes": 830172768,
+            "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9",
+            "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.3/02-mpv-extras-v1.6.3.7z.002"
+          },
+          {
+            "name": "03-mpv-fasterwhisper-addon-v1.6.3.7z",
+            "bytes": 1476001942,
+            "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2",
+            "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.3/03-mpv-fasterwhisper-addon-v1.6.3.7z"
+          },
+          {
+            "name": "04-mpv-config-v1.6.3.7z",
+            "bytes": 5369114,
+            "sha256": "33a45d52bc06fcc07a0aea74ab2985886eacac587bb632c23dd4e5385040d12d",
+            "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.3/04-mpv-config-v1.6.3.7z"
+          },
+          {
+            "name": "VantaInstaller-win-x64-v0.3.13.exe",
+            "bytes": 69740725,
+            "sha256": "f7a37b450d9cc7725497fc0238ad089719b0f13404a2b10db8fb5df07163453a",
+            "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.3/VantaInstaller-win-x64-v0.3.13.exe"
+          }
+        ]
+      },
+      "private_sha256": "4dc461049b0c16d7593e980e932f379ef2e6d87db0ae51e629cd2861cd32bc9a",
+      "artifacts": "backup/release-v1.6.3-pre-menu-nesting"
+    }
+  ],
+  "local_preference": {
+    "restored": true,
+    "local_mode": "keyframes",
+    "public_mode": "exact"
+  },
+  "build_staging": "backup/release-v1.6.3-r3-build-staging",
+  "final_git_check": "tmp/release-v1.6.3-r3/final-git-check.json"
 }
