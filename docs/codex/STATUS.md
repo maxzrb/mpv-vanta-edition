@@ -1,14 +1,10 @@
 # STATUS.md — MPV 便携配置项目
 
-## 本轮续接快照（v1.6.3 已正式发布，Asia/Shanghai）
+## 本轮续接快照（v1.6.3菜单层级覆盖发布准备，Asia/Shanghai）
 
-- 用户明确搁置DV细分信息功能并恢复原路线发布；已正式发布[v1.6.3](https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.3)，Latest，非草稿／非预发布；发布流程原件未修改，无3.2 Gate命中。
-- 统一精确／关键帧跳转切换并记忆、精确跳转优化、色度重建菜单归入色彩、Ctrl+I受管系统ICC及旧入口移除、小窗菜单滚动提示与动态行高已入01／04。DV研究原型没有进入生产配置或包。
-- 01／04重建，02／03完整输入集合与SHA核验后原样复用v1.6.2，安装器沿用0.3.13；六公开附件GitHub远端SHA全部一致，ModelScope六项匿名HTTP200／大小匹配。
-- 本轮同版本私包在替换草稿附件之前完成构建和独立验收：7z t、11795项并集、安装器SHA、版本标记、空数据目录、FW占位及普通启动／实际播放／I面板通过，仅本地保留。
-- 源及实际公开包D3D11／Vulkan×SDR／HDR10／HLG实播、161个Git跟踪Lua／103个Git跟踪Python／构建AST、1424项配置覆盖、全部活动脚本／I面板／字号记忆通过。真实HDR桌面／多屏等边界保留。
-- 升级请同时覆盖01及04以同步版本标记；02／03可沿用。标签构建提交7f8525f，功能d46a4f9；发布结果另行提交并推送master，最终凭据tmp/release-v1.6.3-r2/final-git-check.json。
-- build已归档至根backup，release及VantaInstaller/publish保留。报告docs/modernization/release-build-results-v1.6.3.json与release-results-v1.6.3.json。
+- 用户要求跳转方式归入“导航 > 跳转 > 跳转方式”，并明确同版本覆盖发布。只调整菜单／说明，原跳转和记忆行为保留，无Gate命中。
+- 已发布v1.6.3仍可用；新01／04及私包重建验收后覆盖，02／03／安装器沿用；旧产物与标签对象记录保留，新证据tmp/release-v1.6.3-r3。
+- 本地用户选择keyframes保留为未提交偏好；公开包默认exact，打包时暂用发行默认后恢复本地选择。不将用户偏好夹带入包或提交。
 
 ## 当前状态快照
 
@@ -3959,3 +3955,11 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - 第7节：原六白名单资产先传草稿，本轮验收后更新01／04及说明，六项大小及远端SHA全部匹配后转正式Latest；Release Note只含本次逐行更改／移除条目，无私包或重复资产。https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.3。
 - 第7.1节：ModelScope v1.6.3/六项完成，匿名直链逐项HTTP200／大小匹配，不上传私包或整个release目录。
 - 第8节：构建暂存经绝对路径核验移入backup/release-v1.6.3-r2-build-staging，build不存在，release及安装器publish保留；三类记录与结果报告已更新。结果提交推送后的master同步／干净工作树凭据存tmp/release-v1.6.3-r2/final-git-check.json。
+
+## 2026-10-17 17:01 — 用户要求v1.6.3同版本覆盖：跳转方式收进跳转菜单
+
+- 用户明确“把跳转方式直接做进跳转里的次级菜单，覆盖发布”。最终路径为“导航 > 跳转 > 跳转方式 > 精确／关键帧快速”，只改input.conf菜单层级及配置注释，跳转行为／记忆逻辑不变；版本沿用v1.6.3，不触发3.2 Gate。
+- 已完整重读发布流程、pull及fetch；master与远端同步。发现本地uosc.conf的seek_mode=keyframes是用户运行偏好，保留，不提交为公开默认值；发行包仍为exact。
+- 01／04及同版本私包须重建并全部验收后才替换GitHub同名公开资产；02／03及安装器输入未变沿用。旧产物保留backup/release-v1.6.3-pre-menu-nesting。
+- 用户明确授权已发布v1.6.3覆盖，因此构建记录完成后同步更新同名标签，先核对旧对象，再以精确租约推送，保留旧提交／校验记录；GitHub继续保持正式Latest，随后同步国内镜像。私包始终仅本地。
+- 第3.1～3.3已核对；第3.4及第4～8节继续执行。新证据tmp/release-v1.6.3-r3，默认精确与本地偏好隔离记录在此。
