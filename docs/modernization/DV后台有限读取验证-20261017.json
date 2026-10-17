@@ -1,0 +1,3742 @@
+{
+  "date": "2026-10-17",
+  "purpose": "有限后台读取DV信息的可行性研究，未接入正式配置",
+  "yaozhi_revision": "f4f18cd6c984a2bb1ecc3fa64514ad7522224d48",
+  "dovi_reference_revision": "614c816b6446dcd1dbaf433403d499a6026fbb5a",
+  "scope": {
+    "max_input_bytes": 1048576,
+    "max_video_streams": 2,
+    "max_rpus_per_stream": 8,
+    "ffmpeg_timeout_seconds": 1,
+    "task_timeout_seconds": 3,
+    "trigger": "首个playback-restart后500ms",
+    "decode": false,
+    "network_reads": false
+  },
+  "startup_median_ms": {
+    "False": 484.2315,
+    "True": 464.076
+  },
+  "startup_trials": [
+    {
+      "trial": 0,
+      "enabled": false,
+      "first_ms": 850.151,
+      "probe": {
+        "status": "pending",
+        "generation": 1
+      },
+      "start_pos": 0.0417,
+      "end_pos": 1.584911,
+      "decoder_drops": 0,
+      "vo_drops": 0,
+      "mistimed": null,
+      "cache_wait": false
+    },
+    {
+      "trial": 0,
+      "enabled": true,
+      "first_ms": 471.172,
+      "probe": {
+        "elapsed_ms": 218.98,
+        "generation": 1,
+        "result": {
+          "duration_ms": 145.6471,
+          "bytes_read": 1048576,
+          "status": "observed",
+          "attempts": [
+            {
+              "stream": 0,
+              "output_bytes": 0,
+              "result": {
+                "profile": [],
+                "frames": [],
+                "unknown": [],
+                "valid_rpus": 0,
+                "types": []
+              },
+              "exit": 0
+            },
+            {
+              "stream": 1,
+              "output_bytes": 2867,
+              "result": {
+                "profile": [
+                  7
+                ],
+                "frames": [
+                  {
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ]
+                  },
+                  {
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ]
+                  },
+                  {
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ]
+                  },
+                  {
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ]
+                  },
+                  {
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ]
+                  },
+                  {
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ]
+                  },
+                  {
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ]
+                  },
+                  {
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ]
+                  }
+                ],
+                "unknown": [],
+                "valid_rpus": 8,
+                "types": [
+                  "FEL"
+                ]
+              },
+              "exit": 0
+            }
+          ]
+        },
+        "status": "done",
+        "delay_ms": 500.064,
+        "source": "F:\\演示片\\DOLBY_VISION_CES\\00025.MKV"
+      },
+      "start_pos": 0.0417,
+      "end_pos": 0.709033,
+      "decoder_drops": 0,
+      "vo_drops": 0,
+      "mistimed": null,
+      "cache_wait": false
+    },
+    {
+      "trial": 1,
+      "enabled": true,
+      "first_ms": 451.216,
+      "probe": {
+        "result": {
+          "duration_ms": 139.0688,
+          "attempts": [
+            {
+              "result": {
+                "unknown": [],
+                "valid_rpus": 0,
+                "types": [],
+                "profile": [],
+                "frames": []
+              },
+              "output_bytes": 0,
+              "stream": 0,
+              "exit": 0
+            },
+            {
+              "result": {
+                "unknown": [],
+                "valid_rpus": 8,
+                "types": [
+                  "FEL"
+                ],
+                "profile": [
+                  7
+                ],
+                "frames": [
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  }
+                ]
+              },
+              "output_bytes": 2867,
+              "stream": 1,
+              "exit": 0
+            }
+          ],
+          "status": "observed",
+          "bytes_read": 1048576
+        },
+        "elapsed_ms": 218.322,
+        "delay_ms": 500.252,
+        "source": "F:\\演示片\\DOLBY_VISION_CES\\00025.MKV",
+        "status": "done",
+        "generation": 1
+      },
+      "start_pos": 0.0417,
+      "end_pos": 0.750744,
+      "decoder_drops": 0,
+      "vo_drops": 0,
+      "mistimed": null,
+      "cache_wait": false
+    },
+    {
+      "trial": 1,
+      "enabled": false,
+      "first_ms": 445.507,
+      "probe": {
+        "status": "pending",
+        "generation": 1
+      },
+      "start_pos": 0.0417,
+      "end_pos": 1.5432,
+      "decoder_drops": 0,
+      "vo_drops": 0,
+      "mistimed": null,
+      "cache_wait": false
+    },
+    {
+      "trial": 2,
+      "enabled": false,
+      "first_ms": 459.608,
+      "probe": {
+        "status": "pending",
+        "generation": 1
+      },
+      "start_pos": 0.0417,
+      "end_pos": 1.5432,
+      "decoder_drops": 0,
+      "vo_drops": 0,
+      "mistimed": null,
+      "cache_wait": false
+    },
+    {
+      "trial": 2,
+      "enabled": true,
+      "first_ms": 472.393,
+      "probe": {
+        "delay_ms": 500.592,
+        "source": "F:\\演示片\\DOLBY_VISION_CES\\00025.MKV",
+        "elapsed_ms": 239.269,
+        "generation": 1,
+        "result": {
+          "duration_ms": 147.1693,
+          "attempts": [
+            {
+              "exit": 0,
+              "result": {
+                "unknown": [],
+                "valid_rpus": 0,
+                "types": [],
+                "profile": [],
+                "frames": []
+              },
+              "stream": 0,
+              "output_bytes": 0
+            },
+            {
+              "exit": 0,
+              "result": {
+                "unknown": [],
+                "valid_rpus": 8,
+                "types": [
+                  "FEL"
+                ],
+                "profile": [
+                  7
+                ],
+                "frames": [
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  },
+                  {
+                    "rpu": true,
+                    "crc_valid": true,
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7
+                  }
+                ]
+              },
+              "stream": 1,
+              "output_bytes": 2867
+            }
+          ],
+          "bytes_read": 1048576,
+          "status": "observed"
+        },
+        "status": "done"
+      },
+      "start_pos": 0.0417,
+      "end_pos": 0.792456,
+      "decoder_drops": 0,
+      "vo_drops": 0,
+      "mistimed": null,
+      "cache_wait": false
+    },
+    {
+      "trial": 3,
+      "enabled": true,
+      "first_ms": 456.98,
+      "probe": {
+        "delay_ms": 501.298,
+        "source": "F:\\演示片\\DOLBY_VISION_CES\\00025.MKV",
+        "status": "done",
+        "generation": 1,
+        "result": {
+          "bytes_read": 1048576,
+          "duration_ms": 142.182,
+          "attempts": [
+            {
+              "exit": 0,
+              "output_bytes": 0,
+              "result": {
+                "valid_rpus": 0,
+                "types": [],
+                "profile": [],
+                "frames": [],
+                "unknown": []
+              },
+              "stream": 0
+            },
+            {
+              "exit": 0,
+              "output_bytes": 2867,
+              "result": {
+                "valid_rpus": 8,
+                "types": [
+                  "FEL"
+                ],
+                "profile": [
+                  7
+                ],
+                "frames": [
+                  {
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true
+                  },
+                  {
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true
+                  },
+                  {
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true
+                  },
+                  {
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true
+                  },
+                  {
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true
+                  },
+                  {
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true
+                  },
+                  {
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true
+                  },
+                  {
+                    "disable_residual": false,
+                    "enhancement_type": "FEL",
+                    "nlq": [
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ],
+                      [
+                        512,
+                        0,
+                        1048576,
+                        0,
+                        2048,
+                        0,
+                        0
+                      ]
+                    ],
+                    "profile": 7,
+                    "rpu": true,
+                    "crc_valid": true
+                  }
+                ],
+                "unknown": []
+              },
+              "stream": 1
+            }
+          ],
+          "status": "observed"
+        },
+        "elapsed_ms": 226.842
+      },
+      "start_pos": 0.0417,
+      "end_pos": 0.750744,
+      "decoder_drops": 0,
+      "vo_drops": 0,
+      "mistimed": null,
+      "cache_wait": false
+    },
+    {
+      "trial": 3,
+      "enabled": false,
+      "first_ms": 508.855,
+      "probe": {
+        "generation": 1,
+        "status": "pending"
+      },
+      "start_pos": 0.0417,
+      "end_pos": 1.5432,
+      "decoder_drops": 0,
+      "vo_drops": 0,
+      "mistimed": null,
+      "cache_wait": false
+    }
+  ],
+  "extraction": [
+    {
+      "read_bytes": 262144,
+      "elapsed": 0.06233799999972689,
+      "exit": 0,
+      "output_bytes": 2867,
+      "log": ""
+    },
+    {
+      "read_bytes": 1048576,
+      "elapsed": 0.06569469999976718,
+      "exit": 0,
+      "output_bytes": 2867,
+      "log": ""
+    },
+    {
+      "read_bytes": 4194304,
+      "elapsed": 0.07334280000031868,
+      "exit": 0,
+      "output_bytes": 2867,
+      "log": ""
+    },
+    {
+      "read_bytes": 8388608,
+      "elapsed": 0.18543789999966975,
+      "exit": 0,
+      "output_bytes": 2867,
+      "log": ""
+    }
+  ],
+  "classification": [
+    {
+      "name": "fel_orig",
+      "result": {
+        "valid_rpus": 1,
+        "unknown": [],
+        "types": [
+          "FEL"
+        ],
+        "profile": [
+          7
+        ],
+        "frames": [
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "fel_rpu",
+      "result": {
+        "valid_rpus": 1,
+        "unknown": [],
+        "types": [
+          "FEL"
+        ],
+        "profile": [
+          7
+        ],
+        "frames": [
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "fel_to_mel",
+      "result": {
+        "valid_rpus": 1,
+        "unknown": [],
+        "types": [
+          "MEL"
+        ],
+        "profile": [
+          7
+        ],
+        "frames": [
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "MEL",
+            "nlq": [
+              [
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "mel_orig",
+      "result": {
+        "valid_rpus": 1,
+        "unknown": [],
+        "types": [
+          "MEL"
+        ],
+        "profile": [
+          7
+        ],
+        "frames": [
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "MEL",
+            "nlq": [
+              [
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "mel_rpu",
+      "result": {
+        "valid_rpus": 1,
+        "unknown": [],
+        "types": [
+          "MEL"
+        ],
+        "profile": [
+          7
+        ],
+        "frames": [
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "MEL",
+            "nlq": [
+              [
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "fel_to_81",
+      "result": {
+        "valid_rpus": 1,
+        "unknown": [],
+        "types": [],
+        "profile": [
+          8
+        ],
+        "frames": [
+          {
+            "profile": 8,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": true,
+            "enhancement_type": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "mel_to_81",
+      "result": {
+        "valid_rpus": 1,
+        "unknown": [],
+        "types": [],
+        "profile": [
+          8
+        ],
+        "frames": [
+          {
+            "profile": 8,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": true,
+            "enhancement_type": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "prefix-1048576.rpu.hevc",
+      "result": {
+        "valid_rpus": 8,
+        "unknown": [],
+        "types": [
+          "FEL"
+        ],
+        "profile": [
+          7
+        ],
+        "frames": [
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "prefix-262144.rpu.hevc",
+      "result": {
+        "valid_rpus": 8,
+        "unknown": [],
+        "types": [
+          "FEL"
+        ],
+        "profile": [
+          7
+        ],
+        "frames": [
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "prefix-4194304.rpu.hevc",
+      "result": {
+        "valid_rpus": 8,
+        "unknown": [],
+        "types": [
+          "FEL"
+        ],
+        "profile": [
+          7
+        ],
+        "frames": [
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "prefix-8388608.rpu.hevc",
+      "result": {
+        "valid_rpus": 8,
+        "unknown": [],
+        "types": [
+          "FEL"
+        ],
+        "profile": [
+          7
+        ],
+        "frames": [
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "profile": 7,
+            "rpu": true,
+            "crc_valid": true,
+            "disable_residual": false,
+            "enhancement_type": "FEL",
+            "nlq": [
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ],
+              [
+                512,
+                0,
+                1048576,
+                0,
+                2048,
+                0,
+                0
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "container_checks": [
+    {
+      "case": "mkv",
+      "bytes": 19564,
+      "result": {
+        "status": "observed",
+        "bytes_read": 19564,
+        "duration_ms": 42.613199999323115,
+        "attempts": [
+          {
+            "stream": 0,
+            "exit": 0,
+            "output_bytes": 2867,
+            "result": {
+              "valid_rpus": 8,
+              "unknown": [],
+              "types": [
+                "FEL"
+              ],
+              "profile": [
+                7
+              ],
+              "frames": [
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case": "mp4",
+      "bytes": 19977,
+      "result": {
+        "status": "observed",
+        "bytes_read": 19977,
+        "duration_ms": 44.19479999978648,
+        "attempts": [
+          {
+            "stream": 0,
+            "exit": 0,
+            "output_bytes": 2867,
+            "result": {
+              "valid_rpus": 8,
+              "unknown": [],
+              "types": [
+                "FEL"
+              ],
+              "profile": [
+                7
+              ],
+              "frames": [
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "profile": 7,
+                  "rpu": true,
+                  "crc_valid": true,
+                  "disable_residual": false,
+                  "enhancement_type": "FEL",
+                  "nlq": [
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ],
+                    [
+                      512,
+                      0,
+                      1048576,
+                      0,
+                      2048,
+                      0,
+                      0
+                    ]
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case": "sdr",
+      "result": {
+        "status": "unknown",
+        "bytes_read": 945862,
+        "duration_ms": 72.47189999998227,
+        "attempts": [
+          {
+            "stream": 0,
+            "exit": 0,
+            "output_bytes": 0,
+            "result": {
+              "valid_rpus": 0,
+              "unknown": [],
+              "types": [],
+              "profile": [],
+              "frames": []
+            }
+          },
+          {
+            "stream": 1,
+            "exit": 4294967274,
+            "output_bytes": 0,
+            "result": {
+              "valid_rpus": 0,
+              "unknown": [],
+              "types": [],
+              "profile": [],
+              "frames": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case": "missing",
+      "result": {
+        "status": "unknown",
+        "reason": "只探测本地普通文件"
+      }
+    },
+    {
+      "case": "url",
+      "result": {
+        "status": "unknown",
+        "reason": "只探测本地普通文件"
+      }
+    },
+    {
+      "case": "unc",
+      "result": {
+        "status": "unknown",
+        "reason": "只探测本地普通文件"
+      }
+    }
+  ],
+  "cancellation": {
+    "generation": 5,
+    "result": {
+      "duration_ms": 74.346,
+      "attempts": [
+        {
+          "result": {
+            "unknown": [],
+            "valid_rpus": 0,
+            "types": [],
+            "profile": [],
+            "frames": []
+          },
+          "exit": 0,
+          "stream": 0,
+          "output_bytes": 0
+        },
+        {
+          "result": {
+            "unknown": [],
+            "valid_rpus": 0,
+            "types": [],
+            "profile": [],
+            "frames": []
+          },
+          "exit": 4294967274,
+          "stream": 1,
+          "output_bytes": 0
+        }
+      ],
+      "status": "unknown",
+      "bytes_read": 945862
+    },
+    "source": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\sdr8.mkv",
+    "delay_ms": 500.261,
+    "status": "done",
+    "elapsed_ms": 140.061
+  },
+  "timeout": {
+    "generation": 1,
+    "status": "timeout"
+  },
+  "limitations": [
+    "单机D3D11与一段实际双层DV片源，不能证明所有设备起播绝无差异",
+    "MKV/MP4为含RPU轨道重封装夹具，不是独立影片覆盖",
+    "有限片头可缺少索引、配置或RPU；不扩大扫描，保持未知",
+    "NLQ分类是已观察码流属性，不代表核心已经应用FEL或RPU",
+    "原型无持久化缓存，未接入菜单/底栏/统计页，尚非生产实现"
+  ],
+  "research_sha256": {
+    "benchmark.py": "77ce2049b8d009302e61b0a3a88e61ca29ce24dfc251cc07c86ef055c6c14b7b",
+    "container_checks.py": "719126f1ba29fc3fa763b98bd93945721a0f29e7b97c1a3299be9e513e0c4363",
+    "fetch_reference.py": "5c5ddfd740600fc8d11480a29bd0c07e836591a9f7619ad4de0cb34c24ddf270",
+    "fetch_yaozhi.py": "6fa40587b7a8b3cb9351fee4763753621315a6d44e4759a996db2c4e3241c9df",
+    "limited_extract.py": "8e78b6a2f55e930f46c544bad1cd587fad9510bff887c82c0778f2f2516644d7",
+    "rpu_probe.py": "a5980c74f80ff9859c866b000f68947228a4fa09aa1f80e681254ce0f174f08d",
+    "timeout_check.py": "7cf1fa66bfd38fccddde40b2dfa734dc65ff834387ec393cd2ef81d89871cf58",
+    "worker.py": "11b665e617a7046840ed182eba518b007df19de69f7c227d90f0f1fc80caabed"
+  },
+  "adoption": {
+    "status": "not_adopted",
+    "decided_at": "2026-10-17 13:17",
+    "user_instruction": "算了，这个功能意义不大。按原路线发布"
+  }
+}
