@@ -1,0 +1,110 @@
+{
+  "passed": true,
+  "source": "C:\\Users\\maxzr\\Downloads\\youtube-UCoCy_rS-xtdTtW0GBV8zC_w_ねこしろ - [2017年10月7日]【MMD】「Happy Halloween」 - Miku  Halloween Edit【4K UHD】-5DHyKTW20RE.mp4",
+  "default": "exact",
+  "config": "C:\\Program portable\\mpv2\\tmp\\modernization\\isolated\\seek-modes-qyl_vqnc",
+  "rows": [
+    {
+      "mode": "exact",
+      "action": "RIGHT",
+      "target": 73.4,
+      "actual": 73.4,
+      "delta": 0.0
+    },
+    {
+      "mode": "exact",
+      "action": "LEFT",
+      "target": 63.400000000000006,
+      "actual": 63.4,
+      "delta": -7.105427357601002e-15
+    },
+    {
+      "mode": "exact",
+      "action": "UP",
+      "target": 90.3,
+      "actual": 90.3,
+      "delta": 0.0
+    },
+    {
+      "mode": "exact",
+      "action": "DOWN",
+      "target": 40.3,
+      "actual": 40.3,
+      "delta": 0.0
+    },
+    {
+      "mode": "exact",
+      "action": "click",
+      "target": 73.4,
+      "actual": 73.4,
+      "delta": 0.0
+    },
+    {
+      "mode": "exact",
+      "action": "drag-release",
+      "target": 73.4,
+      "actual": 73.4,
+      "delta": 0.0
+    },
+    {
+      "mode": "exact",
+      "action": "Shift+RIGHT",
+      "target": 69.4,
+      "actual": 69.4
+    },
+    {
+      "mode": "keyframes",
+      "action": "RIGHT",
+      "target": 73.4,
+      "actual": 75.0,
+      "delta": 1.5999999999999943
+    },
+    {
+      "mode": "keyframes",
+      "action": "LEFT",
+      "target": 63.400000000000006,
+      "actual": 62.5,
+      "delta": -0.9000000000000057
+    },
+    {
+      "mode": "keyframes",
+      "action": "UP",
+      "target": 90.3,
+      "actual": 91.666667,
+      "delta": 1.3666670000000067
+    },
+    {
+      "mode": "keyframes",
+      "action": "DOWN",
+      "target": 40.3,
+      "actual": 37.5,
+      "delta": -2.799999999999997
+    },
+    {
+      "mode": "keyframes",
+      "action": "click",
+      "target": 73.4,
+      "actual": 70.833333,
+      "delta": -2.5666670000000096
+    },
+    {
+      "mode": "keyframes",
+      "action": "drag-release",
+      "target": 73.4,
+      "actual": 70.833333,
+      "delta": -2.5666670000000096
+    },
+    {
+      "mode": "keyframes",
+      "action": "Shift+RIGHT",
+      "target": 69.4,
+      "actual": 69.4
+    }
+  ],
+  "persistence": [
+    "keyframes",
+    "exact"
+  ],
+  "forced_exact_passed": true,
+  "errors": []
+}

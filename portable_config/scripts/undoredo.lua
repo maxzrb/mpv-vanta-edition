@@ -38,11 +38,14 @@ end
 
 local function getUndoRedo()
 	if (seeking == 0) then
+			-- 退出或切片时定时回调可能晚于时间属性清空，此时不写入撤销记录。
+			local position = mp.get_property_number('time-pos')
+			if type(position) ~= 'number' then return end
 			prepareUndoRedo()
 			
 			seekNumber = currentIndex + 1
 			currentIndex = seekNumber
-			seekTime = math.floor(mp.get_property_number('time-pos'))
+			seekTime = math.floor(position)
 			table.insert(seekTable, seekNumber, seekTime)
 
 			undoRedo = 0

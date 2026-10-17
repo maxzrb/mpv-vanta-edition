@@ -186,7 +186,8 @@ end
 ---@param fast? boolean
 function Timeline:set_from_cursor(fast)
 	if state.time and state.duration then
-		mp.commandv('seek', self:get_time_at_x(cursor.x), fast and 'absolute+keyframes' or 'absolute+exact')
+		local use_keyframes = fast or options.seek_mode == 'keyframes'
+		mp.commandv('seek', self:get_time_at_x(cursor.x), use_keyframes and 'absolute+keyframes' or 'absolute+exact')
 	end
 end
 
@@ -259,7 +260,7 @@ function Timeline:on_global_mouse_move()
 			mp.set_property_native('pause', true)
 		end
 		if self.pressed.dragging then
-			-- 拖拽过程中保持廉价的关键帧定位，松手时再精确落点
+			-- 拖拽过程按关键帧预览，松手时按所选跳转方式定位。
 			self:set_from_cursor(true)
 		end
 	end

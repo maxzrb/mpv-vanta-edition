@@ -28,6 +28,7 @@ defaults = {
 	timeline_border = 1,
 	chapter_marker_border = 0,
 	timeline_step = '5',
+	seek_mode = 'exact',
 	timeline_cache = true,
 	timeline_buffer = true,
 	timeline_buffer_opacity = 0.18,
@@ -129,7 +130,17 @@ defaults = {
 	ziggy_path = 'default',
 }
 options = table_copy(defaults)
+-- 方向键等普通跳转由核心执行，时间轴显式指令与核心共用同一选择。
+local function apply_seek_mode()
+	if options.seek_mode ~= 'exact' and options.seek_mode ~= 'keyframes' then
+		msg.warn('未知跳转方式，恢复精确跳转：' .. tostring(options.seek_mode))
+		options.seek_mode = 'exact'
+	end
+	mp.set_property('hr-seek', options.seek_mode == 'keyframes' and 'no' or 'yes')
+	mp.set_property('user-data/uosc/seek-mode', options.seek_mode)
+end
 function handle_options(changed_options)
+	if changed_options.seek_mode then apply_seek_mode() end
 	if changed_options.time_precision then
 		timestamp_zero_rep_clear_cache()
 	end
@@ -141,6 +152,7 @@ function handle_options(changed_options)
 	request_render()
 end
 opt.read_options(options, 'uosc', handle_options)
+apply_seek_mode()
 -- Normalize values
 options.proximity_out = math.max(options.proximity_out, options.proximity_in + 1)
 if options.chapter_ranges:sub(1, 4) == '^op|' then options.chapter_ranges = defaults.chapter_ranges end
@@ -355,7 +367,7 @@ function update_config()
 	do
 		local is_exact = options.timeline_step:sub(-1) == '!'
 		config.timeline_step = tonumber(is_exact and options.timeline_step:sub(1, -2) or options.timeline_step)
-		config.timeline_step_flag = is_exact and 'exact' or ''
+		config.timeline_step_flag = is_exact and 'exact' or options.seek_mode
 	end
 
 	-- Other
@@ -1422,6 +1434,17 @@ local function set_timeline_buffer(value, silent)
 end
 mp.register_script_message('timeline-buffer-toggle', set_timeline_buffer)
 publish_timeline_buffer_state()
+-- 统一跳转方式；显式标注exact的精准快捷键不受核心默认方式影响。
+mp.register_script_message('seek-mode', function(value)
+	if value ~= 'exact' and value ~= 'keyframes' then
+		msg.error('无效的跳转方式：' .. tostring(value))
+		return
+	end
+	options.seek_mode = value
+	handle_options({seek_mode = true})
+	persist_uosc_option('seek_mode', options.seek_mode)
+	mp.osd_message(value == 'exact' and '跳转方式：精确' or '跳转方式：关键帧快速（落点可能偏移）', 2)
+end)
 -- 时间显示模式：播放时长/剩余时长与播放时长/总时长之间切换，并持久化到 uosc.conf。
 local function publish_time_display_state()
 	mp.set_property(
