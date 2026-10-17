@@ -1,13 +1,14 @@
 # STATUS.md — MPV 便携配置项目
 
-## 本轮续接快照（v1.6.3 构建验收完成，Asia/Shanghai）
+## 本轮续接快照（v1.6.3 已正式发布，Asia/Shanghai）
 
-- 用户确认版本v1.6.3；普通配置／菜单修复不触发Gate，发布流程未改。功能提交d46a4f9，清理记录单独提交5c60cc1。
-- 时间轴精确跳转优化、色度重建归入色彩、旧ICC／sigmoid入口合并及小窗菜单滚动提示均已进入实际01／04。
-- 新增“导航 > 跳转方式”，统一时间轴／方向键及普通滚轮，默认精确、持久化；强制精准快捷键保持，实片及重启记忆通过。
-- 01／04重建，02／03全输入SHA核验后原样复用1.6.2，安装器沿用0.3.13；全部公开归档及个人私包已构建验收。私包只本地，不上传。
-- 完整源及包双后端实播、1424项配置覆盖、普通启动／全部脚本／I面板及字号记忆通过；校验和见版本记录及docs/modernization/release-build-results-v1.6.3.json。
-- 原候选六附件仅在GitHub未发布草稿；本轮新版01／04／私包已重建验收，下一步更新未发布标签并替换01／04附件及说明。02／03／安装器远端沿用，ModelScope尚未上传。真实HDR桌面／多屏等边界继续保留。
+- 用户明确搁置DV细分信息功能并恢复原路线发布；已正式发布[v1.6.3](https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.3)，Latest，非草稿／非预发布；发布流程原件未修改，无3.2 Gate命中。
+- 统一精确／关键帧跳转切换并记忆、统一精确／关键帧跳转切换并记忆、精确跳转优化、色度重建菜单归入色彩、Ctrl+I受管系统ICC及旧入口移除、小窗菜单滚动提示与动态行高已入01／04。DV研究原型没有进入生产配置或包。
+- 01／04重建，02／03完整输入集合与SHA核验后原样复用v1.6.2，安装器沿用0.3.13；六公开附件GitHub远端SHA全部一致，ModelScope六项匿名HTTP200／大小匹配。
+- 本轮同版本私包在替换草稿附件之前完成构建和独立验收：7z t、11795项并集、安装器SHA、版本标记、空数据目录、FW占位及普通启动／实际播放／I面板通过，仅本地保留。
+- 源及实际公开包D3D11／Vulkan×SDR／HDR10／HLG实播、161个Git跟踪Lua／103个Git跟踪Python／构建AST、1424项配置覆盖、全部活动脚本／I面板／字号记忆通过。真实HDR桌面／多屏等边界保留。
+- 升级请同时覆盖01及04以同步版本标记；02／03可沿用。标签构建提交7f8525f，功能d46a4f9；发布结果另行提交并推送master，最终凭据tmp/release-v1.6.3-r2/final-git-check.json。
+- build已归档至根backup，release及VantaInstaller/publish保留。报告docs/modernization/release-build-results-v1.6.3.json与release-results-v1.6.3.json。
 
 ## 当前状态快照
 
@@ -15,12 +16,12 @@
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **用户核心优先级** | 软件层面完整验证 SDR／HDR 路线准确性，不以校色仪／真实HDR屏幕为条件；性能不重编译、不再增加线程，默认 D3D11、跨片源／后端通用；不推广 OP 单片参数，用户不关注超分／补帧 |
-| **分支** | master／origin/master随本轮补打记录同步；v1.6.2标签保留c498aef |
-| **最新发布提交** | c498aef（tag v1.6.2）；GitHub及ModelScope六公开资产已核验，个人私包只本地 |
-| **工作区** | v1.6.2分包及个人私包已落地；功能、发布和补打／顺序偏好记录随master保存 |
+| **分支** | master／origin/master在收尾提交后同步；v1.6.3标签保留构建提交7f8525f |
+| **最新发布提交** | 7f8525f（tag v1.6.3）；GitHub及ModelScope六公开资产已核验，个人私包只本地 |
+| **工作区** | v1.6.3分包及私包全部构建验收后发布；结果记录随master保存 |
 | **MPV 核心版本** | v0.41.0-1107-g36bf3d529（shinchiro 20261008；FFmpeg N-127242-g5d4755f7d；libplacebo 0d043c7，含99e80abd浮点截断修复）；已纳入v1.6.0候选 |
-| **项目版本** | v1.6.3发布准备；当前公开Latest仍v1.6.2，安装器沿用0.3.13 |
-| **上次操作** | 2026-10-13 20:35完成项目归档清理；trash由用户随后删除；配置／运行库／私包／历史进度保护检查通过 |
+| **项目版本** | v1.6.3正式发布，Latest；安装器独立0.3.13 |
+| **上次操作** | 2026-10-17 16:56完成v1.6.3正式发布、国内镜像、私包验收和暂存归档 |
 | **当前排查** | 默认标准恢复原有效auto目标及HDR对比度恢复0.30；原gamma2.2为注释。HQ保持FP32运算／FP16主纹理、经典sRGB／ACMscRGB／可信ICC／HDR分工及加密表，原精度结论保留。OP原速整片零丢帧未达成，8K48搁置 |
 | **自定义脚本** | quality.lua、quality_status.lua、color-target.lua、color-range-fix.lua、display-color.lua＋display-color-native.lua、hdr-mode.lua、stats.lua＋system_metrics.lua、startup-format-logos.lua（保留用户定制） |
 
@@ -3949,3 +3950,12 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 | mpv-full-private-v1.6.3.7z | 3037964562 | `4dc461049b0c16d7593e980e932f379ef2e6d87db0ae51e629cd2861cd32bc9a` |
 
 - 六公开资产名称已固定，私包白名单排除；原始证据保留tmp/release-v1.6.3-r2。第6～8节仍待提交标签／上传／远端SHA／镜像／结果收尾。
+
+## 2026-10-17 16:56 — v1.6.3 正式发布／镜像及收尾
+
+- 第3节：用户版本与恢复授权明确，git fetch无未合并提交；生产配置未改变，Gate不触发；语法、编码、菜单、源与包实播及diff检查通过。
+- 第4～5节：01／04重建、02／03依据4.1.1原样复用、安装器沿用0.3.13；六公开附件及本地私包全部在各自候选的公开上传前构建验收通过，七项SHA记入版本记录。
+- 第6节：功能d46a4f9→构建7f8525f，annotated v1.6.3及master精确推送，标签对象与剥离提交远端一致。
+- 第7节：原六白名单资产先传草稿，本轮验收后更新01／04及说明，六项大小及远端SHA全部匹配后转正式Latest；Release Note只含本次逐行更改／移除条目，无私包或重复资产。https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.3。
+- 第7.1节：ModelScope v1.6.3/六项完成，匿名直链逐项HTTP200／大小匹配，不上传私包或整个release目录。
+- 第8节：构建暂存经绝对路径核验移入backup/release-v1.6.3-r2-build-staging，build不存在，release及安装器publish保留；三类记录与结果报告已更新。结果提交推送后的master同步／干净工作树凭据存tmp/release-v1.6.3-r2/final-git-check.json。
