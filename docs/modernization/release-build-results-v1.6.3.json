@@ -3,8 +3,8 @@
   "assets": [
     {
       "name": "01-mpv-base-v1.6.3.7z",
-      "bytes": 136910541,
-      "sha256": "d0016b32b6d7b835baa95c51090edf06142066bd3aed062a559beb53d7ef6bee"
+      "bytes": 136909928,
+      "sha256": "07a3a7aff0f756f3b815ab893e7e811292f0bb161680aac1f8bd1fb78d07497a"
     },
     {
       "name": "02-mpv-extras-v1.6.3.7z.001",
@@ -23,8 +23,8 @@
     },
     {
       "name": "04-mpv-config-v1.6.3.7z",
-      "bytes": 5368490,
-      "sha256": "6439160f1382a02701cc9a531a06ee3b2097a757efaf45ffbbe55aeb9b19aa4a"
+      "bytes": 5369114,
+      "sha256": "33a45d52bc06fcc07a0aea74ab2985886eacac587bb632c23dd4e5385040d12d"
     },
     {
       "name": "VantaInstaller-win-x64-v0.3.13.exe",
@@ -36,7 +36,7 @@
     "01-mpv-base-v1.6.3.7z": {
       "files": 1320,
       "entries": 1397,
-      "bytes": 467583162,
+      "bytes": 467585378,
       "forbidden": []
     },
     "02-mpv-extras-v1.6.3.7z.001": {
@@ -54,7 +54,7 @@
     "04-mpv-config-v1.6.3.7z": {
       "files": 268,
       "entries": 303,
-      "bytes": 10914024,
+      "bytes": 10916240,
       "forbidden": []
     }
   },
@@ -242,8 +242,8 @@
         "launch": 1,
         "loaded_scripts": 52,
         "stats_layout": {
-          "canvas_height": 288,
-          "scale": 1
+          "scale": 1,
+          "canvas_height": 288
         },
         "gamma": "scrgb",
         "pixelformat": "rgba16hf"
@@ -279,8 +279,8 @@
   },
   "private": {
     "name": "mpv-full-private-v1.6.3.7z",
-    "bytes": 3037921776,
-    "sha256": "a97fc173ea1fe157451b00a37c30d8cf8a319c4ae02d62417b8f5a7990ff6cf3",
+    "bytes": 3037964562,
+    "sha256": "4dc461049b0c16d7593e980e932f379ef2e6d87db0ae51e629cd2861cd32bc9a",
     "complete_archive": true,
     "merged_files": 11795,
     "size_crc_union_identical": true,
@@ -299,7 +299,7 @@
       "samples": [
         0.3,
         0.567,
-        0.867
+        0.8
       ],
       "stats_layout": {
         "content_width": 379.545244,
@@ -314,11 +314,11 @@
   },
   "preflight": {
     "version": "1.6.3",
-    "checked_at": "2026-10-17 12:51 Asia/Shanghai",
+    "checked_at": "2026-10-17 16:47 Asia/Shanghai",
     "gate_triggered": false,
     "gate_scope": "普通配置／脚本／菜单修复；包边界、核心、构建方式、安装流程不变",
-    "lua_syntax": 142,
-    "python_syntax": 120,
+    "lua_syntax": 161,
+    "python_syntax": 103,
     "build_ast": 6,
     "source_playback": {
       "passed": true,
@@ -338,16 +338,178 @@
     },
     "base_runtime_identical": true,
     "diff_check": true,
-    "workflow_unchanged": true
+    "workflow_unchanged": true,
+    "functional_commit": "d46a4f9",
+    "seek_modes_passed": true,
+    "revised_candidate": true,
+    "syntax_scope": "全部Git跟踪Lua与Python文件，含开发备份；与初版语法范围不同"
   },
-  "functional_commit": "b4511099a564d899156a7d4b040774afea12e18a",
+  "functional_commit": "d46a4f92e3abd863ee062a432e412906628d309e",
   "resume_check": {
-    "checked_at": "2026-10-17 13:17",
-    "covered_config_files": 1424,
     "user_resumed": true,
-    "dv_feature_not_adopted": true
+    "dv_feature_not_adopted": true,
+    "user_added_seek_modes": true,
+    "includes_arrow_keys": true,
+    "default": "exact",
+    "persistence": true
   },
   "dv_feature_included": false,
+  "candidate_revision": 2,
+  "supersedes_unpublished_draft": true,
+  "seek_modes": {
+    "passed": true,
+    "source": "C:\\Users\\maxzr\\Downloads\\youtube-UCoCy_rS-xtdTtW0GBV8zC_w_ねこしろ - [2017年10月7日]【MMD】「Happy Halloween」 - Miku  Halloween Edit【4K UHD】-5DHyKTW20RE.mp4",
+    "default": "exact",
+    "config": "C:\\Program portable\\mpv2\\tmp\\modernization\\isolated\\seek-modes-qyl_vqnc",
+    "rows": [
+      {
+        "mode": "exact",
+        "action": "RIGHT",
+        "target": 73.4,
+        "actual": 73.4,
+        "delta": 0.0
+      },
+      {
+        "mode": "exact",
+        "action": "LEFT",
+        "target": 63.400000000000006,
+        "actual": 63.4,
+        "delta": -7.105427357601002e-15
+      },
+      {
+        "mode": "exact",
+        "action": "UP",
+        "target": 90.3,
+        "actual": 90.3,
+        "delta": 0.0
+      },
+      {
+        "mode": "exact",
+        "action": "DOWN",
+        "target": 40.3,
+        "actual": 40.3,
+        "delta": 0.0
+      },
+      {
+        "mode": "exact",
+        "action": "click",
+        "target": 73.4,
+        "actual": 73.4,
+        "delta": 0.0
+      },
+      {
+        "mode": "exact",
+        "action": "drag-release",
+        "target": 73.4,
+        "actual": 73.4,
+        "delta": 0.0
+      },
+      {
+        "mode": "exact",
+        "action": "Shift+RIGHT",
+        "target": 69.4,
+        "actual": 69.4
+      },
+      {
+        "mode": "keyframes",
+        "action": "RIGHT",
+        "target": 73.4,
+        "actual": 75.0,
+        "delta": 1.5999999999999943
+      },
+      {
+        "mode": "keyframes",
+        "action": "LEFT",
+        "target": 63.400000000000006,
+        "actual": 62.5,
+        "delta": -0.9000000000000057
+      },
+      {
+        "mode": "keyframes",
+        "action": "UP",
+        "target": 90.3,
+        "actual": 91.666667,
+        "delta": 1.3666670000000067
+      },
+      {
+        "mode": "keyframes",
+        "action": "DOWN",
+        "target": 40.3,
+        "actual": 37.5,
+        "delta": -2.799999999999997
+      },
+      {
+        "mode": "keyframes",
+        "action": "click",
+        "target": 73.4,
+        "actual": 70.833333,
+        "delta": -2.5666670000000096
+      },
+      {
+        "mode": "keyframes",
+        "action": "drag-release",
+        "target": 73.4,
+        "actual": 70.833333,
+        "delta": -2.5666670000000096
+      },
+      {
+        "mode": "keyframes",
+        "action": "Shift+RIGHT",
+        "target": 69.4,
+        "actual": 69.4
+      }
+    ],
+    "persistence": [
+      "keyframes",
+      "exact"
+    ],
+    "forced_exact_passed": true,
+    "errors": []
+  },
+  "packaged_seek": {
+    "passed": true,
+    "rows": [
+      {
+        "mode": "keyframes",
+        "actual": 75.0,
+        "target": 73.4,
+        "menu": [
+          {
+            "state": [],
+            "cmd": "script-message-to uosc seek-mode exact                                                                  #menu: 导航 > 跳转方式 > 精确（默认） #@state=(get('user-data/uosc/seek-mode') == 'exact' and 'checked')",
+            "title": "精确（默认）"
+          },
+          {
+            "state": [
+              "checked"
+            ],
+            "cmd": "script-message-to uosc seek-mode keyframes                                                              #menu: 导航 > 跳转方式 > 关键帧快速（落点可能偏移） #@state=(get('user-data/uosc/seek-mode') == 'keyframes' and 'checked')",
+            "title": "关键帧快速（落点可能偏移）"
+          }
+        ]
+      },
+      {
+        "mode": "exact",
+        "actual": 73.4,
+        "target": 73.4,
+        "menu": [
+          {
+            "state": [
+              "checked"
+            ],
+            "cmd": "script-message-to uosc seek-mode exact                                                                  #menu: 导航 > 跳转方式 > 精确（默认） #@state=(get('user-data/uosc/seek-mode') == 'exact' and 'checked')",
+            "title": "精确（默认）"
+          },
+          {
+            "state": [],
+            "cmd": "script-message-to uosc seek-mode keyframes                                                              #menu: 导航 > 跳转方式 > 关键帧快速（落点可能偏移） #@state=(get('user-data/uosc/seek-mode') == 'keyframes' and 'checked')",
+            "title": "关键帧快速（落点可能偏移）"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
   "runtime_audit": {
     "source": "1.6.2",
     "compared_files": 304,
@@ -361,7 +523,7 @@
       }
     ]
   },
-  "checked_at": "2026-10-17 13:18 Asia/Shanghai",
+  "checked_at": "2026-10-17 16:54 Asia/Shanghai",
   "gate_triggered": false,
   "user_version_authorization": "使用 v1.6.3",
   "all_builds_complete_before_upload": true,
