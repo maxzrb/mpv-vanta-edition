@@ -3,8 +3,8 @@
   "assets": [
     {
       "name": "01-mpv-base-v1.6.3.7z",
-      "bytes": 136909928,
-      "sha256": "07a3a7aff0f756f3b815ab893e7e811292f0bb161680aac1f8bd1fb78d07497a"
+      "bytes": 136913378,
+      "sha256": "09a03de629a2ed60288be4b7697e3ac288fb87094913203005dbcfbb556cc9c3"
     },
     {
       "name": "02-mpv-extras-v1.6.3.7z.001",
@@ -23,8 +23,8 @@
     },
     {
       "name": "04-mpv-config-v1.6.3.7z",
-      "bytes": 5369114,
-      "sha256": "33a45d52bc06fcc07a0aea74ab2985886eacac587bb632c23dd4e5385040d12d"
+      "bytes": 5369064,
+      "sha256": "983c777f79c6fc0501551a939edc47b407176c545682d881c0a08f369f3c008c"
     },
     {
       "name": "VantaInstaller-win-x64-v0.3.13.exe",
@@ -36,7 +36,7 @@
     "01-mpv-base-v1.6.3.7z": {
       "files": 1320,
       "entries": 1397,
-      "bytes": 467585378,
+      "bytes": 467585414,
       "forbidden": []
     },
     "02-mpv-extras-v1.6.3.7z.001": {
@@ -54,7 +54,7 @@
     "04-mpv-config-v1.6.3.7z": {
       "files": 268,
       "entries": 303,
-      "bytes": 10916240,
+      "bytes": 10916276,
       "forbidden": []
     }
   },
@@ -229,58 +229,174 @@
       {
         "backend": "d3d11",
         "launch": 0,
-        "loaded_scripts": 52,
-        "stats_layout": {
-          "scale": 1,
-          "canvas_height": 288
-        },
-        "gamma": "scrgb",
-        "pixelformat": "rgba16hf"
+        "loaded_scripts": 52
       },
       {
         "backend": "d3d11",
         "launch": 1,
-        "loaded_scripts": 52,
-        "stats_layout": {
-          "scale": 1,
-          "canvas_height": 288
-        },
-        "gamma": "scrgb",
-        "pixelformat": "rgba16hf"
+        "loaded_scripts": 52
       },
       {
         "backend": "vulkan",
         "launch": 0,
-        "loaded_scripts": 52,
-        "stats_layout": {
-          "canvas_height": 288,
-          "scale": 1
-        },
-        "gamma": "scrgb",
-        "pixelformat": "rgba16hf"
+        "loaded_scripts": 52
       },
       {
         "backend": "vulkan",
         "launch": 1,
-        "loaded_scripts": 52,
-        "stats_layout": {
-          "scale": 1,
-          "canvas_height": 288
-        },
-        "gamma": "scrgb",
-        "pixelformat": "rgba16hf"
+        "loaded_scripts": 52
       }
     ]
   },
-  "installer_startup": {
-    "version": "0.3.13",
-    "started": true,
-    "visible_windows": 1
+  "source_hierarchy": {
+    "passed": true,
+    "path": [
+      "导航",
+      "跳转",
+      "跳转方式"
+    ],
+    "options": [
+      {
+        "mode": "exact",
+        "items": [
+          {
+            "state": [
+              "checked"
+            ],
+            "cmd": "script-message-to uosc seek-mode exact                                                                  #menu: 导航 > 跳转 > 跳转方式 > 精确（默认） #@state=(get('user-data/uosc/seek-mode') == 'exact' and 'checked')",
+            "title": "精确（默认）"
+          },
+          {
+            "state": [],
+            "cmd": "script-message-to uosc seek-mode keyframes                                                              #menu: 导航 > 跳转 > 跳转方式 > 关键帧快速（落点可能偏移） #@state=(get('user-data/uosc/seek-mode') == 'keyframes' and 'checked')",
+            "title": "关键帧快速（落点可能偏移）"
+          }
+        ]
+      },
+      {
+        "mode": "keyframes",
+        "items": [
+          {
+            "state": [],
+            "cmd": "script-message-to uosc seek-mode exact                                                                  #menu: 导航 > 跳转 > 跳转方式 > 精确（默认） #@state=(get('user-data/uosc/seek-mode') == 'exact' and 'checked')",
+            "title": "精确（默认）"
+          },
+          {
+            "state": [
+              "checked"
+            ],
+            "cmd": "script-message-to uosc seek-mode keyframes                                                              #menu: 导航 > 跳转 > 跳转方式 > 关键帧快速（落点可能偏移） #@state=(get('user-data/uosc/seek-mode') == 'keyframes' and 'checked')",
+            "title": "关键帧快速（落点可能偏移）"
+          }
+        ]
+      }
+    ],
+    "video_moves": true,
+    "errors": []
   },
+  "package_hierarchy": {
+    "passed": true,
+    "path": [
+      "导航",
+      "跳转",
+      "跳转方式"
+    ],
+    "options": [
+      {
+        "mode": "exact",
+        "items": [
+          {
+            "state": [
+              "checked"
+            ],
+            "title": "精确（默认）",
+            "cmd": "script-message-to uosc seek-mode exact                                                                  #menu: 导航 > 跳转 > 跳转方式 > 精确（默认） #@state=(get('user-data/uosc/seek-mode') == 'exact' and 'checked')"
+          },
+          {
+            "state": [],
+            "title": "关键帧快速（落点可能偏移）",
+            "cmd": "script-message-to uosc seek-mode keyframes                                                              #menu: 导航 > 跳转 > 跳转方式 > 关键帧快速（落点可能偏移） #@state=(get('user-data/uosc/seek-mode') == 'keyframes' and 'checked')"
+          }
+        ]
+      },
+      {
+        "mode": "keyframes",
+        "items": [
+          {
+            "state": [],
+            "title": "精确（默认）",
+            "cmd": "script-message-to uosc seek-mode exact                                                                  #menu: 导航 > 跳转 > 跳转方式 > 精确（默认） #@state=(get('user-data/uosc/seek-mode') == 'exact' and 'checked')"
+          },
+          {
+            "state": [
+              "checked"
+            ],
+            "title": "关键帧快速（落点可能偏移）",
+            "cmd": "script-message-to uosc seek-mode keyframes                                                              #menu: 导航 > 跳转 > 跳转方式 > 关键帧快速（落点可能偏移） #@state=(get('user-data/uosc/seek-mode') == 'keyframes' and 'checked')"
+          }
+        ]
+      }
+    ],
+    "video_moves": true,
+    "errors": []
+  },
+  "packaged_seek": {
+    "passed": true,
+    "rows": [
+      {
+        "mode": "keyframes",
+        "actual": 75.0,
+        "target": 73.4,
+        "menu": [
+          {
+            "title": "精确（默认）",
+            "cmd": "script-message-to uosc seek-mode exact                                                                  #menu: 导航 > 跳转 > 跳转方式 > 精确（默认） #@state=(get('user-data/uosc/seek-mode') == 'exact' and 'checked')",
+            "state": []
+          },
+          {
+            "title": "关键帧快速（落点可能偏移）",
+            "cmd": "script-message-to uosc seek-mode keyframes                                                              #menu: 导航 > 跳转 > 跳转方式 > 关键帧快速（落点可能偏移） #@state=(get('user-data/uosc/seek-mode') == 'keyframes' and 'checked')",
+            "state": [
+              "checked"
+            ]
+          }
+        ]
+      },
+      {
+        "mode": "exact",
+        "actual": 73.4,
+        "target": 73.4,
+        "menu": [
+          {
+            "title": "精确（默认）",
+            "cmd": "script-message-to uosc seek-mode exact                                                                  #menu: 导航 > 跳转 > 跳转方式 > 精确（默认） #@state=(get('user-data/uosc/seek-mode') == 'exact' and 'checked')",
+            "state": [
+              "checked"
+            ]
+          },
+          {
+            "title": "关键帧快速（落点可能偏移）",
+            "cmd": "script-message-to uosc seek-mode keyframes                                                              #menu: 导航 > 跳转 > 跳转方式 > 关键帧快速（落点可能偏移） #@state=(get('user-data/uosc/seek-mode') == 'keyframes' and 'checked')",
+            "state": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "candidate_revision": 3,
+  "overwrite_existing_release": true,
+  "user_authorization": "把跳转方式直接做进跳转里的次级菜单。覆盖发布",
+  "menu_path": [
+    "导航",
+    "跳转",
+    "跳转方式"
+  ],
+  "functional_commit": "0925dc119ce1c70f5ef4708f3082618f53b2d927",
   "private": {
     "name": "mpv-full-private-v1.6.3.7z",
-    "bytes": 3037964562,
-    "sha256": "4dc461049b0c16d7593e980e932f379ef2e6d87db0ae51e629cd2861cd32bc9a",
+    "bytes": 3037933024,
+    "sha256": "3210c4e7ccab2e9d19271f698ed06bfdfa8793ad3fb4e9c76e5c9ae6cda35177",
     "complete_archive": true,
     "merged_files": 11795,
     "size_crc_union_identical": true,
@@ -297,24 +413,32 @@
       "passed": true,
       "backend": "d3d11",
       "samples": [
-        0.3,
-        0.567,
-        0.8
+        0.033,
+        0.333,
+        0.6
       ],
       "stats_layout": {
+        "canvas_height": 350.440835,
         "content_width": 379.545244,
         "content_height": 315.396752,
-        "scale": 0.821822,
-        "canvas_height": 350.440835
+        "scale": 0.821822
       },
       "errors": []
     },
     "local_only": true,
     "uploaded": false
   },
+  "gate_triggered": false,
+  "all_builds_complete_before_upload": true,
+  "checked_at": "2026-10-17 17:12 Asia/Shanghai",
+  "local_preference": {
+    "restored": true,
+    "local_mode": "keyframes",
+    "public_mode": "exact"
+  },
   "preflight": {
     "version": "1.6.3",
-    "checked_at": "2026-10-17 16:47 Asia/Shanghai",
+    "checked_at": "2026-10-17 17:06 Asia/Shanghai",
     "gate_triggered": false,
     "gate_scope": "普通配置／脚本／菜单修复；包边界、核心、构建方式、安装流程不变",
     "lua_syntax": 161,
@@ -339,197 +463,24 @@
     "base_runtime_identical": true,
     "diff_check": true,
     "workflow_unchanged": true,
-    "functional_commit": "d46a4f9",
+    "functional_commit": "0925dc1",
     "seek_modes_passed": true,
     "revised_candidate": true,
-    "syntax_scope": "全部Git跟踪Lua与Python文件，含开发备份；与初版语法范围不同"
+    "syntax_scope": "全部Git跟踪Lua与Python文件，含开发备份；与初版语法范围不同",
+    "candidate_revision": 3,
+    "user_authorized_overwrite": true,
+    "scope": "仅菜单层级及注释，Lua与跳转算法未改",
+    "personal_preference_excluded": true
   },
-  "functional_commit": "d46a4f92e3abd863ee062a432e412906628d309e",
-  "resume_check": {
-    "user_resumed": true,
-    "dv_feature_not_adopted": true,
-    "user_added_seek_modes": true,
-    "includes_arrow_keys": true,
-    "default": "exact",
-    "persistence": true
+  "installer_startup": {
+    "version": "0.3.13",
+    "started": true,
+    "visible_windows": 1
   },
   "dv_feature_included": false,
-  "candidate_revision": 2,
-  "supersedes_unpublished_draft": true,
-  "seek_modes": {
-    "passed": true,
-    "source": "C:\\Users\\maxzr\\Downloads\\youtube-UCoCy_rS-xtdTtW0GBV8zC_w_ねこしろ - [2017年10月7日]【MMD】「Happy Halloween」 - Miku  Halloween Edit【4K UHD】-5DHyKTW20RE.mp4",
-    "default": "exact",
-    "config": "C:\\Program portable\\mpv2\\tmp\\modernization\\isolated\\seek-modes-qyl_vqnc",
-    "rows": [
-      {
-        "mode": "exact",
-        "action": "RIGHT",
-        "target": 73.4,
-        "actual": 73.4,
-        "delta": 0.0
-      },
-      {
-        "mode": "exact",
-        "action": "LEFT",
-        "target": 63.400000000000006,
-        "actual": 63.4,
-        "delta": -7.105427357601002e-15
-      },
-      {
-        "mode": "exact",
-        "action": "UP",
-        "target": 90.3,
-        "actual": 90.3,
-        "delta": 0.0
-      },
-      {
-        "mode": "exact",
-        "action": "DOWN",
-        "target": 40.3,
-        "actual": 40.3,
-        "delta": 0.0
-      },
-      {
-        "mode": "exact",
-        "action": "click",
-        "target": 73.4,
-        "actual": 73.4,
-        "delta": 0.0
-      },
-      {
-        "mode": "exact",
-        "action": "drag-release",
-        "target": 73.4,
-        "actual": 73.4,
-        "delta": 0.0
-      },
-      {
-        "mode": "exact",
-        "action": "Shift+RIGHT",
-        "target": 69.4,
-        "actual": 69.4
-      },
-      {
-        "mode": "keyframes",
-        "action": "RIGHT",
-        "target": 73.4,
-        "actual": 75.0,
-        "delta": 1.5999999999999943
-      },
-      {
-        "mode": "keyframes",
-        "action": "LEFT",
-        "target": 63.400000000000006,
-        "actual": 62.5,
-        "delta": -0.9000000000000057
-      },
-      {
-        "mode": "keyframes",
-        "action": "UP",
-        "target": 90.3,
-        "actual": 91.666667,
-        "delta": 1.3666670000000067
-      },
-      {
-        "mode": "keyframes",
-        "action": "DOWN",
-        "target": 40.3,
-        "actual": 37.5,
-        "delta": -2.799999999999997
-      },
-      {
-        "mode": "keyframes",
-        "action": "click",
-        "target": 73.4,
-        "actual": 70.833333,
-        "delta": -2.5666670000000096
-      },
-      {
-        "mode": "keyframes",
-        "action": "drag-release",
-        "target": 73.4,
-        "actual": 70.833333,
-        "delta": -2.5666670000000096
-      },
-      {
-        "mode": "keyframes",
-        "action": "Shift+RIGHT",
-        "target": 69.4,
-        "actual": 69.4
-      }
-    ],
-    "persistence": [
-      "keyframes",
-      "exact"
-    ],
-    "forced_exact_passed": true,
-    "errors": []
-  },
-  "packaged_seek": {
-    "passed": true,
-    "rows": [
-      {
-        "mode": "keyframes",
-        "actual": 75.0,
-        "target": 73.4,
-        "menu": [
-          {
-            "state": [],
-            "cmd": "script-message-to uosc seek-mode exact                                                                  #menu: 导航 > 跳转方式 > 精确（默认） #@state=(get('user-data/uosc/seek-mode') == 'exact' and 'checked')",
-            "title": "精确（默认）"
-          },
-          {
-            "state": [
-              "checked"
-            ],
-            "cmd": "script-message-to uosc seek-mode keyframes                                                              #menu: 导航 > 跳转方式 > 关键帧快速（落点可能偏移） #@state=(get('user-data/uosc/seek-mode') == 'keyframes' and 'checked')",
-            "title": "关键帧快速（落点可能偏移）"
-          }
-        ]
-      },
-      {
-        "mode": "exact",
-        "actual": 73.4,
-        "target": 73.4,
-        "menu": [
-          {
-            "state": [
-              "checked"
-            ],
-            "cmd": "script-message-to uosc seek-mode exact                                                                  #menu: 导航 > 跳转方式 > 精确（默认） #@state=(get('user-data/uosc/seek-mode') == 'exact' and 'checked')",
-            "title": "精确（默认）"
-          },
-          {
-            "state": [],
-            "cmd": "script-message-to uosc seek-mode keyframes                                                              #menu: 导航 > 跳转方式 > 关键帧快速（落点可能偏移） #@state=(get('user-data/uosc/seek-mode') == 'keyframes' and 'checked')",
-            "title": "关键帧快速（落点可能偏移）"
-          }
-        ]
-      }
-    ],
-    "errors": []
-  },
-  "runtime_audit": {
-    "source": "1.6.2",
-    "compared_files": 304,
-    "identical": true,
-    "reviewed_documents": [
-      {
-        "path": "README.MD",
-        "source_sha256": "8adf2fe98b05e581eb0a87e883d81f724e01a480333d74c17bfb464703a6329c",
-        "current_sha256": "db77c0b461ddeedba4c48d5303280edb97a11e759d8bb92a3ffb499452071388",
-        "reason": "上轮用户已授权的分包及私包先验收后上传说明，不是运行时升级"
-      }
-    ]
-  },
-  "checked_at": "2026-10-17 16:54 Asia/Shanghai",
-  "gate_triggered": false,
-  "user_version_authorization": "使用 v1.6.3",
-  "all_builds_complete_before_upload": true,
   "limitations": [
-    "真实HDR桌面／多屏及其他厂商硬件未实测",
-    "未宣称修复所有增帧滤镜精确跳转兼容性",
-    "公开包旧首次建files竞争未改，普通启动验收预建空数据目录；私包本身含空目录"
+    "本轮仅调整菜单与说明，跳转行为沿用已验收实现",
+    "实际HDR桌面／多屏等原有未实测边界保留",
+    "本地用户keyframes选择不入公开包，发行默认exact"
   ]
 }
