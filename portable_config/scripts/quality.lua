@@ -44,6 +44,7 @@ local function expand(path)
     return result
 end
 local performance_profiles={balanced='Performance-Balanced',['high-quality']='Performance-HighQuality'}
+local performance_names={balanced='默认',['high-quality']='精细色度'}
 local preferences_path=expand('~~/files/quality-preferences.json')
 local preferences_file=io.open(preferences_path,'r')
 if preferences_file then
@@ -292,12 +293,12 @@ mp.register_script_message('quality-deband',function() write_option('deband',not
 mp.register_script_message('quality-performance',function(value)
     if not performance_profiles[value] then return end
     local _,err=mp.command_native({'apply-profile',performance_profiles[value]})
-    if err then msg.error('性能档位应用失败：'..tostring(err)); return end
+    if err then msg.error('色度重建应用失败：'..tostring(err)); return end
     performance=value
     local file,save_err=io.open(preferences_path,'w')
     if file then file:write(utils.format_json({performance=value}));file:close()
-    else msg.error('保存性能偏好失败：'..tostring(save_err)) end
-    publish();mp.osd_message('性能档位：'..performance_profiles[value],3)
+    else msg.error('保存色度重建偏好失败：'..tostring(save_err)) end
+    publish();mp.osd_message('色度重建：'..performance_names[value],3)
 end)
 -- 只订阅实际加载错误；不会为菜单启动子进程。
 mp.enable_messages('error')
@@ -344,6 +345,6 @@ mp.register_event('shutdown',cancel_attempt)
 -- 默认明确应用 HQ；退役低功耗偏好自动回到默认档。
 do
     local _,err=mp.command_native({'apply-profile',performance_profiles[performance]})
-    if err then msg.error('恢复性能档位失败：'..tostring(err)) end
+    if err then msg.error('恢复色度重建失败：'..tostring(err)) end
 end
 publish()

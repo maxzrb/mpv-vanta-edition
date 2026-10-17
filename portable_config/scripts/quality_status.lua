@@ -175,8 +175,8 @@ local function show_color_status()
     table.insert(lines, '输出色彩空间标记：' .. tostring(mp.get_property_native('target-colorspace-hint')))
     local quality = mp.get_property_native('user-data/quality', {}) or {}
     table.insert(lines, '滤镜状态：' .. tostring(quality.state or '未启用'))
-    local performance_names={balanced='HQ（默认）',['high-quality']='高质量'}
-    table.insert(lines, '性能档位：' .. tostring(performance_names[quality.performance] or quality.performance or 'HQ（默认）'))
+    local performance_names={balanced='默认',['high-quality']='精细色度'}
+    table.insert(lines, '色度重建：' .. tostring(performance_names[quality.performance] or quality.performance or '默认'))
     for _, stage in ipairs(quality.chain or {}) do table.insert(lines, '处理步骤：' .. tostring(stage.title)) end
     if quality.note and quality.note ~= '' then table.insert(lines, quality.note) end
     if quality.warning and quality.warning ~= '' then table.insert(lines, '增强提示：' .. quality.warning) end
@@ -198,9 +198,9 @@ end
 
 local function show_quality_status()
     local q=mp.get_property_native('user-data/quality',{}) or {}
-    local names={balanced='HQ（默认）',['high-quality']='高质量'}
+    local names={balanced='默认',['high-quality']='精细色度'}
     local lines={'当前启用项','状态：'..tostring(q.state or '未启用'),
-        '性能：'..tostring(names[q.performance] or q.performance or '稳健 HQ'),
+        '色度重建：'..tostring(names[q.performance] or q.performance or '默认'),
         '解码：'..tostring(mp.get_property('hwdec-current','no'))}
     local source=mp.get_property_number('container-fps')
     local output=mp.get_property_number('estimated-vf-fps')

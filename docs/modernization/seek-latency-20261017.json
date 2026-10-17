@@ -1,0 +1,735 @@
+{
+  "date": "2026-10-17",
+  "scope": "完整隔离配置，用户指定Happy Halloween 4K60 HEVC实片；不代表全部片源",
+  "method": {
+    "video": "3840x2160,60fps,HEVC Main 8bit,AAC,244.57s,30.7Mbps",
+    "window": "960x540",
+    "decoder": "d3d11va",
+    "audio": "WASAPI,volume=0",
+    "timing": "IPC playback-restart event; paused precise seeks, then resume audio/video",
+    "trials_per_setting": 3,
+    "targets": [
+      15.3,
+      68.4,
+      125.6,
+      183.2,
+      221.7
+    ]
+  },
+  "summary": {
+    "no": {
+      "median_seconds": 0.5984365999997863,
+      "max_seconds": 1.3634202999996887,
+      "max_position_error_seconds": 0.0
+    },
+    "yes": {
+      "median_seconds": 0.3195734999999331,
+      "max_seconds": 0.6902706000000762,
+      "max_position_error_seconds": 0.0
+    }
+  },
+  "comparison": [
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "no",
+      "target": 15.3,
+      "actual": 15.3,
+      "seconds": 0.8364828000003399,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "no",
+      "target": 68.4,
+      "actual": 68.4,
+      "seconds": 0.6072710999997071,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "no",
+      "target": 125.6,
+      "actual": 125.6,
+      "seconds": 0.2281969000000572,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "no",
+      "target": 183.2,
+      "actual": 183.2,
+      "seconds": 1.3608546000000388,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "no",
+      "target": 221.7,
+      "actual": 221.7,
+      "seconds": 0.3173901999998634,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false,
+      "avsync": 5e-06,
+      "audio_pts": 222.169085
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "yes",
+      "target": 15.3,
+      "actual": 15.3,
+      "seconds": 0.44155369999998584,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "yes",
+      "target": 68.4,
+      "actual": 68.4,
+      "seconds": 0.3166855999998006,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "yes",
+      "target": 125.6,
+      "actual": 125.6,
+      "seconds": 0.14917000000014013,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "yes",
+      "target": 183.2,
+      "actual": 183.2,
+      "seconds": 0.6902706000000762,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "yes",
+      "target": 221.7,
+      "actual": 221.7,
+      "seconds": 0.17219120000027033,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false,
+      "avsync": 3e-06,
+      "audio_pts": 222.169627
+    },
+    {
+      "source": "halloween",
+      "trial": 1,
+      "drop": "yes",
+      "target": 15.3,
+      "actual": 15.3,
+      "seconds": 0.41551010000011956,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 1,
+      "drop": "yes",
+      "target": 68.4,
+      "actual": 68.4,
+      "seconds": 0.3195734999999331,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 1,
+      "drop": "yes",
+      "target": 125.6,
+      "actual": 125.6,
+      "seconds": 0.1490246999996998,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 1,
+      "drop": "yes",
+      "target": 183.2,
+      "actual": 183.2,
+      "seconds": 0.6889157000000523,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 1,
+      "drop": "yes",
+      "target": 221.7,
+      "actual": 221.7,
+      "seconds": 0.17102909999994154,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false,
+      "avsync": 5e-06,
+      "audio_pts": 222.181489
+    },
+    {
+      "source": "halloween",
+      "trial": 1,
+      "drop": "no",
+      "target": 15.3,
+      "actual": 15.3,
+      "seconds": 0.8617180999999619,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 1,
+      "drop": "no",
+      "target": 68.4,
+      "actual": 68.4,
+      "seconds": 0.5984365999997863,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 1,
+      "drop": "no",
+      "target": 125.6,
+      "actual": 125.6,
+      "seconds": 0.22377740000001722,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 1,
+      "drop": "no",
+      "target": 183.2,
+      "actual": 183.2,
+      "seconds": 1.3634202999996887,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 1,
+      "drop": "no",
+      "target": 221.7,
+      "actual": 221.7,
+      "seconds": 0.314466899999843,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false,
+      "avsync": 5e-06,
+      "audio_pts": 222.178669
+    },
+    {
+      "source": "halloween",
+      "trial": 2,
+      "drop": "no",
+      "target": 15.3,
+      "actual": 15.3,
+      "seconds": 0.8383401000000958,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 2,
+      "drop": "no",
+      "target": 68.4,
+      "actual": 68.4,
+      "seconds": 0.5953546000000642,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 2,
+      "drop": "no",
+      "target": 125.6,
+      "actual": 125.6,
+      "seconds": 0.22749509999994189,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 2,
+      "drop": "no",
+      "target": 183.2,
+      "actual": 183.2,
+      "seconds": 1.3615725999998176,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 2,
+      "drop": "no",
+      "target": 221.7,
+      "actual": 221.7,
+      "seconds": 0.3151465000000826,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": false,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false,
+      "avsync": 1.9e-05,
+      "audio_pts": 222.181094
+    },
+    {
+      "source": "halloween",
+      "trial": 2,
+      "drop": "yes",
+      "target": 15.3,
+      "actual": 15.3,
+      "seconds": 0.4164647999996305,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 2,
+      "drop": "yes",
+      "target": 68.4,
+      "actual": 68.4,
+      "seconds": 0.3202547000000777,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 2,
+      "drop": "yes",
+      "target": 125.6,
+      "actual": 125.6,
+      "seconds": 0.16427509999994072,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 2,
+      "drop": "yes",
+      "target": 183.2,
+      "actual": 183.2,
+      "seconds": 0.6786810000003243,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 2,
+      "drop": "yes",
+      "target": 221.7,
+      "actual": 221.7,
+      "seconds": 0.17337069999985033,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false,
+      "avsync": 5e-06,
+      "audio_pts": 222.178285
+    }
+  ],
+  "actual_default_verification": [
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "default",
+      "target": 15.3,
+      "actual": 15.3,
+      "seconds": 0.4179991000000882,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "default",
+      "target": 68.4,
+      "actual": 68.4,
+      "seconds": 0.31750410000040574,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "default",
+      "target": 125.6,
+      "actual": 125.6,
+      "seconds": 0.15009449999979552,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "default",
+      "target": 183.2,
+      "actual": 183.2,
+      "seconds": 0.6859167999996316,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false
+    },
+    {
+      "source": "halloween",
+      "trial": 0,
+      "drop": "default",
+      "target": 221.7,
+      "actual": 221.7,
+      "seconds": 0.17302410000002055,
+      "properties": {
+        "hwdec-current": "d3d11va",
+        "vf": [],
+        "hr-seek-framedrop": true,
+        "cache-pause": true,
+        "cache-pause-wait": 1.0
+      },
+      "paused_for_cache": false,
+      "avsync": 8e-06,
+      "audio_pts": 222.18173
+    }
+  ],
+  "svp_audio_smoke": [
+    {
+      "drop": "no",
+      "target": 3.2,
+      "actual": 3.2,
+      "seeking": false,
+      "vf": [
+        {
+          "name": "vapoursynth",
+          "label": "quality-memc",
+          "enabled": true,
+          "params": {
+            "file": "C:\\Program portable\\mpv2\\tmp\\modernization\\isolated\\seek-20261017-nfnslz2u/vs/MEMC_SVP_PRO.vpy",
+            "concurrent-frames": "4"
+          }
+        }
+      ],
+      "avsync": 0.0
+    },
+    {
+      "drop": "no",
+      "target": 8.4,
+      "actual": 8.400066,
+      "seeking": false,
+      "vf": [
+        {
+          "name": "vapoursynth",
+          "label": "quality-memc",
+          "enabled": true,
+          "params": {
+            "file": "C:\\Program portable\\mpv2\\tmp\\modernization\\isolated\\seek-20261017-nfnslz2u/vs/MEMC_SVP_PRO.vpy",
+            "concurrent-frames": "4"
+          }
+        }
+      ],
+      "avsync": 0.0
+    },
+    {
+      "drop": "no",
+      "target": 5.3,
+      "actual": 5.305242,
+      "seeking": false,
+      "vf": [
+        {
+          "name": "vapoursynth",
+          "label": "quality-memc",
+          "enabled": true,
+          "params": {
+            "file": "C:\\Program portable\\mpv2\\tmp\\modernization\\isolated\\seek-20261017-nfnslz2u/vs/MEMC_SVP_PRO.vpy",
+            "concurrent-frames": "4"
+          }
+        }
+      ],
+      "avsync": 0.0,
+      "resumed_avsync": 5e-06
+    },
+    {
+      "drop": "yes",
+      "target": 3.2,
+      "actual": 3.201583,
+      "seeking": false,
+      "vf": [
+        {
+          "name": "vapoursynth",
+          "label": "quality-memc",
+          "enabled": true,
+          "params": {
+            "file": "C:\\Program portable\\mpv2\\tmp\\modernization\\isolated\\seek-20261017-nfnslz2u/vs/MEMC_SVP_PRO.vpy",
+            "concurrent-frames": "4"
+          }
+        }
+      ],
+      "avsync": 0.0
+    },
+    {
+      "drop": "yes",
+      "target": 8.4,
+      "actual": 8.400033,
+      "seeking": false,
+      "vf": [
+        {
+          "name": "vapoursynth",
+          "label": "quality-memc",
+          "enabled": true,
+          "params": {
+            "file": "C:\\Program portable\\mpv2\\tmp\\modernization\\isolated\\seek-20261017-nfnslz2u/vs/MEMC_SVP_PRO.vpy",
+            "concurrent-frames": "4"
+          }
+        }
+      ],
+      "avsync": 0.0
+    },
+    {
+      "drop": "yes",
+      "target": 5.3,
+      "actual": 5.302637,
+      "seeking": false,
+      "vf": [
+        {
+          "name": "vapoursynth",
+          "label": "quality-memc",
+          "enabled": true,
+          "params": {
+            "file": "C:\\Program portable\\mpv2\\tmp\\modernization\\isolated\\seek-20261017-nfnslz2u/vs/MEMC_SVP_PRO.vpy",
+            "concurrent-frames": "4"
+          }
+        }
+      ],
+      "avsync": 0.0,
+      "resumed_avsync": 9e-06
+    }
+  ],
+  "other_sources": {
+    "long_gop_1080p_median_seconds": {
+      "no": 0.1623,
+      "yes": 0.0928
+    },
+    "dolby_4k": "无稳定收益，不作为提速宣传依据"
+  },
+  "limitations": [
+    "未覆盖全部增帧或修改时间戳的滤镜",
+    "本地已读文件与同一Windows硬件的短测，非冷盘保证",
+    "保留精确跳转，仍有从关键帧解码至目标的剩余等待"
+  ],
+  "raw_results": "tmp/seek-20261017",
+  "logs": "tmp/modernization/validation/seek-20261017-*"
+}

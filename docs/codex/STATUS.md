@@ -1,7 +1,11 @@
 # STATUS.md — MPV 便携配置项目
 
-## 本轮续接快照（v1.6.2 已发布，Asia/Shanghai）
+## 本轮续接快照（v1.6.3 发布准备，Asia/Shanghai）
 
+- 用户已确认发布v1.6.3；本轮配置／菜单修复不命中3.2 Gate。01／04待重建，02／03待全输入核验复用，私包必须先构建验收；GitHub／ModelScope上传尚未开始。
+- 2026-10-17 12:43：撤去旧“自动ICC校色／非线性色彩转换”菜单。原日志确认直接cycle ICC令HQ的ACM线性交换链与sRGB编码混用，匹配用户发白反馈；Ctrl+I改走统一“色彩 > 系统ICC”，本机实测保持scRGB／linear且无外部覆盖。小窗溢出菜单常显滚动条与上下提示，提示置于行高亮之后，窗口缩放重算密度；640×360根／画面菜单末项可滚到，480×270及1600×900几何／密度与截图检查通过。报告`docs/modernization/menu-legacy-and-overflow-20261017.json`；仅本地修改，未提交／发布。
+- 2026-10-17 12:33：依用户修正，原两个性能档最终归入“画面 > 色彩 > 色度重建 > 默认／精细色度”，撤去独立“缩放算法”分类，OSD及状态详情同步为色度重建；选中状态、原算法数值与持久化键保留。“其它 > 播放性能”仅留零复制与精确跳转。真实菜单唯一入口／双向切换／状态勾选／色彩与滤镜及跳转独立性复验通过，未提交／发布。
+- 2026-10-17 12:15：修复本地视频精确跳转等待，`hr-seek-framedrop=yes`，保留精确落点。用户指定 Happy Halloween 4K60 HEVC 实片三轮各五点，中位 598→320ms、最慢 1363→690ms；实际默认值复验 317ms、最慢 686ms，全部落点准确。完整隔离配置／D3D11VA／WASAPI，无缓存等待；SVP＋音频小样跳转通过，非全部增帧滤镜认证。详见 `docs/modernization/seek-latency-20261017.json`。只改本地配置及记录，未发布、提交或推送；保留此前清理记录改动。
 - 已正式发布 [v1.6.2](https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.2)，为 Latest，非草稿／非预发布；用户版本及Gate授权已落实，发布流程原件未改。
 - 今日远端窗口／字体／GPU面板更新、ACM 起播／前台修复、OSD字号自动缩放持久化菜单及普通启动脚本发现修复均入包；原 i／I 绑定保留。
 - 01／04重建；02／03全输入SHA核验后原样复用v1.6.1，安装器沿用0.3.13。六附件GitHub远端SHA全匹配，ModelScope六项匿名直链HTTP200／大小一致。
@@ -9,6 +13,8 @@
 - 142Lua／120Python／构建AST、归档门禁、1424项配置资源覆盖、源及实际包双后端实播、普通启动全部脚本／I面板／字号记忆通过。
 - 标签构建提交 c498aef，功能提交f87d24f；结果记录随master推送；最终同步／干净工作树凭据见tmp/release-v1.6.2/final-git-check.json。报告docs/modernization/release-build-results-v1.6.2.json及release-results-v1.6.2.json。
 - 个人私包已补齐：release/mpv-full-private-v1.6.2.7z，7z完整性／并集／安装器SHA／版本标记／普通启动与I键通过，仅本地保留。AGENTS及README已固化今后分包＋私包全部构建验收后才上传的要求；不得自行省略。原始证据留tmp／backup；HDR桌面／多屏边界未实测。
+
+- 2026-10-13 20:35项目归档清理完成：本轮移入trash约181.72 GiB，含原有退役文件的trash约181.94 GiB；用户删除后预计保留31.49 GiB。最新分包／私包、运行库、用户历史／进度与研究原始数据保留，旧包归档backup。原tmp验收／isolated路径由move-manifest映射；删除trash后副本须再生成，配置／诊断文本保留为16.85MiB归档。清理报告docs/项目清理-20261013.md，清单backup/project-cleanup-20261013-200903。
 
 ## 当前状态快照
 
@@ -20,8 +26,8 @@
 | **最新发布提交** | c498aef（tag v1.6.2）；GitHub及ModelScope六公开资产已核验，个人私包只本地 |
 | **工作区** | v1.6.2分包及个人私包已落地；功能、发布和补打／顺序偏好记录随master保存 |
 | **MPV 核心版本** | v0.41.0-1107-g36bf3d529（shinchiro 20261008；FFmpeg N-127242-g5d4755f7d；libplacebo 0d043c7，含99e80abd浮点截断修复）；已纳入v1.6.0候选 |
-| **项目版本** | v1.6.1正式发布，latest；安装器独立0.3.13，GitHub与ModelScope均完成 |
-| **上次操作** | 2026-10-13 18:36 添加 OSD 字号自动缩放菜单持久化开关，双后端即时切换／跨启动记忆与原 I 键回归通过 |
+| **项目版本** | v1.6.3发布准备；当前公开Latest仍v1.6.2，安装器沿用0.3.13 |
+| **上次操作** | 2026-10-13 20:35完成项目归档清理；trash由用户随后删除；配置／运行库／私包／历史进度保护检查通过 |
 | **当前排查** | 默认标准恢复原有效auto目标及HDR对比度恢复0.30；原gamma2.2为注释。HQ保持FP32运算／FP16主纹理、经典sRGB／ACMscRGB／可信ICC／HDR分工及加密表，原精度结论保留。OP原速整片零丢帧未达成，8K48搁置 |
 | **自定义脚本** | quality.lua、quality_status.lua、color-target.lua、color-range-fix.lua、display-color.lua＋display-color-native.lua、hdr-mode.lua、stats.lua＋system_metrics.lua、startup-format-logos.lua（保留用户定制） |
 
@@ -50,7 +56,7 @@ c:\Program portable\mpv2\
 ## TODO
 
 - [x] 本机 HQ／SDR ACM 冷启动双窗口及后台播放：预查输出与窗口重建抬升、通知空档确认，双后端与启动页回归通过（2026-10-13）
-- [ ] 本轮正式日志另有根目录 Python Scripts 内 .exe 被自动当作 mpv 脚本加载；未处理，不与 ACM 撤轨重建原因混为一谈。
+- [x] 根目录Python Scripts EXE误加载已在v1.6.2修复，只发现活动配置脚本；与ACM起播问题分别处理。
 
 - [x] 菜单噪点偏好标准：校正HQ线性材质并修复过渡参考；双后端实际菜单与视频隔离验证通过（2026-10-12）
 
@@ -3799,3 +3805,71 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - 构建暂存经绝对路径核验归档至backup/release-v1.6.2-private-staging，根build清空；release与publish保留产物。本轮仅补本地私包，不上传／不替换公开资产，不改发布标签或发布流程原件。
 - 用户持久要求已写入AGENTS和README：默认分包＋私包全部构建验收成功后，才开始任何GitHub／ModelScope上传；沿用02／03也须先补私包。除用户当轮明确取消，agent不得自行跳过。
 - 本轮偏好说明和补打结果提交后推送master，最终同步／干净工作树检查另存tmp/release-v1.6.2/private-final-git-check.json。
+
+## 2026-10-13 20:35 — 项目归档清理完成
+
+- 用户授权归档和清理213GB项目，把可删除缓存移至根trash由用户随后整体删除；本轮没有永久删除。HandShake／根AGENTS／目录架构已核对，git pull --ff-only同步于b90b87e，起始工作树干净，无mpv／VSPipe或安装器测试进程运行。
+- 初始盘点213.25GiB、846495文件，无扫描错误或重解析点；tmp 176.80GiB，其中522份isolated副本138.64GiB。保留数据范围及原文件完整盘点在backup/project-cleanup-20261013-200903。
+- 先归档92446个文本配置／诊断文件（2.526GiB输入→16.85MiB），7z t和集合相同通过，SHA 201f1dc3cac54a3fd8ff0bb695e762b5795e8f30ad5506e11234a440f256fb95；不把纯资源副本当成用户数据，不公开上传含个人日志的归档。
+- 原路径和最终目标逐项检查在工作区及指定trash／backup内，拒绝跟踪文件、重解析点、已有目标覆盖；全程PowerShell LiteralPath同盘搬移，未组合跨shell删除／移动。864项无失败，本轮trash 181.72GiB；旧v1.5.7六包6.89GiB归档保留。
+- 827045个非Git内部原文件逐项大小／mtime／源目标映射通过，784323个原有文件搬移；2031个配置／关键运行库／当前私包／用户历史与进度SHA不变。mpv --version、VS原生模块导入、diff检查通过，不冒称重跑GUI全功能实播。
+- 保留portable_config/files、cache/watch_later、window_state.conf、settings.xml、当前01～04和1.6.2私包、运行库／模型、原始素材／数值读回、研究源码／依赖、ModelScope deps和VantaInstaller/publish。旧1.6.0 03包仅在与当前包SHA相同后移入trash。清理installer bin／obj、pycache、GPU Shader／ICC计算缓存。
+- 完整盘点原文压缩为inventory.json.gz／file-inventory.json.gz，往返SHA相同；原文缓存移入trash，详细move-manifest、verification及说明留在trash外backup。trash总量约181.94GiB；同盘移动不立即释放，用户删除整个trash后项目预计31.49GiB（逻辑大小）。
+- 历史报告原tmp路径需按清单映射，trash删除后测试／解压副本从保留分包或工具重建；只读诊断配置可由测试配置与诊断记录.7z提取。后续阶段回归收尾及时移除isolated／包验收副本，防止再堆积。
+- 本轮仅本地记录变动：docs/项目架构.md、docs/项目清理-20261013.md、STATUS及工作进度；版本／发布流程／活动代码未改，未提交／推送。切换设备前建议提交清理记录。
+
+## 2026-10-17 12:15 — 本地时间轴精确跳转延迟优化
+
+- 已读根 AGENTS、HandShake、STATUS；INDEX 不存在。`git pull --ff-only` 显示已同步，master／origin/master 无分歧；起始存在上轮清理记录四文件改动，全部保留。
+- 时间轴点击和松手均走 `absolute+exact`，拖动中已有关键帧定位。原 `hr-seek-framedrop=no` 要求处理目标前中间帧；官方默认 yes。未将普通点击改成关键帧跳转，未减少画质、调整线程或缓存。
+- 最近原始播放日志四次杜比实片点击约90～180ms，无缓存等待。隔离完整配置复测杜比片段开关无稳定收益；1080p 长 GOP 合成片三轮中位162→93ms，不能代替用户片源结论。
+- 用户随后指定下载目录中的 Happy Halloween 4K UHD MP4。FFmpeg 读取为3840×2160、60fps、8bit HEVC Main＋AAC，时长244.57秒，约30.7Mbps。用实际完整配置副本、D3D11VA硬解、960×540窗口、WASAPI静音，每组三轮交替顺序，五个前后向目标15.3／68.4／125.6／183.2／221.7秒。
+- 以核心 `playback-restart` 事件计时，排除只读到目标属性的竞态；旧设置15次中位0.598437秒、最大1.363420秒，新设置15次中位0.319573秒、最大0.690271秒，全部落点误差0，无paused-for-cache。跳转后音频和视频继续前进，AV同步观测绝对值≤0.000019秒；该短测不替代长期同步验收。
+- 生产仅修改 `portable_config/mpv.conf` 默认 `hr-seek-framedrop=yes` 并补中文说明。Ctrl+Y及原菜单仍可关闭，供增帧／改时间戳滤镜出现精确定位问题时回退。SVP＋HEVC10／AAC小样两组各三次跳转／恢复通过，未宣称覆盖RIFE、所有滤镜或全部片源。
+- 修改后刷新隔离配置、不传该选项覆盖值，确认实际默认true；五次跳转中位0.317504秒、最大0.685917秒，落点准确，日志无error／fatal／Lua error。对照数据及方法保存 `docs/modernization/seek-latency-20261017.json`，原始脚本／结果在 `tmp/seek-20261017`，日志在 `tmp/modernization/validation/seek-20261017-*`。
+- UTF-8／LF及 `git diff --check` 验证；沿用Git对历史记录的LF→CRLF提示，不改全局Git配置。测试使用独立配置副本，未覆盖用户播放历史／窗口／持久化偏好；递归清理命令被执行策略拦截后改为将副本移入根trash保留可恢复性，结果与小型测试素材仍留tmp。
+- 当前版本仍v1.6.2；不打包、不发布、不改发布流程，不自动提交／推送。工作区保留上轮清理记录并新增本轮mpv.conf、结果JSON及HandShake记录，建议验证体验后提交。
+
+## 2026-10-17 12:30 — 缩放算法与色彩／播放性能菜单分工
+
+- 用户指出“其它 > 播放性能”与“画面”重复。`git pull --ff-only`已同步，保留前轮本地跳转优化及原有清理记录。核查两个Performance profile算法数值仅cscale=bilinear／spline36不同，原“HQ · 默认／高质量 · 色度与线性缩小”与“HQ 高色准”是不同功能，命名却容易混淆。
+- `input.conf`将上述两项移至“画面 > 缩放算法 > 默认／精细色度”，每个命令仅一个入口，新增当前档位勾选。“画面 > 色彩”继续处理标准／HQ高色准／系统ICC；“其它 > 播放性能”仅保留D3D11VA零复制、精确跳转跳过中间帧，Ctrl+Y保持。
+- `quality.lua`与`quality_status.lua`同步OSD、当前启用项、色彩与播放详情及错误提示为“缩放算法：默认／精细色度”。脚本消息名、Performance profile数值、保存文件与performance键不改，保留旧偏好兼容。
+- 更新`tools/validate-quality-menu.py`原有菜单文字断言；本轮只运行针对本次改动的真实菜单回归，未重跑其中全部超分／Shader广覆盖流程。
+- `python tmp/menu-layout-20261017.py`通过：隔离完整配置、真实mpv菜单树、两个缩放档路径唯一、性能菜单仅两项、spline36↔bilinear切换、互斥勾选；色彩模式／目标TRC与prim／VF／Shader／hr-seek-framedrop完全保持；两个详情视图都使用新用语，最终日志无error／fatal／Lua error。测试使用软解，避免菜单验证被旧H26410夹具的自动硬解探测报错干扰；不把该边界写成硬解修复。
+- 两个Lua文件语法、Python AST、修改文件UTF-8／LF与`git diff --check`验证；原始结果在`tmp/menu-layout-20261017/results.json`，日志在`tmp/modernization/validation/menu-layout-20261017.log`，隔离副本移至根trash避免重复堆积。
+- 新增本轮改动为input.conf、quality.lua、quality_status.lua、现有菜单回归断言及HandShake记录。版本仍1.6.2，未提交／推送／发布；切换设备前建议将已确认的功能与记录一并提交。
+
+## 2026-10-17 12:33 — 色度重建归入色彩子菜单
+
+- 用户指出“缩放算法”仍会与Lanczos等采样算法混淆，明确要求放入色彩下一级。最终路径调整为“画面 > 色彩 > 色度重建 > 默认／精细色度”；同步quality.lua、quality_status.lua的OSD、状态详情和错误提示，沿用原消息、profile、算法参数和持久化键。
+- 更新现有菜单断言，要求存在色度重建且没有独立缩放算法。针对新路径运行真实隔离菜单回归`python -X utf8 tmp/menu-color-20261017.py`通过：两个入口唯一、四层路径、双向切换与勾选正确，色彩模式／VF／Shader／跳转选项不变，两种状态详情使用新名称，最终日志无error／fatal。
+- 两Lua语法、Python AST及diff检查通过，文件继续使用UTF-8／LF。结果`tmp/menu-color-20261017/results.json`，日志`tmp/modernization/validation/menu-color-20261017.log`；隔离副本移至根trash。保留既有未提交改动，未发布／推送。
+
+## 2026-10-17 12:43 — 旧ICC开关发白与小窗菜单溢出提示
+
+- 用户询问截图中的自动ICC／非线性色彩转换开关是否仍有价值，并指出小窗右键菜单底部选项被吞；随后补充自动ICC开启后偏白。已核查真实脚本、预设及官方ICC／sigmoid文档。
+- 原portable_config/files/mpv.log记录43.633秒：HQ、sdr-acm、Windows advanced_active=true／mode=wcg、系统通用sRGB描述文件；直接打开icc-profile-auto后，管理器标记“外部覆盖”，target-trc仍scrgb、D3D11交换链rgba16f／linear，但actual_target.gamma变为srgb。48.956秒再次关闭后actual gamma恢复scrgb。该混用可解释用户的亮度抬高，不泛称所有ICC都会发白，不将通用sRGB描述文件当屏幕校准。
+- input.conf撤去两个旧菜单入口；Ctrl+I合并到既有“画面 > 色彩 > 系统 ICC”，执行color-select icc事务，避免直接cycle底层选项。ICC功能保留，当前ACM场景交由受管路径处理。sigmoid-upscaling是放大抗振铃，不是通用非线性色彩开关；其默认预设yes保留，不改变画质默认值。
+- 640×360实复现根菜单13项只显前9项；旧滚轮能到最后4项，但滚动条平时隐藏，无下方内容提示。Menu.lua对溢出面板常显细滚动条与上下方向标记，交互时加亮；在行内容之后绘制避免被高亮覆盖。on_display改为重算内容尺寸，以适配窗口高度变化时行高和字体密度。
+- 实际隔离完整配置回归：根菜单13项、画面子菜单15项滚轮上下往返，最终“退出程序／色彩调整”均可见；根菜单贴近底边仍完整处于窗口内。640×360行高34，1600×900行高40且全部内容不溢出，480×270恢复34且视口完整。逐张检查root-top-after及picture-bottom-after截图，滚动提示可见、底部完整行可达；极小窗仍需滚轮，不宣称能同时展示全部菜单。
+- 真实keypress Ctrl+I确认requested=icc、状态非外部覆盖，当前ACM路径icc-profile-auto=false、output-csp=linear、actual gamma=scrgb。测试日志无error／fatal／Lua error；非物理屏幕校色，也未重跑全部HDR／其他平台ICC路线。
+- 更新现有菜单回归断言，要求两个旧标签和直接cycle命令消失；针对回归脚本`tmp/menu-overflow-check.py`通过。Lua语法、Python AST、UTF-8／LF与diff检查通过。证据报告`docs/modernization/menu-legacy-and-overflow-20261017.json`，原始结果及截图`tmp/menu-overflow-20261017`，运行日志`tmp/modernization/validation/menu-overflow-after.log`。
+- 隔离副本移至根trash，原用户历史／持久化／窗口偏好不改，所有前轮未提交改动保留。本轮修改input.conf、Menu.lua、现有菜单断言和记录；版本仍1.6.2，未提交／推送／发布。Ctrl+I语义已由旧底层开关统一到系统ICC选择，重启后生效；建议确认体验后提交。
+
+## 2026-10-17 12:47 — v1.6.3 发布准备与逐项检查
+
+- 已完整阅读《发布流程.md》，用户明确确认版本v1.6.3；不修改流程原件。3.2逐项评估：公开包数量／边界／命名／覆盖顺序、构建脚本、核心／运行库、大资源、安装／启动方式、版权边界和分卷均不变，无Gate命中。
+- 3.1：master／origin/master均b90b87e，git fetch完成，无远端未合并提交。审阅本轮配置／菜单及上次清理文档变更，后者仅记录归档，不改发布内容；所有改动按功能／构建／结果整理提交，禁止混入未知改动。
+- 3.3：新版本准备章节已创建并将1.6.2完整移入历史；工作进度及本状态追加记录。README安装方式／结构不变，无需修改。ReleaseNote仅使用逐行更改／移除条目。
+- 3.4：跳转实片、菜单／ICC针对验证已通过；发布前全Lua／Python、构建AST、配置保留与完整配置双后端实播待补齐。
+- 4.1／4.1.1：计划01／04重建；02／03从1.6.2归档重新提取并与全部实际输入SHA／集合／数量／字节／mtime对照，无法证明则重建；安装器0.3.13沿用。复用例外允许子包入口，私包build-full-private必做。
+- 第5节完整性、SHA、内容门禁、Logo／ffmpeg／版本标记／窗口状态、全功能覆盖、实际包及安装器实启、私包并集及占位目录均待完成；第6～8节提交标签／上传／远端验证／镜像／收尾均未开始。
+
+## 2026-10-17 12:51 — v1.6.3 发布前功能验收通过
+
+- 3.1：上轮清理文档已单独提交5c60cc1；本轮功能、版本标记、记录及两个结果JSON已审阅，接下来创建功能提交，不夹带tmp／缓存或用户状态。
+- 3.2：额外解压v1.6.2 Base核对Git忽略输入，304项非配置文件SHA未变。README与旧包差异仅b90b87e中用户已要求的私包先验收后上传说明；不涉及安装方式／包边界，无Gate命中。
+- 3.4全部通过：142 Lua、120 Python、六个构建脚本AST、Shader引用、徽标素材完整性、用户选项逐字节保留、发布流程未修改、diff检查。完整源配置D3D11／Vulkan×SDR／HDR10／HLG六组真实视频持续播放、标准→HQ→标准、窗口缩放和暂停恢复均无error／fatal。
+- 完整菜单回归七组通过：新色度重建／HQ／滤镜入口、旧ICC及sigmoid开关消失、Shader与VF独立清空、十二Anime4K、VS菜单与换片清理等。前轮小窗菜单／ICC快捷键及用户指定实片跳转证据继续有效，生产代码未再改动。
+- 第4／5节输入核验及全部构建验收继续进行，未上传。结果`tmp/release-v1.6.3/preflight.json`、source-playback.json、base-input-audit.json。

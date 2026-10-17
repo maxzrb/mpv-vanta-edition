@@ -912,7 +912,10 @@ function Menu:move_selected_item_by(delta)
 	end
 end
 
-function Menu:on_display() self:update_dimensions() end
+function Menu:on_display()
+	-- 窗口高度变化时重算行高和字号，避免沿用大窗密度挤掉更多菜单项。
+	self:update_content_dimensions()
+end
 function Menu:on_prop_fullormaxed() self:update_content_dimensions() end
 function Menu:on_options() self:update_content_dimensions() end
 
@@ -1906,19 +1909,19 @@ function Menu:render()
 			bind_zone('primary_down', bg_rect, self:create_action(function() self:slide_in_menu(menu.id, x) end))
 		end
 
-		-- Scrollbar: reveal only while scrolling/dragging or when the pointer
-		-- deliberately approaches the panel's right edge.
+		-- 超长菜单始终提供滚动提示，避免小窗底部选项看起来被删除。
 		local scrollbar_hover_rect = {
 			ax = content_rect.bx - round(14 * state.scale),
 			ay = content_rect.ay,
 			bx = bg_rect.bx,
 			by = content_rect.by,
 		}
-		local show_scrollbar = self.is_dragging or menu.fling
+		local scrollbar_active = self.is_dragging or menu.fling
 			or now < (menu.scrollbar_visible_until or 0)
 			or get_point_to_rectangle_proximity(cursor, scrollbar_hover_rect) <= 0
-		if menu.scroll_height > 0 and show_scrollbar then
-			local groove_inset = round(1 * state.scale)
+		local function draw_scrollbar()
+			if menu.scroll_height <= 0 then return end
+			local groove_inset = math.min(round(10 * state.scale), menu.height / 4)
 			local groove_height = menu.height - groove_inset * 2
 			local thumb_height = math.min(groove_height, math.max(
 				(menu.height / (menu.scroll_height + menu.height)) * groove_height,
@@ -1928,9 +1931,24 @@ function Menu:render()
 				+ ((menu.scroll_y / menu.scroll_height) * (groove_height - thumb_height))
 			local sax = content_rect.bx - round(self.scrollbar_size / 2)
 			local sbx = sax + self.scrollbar_size
-			ass:rect(sax, thumb_y, sbx, thumb_y + thumb_height, {
-				color = config.color.match, opacity = menu_opacity * 0.8,
+			ass:rect(sax, content_rect.ay + groove_inset, sbx, content_rect.by - groove_inset, {
+				color = menu_fg, opacity = menu_opacity * 0.14,
 			})
+			ass:rect(sax, thumb_y, sbx, thumb_y + thumb_height, {
+				color = config.color.match, opacity = menu_opacity * (scrollbar_active and 0.9 or 0.65),
+			})
+			local indicator_x = content_rect.bx - round(4 * state.scale)
+			local indicator_size = round(12 * state.scale)
+			if menu.scroll_y > 0.5 then
+				ass:icon(indicator_x, content_rect.ay + groove_inset / 2, indicator_size, 'expand_less', {
+					color = menu_text, opacity = menu_opacity * 0.85,
+				})
+			end
+			if menu.scroll_y < menu.scroll_height - 0.5 then
+				ass:icon(indicator_x, content_rect.by - groove_inset / 2, indicator_size, 'expand_more', {
+					color = menu_text, opacity = menu_opacity * 0.85,
+				})
+			end
 		end
 
 		-- Draw submenu if selected（两阶段绘制）
@@ -2618,6 +2636,9 @@ function Menu:render()
 			menu.action_index = nil
 			request_render()
 		end
+
+		-- 最后绘制滚动提示，避免被选中行的背景遮住。
+		draw_scrollbar()
 
 		-- 阶段2：本层全部内容绘制完成后，再递归绘制子菜单。
 		-- 递归内层同样后置绘制它的子菜单，因此最深层的子菜单最后写入 ASS，
