@@ -471,6 +471,39 @@ mp.register_script_message('set-position', function(value)
 	apply_and_persist('窗口位置')
 end)
 
+-- 按当前视频输出比例调整窗口，不裁剪画面；仅本次生效，不改变窗口比例锁定设置。
+mp.register_script_message('fit-video', function()
+	local params = mp.get_property_native('video-out-params')
+		or mp.get_property_native('video-params')
+	if not params or not params.w or not params.h then
+		osd_show('当前没有可用的视频画面')
+		return
+	end
+	local source_w = params.dw or params.w
+	local source_h = params.dh or params.h
+	if source_w <= 0 or source_h <= 0 then return end
+	local aspect = source_w / source_h
+	local screen_w = mp.get_property_number('display-width', 1920)
+	local screen_h = mp.get_property_number('display-height', 1080)
+	local max_w = math.max(320, math.floor(screen_w * 0.9 + 0.5))
+	local max_h = math.max(180, math.floor(screen_h * 0.9 + 0.5))
+	local w = max_w
+	local h = math.floor(w / aspect + 0.5)
+	if h > max_h then
+		h = max_h
+		w = math.floor(h * aspect + 0.5)
+	end
+	local geometry = string.format('%dx%d+50%%+50%%', w, h)
+	local ok, err = pcall(mp.set_property, 'geometry', geometry)
+	if not ok then
+		msg.error('贴合视频比例失败：' .. tostring(err))
+		osd_show('贴合视频比例失败')
+		return
+	end
+	positioned = true
+	osd_show(string.format('贴合视频比例：%dx%d（无黑边）', w, h))
+end)
+
 local function toggle_remember(kind, value)
 	local v = tostring(value or ''):lower()
 	local on = v == 'yes' or v == 'true' or v == '1' or v == 'on'
