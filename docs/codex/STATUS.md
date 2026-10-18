@@ -1,13 +1,14 @@
 # STATUS.md — MPV 便携配置项目
 
-## 本轮续接快照（v1.6.4构建与包级验收通过，待上传，Asia/Shanghai）
+## 本轮续接快照（v1.6.4 已正式发布，Asia/Shanghai）
 
-- 用户指定发布1.6.4；本轮为普通配置／脚本／菜单改动，不触发发布流程3.2 Gate。功能提交b6f6c82，覆盖杜比视界映射、窗口比例控制、菜单重排及窗口偏好持久化。
-- 01／04及同版本私包已重建；02／03输入与1.6.3完全一致，按4.1.1原样复用并逐字节、7z t及SHA复核。六公开资产均小于2GiB，私包只本地。
-- 源完整配置真实播放通过；实际合并包D3D11／Vulkan×SDR／HDR10／HLG、色彩模式往返、窗口变化及暂停恢复通过；包内容门禁、版本标记、Logo／ffmpeg边界和个人偏好排除通过。
-- 用户本地uosc.conf（keyframes）与window_size_position.conf（remember_size=no）未提交、未写入公开包，构建后恢复；不得清理覆盖。
-- 构建报告docs/modernization/release-build-results-v1.6.4.json，包级播放release-playback-v1.6.4.json；资产SHA已写入版本记录及release/SHA256SUMS-v1.6.4.txt。
-- 待提交构建记录、创建并推送v1.6.4标签，随后上传GitHub六公开资产并同步ModelScope；私包禁止上传。
+- 用户指定发布1.6.4；本轮为普通配置／脚本／菜单改动，不触发发布流程3.2 Gate，流程原件未修改。功能提交b6f6c82。
+- 前次上传阶段主机意外关机；恢复后复核草稿已有01／02.002／04／安装器且SHA一致，补传02.001／03，六项远端SHA全部匹配后转正式Latest。
+- 01／04及同版本私包已重建；02／03输入与v1.6.3完全一致，按4.1.1原样复用；安装器沿用0.3.13。
+- 源完整配置及实际合并包D3D11／Vulkan×SDR／HDR10／HLG、色彩模式往返、窗口变化与暂停恢复通过；包内容门禁、版本标记、Logo／ffmpeg边界和264项配置覆盖通过。
+- 用户本地uosc.conf（keyframes）与window_size_position.conf（remember_size=no）未提交、未写入公开包，本轮未改动。
+- [GitHub v1.6.4](https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.4)正式Latest；ModelScope v1.6.4/六项匿名HTTP200及大小一致；私包仅本地。
+- 报告docs/modernization/release-build-results-v1.6.4.json与release-results-v1.6.4.json；build已归档backup/release-v1.6.4-build-staging。
 
 ## 当前状态快照
 
@@ -15,12 +16,12 @@
 |------|------|
 | **项目** | MPV 便携播放器个人配置（fork from gaoxing64/MPV-lazy-full v2.0.0） |
 | **用户核心优先级** | 软件层面完整验证 SDR／HDR 路线准确性，不以校色仪／真实HDR屏幕为条件；性能不重编译、不再增加线程，默认 D3D11、跨片源／后端通用；不推广 OP 单片参数，用户不关注超分／补帧 |
-| **分支** | master功能提交b6f6c82；构建记录待提交，v1.6.4标签待创建 |
-| **最新发布提交** | v1.6.3仍为当前Latest（6359153）；v1.6.4已完成构建与包级验收，待上传 |
-| **工作区** | v1.6.4构建完成；个人uosc.conf与window_size_position.conf差异保留，不纳入提交 |
+| **分支** | master／origin/master在收尾提交后同步；v1.6.4标签保留构建提交be98e40 |
+| **最新发布提交** | be98e40（tag v1.6.4）；GitHub及ModelScope六公开资产已核验，个人私包只本地 |
+| **工作区** | v1.6.4分包及私包全部构建验收后发布；结果记录随master保存 |
 | **MPV 核心版本** | v0.41.0-1107-g36bf3d529（shinchiro 20261008；FFmpeg N-127242-g5d4755f7d；libplacebo 0d043c7，含99e80abd浮点截断修复）；已纳入v1.6.0候选 |
-| **项目版本** | v1.6.4构建完成，待发布；安装器独立0.3.13 |
-| **上次操作** | 2026-10-18完成1.6.4功能提交、01／04／私包构建及实际包验收 |
+| **项目版本** | v1.6.4正式发布，Latest；安装器独立0.3.13 |
+| **上次操作** | 2026-10-18 22:17完成v1.6.4正式发布、国内镜像、私包核验和暂存归档 |
 | **当前排查** | 默认标准恢复原有效auto目标及HDR对比度恢复0.30；原gamma2.2为注释。HQ保持FP32运算／FP16主纹理、经典sRGB／ACMscRGB／可信ICC／HDR分工及加密表，原精度结论保留。OP原速整片零丢帧未达成，8K48搁置 |
 | **自定义脚本** | quality.lua、quality_status.lua、color-target.lua、color-range-fix.lua、display-color.lua＋display-color-native.lua、hdr-mode.lua、stats.lua＋system_metrics.lua、startup-format-logos.lua（保留用户定制） |
 
@@ -4015,3 +4016,12 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - **5.6 安装器**：v0.3.13以最小化窗口启动，主窗口`Vanta Installer`出现后正常关闭，候选SHA未变。
 - **6～8 待执行**：提交构建记录与版本标记，创建并推送v1.6.4标签，上传GitHub六白名单公开资产，同步ModelScope `v1.6.4/`六项并做匿名HTTP200／大小核验，最后提交发布结果并恢复个人偏好。
 
+
+## 2026-10-18 22:17 — v1.6.4 发布中断恢复与正式发布
+
+- 第1～5节：发布前检查、构建与包级验收记录已在前一条完成；恢复后完整重读《发布流程.md》并复核标签、草稿与本地SHA，无需重建产物。
+- 第6节：功能b6f6c82→构建be98e40，v1.6.4为lightweight标签，远端标签引用与本地提交一致。
+- 第7节：草稿原有01／02.002／04／安装器四项SHA通过；补传02.001与03后六项名称／大小／远端SHA全部匹配，转正式Latest，非草稿／非预发布，无私包或重复资产。https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.4。
+- 第7.1节：ModelScope v1.6.4/六项完成，匿名直链逐项HTTP200／大小匹配，未上传私包。
+- 第8节：build经绝对路径核验移入backup/release-v1.6.4-build-staging，release与安装器publish保留；三类记录及结果报告更新；用户个人偏好未改动。
+- 私包7z t、安装器SHA与FW占位核验通过；本轮未单独复测私包实播，不将公开合并包结果冒充私包播放验收。
