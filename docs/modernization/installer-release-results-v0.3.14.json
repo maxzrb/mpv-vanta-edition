@@ -1,0 +1,125 @@
+{
+  "installer_version": "0.3.14",
+  "player_version": "1.6.4",
+  "checked_at": "2026-10-25 15:09 Asia/Shanghai",
+  "published": true,
+  "release_url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.4",
+  "latest": true,
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.4.7z",
+      "bytes": 136917184,
+      "sha256": "f451da6de0612e7f466ab32f6a42003262637dc4e95dc76d402203a23d8077b7",
+      "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.4/01-mpv-base-v1.6.4.7z"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.4.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5",
+      "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.4/02-mpv-extras-v1.6.4.7z.001"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.4.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9",
+      "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.4/02-mpv-extras-v1.6.4.7z.002"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.4.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2",
+      "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.4/03-mpv-fasterwhisper-addon-v1.6.4.7z"
+    },
+    {
+      "name": "04-mpv-config-v1.6.4.7z",
+      "bytes": 5370418,
+      "sha256": "9b1b59eb91f9c9bdcd67973c46ae6ac61d8f04b563a3b744f16e7fe720910c9f",
+      "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.4/04-mpv-config-v1.6.4.7z"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8",
+      "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.4/VantaInstaller-win-x64-v0.3.14.exe"
+    }
+  ],
+  "withdrawn": {
+    "name": "VantaInstaller-win-x64-v0.3.13.exe",
+    "github_http": 404,
+    "modelscope_http": 404,
+    "scope": "current v1.6.4 update channel"
+  },
+  "modelscope": {
+    "complete": true,
+    "dataset": "AerithDream/mpv-vanta-edition",
+    "directory": "v1.6.4/",
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.4.7z",
+        "bytes": 136917184,
+        "anonymous_http": 200
+      },
+      {
+        "name": "02-mpv-extras-v1.6.4.7z.001",
+        "bytes": 1992294400,
+        "anonymous_http": 200
+      },
+      {
+        "name": "02-mpv-extras-v1.6.4.7z.002",
+        "bytes": 830172768,
+        "anonymous_http": 200
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.4.7z",
+        "bytes": 1476001942,
+        "anonymous_http": 200
+      },
+      {
+        "name": "04-mpv-config-v1.6.4.7z",
+        "bytes": 5370418,
+        "anonymous_http": 200
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.14.exe",
+        "bytes": 69776451,
+        "anonymous_http": 200
+      }
+    ],
+    "withdrawn": "VantaInstaller-win-x64-v0.3.13.exe",
+    "withdrawn_http": 404,
+    "initial_delete_propagation_delay": true
+  },
+  "update_probe": {
+    "passed": true,
+    "old_version": "0.3.13",
+    "new_version": "0.3.14",
+    "player_release": "v1.6.4",
+    "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8",
+    "bytes": 69776451,
+    "modelscope_download": true,
+    "current_version_no_update": true
+  },
+  "private": {
+    "name": "mpv-full-private-v1.6.4.7z",
+    "bytes": 3037921285,
+    "sha256": "4c04a9c457fefc8dea91915d3e6094e110ca0397eec3f7c526c890ce8d9059ca",
+    "local_only": true,
+    "uploaded": false,
+    "manifest": {
+      "passed": true,
+      "union_files_including_empty": 11796,
+      "empty_files": 53,
+      "extra_files": [
+        "Faster-Whisper-XXL/03包解压后覆盖于此.txt",
+        "README-个人私用全量包.txt",
+        "VantaInstaller-win-x64-v0.3.14.exe"
+      ]
+    }
+  },
+  "functional_commit": "1ea7f503bf93c6ed399ac54683982169c1646e18",
+  "source_tag": "v0.3.14",
+  "tag_object": "765767870c29a1c8e9b2c9eaeccc42104f3a19b8",
+  "tag_commit": "836c2594920c3382d11d2e889159e2b8690b3871",
+  "player_tag_unchanged": "be98e40bec7f0133ef94a4e5b1ea3a277f725c23",
+  "build_staging_archived": true
+}
