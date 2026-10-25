@@ -1,5 +1,14 @@
 # STATUS.md — MPV 便携配置项目
 
+## 当前任务快照（2026-10-25 15:02，Asia/Shanghai）
+
+- 用户授权独立发布 VantaInstaller 0.3.14，并撤下当前更新入口的 0.3.13；播放器保持 v1.6.4，现有 01～04 归档逐字节不变，不改历史 Release。
+- 功能提交 1ea7f50：下载后目录交接、欢迎页激活刷新、重新扫描命令绑定、旧结果隔离／补扫、目标目录写入权限预检及权限文案；不改变安装提权、构建形式或核心运行时，无 3.2 Gate。
+- 本地自包含单文件、同播放器版本私包已全部构建验收，尚未上传。新安装器 69776451 字节／SHA `10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8`；私包 3037921285 字节，仅本地；原件备份位于 backup/installer-v0.3.14-before-release。
+- Rebuild／真实 WPF 与 aria2／ACL 回归、六组完整配置实播、候选有效窗口和正常退出、公开归档 7z t／原 SHA、私包 7z t／并集 CRC／新安装器 SHA／占位／发行默认全部通过。
+- 下一步：提交构建记录并推送 master 与 v0.3.14 源码标签，给正式 Latest v1.6.4 上传并核验新安装器后撤该页旧包，同步镜像，实测 0.3.13 自动检测并下载 0.3.14，收尾记录。
+- 用户原有 portable_config/script-opts/window_size_position.conf 偏好未动，不纳入本轮提交或私包；根 .vanta-version 仍逐字节为 1.6.4。
+
 ## 本轮续接快照（v1.6.4 已正式发布，Asia/Shanghai）
 
 - 用户指定发布1.6.4；本轮为普通配置／脚本／菜单改动，不触发发布流程3.2 Gate，流程原件未修改。功能提交b6f6c82。
@@ -4025,3 +4034,49 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - 第7.1节：ModelScope v1.6.4/六项完成，匿名直链逐项HTTP200／大小匹配，未上传私包。
 - 第8节：build经绝对路径核验移入backup/release-v1.6.4-build-staging，release与安装器publish保留；三类记录及结果报告更新；用户个人偏好未改动。
 - 私包7z t、安装器SHA与FW占位核验通过；本轮未单独复测私包实播，不将公开合并包结果冒充私包播放验收。
+
+## 2026-10-24 12:16 — 修复安装器下载后扫描不刷新
+
+- 用户反馈全新安装时内置下载完成仍找不到包，重新扫描无效，重启后能识别；本轮按新会话接手，读取 AGENTS.md／STATUS.md（INDEX.md 不存在）。`git pull --ff-only` 已为最新；原有唯一差异是用户 window_size_position.conf，保留未改。
+- 修改 `WelcomeView.xaml` 的扫描命令绑定；`MainViewModel.StartInstall` 激活欢迎页时调用刷新；`SettingsViewModel` 每项下载成功后把实际下载目录交接给会话；`WelcomeViewModel` 刷新目录和结果，扫描中禁用下一步并清空旧结果，目录切换或重入时补扫。
+- 新增独立回归入口 `VantaInstaller/tests/RescanRegression/`，无需测试框架依赖；使用真实 WPF 资源／按钮命令、真实 Main／Settings／Welcome 视图模型及内置 aria2。小型占位包只验证下载和扫描，不执行归档解压或安装，不替代正式发布验收。
+- 首次普通 build 遇到已有 WPF obj 缓存缺失生成文件（CS2001），执行 `dotnet build VantaInstaller/VantaInstaller.slnx --no-restore -t:Rebuild -v minimal` 后成功，0 警告、0 错误。真实绑定回归最初因脱离窗口的绑定尚未经过 Dispatcher 而失败，等待 ApplicationIdle 后验证通过。
+- `dotnet run --project VantaInstaller/tests/RescanRegression/RescanRegression.csproj` 全部通过：初始无包；真实按钮绑定；同进程默认目录下载后进入安装即可识别；按钮重扫新增包；自选中文／空格目录下载后自动交接并识别；扫描期间切换目录补扫且路径一致；无效目录禁用下一步，未沿用旧成功结果。
+- 代码及记录统一 UTF-8／LF；`git diff --check` 通过。未更新版本号、未执行发布打包或上传；已发布 0.3.13 二进制未替换。工作区未提交，切换设备前建议单独提交本轮修复和测试，排除用户偏好。
+
+## 2026-10-24 12:54 — 他人首次安装后打开方式无响应，重新注册后恢复
+
+- 查看用户提供的 `C:\Users\maxzr\Downloads\下载.png`：Windows 打开方式中存在两个同名 MPV Vanta Edition 入口，不能仅据此认定旧版本残留或冲突。
+- 用户确认直接拖入同一个视频可以播放，而选择 MPV 打开方式不能播放；在安装器“设置 → 文件关联”重新注册多实例入口后，用户确认“恢复了”。
+- 只读核查 AppSession 默认多实例注册、组件选择页会话同步、InstallEngine 安装末尾调用 AssociationService.Register，以及 Applications／ProgID 两条打开命令，当前源码均使用带引号的安装绝对路径和 `%L` 参数。安装引擎把注册失败记为日志警告，仍显示安装完成，存在反馈不够明显的观察点，但未取得本例失败日志，不能认定为根因。
+- 本例现象已恢复；原路径是否失效、首次注册是否完整、Shell 缓存是否刷新，缺少修复前证据，尚不能区分。没有针对未证实原因改写关联逻辑，未改用户本机注册表，未提交／发布。
+- 后续若复现，应在重注册之前采集自动注册日志、实际安装目录、当前用户／系统级 Applications\mpv.exe 与 MPV.Vanta.Multi.File 打开命令及其目标存在状态，并区分首次安装和安装后移动目录。此前扫描修复与 RescanRegression 验证记录继续有效。
+
+## 2026-10-24 12:59 — 安装目录权限预检与首次失败线索
+
+- 用户补充“他好像第一次是因为选了 program files 文件夹所以安装失败了”，这是未经原始日志确认的线索。源码 asInvoker 不主动提权；LocationViewModel 原来只检查目录存在和可用空间，不检查创建／写入权限；受限新目录因此可能显示可继续。
+- 审阅 InstallEngine／SevenZipService：创建目录或 7z 非零退出会进入失败返回，不会执行安装末尾的 AssociationService.Register。解压失败可能留下已解出的部分文件，但本例没有失败前后目录或日志，不能断定关联已由失败流程生成。重新注册后恢复的结论保持，具体历史原因仍未知。
+- 新增 `Vanta.Core/Services/InstallDirectoryAccess.cs`：已有目录用随机临时文件验证写入；不存在的目标在最近已有父目录创建随机临时子目录并验证文件写入，随后清理探针，不创建实际安装目录；同名文件、无磁盘／父目录、拒绝访问等给出明确提示。按实际权限判断，不硬编码 Program Files，不改变 manifest／安装提权方式。
+- LocationViewModel 在返回可继续之前调用检查，权限失败禁用下一步；InstallEngine 在定位工具／扫描／哈希／备份／解压之前独立调用检查，防止非向导入口绕过位置页。目录权限可能在检查后改变，实际创建／解压异常仍由原有失败路径处理；该预检不等同全部已有文件均可覆盖的保证。
+- 修正 LocationView 的“全程免管理员、不写注册表”旧说明，以及 PackagesView／DoneView 的“关联需 UAC”旧提示：安装目录需当前账户可写；当前用户关联本身无需管理员权限。
+- 扩展 `VantaInstaller/tests/RescanRegression/Program.cs`：已有可写目录、可写父目录／未创建目标、探针清理、同名文件阻挡、现有受限目录、受限父目录新装、位置页禁用／换可写目录恢复、独立引擎提前失败均通过。拒绝写入 ACL 仅设置在本次唯一临时夹具，finally 恢复原 ACL；未修改 Program Files 或用户系统关联。
+- 首次普通 build 再次遇本地 WPF 生成缓存 CS2001；`dotnet build VantaInstaller/VantaInstaller.slnx --no-restore -t:Rebuild -v minimal` 成功（0 警告、0 错误）。`dotnet run --project VantaInstaller/tests/RescanRegression/RescanRegression.csproj` 新增权限回归及原真实 WPF／aria2 下载／重扫回归全部通过。
+- `git pull --ff-only` 已为最新；UTF-8／LF与 `git diff --check` 通过。仍未提交／发布／更新版本号；用户 window_size_position.conf 原偏好未动，切换设备前建议排除该偏好、提交本轮安装器修复与记录。
+
+## 2026-10-25 14:53 — VantaInstaller 0.3.14 独立发布前置检查
+
+- 用户明确要求“推送 0.3.14 更新包，撤 13 更新包”；本轮只升级附属安装器，不提升播放器 v1.6.4，不改已有 01～04 公开归档。当前 v1.6.4 正式 Latest 仍挂 0.3.13，先完成全部本地构建／验收，再上传新包并撤回当前更新入口的旧包；历史播放器 Release 不批量改写。
+- 已完整阅读《发布流程.md》；3.1：pull／fetch 通过，master 与 origin/master 同步；本轮只审阅和提交安装器相关改动及记录，排除用户原有 window_size_position.conf。
+- 3.2：扫描刷新、目录权限检查、说明及独立版本迭代，不改构建／产物形式、运行时、公开分包边界或版权，不触发 Gate；流程文件未改。
+- 3.3：安装器版本提升 0.3.14，README 推荐同步；版本记录和工作进度随本轮更新。3.4：待本轮重编译／真实 WPF 与 aria2／拒绝写入 ACL 回归及完整配置播放复验。
+- 4～5：使用流程 4.1 原有单文件自包含压缩 publish 命令；候选规范名先置 release/。01～04 无改动原包保留并核对 SHA；用 build-full-private.ps1 -Version 1.6.4 重建包含 0.3.14 的同播放器版本私包，必须在首次上传前完成验收，旧私包保留本地备份。
+- 6～8：待功能提交、构建记录、推送及 v0.3.14 源码标签；不创建影响 /releases/latest 的独立安装器 Release，更新现有 v1.6.4 附件与说明；核对新附件 SHA 后撤当前 v1.6.4 的旧 0.3.13，同步 ModelScope v1.6.4/ 并撤该目录旧包，最终验证 0.3.13 自动检测到 0.3.14，提交发布结果。
+
+## 2026-10-25 15:02 — VantaInstaller 0.3.14 本地全部构建验收完成
+
+- 3.1：pull／fetch 无远端新增，功能提交 1ea7f50；原有用户偏好单独保留。3.2：独立安装器功能／版本迭代，未修改发布流程、构建脚本、产物形态或公开分包，Gate 不触发。
+- 3.3：README 推荐安装器更新至 0.3.14；本 STATUS、工作进度及版本记录更新。3.4：Rebuild 0 警告／0 错误，真实 WPF／aria2／ACL 全套回归及 D3D11／Vulkan×三类视频完整配置实播通过；Lua 未改；UTF-8 无 BOM／LF及 diff 检查通过。
+- 4：执行原有 dotnet publish 自包含压缩单文件命令，候选规范命名后置于 release/；01～04 沿用当前正式原件，归档测试与五文件大小／SHA 和远端一致。build-full-private.ps1 -Version 1.6.4 已重新构建，全部本地构建验收先于首次 GitHub／ModelScope 上传。
+- 5：候选有效窗口／正常退出、外部 DOTNET_ROOT 隔离通过；不是独立无 .NET 机器测试。私包 7z t、11743 文件并集大小／CRC、新安装器 SHA、精确 1.6.4 标记、FW 占位与发行默认通过。公开包已有 ffmpeg／Logo／版权／根备份等边界按原件维持；无新增第三方文件。
+- 新安装器 SHA `10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8`；私包 SHA `4c04a9c457fefc8dea91915d3e6094e110ca0397eec3f7c526c890ce8d9059ca`。校验表见版本记录及 release/SHA256SUMS-v1.6.4.txt、SHA256SUMS-private-v1.6.4.txt；旧私包和校验单已备份 backup/installer-v0.3.14-before-release。
+- 6～8 待执行：构建提交／源码标签推送；当前 v1.6.4 正式 Latest 换装 0.3.14 并撤 0.3.13；国内镜像相同路径同步；自动检测／真实下载 SHA、远端集合和 Git 同步验证；私包暂存归档和发布结果提交。历史 v1.6.4 标签不移动。

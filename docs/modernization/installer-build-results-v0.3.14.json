@@ -1,0 +1,61 @@
+{
+  "installer_version": "0.3.14",
+  "player_version": "1.6.4",
+  "passed": true,
+  "functional_commit": "1ea7f50",
+  "public_packages_unchanged": true,
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.4.7z",
+      "bytes": 136917184,
+      "sha256": "f451da6de0612e7f466ab32f6a42003262637dc4e95dc76d402203a23d8077b7"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.4.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.4.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.4.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+    },
+    {
+      "name": "04-mpv-config-v1.6.4.7z",
+      "bytes": 5370418,
+      "sha256": "9b1b59eb91f9c9bdcd67973c46ae6ac61d8f04b563a3b744f16e7fe720910c9f"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+    },
+    {
+      "name": "mpv-full-private-v1.6.4.7z",
+      "bytes": 3037921285,
+      "sha256": "4c04a9c457fefc8dea91915d3e6094e110ca0397eec3f7c526c890ce8d9059ca"
+    }
+  ],
+  "archive_tests": [
+    "01-mpv-base-v1.6.4.7z",
+    "02-mpv-extras-v1.6.4.7z.001",
+    "03-mpv-fasterwhisper-addon-v1.6.4.7z",
+    "04-mpv-config-v1.6.4.7z",
+    "mpv-full-private-v1.6.4.7z"
+  ],
+  "private_union_files": 11743,
+  "private_extra_files": [
+    "Faster-Whisper-XXL/03包解压后覆盖于此.txt",
+    "README-个人私用全量包.txt",
+    "VantaInstaller-win-x64-v0.3.14.exe"
+  ],
+  "private_local_only": true,
+  "startup": true,
+  "real_playback": true,
+  "regression": true
+}
