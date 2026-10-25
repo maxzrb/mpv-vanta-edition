@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System.IO;
 using Vanta.Core.Models;
+using Vanta.Core.Services;
 
 namespace Vanta.Installer.ViewModels;
 
@@ -123,6 +124,16 @@ public partial class LocationViewModel : ObservableObject
         {
             StatusText = "请选择安装目录。";
             StatusIsWarning = false;
+            OnPropertyChanged(nameof(CanProceed));
+            return;
+        }
+
+        // 提前拦截受保护目录，避免把“目录尚不存在”误判为可安装。
+        var writeError = InstallDirectoryAccess.GetWriteError(FinalDirectory);
+        if (writeError is not null)
+        {
+            StatusText = writeError;
+            StatusIsWarning = true;
             OnPropertyChanged(nameof(CanProceed));
             return;
         }

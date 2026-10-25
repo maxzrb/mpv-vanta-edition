@@ -68,7 +68,7 @@
                             <TextBlock Margin="0,4,0,0" FontSize="12" TextWrapping="Wrap"
                                        Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}">
                                 注册后可用 mpv 打开视频/音频文件，并在“打开方式”中看到 mpv。
-                                此操作写入系统注册表，需要管理员权限，将弹出 UAC 确认。
+                                此操作只写入当前用户注册表，无需管理员权限。
                             </TextBlock>
                             <Grid Margin="0,12,0,0">
                                 <Grid.ColumnDefinitions>

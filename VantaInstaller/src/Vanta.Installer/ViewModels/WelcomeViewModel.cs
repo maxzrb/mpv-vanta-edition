@@ -12,6 +12,7 @@ namespace Vanta.Installer.ViewModels;
 public partial class WelcomeViewModel : ObservableObject
 {
     private readonly AppSession _session;
+    private bool _rescanRequested;
 
     /// <summary>包所在目录</summary>
     [ObservableProperty]
@@ -30,7 +31,7 @@ public partial class WelcomeViewModel : ObservableObject
     private PackageScanResult? _scanResult;
 
     /// <summary>是否可进入下一步</summary>
-    public bool CanProceed => ScanResult is { CanInstall: true };
+    public bool CanProceed => !IsScanning && ScanResult is { CanInstall: true };
 
     /// <summary>是否有错误</summary>
     public bool HasErrors => ScanResult is { Errors.Count: > 0 };
@@ -56,6 +57,16 @@ public partial class WelcomeViewModel : ObservableObject
         _ = ScanAsync();
     }
 
+    /// <summary>进入安装向导时同步下载目录，并刷新启动时的旧扫描结果。</summary>
+    public void Refresh()
+    {
+        if (!string.IsNullOrWhiteSpace(_session.SourceDirectory))
+        {
+            SourceDirectory = _session.SourceDirectory;
+        }
+        _ = ScanAsync();
+    }
+
     /// <summary>浏览选择包目录</summary>
     [RelayCommand]
     private void ChooseDirectory()
@@ -76,23 +87,39 @@ public partial class WelcomeViewModel : ObservableObject
     [RelayCommand]
     private async Task ScanAsync()
     {
-        if (string.IsNullOrWhiteSpace(SourceDirectory) || IsScanning)
+        if (IsScanning)
+        {
+            // 扫描期间发生目录切换或再次进入向导时，完成后补扫最新目录。
+            _rescanRequested = true;
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(SourceDirectory))
         {
             return;
         }
 
         IsScanning = true;
+        var sourceDirectory = SourceDirectory;
+        ScanResult = null;
+        _session.ScanResult = null;
+        OnPropertyChanged(nameof(CanProceed));
         StatusText = "正在扫描…";
 
         try
         {
             // 宽松扫描：缺少 01 Base 只警告不阻止，让已装 Base 的升级场景能继续；
             // 是否必须 Base 由安装引擎按目标目录状态把关。
-            var result = await Task.Run(() => PackageScanner.Scan(SourceDirectory, allowMissingBase: true));
+            var result = await Task.Run(() => PackageScanner.Scan(sourceDirectory, allowMissingBase: true));
+            // 目录已变化时不把旧目录的结果写入新会话，交给后续补扫。
+            if (SourceDirectory != sourceDirectory)
+            {
+                _rescanRequested = true;
+                return;
+            }
             ScanResult = result;
 
             // 写入会话，供后续页面使用
-            _session.SourceDirectory = SourceDirectory;
+            _session.SourceDirectory = sourceDirectory;
             _session.ScanResult = result;
 
             StatusText = result.CanInstall
@@ -116,6 +143,11 @@ public partial class WelcomeViewModel : ObservableObject
             OnPropertyChanged(nameof(HasWarnings));
             OnPropertyChanged(nameof(HasFullPackage));
             OnPropertyChanged(nameof(FullPackageText));
+            if (_rescanRequested)
+            {
+                _rescanRequested = false;
+                _ = ScanAsync();
+            }
         }
     }
 }

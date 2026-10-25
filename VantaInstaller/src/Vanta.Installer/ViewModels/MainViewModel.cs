@@ -348,6 +348,7 @@ public partial class MainViewModel : ObservableObject
         CurrentMode = AppMode.Install;
         CurrentStep = 0;
         CurrentPage = _installPages[0];
+        ((WelcomeViewModel)CurrentPage).Refresh();
         UpdatePanelState();
         UpdateSteps();
     }

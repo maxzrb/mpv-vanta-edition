@@ -44,7 +44,7 @@ Faster-Whisper 占位说明；AI 字幕运行时按需另行解压 03。
 
 > 三合一辅助工具：安装 / 卸载 / 设置，单文件自包含、免 .NET 运行时，随 Release 附装。
 
-从 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 下载 `VantaInstaller-win-x64-v0.3.13.exe`，双击即用。
+从 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 下载 `VantaInstaller-win-x64-v0.3.14.exe`，双击即用。
 
 - **安装**：扫描 01~04 增量包（或个人全量包），自动校验完整性，支持覆盖升级与配置备份；可选安装完成后自动注册文件关联。
 - **卸载**：默认备份 `portable_config` 到 `文档\MPV Vanta Edition\uninstall-backups`，删除明细日志，可选清理文件关联。
@@ -79,7 +79,7 @@ Faster-Whisper 占位说明；AI 字幕运行时按需另行解压 03。
 ### 方案一：使用 VantaInstaller（推荐）
 
 下载 [Releases](https://github.com/maxzrb/mpv-vanta-edition/releases) 中的
-`VantaInstaller-win-x64-v0.3.13.exe`，双击运行，在「安装」向导中选择
+`VantaInstaller-win-x64-v0.3.14.exe`，双击运行，在「安装」向导中选择
 包含 01~04 增量包的目录（或直接勾选「下载并安装」），它会自动完成：
 
 - 安装前对每个包做 SHA-256 校验（有风险会提醒，默认取消）
@@ -208,7 +208,7 @@ SVP 保留全分辨率、固定 59.94fps 目标；已达到目标的片源保留
 
 v1.6.0 包含上述色彩、滤镜与播放体验修复。最新行为、测试数据与回退方法见
 [滤镜恢复与色彩性能优化结果](docs/modernization/滤镜恢复与色彩性能优化结果-20261006.md)及[播放体验修复](docs/modernization/播放体验回归修复-20261007.md)。历史记录见[现代化实施报告](docs/modernization/实施报告.md)与[升级和回退](docs/modernization/升级和回退.md)。
-旧安装请使用支持组件隔离的 VantaInstaller v0.3.13；手动覆盖需按回退说明移走旧弹幕程序目录，保留用户下载文件。
+旧安装请使用支持组件隔离的 VantaInstaller v0.3.14；手动覆盖需按回退说明移走旧弹幕程序目录，保留用户下载文件。
 
 起播、主动打开新媒体和从最小化恢复时，播放器会抬到普通窗口前面；持续置顶选择仍由原菜单控制，暂停和自动切集不会反复抬窗。
 - `Alt+数字` — 切换预设配置组

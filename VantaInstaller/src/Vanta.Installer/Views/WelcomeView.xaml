@@ -36,7 +36,7 @@
                             <ui:Button Grid.Column="1" Content="浏览…" Margin="10,0,0,0" Padding="16,7"
                                        Appearance="Secondary" Command="{Binding ChooseDirectoryCommand}" />
                             <ui:Button Grid.Column="2" Content="重新扫描" Margin="10,0,0,0" Padding="16,7"
-                                       Appearance="Primary" Command="{Binding ScanAsyncCommand}" />
+                                       Appearance="Primary" Command="{Binding ScanCommand}" />
                         </Grid>
                         <TextBlock Margin="0,12,0,0" FontSize="12"
                                    Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorTertiaryBrush}">

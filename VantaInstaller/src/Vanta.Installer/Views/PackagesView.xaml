@@ -101,7 +101,7 @@
                         <TextBlock Text="文件关联注册" FontSize="16" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorPrimaryBrush}" />
                         <TextBlock Style="{StaticResource CardDescStyle}">
-                            安装完成后把播放器注册为文件打开方式（写注册表，需 UAC）。可同时勾选两种入口，之后在 Windows「打开方式」里自行选择用哪个打开视频。
+                            安装完成后把播放器注册为当前用户的文件打开方式，无需管理员权限。可同时勾选两种入口，之后在 Windows「打开方式」里自行选择用哪个打开视频。
                         </TextBlock>
                         <StackPanel Margin="0,14,0,0">
                             <CheckBox Content="注册多实例关联（双击经 mpv.exe 新开窗口）"

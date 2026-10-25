@@ -76,7 +76,8 @@
                                    Foreground="{DynamicResource Wpf.Ui.Brushes.TextFillColorSecondaryBrush}">
                             <Run Text="• 升级前自动备份 portable_config 到 backup\ 目录，保留最近 5 份。" /><LineBreak />
                             <Run Text="• 按 01→02→03→04→05 顺序覆盖，同名文件以新版本为准。" /><LineBreak />
-                            <Run Text="• 全程免管理员权限（便携版不写注册表）。" />
+                            <Run Text="• 默认以当前账户权限安装，请选择可写目录；Program Files 等受保护目录可能需要管理员权限。" /><LineBreak />
+                            <Run Text="• 可选文件关联只写入当前用户注册表，无需管理员权限。" />
                         </TextBlock>
                     </StackPanel>
                 </ui:Card>

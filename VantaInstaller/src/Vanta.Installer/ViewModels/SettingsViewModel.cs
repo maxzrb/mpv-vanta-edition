@@ -940,6 +940,8 @@ public partial class SettingsViewModel : ObservableObject
                         item.Name,
                         ct: ct);
                     item.Exists = true;
+                    // 下载成功后交接实际保存目录，安装向导再次进入时扫描这里。
+                    _session.SourceDirectory = DownloadDirectory;
                     item.Status = "完成";
                     item.Progress = 100;
                     item.SpeedBytesPerSecond = 0;

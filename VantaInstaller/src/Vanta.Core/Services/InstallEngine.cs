@@ -38,6 +38,15 @@ public sealed class InstallEngine
 
         try
         {
+            // 独立入口同样检查权限，在定位工具、校验、备份及解压之前明确失败。
+            var writeError = InstallDirectoryAccess.GetWriteError(options.InstallDirectory);
+            if (writeError is not null)
+            {
+                result.Error = writeError;
+                AddLog($"[错误] {writeError}");
+                return result;
+            }
+
             // 1. 定位 7z
             var sevenZipPath = await _sevenZip.LocateAsync();
             AddLog($"7z：{sevenZipPath}");
