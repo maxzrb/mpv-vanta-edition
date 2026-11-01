@@ -1,0 +1,226 @@
+{
+  "version": "1.6.5",
+  "passed": true,
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.5.7z",
+      "bytes": 136919085,
+      "sha256": "3fa8ffe7082f2082ad161ff663c411307f39f534272f01b6391fcc5fd25654b1"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.5.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.5.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.5.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+    },
+    {
+      "name": "04-mpv-config-v1.6.5.7z",
+      "bytes": 5372349,
+      "sha256": "a6adea408e50271b074210df3f0fbaab85752b112a3734d56d591487277d6d42"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+    },
+    {
+      "name": "mpv-full-private-v1.6.5.7z",
+      "bytes": 3038008429,
+      "sha256": "c07076be6b20cf8a3115dda5cdbb4e74709f9db16763de76b7bccb3025e7af32"
+    }
+  ],
+  "covered_config_files": 1427,
+  "archive_files": {
+    "01-mpv-base-v1.6.5.7z": 1323,
+    "02-mpv-extras-v1.6.5.7z.001": 10474,
+    "03-mpv-fasterwhisper-addon-v1.6.5.7z": 5122,
+    "04-mpv-config-v1.6.5.7z": 270,
+    "mpv-full-private-v1.6.5.7z": 11801
+  },
+  "input_reuse": {
+    "source_version": "1.6.4",
+    "extras": {
+      "files": 10473,
+      "bytes": 4603603173,
+      "latest_input_time": 1791366824.1750202,
+      "all_input_size_crc_identical": true
+    },
+    "fasterwhisper": {
+      "files": 5121,
+      "bytes": 4714825519,
+      "latest_input_time": 1744549392.576642,
+      "all_input_size_crc_identical": true
+    },
+    "assets": [
+      {
+        "source": "02-mpv-extras-v1.6.4.7z.001",
+        "name": "02-mpv-extras-v1.6.5.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+      },
+      {
+        "source": "02-mpv-extras-v1.6.4.7z.002",
+        "name": "02-mpv-extras-v1.6.5.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+      },
+      {
+        "source": "03-mpv-fasterwhisper-addon-v1.6.4.7z",
+        "name": "03-mpv-fasterwhisper-addon-v1.6.5.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+      }
+    ],
+    "tracked_input_changes": [],
+    "ignored_input_checks": true,
+    "byte_identical_copy": true,
+    "internal_readme_versions": {
+      "extras": "1.6.0",
+      "fasterwhisper": "1.5.7"
+    }
+  },
+  "private": {
+    "name": "mpv-full-private-v1.6.5.7z",
+    "merged_files": 11798,
+    "size_crc_union_identical": true,
+    "local_only": true,
+    "uploaded": false,
+    "installer_sha_identical": true,
+    "placeholder_only": true
+  },
+  "checks": [
+    "来源与新02／03、01／04与私包7z t全部通过",
+    "公开门禁／分卷限制／版本标记／Logo与ffmpeg边界通过",
+    "私包完整文件并集及覆盖次序一致（含空文件）",
+    "全部配置／素材／模块与源文件逐字节一致，仅排除个人偏好",
+    "核心／运行时与源目录SHA一致",
+    "许可按既有01边界入包，联网字幕不存在",
+    "安装器0.3.14同SHA候选沿用既有有效窗口／退出验证",
+    "个人关键帧与窗口偏好逐字节恢复"
+  ],
+  "candidate_type": "same-version local rebuild",
+  "timestamp": "2026-11-01 16:23",
+  "uploaded": false,
+  "github_changed": false,
+  "modelscope_changed": false,
+  "tag_changed": false,
+  "feature_commit": "bb066e15420e647cfa28c8b387b112b03446e9d5",
+  "published_tag_commit": "2c3606ec03c863e409972e9c3648b2f0ee321f37",
+  "old_local_assets": "backup/release-v1.6.5-before-repack-20261101-1604",
+  "regressions": {
+    "passed": true,
+    "rows": [
+      {
+        "test": "test-safe-file.py",
+        "passed": true,
+        "reused_from_completed_functional_run": true
+      },
+      {
+        "test": "test-state-storage.py",
+        "passed": true,
+        "reused_from_completed_functional_run": true
+      },
+      {
+        "test": "test-playback-preferences.py",
+        "passed": true,
+        "reused_from_completed_functional_run": true
+      },
+      {
+        "test": "test-hwdec-menu.py",
+        "passed": true,
+        "reused_from_completed_functional_run": true
+      },
+      {
+        "test": "test-decode-performance.py",
+        "passed": true,
+        "reused_from_completed_functional_run": true
+      },
+      {
+        "test": "Lua syntax / UTF-8 no BOM / LF / diff",
+        "files": 145,
+        "passed": true
+      }
+    ]
+  },
+  "package_preferences": {
+    "passed": true,
+    "rows": [
+      {
+        "phase": "software and audio sync saved",
+        "passed": true
+      },
+      {
+        "phase": "software and sync restored; copy saved",
+        "passed": true
+      },
+      {
+        "phase": "D3D11 copy restored",
+        "actual_backend": "d3d11va-copy",
+        "passed": true
+      },
+      {
+        "phase": "private default startup and moving video",
+        "motion": {
+          "samples": [
+            0.9,
+            1.133,
+            1.4
+          ],
+          "output": {
+            "pixelformat": "d3d11",
+            "hw-pixelformat": "p010",
+            "average-bpp": 24,
+            "w": 640,
+            "h": 360,
+            "dw": 640,
+            "dh": 360,
+            "crop-x": 0,
+            "crop-y": 0,
+            "crop-w": 640,
+            "crop-h": 360,
+            "aspect": 1.777778,
+            "aspect-name": "16:9",
+            "par": 1.0,
+            "sar": 1.777778,
+            "sar-name": "16:9",
+            "colormatrix": "bt.709",
+            "colorlevels": "limited",
+            "primaries": "bt.709",
+            "gamma": "bt.1886",
+            "sig-peak": 0.0,
+            "light": "display",
+            "chroma-location": "mpeg2/4/h264",
+            "stereo-in": "mono",
+            "rotate": 0,
+            "alpha": "none"
+          }
+        },
+        "hwdec_policy": "auto-safe",
+        "passed": true
+      }
+    ],
+    "errors": []
+  },
+  "actual_package_playback": {
+    "passed": true,
+    "cases": 6
+  },
+  "early_switch_probe": {
+    "initial_probe_had_hevc_reference_errors": true,
+    "initial_logs_glob": "C:\\Program portable\\mpv2\\tmp\\repack-v1.6.5-20261101\\initial-repack-165-*.log",
+    "clean_no_config_mid_playback_baseline_reproduced": false,
+    "final_test_waits_for_actual_moving_video": true,
+    "final_switch_and_restart_errors": [],
+    "limit": "首次探针在首帧呈现前注入解码切换，出现HEVC参考错误；等待实际画面推进后同样切换及重启无目标错误。本轮未修改初始化切换行为，不宣称首帧前无缝切换通过。"
+  },
+  "overload_catchup_included": false
+}
