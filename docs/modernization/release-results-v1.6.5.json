@@ -1,0 +1,103 @@
+{
+  "version": "1.6.5",
+  "checked_at": "2026-11-01 14:11 Asia/Shanghai",
+  "github": {
+    "tag": "v1.6.5",
+    "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.5",
+    "draft": false,
+    "prerelease": false,
+    "published_at": "2026-11-01T06:09:54Z",
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.5.7z",
+        "bytes": 136916240,
+        "sha256": "76603a4178c5c655bb6af3c82b042953b8d20d2e8e28ed89ff8cb5c287e6a633",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.5/01-mpv-base-v1.6.5.7z"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.5.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.5/02-mpv-extras-v1.6.5.7z.001"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.5.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.5/02-mpv-extras-v1.6.5.7z.002"
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.5.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.5/03-mpv-fasterwhisper-addon-v1.6.5.7z"
+      },
+      {
+        "name": "04-mpv-config-v1.6.5.7z",
+        "bytes": 5370799,
+        "sha256": "39f9202aced4cc3db74715a9a1068ca9a83b1a8142ba798eb551ade1898d2c61",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.5/04-mpv-config-v1.6.5.7z"
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.14.exe",
+        "bytes": 69776451,
+        "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.5/VantaInstaller-win-x64-v0.3.14.exe"
+      }
+    ]
+  },
+  "modelscope": {
+    "dataset": "AerithDream/mpv-vanta-edition",
+    "revision": "master",
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.5.7z",
+        "anonymous_http": 200,
+        "bytes": 136916240,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.5/01-mpv-base-v1.6.5.7z"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.5.7z.001",
+        "anonymous_http": 200,
+        "bytes": 1992294400,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.5/02-mpv-extras-v1.6.5.7z.001"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.5.7z.002",
+        "anonymous_http": 200,
+        "bytes": 830172768,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.5/02-mpv-extras-v1.6.5.7z.002"
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.5.7z",
+        "anonymous_http": 200,
+        "bytes": 1476001942,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.5/03-mpv-fasterwhisper-addon-v1.6.5.7z"
+      },
+      {
+        "name": "04-mpv-config-v1.6.5.7z",
+        "anonymous_http": 200,
+        "bytes": 5370799,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.5/04-mpv-config-v1.6.5.7z"
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.14.exe",
+        "anonymous_http": 200,
+        "bytes": 69776451,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.5/VantaInstaller-win-x64-v0.3.14.exe"
+      }
+    ],
+    "complete": true
+  },
+  "private": {
+    "name": "mpv-full-private-v1.6.5.7z",
+    "local_only": true,
+    "uploaded": false,
+    "passed": true
+  },
+  "tag_commit": "2c3606ec03c863e409972e9c3648b2f0ee321f37",
+  "all_builds_complete_before_upload": true,
+  "staging_archive": "backup/release-v1.6.5-build-staging",
+  "personal_preferences_preserved": true,
+  "passed": true
+}
