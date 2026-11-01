@@ -171,7 +171,6 @@ Faster-Whisper 占位说明；AI 字幕运行时按需另行解压 03。
 ### 字幕
 - 多语言、多格式字幕渲染
 - AI 字幕生成（Faster-Whisper，需自行下载模型）
-- 在线字幕下载（Assrt.net）
 
 ### 字体
 - OSD 使用 `fonts/osd` 中的七个原样字体副本，减少界面重复加载完整字体库；字幕仍使用完整 `fonts`。维护者换机运行 `tools/prepare-osd-fonts.ps1` 后再打包，字体及授权由 01 Base 交付。

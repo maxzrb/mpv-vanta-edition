@@ -167,8 +167,7 @@ local function append(parts, text, tone, group, compact_before)
 	end
 end
 
-local function build_segments(mode, filter)
-	local info = MediaFormatInfo.collect()
+local function build_segments(mode, filter, info)
 	if not info.video_present then return {} end
 	local parts = {}
 	-- 硬解/软解放在最前，一眼确认当前解码状态
@@ -347,15 +346,23 @@ function MediaInfo:init()
 	self.layout_x, self.layout_y, self.layout_width = 0, 0, 0
 	-- 实时码率平滑滤波器状态：value=内部跟踪值，display=实际显示值，mean=短期平均
 	self.bitrate_filter = { value = 0, time = 0, display = 0, mean = 0 }
-	local function refresh() request_render() end
+	-- 参考 Yaozhi 时间轴的失效缓存；静态格式不随每次动画重绘重复读取。
+	self.media_info, self.media_info_dirty = nil, true
+	local function refresh()
+		self.media_info_dirty = true
+		request_render()
+	end
 	for _, property in ipairs({
-		'hwdec-current', 'video-params', 'video-frame-info', 'video-codec',
+		'hwdec-current', 'video-params', 'video-frame-info/interlaced', 'video-codec',
 		'estimated-vf-fps', 'container-fps',
-		'video-bitrate', 'audio-bitrate', 'audio-codec', 'audio-params', 'audio-out-params/format',
+		'audio-codec', 'audio-params', 'audio-channels', 'audio-out-params/format',
 		'current-tracks/video', 'current-tracks/audio', 'track-list', 'vid', 'aid',
-		'cache-speed', 'demuxer-via-network',
 	}) do
 		self:observe_mp_property(property, 'native', refresh)
+	end
+	-- 实时码率与下载速度独立刷新，保留原有平滑和点击切换方式。
+	for _, property in ipairs({'video-bitrate', 'audio-bitrate', 'cache-speed', 'demuxer-via-network'}) do
+		self:observe_mp_property(property, 'native', function() request_render() end)
 	end
 	self:register_mp_event('file-loaded', function()
 		-- 切换文件后重置平滑状态，避免沿用上一文件的码率
@@ -455,7 +462,11 @@ function MediaInfo:render()
 		self.layout_width = 0
 		return
 	end
-	local segments = build_segments(self.bitrate_mode, self.bitrate_filter)
+	if self.media_info_dirty or not self.media_info then
+		self.media_info = MediaFormatInfo.collect()
+		self.media_info_dirty = false
+	end
+	local segments = build_segments(self.bitrate_mode, self.bitrate_filter, self.media_info)
 	if #segments == 0 then
 		self.layout_width = 0
 		return

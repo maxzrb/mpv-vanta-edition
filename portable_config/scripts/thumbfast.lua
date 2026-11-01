@@ -175,6 +175,8 @@ local disabled = false
 local force_disabled = false
 local spawn_waiting = false
 local spawn_working = false
+local worker_request_id = nil
+local worker_generation = 0
 local script_written = false
 
 local dirty = false
@@ -513,8 +515,12 @@ local function spawn(time)
     spawned = true
     spawn_waiting = true
 
-    subprocess(args, true,
+    worker_generation = worker_generation + 1
+    local generation = worker_generation
+    worker_request_id = subprocess(args, true,
         function(success, result)
+            if generation ~= worker_generation then return end
+            worker_request_id = nil
             if spawn_waiting and (success == false or (result.status ~= 0 and result.status ~= -2)) then
                 spawned = false
                 spawn_waiting = false
@@ -590,6 +596,20 @@ local function run(command)
         file:write(command_n)
         file:flush()
     end
+end
+
+-- 参考 Yaozhi 1.0.8-3 的请求归属：先隔离旧回调，再取消尚未建立 IPC 的子进程。
+local function stop_worker()
+    worker_generation = worker_generation + 1
+    if worker_request_id and mp.abort_async_command then
+        mp.abort_async_command(worker_request_id)
+    elseif spawned then
+        run('quit')
+    end
+    worker_request_id = nil
+    spawned, spawn_waiting = false, false
+    if file then pcall(function() file:close() end); file = nil end
+    file_bytes = 0
 end
 
 local function draw(w, h, script)
@@ -738,8 +758,7 @@ local function quit()
         activity_timer:resume()
         return
     end
-    run("quit")
-    spawned = false
+    stop_worker()
     real_w, real_h = nil, nil
     clear()
 end
@@ -810,7 +829,7 @@ local function watch_changes()
         if resized then
             -- mpv doesn't allow us to change output size
             local seek_time = last_seek_time
-            run("quit")
+            stop_worker()
             clear()
             spawned = false
             spawn(seek_time or mp.get_property_number("time-pos", 0))
@@ -885,6 +904,7 @@ local function sync_changes(prop, val)
 end
 
 local function file_load()
+    stop_worker()
     clear()
     spawned = false
     real_w, real_h = nil, nil
@@ -900,7 +920,7 @@ local function file_load()
 end
 
 local function shutdown()
-    run("quit")
+    stop_worker()
     remove_thumbnail_files()
     if os_name ~= "windows" then
         os.remove(options.socket)

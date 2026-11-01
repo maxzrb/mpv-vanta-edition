@@ -1,5 +1,7 @@
 --[[ uosc | https://github.com/tomasklaen/uosc ]]
 local uosc_version = '5.13.0'
+local safe_file = dofile(mp.find_config_file('script-modules/safe-file.lua')
+	or (mp.get_script_directory() .. '/../../script-modules/safe-file.lua'))
 
 mp.commandv('script-message', 'uosc-version', uosc_version)
 
@@ -83,6 +85,7 @@ defaults = {
 	window_border_size = 1,
 
 	autoload = false,
+	auto_next = false,
 	shuffle = false,
 
 	scale = 1,
@@ -125,7 +128,6 @@ defaults = {
 	chapter_ranges = 'openings:30abf964,endings:30abf964,ads:c54e4e80',
 	chapter_range_patterns = 'openings:オープニング;endings:エンディング',
 	languages = 'slang,en',
-	subtitles_directory = '~~/subtitles',
 	disable_elements = '',
 	ziggy_path = 'default',
 }
@@ -224,8 +226,6 @@ local config_defaults = {
 }
 config = {
 	version = uosc_version,
-	open_subtitles_api_key = 'b0rd16N0bp7DETMpO4pYZwIqmQkZbYQr',
-	open_subtitles_agent = 'uosc v' .. uosc_version,
 	-- sets max rendering frequency in case the
 	-- native rendering frequency could not be detected
 	render_delay = 1 / 60,
@@ -308,11 +308,10 @@ end
 
 -- Updates config with values dependent on options
 function update_config()
-	-- Required environment config
-	if options.autoload then
-		mp.commandv('set', 'keep-open', 'yes')
-		mp.commandv('set', 'keep-open-pause', 'no')
-	end
+	-- 自动连播统一控制核心播放列表和 uosc 目录续播；关闭时停在当前文件末尾。
+	mp.set_property('keep-open', options.auto_next and 'yes' or 'always')
+	mp.set_property_native('keep-open-pause', not (options.auto_next and options.autoload))
+	mp.set_property_native('user-data/uosc/auto-next', options.auto_next)
 
 	-- Adds `{element}_persistency` config properties with forced visibility states (e.g.: `{paused = true}`)
 	for _, name in ipairs({'timeline', 'controls', 'volume', 'top_bar', 'speed'}) do
@@ -377,39 +376,14 @@ update_config()
 
 function persist_uosc_option(name, value)
 	local config_path = mp.command_native({'expand-path', '~~/script-opts/uosc.conf'})
-	local file = io.open(config_path, 'rb')
-	local content = file and file:read('*a') or ''
-	if file then file:close() end
-
-	local serialized = type(value) == 'boolean' and (value and 'yes' or 'no') or tostring(value)
-	local pattern_name = name:gsub('([^%w])', '%%%1')
-	local replaced
-	content, replaced = content:gsub(
-		'^([ \t]*' .. pattern_name .. '[ \t]*=)[^\r\n]*',
-		'%1' .. serialized,
-		1
-	)
-	if replaced == 0 then
-		content, replaced = content:gsub(
-			'([\r\n][ \t]*' .. pattern_name .. '[ \t]*=)[^\r\n]*',
-			'%1' .. serialized,
-			1
-		)
-	end
-	if replaced == 0 then
-		local newline = content:find('\r\n', 1, true) and '\r\n' or '\n'
-		if content ~= '' and not content:match('[\r\n]$') then content = content .. newline end
-		content = content .. name .. '=' .. serialized .. newline
-	end
-
-	file = io.open(config_path, 'wb')
-	if not file then
-		msg.error('Could not persist uosc option: ' .. tostring(config_path))
+	local ok, err = safe_file.update_options(config_path, {[name] = value})
+	if not ok then
+		msg.error('无法保存 uosc 设置：' .. tostring(err))
+		-- 等调用方的正常提示显示完本轮，再明确提示当前选择尚未保存。
+		mp.add_timeout(0, function() mp.osd_message('设置已生效，但未能保存；原配置保留，请稍后重试', 4) end)
 		return false
 	end
-	file:write(content)
-	file:close()
-	msg.info(string.format('Persisted uosc option: %s=%s', name, serialized))
+	msg.info(string.format('已保存 uosc 设置：%s=%s', name, tostring(value)))
 	return true
 end
 
@@ -696,6 +670,8 @@ function set_state(name, value)
 end
 
 function handle_file_end()
+	-- 随机播放和目录自动加载也必须服从连播开关，手动切集不受影响。
+	if not options.auto_next then return end
 	local resume = false
 	if not state.loop_file then
 		if state.has_playlist then
@@ -985,7 +961,6 @@ bind_command('keybinds', function()
 		open_command_menu({type = 'keybinds', items = get_keybinds_items(), search_style = 'palette'})
 	end
 end)
-bind_command('download-subtitles', open_subtitle_downloader)
 bind_command('load-subtitles', create_track_loader_menu_opener({
 	prop = 'sub',
 	title = t('Load subtitles'),
@@ -1011,7 +986,6 @@ bind_command('subtitles', create_select_tracklist_type_menu_opener({
 	enable_prop = 'sub-visibility',
 	secondary = {prop = 'secondary-sid', icon = 'vertical_align_top', enable_prop = 'secondary-sub-visibility'},
 	load_command = 'script-binding uosc/load-subtitles',
-	download_command = 'script-binding uosc/download-subtitles',
 }))
 bind_command('audio', create_select_tracklist_type_menu_opener({
 	title = t('Audio'), type = 'audio', prop = 'aid', load_command = 'script-binding uosc/load-audio',
@@ -1026,7 +1000,6 @@ bind_command('secondary-subtitles', create_select_tracklist_type_menu_opener({
 	prop = 'secondary-sid',
 	enable_prop = 'secondary-sub-visibility',
 	load_command = 'script-binding uosc/load-subtitles',
-	download_command = 'script-binding uosc/download-subtitles',
 }))
 bind_command('playlist', create_self_updating_menu_opener({
 	title = t('Playlist'),
@@ -1436,6 +1409,7 @@ mp.register_script_message('timeline-buffer-toggle', set_timeline_buffer)
 publish_timeline_buffer_state()
 -- 统一跳转方式；显式标注exact的精准快捷键不受核心默认方式影响。
 mp.register_script_message('seek-mode', function(value)
+	if value == 'toggle' then value = options.seek_mode == 'keyframes' and 'exact' or 'keyframes' end
 	if value ~= 'exact' and value ~= 'keyframes' then
 		msg.error('无效的跳转方式：' .. tostring(value))
 		return
@@ -1443,7 +1417,23 @@ mp.register_script_message('seek-mode', function(value)
 	options.seek_mode = value
 	handle_options({seek_mode = true})
 	persist_uosc_option('seek_mode', options.seek_mode)
-	mp.osd_message(value == 'exact' and '跳转方式：精确' or '跳转方式：关键帧快速（落点可能偏移）', 2)
+	mp.osd_message(value == 'exact' and '跳转方式：精确' or '跳转方式：关键帧', 2)
+end)
+-- 菜单选择立即生效，并写回配置供下次启动使用。
+mp.register_script_message('auto-next', function(value)
+	if value == 'yes' then
+		options.auto_next = true
+	elseif value == 'no' then
+		options.auto_next = false
+	elseif value == nil or value == 'toggle' then
+		options.auto_next = not options.auto_next
+	else
+		msg.error('无效的自动连播选项：' .. tostring(value))
+		return
+	end
+	handle_options({auto_next = true})
+	persist_uosc_option('auto_next', options.auto_next)
+	mp.osd_message(options.auto_next and '自动连播：开启' or '自动连播：关闭（播完本集暂停）', 2)
 end)
 -- 时间显示模式：播放时长/剩余时长与播放时长/总时长之间切换，并持久化到 uosc.conf。
 local function publish_time_display_state()

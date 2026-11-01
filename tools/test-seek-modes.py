@@ -42,6 +42,9 @@ class Player(BasePlayer):
         raise TimeoutError(args)
 create_config = runpy.run_path(str(ROOT/'tools/isolated-config.py'))['create_config']
 config = create_config('seek-modes')
+personal_options = (ROOT/'portable_config/script-opts/uosc.conf').read_bytes()
+config_options = config/'script-opts/uosc.conf'
+config_options.write_text(re.sub(r'(?m)^seek_mode=.*$', 'seek_mode=exact', config_options.read_text(encoding='utf-8')), encoding='utf-8', newline='\n')
 source = Path('C:/Users/maxzr/Downloads/youtube-UCoCy_rS-xtdTtW0GBV8zC_w_ねこしろ - [2017年10月7日]【MMD】「Happy Halloween」 - Miku  Halloween Edit【4K UHD】-5DHyKTW20RE.mp4')
 assert source.is_file()
 # 仅隔离副本增加测试入口，调用正式时间轴点击／松手方法，不替换seek实现。
@@ -96,7 +99,7 @@ try:
     assert p.get('user-data/uosc/seek-mode') == 'exact'
     menu = p.get('menu-data') or p.get('user-data/menu/items')
     text = json.dumps(menu, ensure_ascii=False)
-    assert '跳转方式' in text and '关键帧快速（落点可能偏移）' in text
+    assert '关键帧跳转' in text
     (OUT/'menu.json').write_text(json.dumps(menu, ensure_ascii=False, indent=2), encoding='utf-8')
     for selected in ['exact', 'keyframes']:
         mode(p, selected)
@@ -145,7 +148,7 @@ for expected in ['keyframes', 'exact']:
 for log in logs:
     errors = [s for s in log.read_text(encoding='utf-8').splitlines() if '[e]' in s or '[f]' in s or 'Lua error' in s]
     assert not errors, errors[:5]
-assert 'seek_mode=exact' in (ROOT/'portable_config/script-opts/uosc.conf').read_text(encoding='utf-8')
+assert (ROOT/'portable_config/script-opts/uosc.conf').read_bytes() == personal_options
 result = dict(passed=True, source=str(source), default='exact', config=str(config), rows=rows,
               persistence=['keyframes', 'exact'], forced_exact_passed=True, errors=[])
 (ROOT/'docs/modernization/seek-modes-20261017.json').write_text(json.dumps(result, ensure_ascii=False, indent=2)+'\n', encoding='utf-8', newline='\n')

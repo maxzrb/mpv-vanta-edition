@@ -1,5 +1,8 @@
 local utils = require("mp.utils")
 local options = require("mp.options")
+local safe_file = dofile(mp.find_config_file('script-modules/safe-file.lua')
+    or (mp.get_script_directory() .. '/../script-modules/safe-file.lua'))
+local pending_updates = {}
 local input_available, input = pcall(require, "mp.input")
 
 local o = {
@@ -43,6 +46,21 @@ local dyn_menu = {
 }
 
 local current_item = { nil, nil, nil }
+
+local function parse_history(bytes)
+    if bytes:sub(1, 3) == '\239\187\191' then bytes = bytes:sub(4) end
+    local items = bytes == '' and {} or utils.parse_json(bytes)
+    if type(items) ~= 'table' then return nil, '历史文件格式异常' end
+    for key, item in pairs(items) do
+        if type(key) ~= 'number' or key < 1 or key > #items or key % 1 ~= 0
+            or type(item) ~= 'table' or type(item.value) ~= 'table'
+            or item.value[1] ~= 'loadfile' or type(item.value[2]) ~= 'string'
+            or type(item.title) ~= 'string' or (item.hint ~= nil and type(item.hint) ~= 'string') then
+            return nil, '历史条目格式异常'
+        end
+    end
+    return items
+end
 
 function utf8_char_bytes(str, i)
     local char_byte = str:byte(i)
@@ -231,78 +249,81 @@ function is_same_series(path1, path2)
     return false
 end
 
-function remove_deleted()
-    local new_items = {}
-    for _, item in ipairs(menu.items) do
-        local path = item.value[2]
-        local deleted = false
-
-        if not is_protocol(path) then
-            local meta, meta_error = utils.file_info(path)
-            if not (meta and meta.is_file) then
-                deleted = true
-            end
-        end
-
-        if not deleted then
-            new_items[#new_items + 1] = item
-        end
-    end
-
-    if #menu.items ~= #new_items then
-        menu.items = new_items
-        write_json()
-    end
-end
-
 function read_json(force)
     if o.reduce_io and not force then
         return
     end
-    local meta, meta_error = utils.file_info(path)
-    if not meta or not meta.is_file then
-        menu.items = {}
-        return
-    end
-
-    local json_file = io.open(path, "r")
-    if not json_file then
-        menu.items = {}
-        return
-    end
-
-    local json = json_file:read("*all")
-    json_file:close()
-
-    menu.items = utils.parse_json(json) or {}
-    remove_deleted()
+    local json, err = safe_file.read(path)
+    if json == nil then mp.msg.error('无法读取历史记录：' .. tostring(err)); return false end
+    local items, parse_err = parse_history(json)
+    if not items then mp.msg.error(parse_err .. '，原文件已保留'); return false end
+    menu.items = items
+    -- 临时离线、共享盘断开不会自动抹去记录；只在用户主动删除时移除。
+    return true
 end
 
 function write_json(force)
     if o.reduce_io and not force then
         return
     end
-    local json_file = io.open(path, "w")
-    if not json_file then return end
-
-    local json = utils.format_json(menu.items)
-
-    json_file:write(json)
-    json_file:close()
+    if #pending_updates == 0 then return true end
+    local saved
+    local ok, err = safe_file.update(path, function(bytes)
+        local items, parse_err = parse_history(bytes)
+        if not items then return nil, parse_err end
+        for _, change in ipairs(pending_updates) do
+            if change.kind == 'append' then
+                local next_items = {change.item}
+                for _, item in ipairs(items) do
+                    if #next_items < o.length and item.value[2] ~= change.item.value[2]
+                        and not is_same_series(change.item.value[2], item.value[2]) then
+                        next_items[#next_items + 1] = item
+                    end
+                end
+                items = next_items
+            elseif change.kind == 'remove' then
+                local found
+                for index, item in ipairs(items) do
+                    if item.value[2] == change.item.value[2] then
+                        if item.title ~= change.item.title or item.hint ~= change.item.hint then
+                            return nil, '所选记录已由其他实例更新，请刷新后再删除'
+                        end
+                        found = index
+                        break
+                    end
+                end
+                if found then table.remove(items, found) end
+            end
+        end
+        saved = items
+        local bom = bytes:sub(1, 3) == '\239\187\191' and '\239\187\191' or ''
+        return bom .. utils.format_json(items)
+    end)
+    if not ok then
+        mp.msg.error('历史保存失败，原记录已保留：' .. tostring(err))
+        mp.osd_message('历史保存失败，原记录已保留；请稍后重试', 4)
+        return false
+    end
+    menu.items, pending_updates = saved, {}
 
     if dyn_menu.ready then
         update_dyn_menu_items()
     end
+    return true
 end
 
 function clip_uosc_menu_item(menu)
+    local display_menu = {}
+    for key, value in pairs(menu) do display_menu[key] = value end
     local menu_items = {}
     for _, item in ipairs(menu.items) do
-        item.title = utf8_substring(item.title, 1, o.width)
-        table.insert(menu_items, item)
+        local display_item = {}
+        for key, value in pairs(item) do display_item[key] = value end
+        display_item.title = utf8_substring(item.title, 1, o.width)
+        table.insert(menu_items, display_item)
     end
-    menu.items = menu_items
-    return menu
+    display_menu.items = menu_items
+    return display_menu
 end
 
 function append_item(path, title, hint)
@@ -318,14 +339,24 @@ function append_item(path, title, hint)
         end
     end
     menu.items = new_items
+    pending_updates[#pending_updates + 1] = {kind = 'append', item = new_items[1]}
     write_json()
 end
 
-function remove_item(index)
-    table.remove(menu.items, index)
+function remove_item(index, value)
+    local selected = menu.items[index]
+    if type(value) == 'table' then
+        selected = nil
+        for _, item in ipairs(menu.items) do if item.value[2] == value[2] then selected = item; break end end
+    end
+    if not selected then return end
+    pending_updates[#pending_updates + 1] = {kind = 'remove', item = selected}
+    if not write_json(true) then
+        pending_updates[#pending_updates] = nil
+        return
+    end
     local json = utils.format_json(clip_uosc_menu_item(menu))
     mp.commandv('script-message-to', 'uosc', 'update-menu', json)
-    write_json()
 end
 
 function open_menu_uosc()
@@ -429,7 +460,8 @@ function on_end(e)
     if not current_item[1] then
         return
     end
-    append_item(unpack(current_item))
+    -- 退出只提交尚未保存的操作，避免旧实例重新顶置已过时的记录。
+    write_json(true)
 end
 
 mp.add_key_binding(nil, "open", open_menu)
@@ -464,12 +496,12 @@ mp.register_script_message('uosc-callback', function(json)
     end
 
     if event.type == "activate" and event.action == "remove" then
-        remove_item(event.index)
+        remove_item(event.index, event.value)
         return
     end
 
     if event.type == "key" and event.id == "del" then
-        remove_item(event.selected_item.index)
+        remove_item(event.selected_item.index, event.selected_item.value)
         return
     end
 end)
@@ -486,7 +518,5 @@ end)
 
 if o.reduce_io then
     read_json(true)
-    mp.register_event("shutdown", function (e)
-        write_json(true)
-    end)
 end
+mp.register_event('shutdown', function() write_json(true) end)

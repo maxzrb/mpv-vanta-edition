@@ -1360,7 +1360,7 @@ function Menu:search_query_backspace(event, word_mode)
 		local is_palette = self.current.search_style == 'palette'
 		if not is_palette and self.type_to_search then
 			self:search_cancel()
-		elseif is_palette and event ~= 'repeat' then
+		elseif is_palette and event ~= 'repeat' and not self.current.search_keep_open_on_empty then
 			self:back()
 		end
 	end
@@ -1379,11 +1379,11 @@ function Menu:search_query_delete(event, word_mode)
 	if word_mode then
 		tail_cursor = find_string_segment_bound(tail, 0, 1) + 1
 	else
-		-- The while loop is for skipping utf8 continuation bytes
-		while tail_cursor < #tail and tail:byte(tail_cursor) >= 0x80 and tail:byte(tail_cursor) <= 0xbf do
+		-- 先跳过完整首字符，再跨过其 UTF-8 续字节，避免 Delete 留下残字节。
+		tail_cursor = 2
+		while tail_cursor <= #tail and tail:byte(tail_cursor) >= 0x80 and tail:byte(tail_cursor) <= 0xbf do
 			tail_cursor = tail_cursor + 1
 		end
-		tail_cursor = tail_cursor + 1
 	end
 
 	local new_query = head .. tail:sub(tail_cursor)
@@ -1397,7 +1397,7 @@ function Menu:search_query_delete(event, word_mode)
 		local is_palette = self.current.search_style == 'palette'
 		if not is_palette and self.type_to_search then
 			self:search_cancel()
-		elseif is_palette and event ~= 'repeat' then
+		elseif is_palette and event ~= 'repeat' and not self.current.search_keep_open_on_empty then
 			self:back()
 		end
 	end

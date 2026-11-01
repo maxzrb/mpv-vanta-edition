@@ -35,14 +35,6 @@
     "install_missing": false
   },
   {
-    "name": "sub-assrt",
-    "git": "https://github.com/dyphire/mpv-sub-assrt",
-    "branch": "master",
-    "whitelist": "%.lua$",
-    "dest": "~~/scripts",
-    "install_missing": false
-  },
-  {
     "name": "sub-fastwhisper",
     "git": "https://github.com/dyphire/mpv-sub-fastwhisper",
     "branch": "master",

@@ -7,8 +7,10 @@ local names, err = utils.readdir(directory)
 if not names then msg.error('无法读取活动脚本目录：' .. tostring(err)); return end
 table.sort(names, function(a, b) return a:lower() < b:lower() end)
 local loaded = {}
+-- 覆盖升级可能留下旧文件；退役的联网字幕脚本不再自动加载。
+local retired = {['sub-assrt.lua'] = true}
 for _, name in ipairs(names) do
-    if name:sub(1, 1) ~= '.' and name:lower() ~= 'backup' then
+    if name:sub(1, 1) ~= '.' and name:lower() ~= 'backup' and not retired[name:lower()] then
         local path = utils.join_path(directory, name)
         local info = utils.file_info(path)
         local supported = info and info.is_file and name:lower():match('%.(lua)$')

@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "effective_key_bindings_unchanged": true,
+  "protected_menus_byte_identical": true,
+  "native_and_uosc_checked": true,
+  "direct_toggles": true,
+  "persistence": true,
+  "screenshots": [
+    "C:\\Program portable\\mpv2\\tmp\\release-v1.6.5\\menu-导航.png",
+    "C:\\Program portable\\mpv2\\tmp\\release-v1.6.5\\menu-视频.png",
+    "C:\\Program portable\\mpv2\\tmp\\release-v1.6.5\\menu-字幕.png",
+    "C:\\Program portable\\mpv2\\tmp\\release-v1.6.5\\menu-界面.png",
+    "C:\\Program portable\\mpv2\\tmp\\release-v1.6.5\\menu-navigation-small.png"
+  ],
+  "errors": []
+}

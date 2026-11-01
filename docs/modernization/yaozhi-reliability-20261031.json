@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-31",
+  "reference": {
+    "repository": "https://github.com/Yaozhil/mpv-Yaozhi",
+    "main": "8cbcdc940b064bbb8d9ddca58f9c07ebe148bd04",
+    "core_branch": "a8fdb403913aaee8f2a41b133c54a12f99537936",
+    "release": "mpv-Yaozhi（1.0.8-3）",
+    "archive": "Yaoplayer-1.0.8-3.7z",
+    "bytes": 347280714,
+    "sha256": "8dda5def203fc6b5ad05f09f34bc778750a69d2abba43f2749f5123db90629f5",
+    "archive_integrity": "7z t passed",
+    "executed_reference_binaries": false,
+    "source_sha256": {
+      "scripts/simplebookmark.lua": "a261d5f75bd7ff0ffae1af74e77dbc6c09ca733d89bfa5aa5ab50150d39fd9be",
+      "scripts/recentmenu.lua": "5f4d0d941e374f48d809ba8d019d6cab7366500d9b360d412406b0cb70a5a12c",
+      "scripts/thumbfast.lua": "cca1edc27f4049597fdfbe2a268d03c9961419e3d197fd56882628638dffef50",
+      "scripts/sub-assrt.lua": "d67f5fc34fef7cf668cb91a08673840d70b2b45fc59e96ffc0fb434e9d131d96",
+      "scripts/uosc/elements/Timeline.lua": "925271a800f00195e0d9d6780594ac20500e44c99921aba3a311efae4174f15d",
+      "script-modules/yaozhi-persistence.lua": "1ee2adee3530991eea8bb19e55775d4eb3865b245a61a3132fdabf61cef7a544",
+      "script-modules/subtitle-cat.lua": "d80fb74d877fd99880052f8191cde11b73883e436ca3f99cc0d8cc9bb5abbe72",
+      "script-modules/subtitle-output.lua": "ad25a3ec466acf685d8bf624421a1db216dc28b4eb0032b3c4543a5e0799d431",
+      "script-modules/subtitle-request.lua": "4ee7e2d0540ac55a68484da6cda460397dfa56c9aa6c9d7081e5651632ce90ea",
+      "script-modules/subtitle-search-query.lua": "0faa79a0633d0454fb46ba7e3a1ebe60aff3395479d93c4284b39fb2c8851614",
+      "script-modules/subtitle-search-session.lua": "75da043427dac0dfb7c6cb33f9fb0c73c277359b80d505180780d38ec42b4a4e"
+    }
+  },
+  "checks": {
+    "safe_file": "UTF-8 paths, BOM/CRLF, replace failure, conflict check, concurrent updates passed",
+    "state_storage": "7 real multi-instance and failure scenarios passed",
+    "auto_next": "9 existing real EOF/menu/persistence scenarios passed",
+    "thumbfast": "6 real pipe/native lifecycle scenarios passed",
+    "uosc_refresh": "100 renders collect static format once; rotation/reload invalidate; UTF-8 edit passed",
+    "subtitle_search": {
+      "current": "removed",
+      "previous": "7 fixture groups passed before removal; historical evidence only"
+    },
+    "lua_loadfile": 135,
+    "diff_check": "passed"
+  },
+  "live_providers": {
+    "assrt": {
+      "curl_status": 35,
+      "bytes": 0
+    },
+    "xunlei": {
+      "curl_status": 0,
+      "bytes": 4120,
+      "service_status": 0,
+      "results": 11
+    },
+    "subtitlecat": {
+      "curl_status": 35,
+      "bytes": 0
+    }
+  },
+  "full_playback": {
+    "config": "C:\\Program portable\\mpv2\\tmp\\modernization\\isolated\\yaozhi-reliability-full-lp6eyxvw",
+    "rows": [
+      {
+        "backend": "d3d11",
+        "clock_before": 0.041667,
+        "clock_after": 0.833333,
+        "default_auto_next": false,
+        "subtitle_menu": true
+      },
+      {
+        "backend": "vulkan",
+        "clock_before": 0.041667,
+        "clock_after": 0.625,
+        "default_auto_next": false,
+        "subtitle_menu": true
+      }
+    ],
+    "errors": [],
+    "initial_vulkan_minimized_probe": "surface extent 0x0; repeated with a normal window"
+  },
+  "limits": [
+    "Assrt and Subtitle Cat live TLS requests reset on this host; fixtures do not certify current service availability.",
+    "No rendering speed or whole-player FPS gain claimed.",
+    "HDR subtitle core patches, network media subsystem and MEL/FEL display were not introduced.",
+    "Existing ignore_same_series and history length preferences are retained."
+  ],
+  "current_state_updated": "2026-10-31 21:19",
+  "online_subtitle_search": {
+    "enabled": false,
+    "removed_by_user": true,
+    "includes_original_assrt": true,
+    "includes_builtin_opensubtitles": true,
+    "archive": "backup/removed-online-subtitles-20261031-211548"
+  },
+  "full_playback_after_subtitle_removal": {
+    "passed": true,
+    "config": "C:\\Program portable\\mpv2\\tmp\\modernization\\isolated\\remove-online-subtitles-sf4rm8da",
+    "rows": [
+      "完整配置不加载在线字幕脚本，输入绑定没有在线搜索下载命令",
+      "主字幕与副字幕菜单保留本地加载，均无在线下载按钮",
+      "本地字幕浏览器正常，自动连播默认关闭"
+    ],
+    "errors": []
+  },
+  "live_providers_note": "Historical probes for the removed feature; no active online subtitle provider remains."
+}

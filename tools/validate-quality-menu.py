@@ -27,7 +27,7 @@ def run():
         assert '着色器' in text and '视频滤镜' in text
         assert '画质增强' not in text and '专家库' in text
         assert all(tier not in text for tier in ['3050级参考', '4060级参考', '5060Ti级参考'])
-        assert all(section in text for section in ['片源修复', '帧率改写', '修复错误标记'])
+        assert all(section in text for section in ['片源修复', '改写帧率为 59.94', '片源标记'])
         assert all(x in text for x in ['播放性能', '色度重建', '精细色度', 'HQ 高色准', 'RIFE 4.26'])
         assert '缩放算法' not in text
         assert '自动 ICC 校色' not in text and '非线性色彩转换' not in text
@@ -42,11 +42,11 @@ def run():
                 paths.extend(performance_paths(item.get('items',item.get('submenu',[])),(*parents,title)))
             return paths
         paths=performance_paths(menu if isinstance(menu,list) else menu.get('items',[]))
-        assert paths and all('其它' in path and '画面' not in path for path in paths), paths
+        assert paths and all('视频' in path and '画面' not in path for path in paths), paths
         assert '低功耗' not in text and '关闭全部补帧' not in text
         roots=menu if isinstance(menu,list) else menu.get('items',[])
         names=[item.get('title','') for item in roots]
-        assert names.index('工具') < names.index('其它') < names.index('最小化'), names
+        assert names.index('工具') < names.index('界面') < names.index('最小化'), names
         filters=next(item for item in roots if item.get('title')=='视频滤镜')
         children=filters.get('items',filters.get('submenu',[]))
         assert any(item.get('title')=='清空全部视频滤镜' for item in children)
