@@ -1,0 +1,196 @@
+{
+  "version": "1.6.5",
+  "passed": true,
+  "timestamp": "2026-11-01 19:43 +0800",
+  "candidate_type": "same-version local rebuild: interrupted reload cleanup and exact resume",
+  "feature_commit": "ee41c2a8bcb94737faf940bd4fc77baad93faae8",
+  "published_tag_commit": "2c3606ec03c863e409972e9c3648b2f0ee321f37",
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.5.7z",
+      "bytes": 136920248,
+      "sha256": "5955edb8ca9aa4fd3e7dec73ca5121f7c7e77b56f82e4965ce074e68571ccbda"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.5.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.5.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.5.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+    },
+    {
+      "name": "04-mpv-config-v1.6.5.7z",
+      "bytes": 5373537,
+      "sha256": "af86a9671f6c301e0e48307d8a5db1f69c256703e1bdf21e21061ecaa5ecfef3"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+    }
+  ],
+  "private_asset": {
+    "name": "mpv-full-private-v1.6.5.7z",
+    "bytes": 3038067621,
+    "sha256": "f1fc4e91a4c3f5f4c802259d26ca06ae58f489c79ffb865c69067252bf0c25c2"
+  },
+  "private_uncompressed_bytes": 5140982235,
+  "private_file_count": 11801,
+  "covered_config_files": 1427,
+  "archive_files": {
+    "01-mpv-base-v1.6.5.7z": 1323,
+    "02-mpv-extras-v1.6.5.7z.001": 10474,
+    "03-mpv-fasterwhisper-addon-v1.6.5.7z": 5122,
+    "04-mpv-config-v1.6.5.7z": 270,
+    "mpv-full-private-v1.6.5.7z": 11801
+  },
+  "input_reuse": {
+    "source_version": "1.6.4",
+    "extras": {
+      "files": 10473,
+      "bytes": 4603603173,
+      "latest_input_time": 1791366824.1750202,
+      "all_input_size_crc_identical": true
+    },
+    "fasterwhisper": {
+      "files": 5121,
+      "bytes": 4714825519,
+      "latest_input_time": 1744549392.576642,
+      "all_input_size_crc_identical": true
+    },
+    "assets": [
+      {
+        "source": "02-mpv-extras-v1.6.4.7z.001",
+        "name": "02-mpv-extras-v1.6.5.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+      },
+      {
+        "source": "02-mpv-extras-v1.6.4.7z.002",
+        "name": "02-mpv-extras-v1.6.5.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+      },
+      {
+        "source": "03-mpv-fasterwhisper-addon-v1.6.4.7z",
+        "name": "03-mpv-fasterwhisper-addon-v1.6.5.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+      }
+    ],
+    "tracked_input_changes": [],
+    "ignored_input_checks": true,
+    "byte_identical_copy": true,
+    "internal_readme_versions": {
+      "extras": "1.6.0",
+      "fasterwhisper": "1.5.7"
+    }
+  },
+  "private_union": {
+    "name": "mpv-full-private-v1.6.5.7z",
+    "merged_files": 11798,
+    "size_crc_union_identical": true,
+    "local_only": true,
+    "uploaded": false,
+    "installer_sha_identical": true,
+    "placeholder_only": true
+  },
+  "archive_checks": [
+    "来源与新02／03、01／04与私包7z t全部通过",
+    "公开门禁／分卷限制／版本标记／Logo与ffmpeg边界通过",
+    "私包完整文件并集及覆盖次序一致（含空文件）",
+    "全部配置／素材／模块与源文件逐字节一致，仅排除个人偏好",
+    "核心／运行时与源目录SHA一致",
+    "许可按既有01边界入包，联网字幕不存在",
+    "安装器0.3.14同SHA候选沿用既有有效窗口／退出验证",
+    "个人关键帧与窗口偏好逐字节恢复"
+  ],
+  "regressions": {
+    "passed": true,
+    "rows": [
+      {
+        "test": "lua-lifecycle",
+        "passed": true,
+        "completed_functional_run": true
+      },
+      {
+        "test": "actual-lifecycle",
+        "passed": true,
+        "completed_functional_run": true
+      },
+      {
+        "test": "codec-switch",
+        "passed": true,
+        "completed_functional_run": true
+      },
+      {
+        "test": "preferences",
+        "passed": true,
+        "completed_functional_run": true
+      },
+      {
+        "test": "hwdec-menu",
+        "passed": true,
+        "completed_functional_run": true
+      },
+      {
+        "test": "av1-parameters",
+        "passed": true,
+        "completed_functional_run": true
+      },
+      {
+        "test": "Lua syntax / UTF-8 / LF / diff",
+        "files": 145,
+        "passed": true
+      }
+    ]
+  },
+  "package_regressions": {
+    "passed": true,
+    "tests": [
+      "archive-audit",
+      "package-playback",
+      "package-lifecycle"
+    ],
+    "source_script_matches_all_archives": true
+  },
+  "package_playback": {
+    "passed": true,
+    "cases": 6,
+    "report": "docs/modernization/repack-playback-v1.6.5-reload-cleanup-20261101.json"
+  },
+  "package_lifecycle": {
+    "passed": true,
+    "cases": 4,
+    "report": "docs/modernization/repack-lifecycle-v1.6.5-reload-cleanup-20261101.json"
+  },
+  "installer_startup": {
+    "passed": true,
+    "main_window_handle": 24054920,
+    "close_requested": true,
+    "forced_termination": false,
+    "exit_code": 0,
+    "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+  },
+  "user_preferences_restored": {
+    "uosc.conf": "dfa6a345627d0f607aacff55a6bb8d2d93fde065608fd44c5c58339f0136a545",
+    "window_size_position.conf": "e753633f532f130510dcf6eecb5a21e7802117c3d0b8c9cfbed6cc6acaf4bfd1"
+  },
+  "old_local_assets": "backup/release-v1.6.5-before-reload-cleanup-20261101",
+  "build_staging": "backup/repack-v1.6.5-reload-cleanup-build-staging-20261101",
+  "package_unpacked_staging": "backup/repack-v1.6.5-reload-cleanup-tested-package-20261101",
+  "build_staging_cleaned": true,
+  "uploaded": false,
+  "git_pushed": false,
+  "tag_changed": false,
+  "github_changed": false,
+  "modelscope_changed": false
+}

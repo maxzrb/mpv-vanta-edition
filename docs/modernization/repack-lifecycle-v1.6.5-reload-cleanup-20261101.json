@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "package_root": "C:\\Program portable\\mpv2\\tmp\\repack-v1.6.5-reload-cleanup-20261101\\merged",
+  "rows": [
+    {
+      "mode": "normal",
+      "passed": true,
+      "path": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\compat-hevc10.mkv",
+      "final_hwdec": "no",
+      "final_position": 1.0,
+      "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\decoder-lifecycle-decoder-lifecycle-4i_yb0nv-normal.log",
+      "expected_load_error": false
+    },
+    {
+      "mode": "failure",
+      "passed": true,
+      "path": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\compat-hevc10.mkv",
+      "final_hwdec": "no",
+      "final_position": 0.0,
+      "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\decoder-lifecycle-decoder-lifecycle-4i_yb0nv-failure.log",
+      "expected_load_error": true
+    },
+    {
+      "mode": "stop",
+      "passed": true,
+      "path": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\compat-hevc10.mkv",
+      "final_hwdec": "no",
+      "final_position": 0.0,
+      "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\decoder-lifecycle-decoder-lifecycle-4i_yb0nv-stop.log",
+      "expected_load_error": false
+    },
+    {
+      "mode": "replace",
+      "passed": true,
+      "path": "C:\\Program portable\\mpv2\\tmp\\decoder-lifecycle-4i_yb0nv\\next.mkv",
+      "final_hwdec": "no",
+      "final_position": 1.0,
+      "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\decoder-lifecycle-decoder-lifecycle-4i_yb0nv-replace.log",
+      "expected_load_error": false
+    }
+  ]
+}
