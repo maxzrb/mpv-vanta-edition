@@ -220,7 +220,13 @@
     "clean_no_config_mid_playback_baseline_reproduced": false,
     "final_test_waits_for_actual_moving_video": true,
     "final_switch_and_restart_errors": [],
-    "limit": "首次探针在首帧呈现前注入解码切换，出现HEVC参考错误；等待实际画面推进后同样切换及重启无目标错误。本轮未修改初始化切换行为，不宣称首帧前无缝切换通过。"
+    "limit": "两次初始探针出现HEVC参考帧错误：一组首帧前，另一组已经显示过画面后切换。因此不能仅归为测试操作过早；正常实际画面推进后的复测及跨重启无目标错误，但切换竞态尚未修复，触发范围与恢复上限未完成认证。",
+    "scope_correction_timestamp": "2026-11-01 16:27",
+    "second_probe_had_already_shown_video": true,
+    "first_probe_switch_seconds": 0.827,
+    "first_probe_next_shown_frame_seconds": 1.609,
+    "second_probe_first_shown_frame_seconds": 1.073,
+    "second_probe_switch_seconds": 1.794
   },
   "overload_catchup_included": false
 }
