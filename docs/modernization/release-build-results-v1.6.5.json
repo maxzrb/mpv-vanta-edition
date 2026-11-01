@@ -1,0 +1,155 @@
+{
+  "version": "1.6.5",
+  "passed": true,
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.5.7z",
+      "bytes": 136916240,
+      "sha256": "76603a4178c5c655bb6af3c82b042953b8d20d2e8e28ed89ff8cb5c287e6a633"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.5.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.5.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.5.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+    },
+    {
+      "name": "04-mpv-config-v1.6.5.7z",
+      "bytes": 5370799,
+      "sha256": "39f9202aced4cc3db74715a9a1068ca9a83b1a8142ba798eb551ade1898d2c61"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+    },
+    {
+      "name": "mpv-full-private-v1.6.5.7z",
+      "bytes": 3037974273,
+      "sha256": "4cca8b72f45dce244b1b1b9b3ef7ea8f28812de0e2d2f4c339b484e8ae58df06"
+    }
+  ],
+  "covered_config_files": 1425,
+  "archive_files": {
+    "01-mpv-base-v1.6.5.7z": 1321,
+    "02-mpv-extras-v1.6.5.7z.001": 10474,
+    "03-mpv-fasterwhisper-addon-v1.6.5.7z": 5122,
+    "04-mpv-config-v1.6.5.7z": 268,
+    "mpv-full-private-v1.6.5.7z": 11799
+  },
+  "input_reuse": {
+    "source_version": "1.6.4",
+    "extras": {
+      "files": 10473,
+      "bytes": 4603603173,
+      "latest_input_time": 1791366824.1750202,
+      "all_input_size_crc_identical": true
+    },
+    "fasterwhisper": {
+      "files": 5121,
+      "bytes": 4714825519,
+      "latest_input_time": 1744549392.576642,
+      "all_input_size_crc_identical": true
+    },
+    "assets": [
+      {
+        "source": "02-mpv-extras-v1.6.4.7z.001",
+        "name": "02-mpv-extras-v1.6.5.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+      },
+      {
+        "source": "02-mpv-extras-v1.6.4.7z.002",
+        "name": "02-mpv-extras-v1.6.5.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+      },
+      {
+        "source": "03-mpv-fasterwhisper-addon-v1.6.4.7z",
+        "name": "03-mpv-fasterwhisper-addon-v1.6.5.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+      }
+    ],
+    "tracked_input_changes": [],
+    "ignored_input_checks": true,
+    "byte_identical_copy": true,
+    "internal_readme_versions": {
+      "extras": "1.6.0",
+      "fasterwhisper": "1.5.7"
+    }
+  },
+  "private": {
+    "name": "mpv-full-private-v1.6.5.7z",
+    "merged_files": 11796,
+    "size_crc_union_identical": true,
+    "local_only": true,
+    "uploaded": false,
+    "installer_sha_identical": true,
+    "placeholder_only": true,
+    "playback": {
+      "passed": true,
+      "normal_startup": true,
+      "samples": [
+        0.333,
+        0.633,
+        0.867
+      ],
+      "loaded_scripts": 52,
+      "errors": []
+    }
+  },
+  "checks": [
+    "来源与新02／03、01／04与私包7z t全部通过",
+    "公开门禁／分卷限制／版本标记／Logo与ffmpeg边界通过",
+    "私包完整文件并集及覆盖次序一致（含空文件）",
+    "全部配置／素材／模块与源文件逐字节一致，仅排除个人偏好",
+    "核心／运行时与源目录SHA一致",
+    "许可按既有01边界入包，联网字幕不存在",
+    "安装器0.3.14同SHA候选沿用既有有效窗口／退出验证",
+    "个人关键帧与窗口偏好逐字节恢复",
+    "实际公开合并包D3D11／Vulkan×SDR／HDR10／HLG，模式往返、窗口变化及暂停恢复通过",
+    "实际私包正常启动与持续视频、连播关闭／精确默认、菜单／加载器通过",
+    "已在全部构建与私包验收完成后才进入上传阶段"
+  ],
+  "playback": {
+    "passed": true,
+    "backends": [
+      "d3d11",
+      "vulkan"
+    ],
+    "sources": [
+      "SDR",
+      "HDR10",
+      "HLG"
+    ],
+    "groups": 6,
+    "modes_and_resize_and_pause_resume": true
+  },
+  "menu": {
+    "passed": true,
+    "effective_key_bindings_unchanged": true,
+    "protected_menus_byte_identical": true,
+    "native_and_uosc_checked": true,
+    "direct_toggles": true,
+    "persistence": true,
+    "screenshots": [
+      "C:\\Program portable\\mpv2\\tmp\\release-v1.6.5\\menu-导航.png",
+      "C:\\Program portable\\mpv2\\tmp\\release-v1.6.5\\menu-视频.png",
+      "C:\\Program portable\\mpv2\\tmp\\release-v1.6.5\\menu-字幕.png",
+      "C:\\Program portable\\mpv2\\tmp\\release-v1.6.5\\menu-界面.png",
+      "C:\\Program portable\\mpv2\\tmp\\release-v1.6.5\\menu-navigation-small.png"
+    ],
+    "errors": []
+  },
+  "all_builds_complete_before_upload": true
+}
