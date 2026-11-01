@@ -38,6 +38,18 @@ end
 local state = {}
 local pending
 local user_policy
+local requested_policy = mp.get_property('hwdec', 'no')
+local preferences_loaded, preferences = pcall(function()
+    return dofile(mp.find_config_file('script-modules/preference-store.lua'))
+end)
+if preferences_loaded then
+    local err
+    user_policy, err = preferences.restore('hwdec')
+    if user_policy then requested_policy = user_policy end
+    if err then msg.error(err) end
+else
+    msg.error('解码偏好保存模块无法加载：' .. tostring(preferences))
+end
 local function Copy(value)
     local result = {}
     for k, v in pairs(value or {}) do result[k] = v end
@@ -45,10 +57,15 @@ local function Copy(value)
 end
 
 local function Status(phase, delay)
+    local policy = requested_policy
+    if policy == 'auto' then policy = 'auto-safe'
+    elseif policy == 'auto-copy' then policy = 'auto-copy-safe' end
     mp.set_property_native('user-data/decode-performance', {
         state = phase, threads = state.threads, frame_delay = delay,
+        ['hwdec-policy'] = policy,
     })
 end
+Status('标准解码')
 
 local function Local(name, value)
     -- Lua 空表会被 native 接口编码为数组；键值选项用空字符串显式清空。
@@ -231,7 +248,12 @@ end
 local function Hardware(policy)
     -- 先撤销本脚本的 dav1d 专用参数，再切硬解，避免传给其它解码器。
     if not policy or policy == '' then return end
+    if preferences_loaded and not preferences.valid('hwdec', policy) then
+        msg.error('无效的解码方式：' .. tostring(policy))
+        return
+    end
     user_policy = policy
+    requested_policy = policy
     if state.prepared then
         local threads, avopts = OriginalOptions()
         pending = nil
@@ -240,6 +262,13 @@ local function Hardware(policy)
         mp.set_property('hwdec', policy)
         Prepare()
         Tune()
+    end
+    -- 仅菜单／绑定调用保存用户策略；hwdec-current 和局部软解／复制回退不保存。
+    local saved, err
+    if preferences_loaded then saved, err = preferences.set('hwdec', policy) end
+    if not saved then
+        msg.error('解码偏好保存失败，原文件保留：' .. tostring(err or preferences))
+        mp.osd_message('解码方式已生效，但未能保存', 3)
     end
 end
 mp.register_script_message('decode-performance-hwdec', Hardware)

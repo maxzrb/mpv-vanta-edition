@@ -15,6 +15,7 @@ if windows then
         int __stdcall CloseHandle(void *);
         int __stdcall MoveFileExW(const wchar_t *, const wchar_t *, unsigned long);
         int __stdcall DeleteFileW(const wchar_t *);
+        int __stdcall CreateDirectoryW(const wchar_t *, void *);
         int __stdcall GetFileSizeEx(void *, int64_t *);
         unsigned long __stdcall GetLastError(void);
         unsigned long __stdcall GetCurrentProcessId(void);
@@ -46,6 +47,15 @@ local function failure(action)
     return action .. '（Windows 错误 ' .. tonumber(kernel.GetLastError()) .. '）'
 end
 
+function M.ensure_directory(path)
+    if not windows then return nil, '可靠文件保存需要 Windows LuaJIT 接口' end
+    local name = wide(path)
+    if not name then return nil, '文件路径不是有效的 UTF-8' end
+    if kernel.CreateDirectoryW(name, nil) ~= 0 then return true end
+    if tonumber(kernel.GetLastError()) == 183 then return true end
+    return nil, failure('创建状态目录失败')
+end
+
 function M.read(path)
     if not windows then return nil, '可靠文件保存需要 Windows LuaJIT 接口' end
     local name = wide(path)
@@ -53,7 +63,7 @@ function M.read(path)
     local handle = kernel.CreateFileW(name, 0x80000000, 7, nil, 3, 0x80, nil)
     if invalid(handle) then
         local code = tonumber(kernel.GetLastError())
-        if code == 2 then return '', nil, false end
+        if code == 2 or code == 3 then return '', nil, false end
         return nil, failure('读取文件失败')
     end
     local size = ffi.new('int64_t[1]')

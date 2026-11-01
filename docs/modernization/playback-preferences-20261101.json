@@ -1,0 +1,198 @@
+{
+  "passed": true,
+  "checked_at": "2026-11-01 15:16 Asia/Shanghai",
+  "base_release": "1.6.5",
+  "published": false,
+  "core": "mpv v0.41.0-1107-g36bf3d529 Copyright © 2000-2026 mpv/MPlayer/mplayer2 projects",
+  "user_choice_tests": {
+    "passed": true,
+    "checks": [
+      "首次硬解选择与首次音量改动在五秒内退出仍保存",
+      "软件／NVDEC复制／D3D11复制／自动硬解跨启动恢复",
+      "CPU滤镜复制回退和文件局部软解不覆盖用户策略",
+      "硬解切换绑定也通过同一路径保存，原快捷键不改动",
+      "帧同步／跳转跳帧／零复制保存，临时同步调整不写回",
+      "命令行覆盖本次启动，退出不改已保存偏好",
+      "两实例偏好与通用设置按字段合并，退出不回滚另一实例",
+      "多行JSON恢复、BOM与其他模块字段保留",
+      "损坏数据下设置当前生效，原文件保留并报告保存失败"
+    ],
+    "artifacts": "C:\\Program portable\\mpv2\\tmp\\playback-preferences-p963ycyf",
+    "hardware_backend_availability_not_asserted": true,
+    "expected_fallback_errors": [
+      "[   0.560][e][ffmpeg] CUDA: Cannot load nvcuda.dll",
+      "[   0.561][e][ffmpeg] CUDA: Could not dynamically load CUDA",
+      "[   0.222][e][ffmpeg] CUDA: Cannot load nvcuda.dll",
+      "[   0.222][e][ffmpeg] CUDA: Could not dynamically load CUDA",
+      "[   0.219][e][ffmpeg] CUDA: Cannot load nvcuda.dll",
+      "[   0.219][e][ffmpeg] CUDA: Could not dynamically load CUDA"
+    ]
+  },
+  "hwdec_menu_tests": {
+    "passed": true,
+    "compiled_methods": [
+      "amf",
+      "amf-copy",
+      "cuda",
+      "cuda-copy",
+      "d3d11va",
+      "d3d11va-copy",
+      "d3d12va",
+      "d3d12va-copy",
+      "dxva2",
+      "dxva2-copy",
+      "nvdec",
+      "nvdec-copy",
+      "qsv",
+      "qsv-copy",
+      "vaapi",
+      "vaapi-copy",
+      "vulkan",
+      "vulkan-copy"
+    ],
+    "excluded_methods": {
+      "vaapi": "官方文档列为Linux直出；Windows复制路径vaapi-copy保留"
+    },
+    "menu_choices": [
+      {
+        "policy": "auto-safe",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "auto-copy-safe",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "d3d11va",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "d3d11va-copy",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "nvdec",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "nvdec-copy",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "vulkan",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "vulkan-copy",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "d3d12va",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "d3d12va-copy",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "qsv",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "qsv-copy",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "amf",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "amf-copy",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "dxva2",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "dxva2-copy",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "cuda",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "cuda-copy",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "vaapi-copy",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "auto-unsafe",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "auto-copy-unsafe",
+        "restored": true,
+        "single_checked": true
+      },
+      {
+        "policy": "no",
+        "restored": true,
+        "single_checked": true
+      }
+    ],
+    "aliases_not_duplicated": true,
+    "protected_menus_unchanged": true,
+    "full_config_quality_temporary_sync_not_saved": true,
+    "screenshots": [
+      "C:\\Program portable\\mpv2\\tmp\\hwdec-menu-060i1nb3\\decode-menu.png",
+      "C:\\Program portable\\mpv2\\tmp\\hwdec-menu-060i1nb3\\other-backends.png"
+    ],
+    "limit": "全部选项的保存／恢复在无片源状态验证；实际视频验证D3D11复制与临时同步，不代表每种显卡和互操作组合均可用",
+    "sources": [
+      "https://mpv.io/manual/master/#options-hwdec",
+      "https://raw.githubusercontent.com/mpv-player/mpv/master/video/decode/vd_lavc.c"
+    ],
+    "matrix_reused_after_caption_only_change": "C:\\Program portable\\mpv2\\tmp\\hwdec-menu-rxx9k_z_\\results.json"
+  },
+  "regressions": [
+    "test-safe-file.py",
+    "test-state-storage.py",
+    "test-decode-performance.py真实12-bit444AV1事务／外部字幕／列表保留"
+  ],
+  "lua_syntax_files": 145,
+  "encoding": "UTF-8无BOM／LF",
+  "original_personal_preferences_preserved": true,
+  "source_sha256": {
+    "portable_config/scripts/decode-performance.lua": "17d6a3fa6188fdb17290d5fa98bca507407f59106f95e1c5c039d72a6069b98b",
+    "portable_config/scripts/playback-preferences.lua": "5d157a9f50bbec8d8103fe9e669147d4df3608bce29fceb334b582b8330202a8",
+    "portable_config/scripts/persist_properties.lua": "bd3b09957ebcf275a531ae671819994730c87db80592a6df45de4694728449f4",
+    "portable_config/script-modules/preference-store.lua": "373140a9142d9bb75654e107de2293946625ff33f780cdc271cbb85d07fbbe28",
+    "portable_config/script-modules/safe-file.lua": "2501af6533120c05fb91492485da268f7f12c4a8674e4131973f7d1e14e14de0",
+    "portable_config/input.conf": "5a0aef7734898e597aa2dc0f548606d9e612996c2667eaf40844da4f430d6360"
+  }
+}
