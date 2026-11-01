@@ -1,0 +1,205 @@
+{
+  "timestamp": "2026-11-01T15:48:42",
+  "video": "C:\\Users\\maxzr\\Downloads\\ChouKaguya432048-Part.mkv",
+  "hardware": "i5-12600KF / RX 6600 / 16 logical processors",
+  "format": {
+    "video": "AV1 Main / 7680×4320 / 10-bit 4:2:0 / 7001/146 fps (~47.952)",
+    "audio": "AAC LC / 48000 Hz / 6 channels → VS WASAPI 2-channel float output"
+  },
+  "vs_version": "1.0.16 / API 20",
+  "vs_source_commit": "deefd4f8effc028e2bfea69fca10e859d8ff16cd",
+  "vs_bundled_binary_sha256": {
+    "FFF.Native.dll": "873221b73e90b5f32822fe748e1af55421d99dbc8fa87992bbd95d2ae3b46aea",
+    "vs-player.exe": "66d14646c34c878855dad79a41ed53dee1d1b480cb488d8685be8fb91d754663"
+  },
+  "mpv": [
+    {
+      "case": "full-audio",
+      "seconds": 20.443076399998972,
+      "media_advance": 10.407,
+      "clock_ratio": 0.5090721081490711,
+      "cpu_cores": 10.757003774637903,
+      "counters": {
+        "frame-drop-count": 436,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "last_avsync_seconds": 11.045476,
+      "note": "time-pos推进比例，不代表声音速度；纯解码行没有音频或呈现"
+    },
+    {
+      "case": "full-no-audio",
+      "seconds": 20.294624799998928,
+      "media_advance": 10.010000000000002,
+      "clock_ratio": 0.49323405082120714,
+      "cpu_cores": 10.508478333633015,
+      "counters": {
+        "frame-drop-count": 372,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "last_avsync_seconds": null,
+      "note": "time-pos推进比例，不代表声音速度；纯解码行没有音频或呈现"
+    },
+    {
+      "case": "minimal-audio",
+      "seconds": 21.14549520000037,
+      "media_advance": 9.998999999999999,
+      "clock_ratio": 0.47286667469484583,
+      "cpu_cores": 11.266436314056898,
+      "counters": {
+        "frame-drop-count": 413,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "last_avsync_seconds": 8.082519,
+      "note": "time-pos推进比例，不代表声音速度；纯解码行没有音频或呈现"
+    },
+    {
+      "case": "full-audio-t32",
+      "seconds": 20.893647099999725,
+      "media_advance": 11.219000000000001,
+      "clock_ratio": 0.5369574754615315,
+      "cpu_cores": 12.891179252281118,
+      "counters": {
+        "frame-drop-count": 516,
+        "decoder-frame-drop-count": 0,
+        "mistimed-frame-count": 0,
+        "vo-delayed-frame-count": 0
+      },
+      "last_avsync_seconds": 10.141464,
+      "note": "time-pos推进比例，不代表声音速度；纯解码行没有音频或呈现"
+    },
+    {
+      "case": "pure-decode-t32-d32",
+      "seconds": 45.41986139999972,
+      "media_advance": 19.822,
+      "clock_ratio": 0.4364170076485553,
+      "cpu_cores": 12.163593920610323,
+      "counters": null,
+      "last_avsync_seconds": null,
+      "note": "time-pos推进比例，不代表声音速度；纯解码行没有音频或呈现"
+    }
+  ],
+  "vs_app": {
+    "config": "原INI复制隔离，未静音，音量76%，实际内层exe与原包SHA相同；仅CLI启动和读取文件／日志",
+    "default_catchup_events": [
+      "CATCHUP references=1 lag_ms=4736 key_pts=5214 size=1509181"
+    ],
+    "disabled_catchup_events": [],
+    "raw": "C:\\Program portable\\mpv2\\tmp\\vs-player-compare-20261101\\vs-app-results.json"
+  },
+  "vs_native": [
+    {
+      "mode": "1",
+      "scope": "原包DLL隔离核心渲染测试，非Qt窗口完整程序；1280×720，软件解码，AAC音频开启，音量76%，从10秒起播",
+      "wall_seconds": 19.11512430000039,
+      "clock_advance_seconds": 19.1159965,
+      "video_pts_advance_seconds": 15.556999999999999,
+      "last_video_lag_seconds": 6.433224400000004,
+      "decoded_frames_per_second": 22.65221994920489,
+      "accepted_for_present_per_second": 21.18741126888679,
+      "inserted_silence_seconds": 19.11,
+      "dropped_overlap_seconds": 15.616,
+      "last_underruns": 2,
+      "zero_output_samples": 39,
+      "sample_count": 39,
+      "last_input_levels": [
+        0.15346407890319824,
+        0.11568710952997208,
+        0.1041259765625,
+        0.00042956462129950523,
+        0.05467328056693077,
+        0.06183188036084175
+      ],
+      "last_output_levels": [
+        0.0,
+        0.0
+      ],
+      "policy": {
+        "softwareVideoReferenceOnly": true,
+        "softwareVideoRealtimeSwitches": 1,
+        "videoDecoderThreads": 8,
+        "videoDecoderDelayFrames": 8
+      },
+      "raw": "C:\\Program portable\\mpv2\\tmp\\vs-player-compare-20261101\\vs-native-1.json"
+    },
+    {
+      "mode": "0",
+      "scope": "原包DLL隔离核心渲染测试，非Qt窗口完整程序；1280×720，软件解码，AAC音频开启，音量76%，从10秒起播",
+      "wall_seconds": 19.0909972999998,
+      "clock_advance_seconds": 19.0918589,
+      "video_pts_advance_seconds": 9.905,
+      "last_video_lag_seconds": 12.180232100000001,
+      "decoded_frames_per_second": 24.880837419635746,
+      "accepted_for_present_per_second": 21.161806984279668,
+      "inserted_silence_seconds": 19.11,
+      "dropped_overlap_seconds": 9.898666666666667,
+      "last_underruns": 3,
+      "zero_output_samples": 39,
+      "sample_count": 39,
+      "last_input_levels": [
+        0.21393266320228577,
+        0.2248663604259491,
+        0.08182989805936813,
+        0.03563741594552994,
+        0.07844284176826477,
+        0.0823148712515831
+      ],
+      "last_output_levels": [
+        0.0,
+        0.0
+      ],
+      "policy": {
+        "softwareVideoReferenceOnly": false,
+        "softwareVideoRealtimeSwitches": 0,
+        "videoDecoderThreads": 8,
+        "videoDecoderDelayFrames": 8
+      },
+      "raw": "C:\\Program portable\\mpv2\\tmp\\vs-player-compare-20261101\\vs-native-0.json"
+    },
+    {
+      "mode": "audio",
+      "scope": "原包DLL隔离核心渲染测试，非Qt窗口完整程序；1280×720，软件解码，AAC音频开启，音量76%，从10秒起播",
+      "wall_seconds": 15.102188700000625,
+      "clock_advance_seconds": 15.1028899,
+      "video_pts_advance_seconds": null,
+      "last_video_lag_seconds": null,
+      "decoded_frames_per_second": 0.0,
+      "accepted_for_present_per_second": 0.0,
+      "inserted_silence_seconds": 0.0,
+      "dropped_overlap_seconds": 0.0,
+      "last_underruns": 0,
+      "zero_output_samples": 0,
+      "sample_count": 31,
+      "last_input_levels": [
+        0.17876498401165009,
+        0.09724470973014832,
+        0.058277107775211334,
+        0.00039623252814635634,
+        0.05994835123419762,
+        0.06574807316064835
+      ],
+      "last_output_levels": [
+        0.058094143867492676,
+        0.04879632592201233
+      ],
+      "policy": {
+        "softwareVideoReferenceOnly": false,
+        "softwareVideoRealtimeSwitches": 0,
+        "videoDecoderThreads": 0,
+        "videoDecoderDelayFrames": 0
+      },
+      "raw": "C:\\Program portable\\mpv2\\tmp\\vs-player-compare-20261101\\vs-native-audio.json"
+    }
+  ],
+  "limits": [
+    "原生核心测试不包含Qt外层，不能把核心计数当作完整GUI实际监视器FPS。",
+    "音频电平来自原生API，未进行物理扬声器录音；输入非零、输出零及持续补静音形成可复现的软件链路证据。",
+    "完整mpv与VS原生测试不构成同算法、同线程、同输出策略的解码器跑分；结论限定本机本片。",
+    "全程未用computer-use；未修改两播放器用户配置或生产性能配置。"
+  ]
+}
