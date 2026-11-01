@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "package_root": "C:\\Program portable\\mpv2\\build\\mpv-full-private-v1.6.5",
+  "mpv_sha256_source": "package/core",
+  "transitions": [
+    {
+      "policy": "d3d11va-copy",
+      "before": 0.0,
+      "after": 0.0,
+      "actual": "d3d11va-copy",
+      "errors": []
+    },
+    {
+      "policy": "no",
+      "before": 0.0,
+      "after": 0.0,
+      "actual": "no",
+      "errors": []
+    }
+  ],
+  "errors": [],
+  "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\repack-165-decoder-switch-package.log"
+}

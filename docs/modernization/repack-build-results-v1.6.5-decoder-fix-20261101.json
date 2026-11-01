@@ -1,0 +1,193 @@
+{
+  "version": "1.6.5",
+  "passed": true,
+  "candidate_type": "same-version local rebuild with safe decoder switching",
+  "timestamp": "2026-11-01 17:18 +0800",
+  "feature_commit": "a7234b0",
+  "published_tag_commit": "2c3606ec03c863e409972e9c3648b2f0ee321f37",
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.5.7z",
+      "bytes": 136919731,
+      "sha256": "aa6e29c7b5bb43878f5e0134cc4d8ca0b358e9153c17ac2db72e21f8711d9071"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.5.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.5.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.5.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+    },
+    {
+      "name": "04-mpv-config-v1.6.5.7z",
+      "bytes": 5373054,
+      "sha256": "b9be4ec0e3275169ce136a819536ca07a5a5a70a9719e9059881ac2a939a881c"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+    }
+  ],
+  "private_asset": {
+    "name": "mpv-full-private-v1.6.5.7z",
+    "bytes": 3037991886,
+    "sha256": "2cb6944168a92a50dde6f6dbc6c18ae589f5c5f16afb396a591f4f9d69bba99a"
+  },
+  "public_size_limit": true,
+  "archive_tests": {
+    "01-mpv-base-v1.6.5.7z": "ok",
+    "02-mpv-extras-v1.6.5.7z.001": "ok",
+    "03-mpv-fasterwhisper-addon-v1.6.5.7z": "ok",
+    "04-mpv-config-v1.6.5.7z": "ok",
+    "mpv-full-private-v1.6.5.7z": "ok"
+  },
+  "archive_files": {
+    "01": 1323,
+    "02": 10474,
+    "03": 5122,
+    "04": 270,
+    "private": 11801
+  },
+  "archive_audit": {
+    "passed": true,
+    "forbidden": [],
+    "checks": {
+      "01_script_assets": true,
+      "01_ffmpeg": true,
+      "01_no_window_state": true,
+      "04_no_script_assets": true,
+      "04_no_fonts": true,
+      "04_no_licenses": true,
+      "04_no_window_state": true,
+      "04_no_version_marker": true,
+      "version_marker_exact": true,
+      "local_version_marker_exact": true,
+      "version_markers_match": true,
+      "01_decode_performance_matches_source": true,
+      "04_decode_performance_matches_source": true,
+      "private_decode_performance_matches_source": true,
+      "04_default_seek_exact": true,
+      "04_default_remember_size_yes": true,
+      "private_contains_expected_extras": true,
+      "private_union_complete": true,
+      "private_union_crc_identical": true,
+      "private_no_fw_runtime": true,
+      "private_installer_present": true,
+      "private_installer_sha": true
+    }
+  },
+  "package_config_coverage": {
+    "passed": true,
+    "package_config_files": 1427,
+    "expected_source_files": 1427,
+    "missing": [],
+    "extra": [],
+    "changed": []
+  },
+  "input_reuse": {
+    "source_version": "1.6.4",
+    "extras": {
+      "files": 10473,
+      "bytes": 4603603173,
+      "latest_input_time": "2026-10-07T09:53:44.175020+00:00",
+      "sha256_source_equals_new": true
+    },
+    "fasterwhisper": {
+      "files": 5121,
+      "bytes": 4714825519,
+      "latest_input_time": "2025-04-13T13:03:12.576642+00:00",
+      "sha256_source_equals_new": true
+    },
+    "byte_identical": true
+  },
+  "private_union": {
+    "union_files": 11798,
+    "private_files": 11801,
+    "extra": [
+      "Faster-Whisper-XXL/03包解压后覆盖于此.txt",
+      "README-个人私用全量包.txt",
+      "VantaInstaller-win-x64-v0.3.14.exe"
+    ],
+    "missing": [],
+    "changed": []
+  },
+  "package_playback": {
+    "passed": true,
+    "cases": 6,
+    "report": "docs/modernization/repack-playback-v1.6.5-decoder-fix-20261101.json"
+  },
+  "package_decoder_switch": {
+    "passed": true,
+    "transitions": [
+      {
+        "policy": "d3d11va-copy",
+        "before": 0.0,
+        "after": 0.0,
+        "actual": "d3d11va-copy",
+        "errors": []
+      },
+      {
+        "policy": "no",
+        "before": 0.0,
+        "after": 0.0,
+        "actual": "no",
+        "errors": []
+      }
+    ],
+    "report": "docs/modernization/repack-decoder-switch-v1.6.5-20261101.json"
+  },
+  "installer_startup": {
+    "started": true,
+    "main_window_handle_nonzero": true,
+    "close_requested": true,
+    "forced_termination": false,
+    "exit_code": 0,
+    "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+  },
+  "user_preferences_restored": {
+    "uosc.conf": "dfa6a345627d0f607aacff55a6bb8d2d93fde065608fd44c5c58339f0136a545",
+    "window_size_position.conf": "e753633f532f130510dcf6eecb5a21e7802117c3d0b8c9cfbed6cc6acaf4bfd1",
+    "expected": {
+      "uosc.conf": "dfa6a345627d0f607aacff55a6bb8d2d93fde065608fd44c5c58339f0136a545",
+      "window_size_position.conf": "e753633f532f130510dcf6eecb5a21e7802117c3d0b8c9cfbed6cc6acaf4bfd1"
+    }
+  },
+  "source_regressions": {
+    "test-decoder-switch.py": {
+      "passed": true,
+      "safe_cases": 5,
+      "direct_control_matrix": "HEVC/H.264/AV1/VP9 all reproduced in at least one multi-run attempt"
+    },
+    "test-decode-performance.lua": {
+      "passed": true
+    },
+    "test-playback-preferences.py": {
+      "passed": true
+    },
+    "test-hwdec-menu.py": {
+      "passed": true,
+      "menu_choices": 22
+    },
+    "test-decode-performance.py": {
+      "passed": true,
+      "media": "4K yuv444p12 AV1"
+    }
+  },
+  "old_local_assets": "C:\\Program portable\\mpv2\\backup\\release-v1.6.5-before-decoder-fix-20261101-1703",
+  "uploaded": false,
+  "github_changed": false,
+  "modelscope_changed": false,
+  "tag_changed": false,
+  "git_pushed": false,
+  "build_staging": "backup/repack-v1.6.5-decoder-fix-build-staging-20261101-1718",
+  "build_staging_cleaned": true
+}
