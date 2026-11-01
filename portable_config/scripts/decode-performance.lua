@@ -37,6 +37,7 @@ end
 
 local state = {}
 local pending
+local reload_state = {active = false, path = nil, queued = nil}
 local user_policy
 local requested_policy = mp.get_property('hwdec', 'no')
 local preferences_loaded, preferences = pcall(function()
@@ -54,6 +55,15 @@ local function Copy(value)
     local result = {}
     for k, v in pairs(value or {}) do result[k] = v end
     return result
+end
+
+local function TrackSelection()
+    local selection = {}
+    for _, name in ipairs({'vid', 'aid', 'sid', 'secondary-sid'}) do
+        local value = mp.get_property_native(name)
+        if value ~= nil and value ~= '' then selection[name] = value end
+    end
+    return selection
 end
 
 local function Status(phase, delay)
@@ -110,7 +120,8 @@ local function Reload(policy, threads, avopts)
     local position = mp.get_property_number('time-pos', 0)
     if not pending then pending = {path = path, reprepare = true} end
     pending.overrides = {policy = policy, threads = threads, avopts = Copy(avopts),
-        position = position, pause = mp.get_property_native('pause', false)}
+        position = position, pause = mp.get_property_native('pause', false),
+        selection = TrackSelection()}
     -- 将运行时添加的字幕／音轨纳入本文件选项，重播时保留内容与选择。
     local extra = {}
     for _, track in ipairs(mp.get_property_native('track-list', {})) do
@@ -132,7 +143,9 @@ local function Reload(policy, threads, avopts)
     if not ok or err then
         pending = nil
         msg.error('切换解码并行失败：' .. tostring(err or result))
+        return false, err or result
     end
+    return true
 end
 
 local function Tune()
@@ -213,6 +226,7 @@ local function Prepare()
     end
 end
 mp.add_hook('on_load', 55, function()
+    local loaded_override = false
     if pending and pending.path == mp.get_property('path') and pending.overrides then
         local values = pending.overrides
         Local('hwdec', values.policy)
@@ -222,10 +236,13 @@ mp.add_hook('on_load', 55, function()
         Local('resume-playback', false)
         Local('pause', values.pause)
         for key, files in pairs(values.extra) do Local(key, files) end
+        for name, value in pairs(values.selection) do Local(name, value) end
         pending.overrides = nil
+        loaded_override = true
     end
     -- 菜单选择跨文件保留；显式文件配置仍优先，CPU 滤镜的预加载选择随后运行。
-    if user_policy and not mp.get_property_bool('option-info/hwdec/set-locally', false) then
+    if not loaded_override and user_policy
+        and not mp.get_property_bool('option-info/hwdec/set-locally', false) then
         Local('hwdec', user_policy)
     end
 end)
@@ -245,8 +262,67 @@ local function OriginalOptions()
     return threads, current
 end
 
+local function ActiveVideo()
+    local track = mp.get_property_native('current-tracks/video')
+    if not track or not track.codec or track.image or track.albumart then return end
+    return track
+end
+
+local function CanReposition()
+    local path = mp.get_property('path', '')
+    if not path or path == '' then return false, '文件路径不可用' end
+    if not mp.get_property_bool('seekable', false) then return false, '当前流不可定位' end
+    if mp.get_property_number('time-pos') == nil then return false, '当前位置未知' end
+    return true
+end
+
+local function SavePolicy(policy)
+    local saved, err
+    if preferences_loaded then saved, err = preferences.set('hwdec', policy) end
+    if not saved then
+        msg.error('解码偏好保存失败，原文件保留：' .. tostring(err or preferences))
+        mp.osd_message('解码选择未能保存，仅在本次会话保留', 3)
+    end
+end
+
+local ApplyHardware
+ApplyHardware = function(policy)
+    local threads, avopts = OriginalOptions()
+    if ActiveVideo() then
+        local safe, reason = CanReposition()
+        if not safe then
+            msg.warn('未重建解码器：' .. reason .. '；选择将在下个可定位文件生效')
+            Status('等待下次文件安全切换')
+            mp.osd_message(reason .. '，已保留当前解码器；选择将在下次打开文件时生效', 5)
+            return false
+        end
+        local position = mp.get_property_number('time-pos')
+        reload_state.active, reload_state.path = true, mp.get_property('path')
+        reload_state.queued = nil
+        pending = nil
+        local ok, err = Reload(policy, threads, avopts)
+        if not ok then
+            reload_state.active, reload_state.path = false, nil
+            msg.error('安全重建解码器失败：' .. tostring(err))
+            mp.osd_message('解码方式切换失败，当前播放未改变', 4)
+            return false
+        end
+        msg.info(('安全重建解码器：%s -> %s，位置 %.3f 秒')
+            :format(mp.get_property('hwdec-current', '?'), policy, position))
+        mp.osd_message('正在安全切换解码器并恢复播放位置', 3)
+        return true
+    end
+    local ok, err = mp.set_property('hwdec', policy)
+    if not ok then
+        msg.error('设置解码方式失败：' .. tostring(err))
+        return false
+    end
+    Prepare()
+    Tune()
+    return true
+end
+
 local function Hardware(policy)
-    -- 先撤销本脚本的 dav1d 专用参数，再切硬解，避免传给其它解码器。
     if not policy or policy == '' then return end
     if preferences_loaded and not preferences.valid('hwdec', policy) then
         msg.error('无效的解码方式：' .. tostring(policy))
@@ -254,24 +330,43 @@ local function Hardware(policy)
     end
     user_policy = policy
     requested_policy = policy
-    if state.prepared then
-        local threads, avopts = OriginalOptions()
-        pending = nil
-        Reload(policy, threads, avopts)
-    else
-        mp.set_property('hwdec', policy)
-        Prepare()
-        Tune()
+    if reload_state.active then
+        reload_state.queued = policy
+        SavePolicy(policy)
+        mp.osd_message('解码器正在重建，完成后应用最新选择', 3)
+        return
     end
+    ApplyHardware(policy)
     -- 仅菜单／绑定调用保存用户策略；hwdec-current 和局部软解／复制回退不保存。
-    local saved, err
-    if preferences_loaded then saved, err = preferences.set('hwdec', policy) end
-    if not saved then
-        msg.error('解码偏好保存失败，原文件保留：' .. tostring(err or preferences))
-        mp.osd_message('解码方式已生效，但未能保存', 3)
+    SavePolicy(policy)
+end
+
+local function FinishReload()
+    if not reload_state.active then return end
+    local path = mp.get_property('path')
+    if path ~= reload_state.path then
+        reload_state.active, reload_state.path, reload_state.queued = false, nil, nil
+        msg.warn('播放文件已变化，取消未完成的解码器重建')
+        return
+    end
+    reload_state.active, reload_state.path = false, nil
+    local queued = reload_state.queued
+    reload_state.queued = nil
+    msg.info('解码器安全重建完成：' .. tostring(requested_policy))
+    if queued and queued ~= mp.get_property('hwdec') then
+        mp.add_timeout(0, function()
+            if reload_state.active then
+                reload_state.queued = queued
+            else
+                ApplyHardware(queued)
+            end
+        end)
     end
 end
+
+mp.add_hook('on_loaded', 56, FinishReload)
 mp.register_script_message('decode-performance-hwdec', Hardware)
 mp.add_key_binding(nil, 'decode-performance-toggle-hwdec', function()
-    Hardware(mp.get_property('hwdec') == 'no' and 'auto-safe' or 'no')
+    -- 快速连按时以最近一次用户请求为准，避免重载尚未生效时两次都得到同一策略。
+    Hardware(requested_policy == 'no' and 'auto-safe' or 'no')
 end)
