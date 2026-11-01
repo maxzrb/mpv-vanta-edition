@@ -37,7 +37,10 @@ end
 
 local state = {}
 local pending
-local reload_state = {active = false, path = nil, queued = nil}
+local reload_state = {active = false, path = nil, queued = nil, started = false}
+local reload_serial, file_generation = 0, 0
+local seek_restore
+local RestoreSeek
 local user_policy
 local requested_policy = mp.get_property('hwdec', 'no')
 local preferences_loaded, preferences = pcall(function()
@@ -77,6 +80,15 @@ local function Status(phase, delay)
 end
 Status('标准解码')
 
+local function CancelReload(reason)
+    if RestoreSeek then RestoreSeek() end
+    reload_serial = reload_serial + 1
+    reload_state = {active = false, path = nil, queued = nil, started = false}
+    pending = nil
+    Status('解码切换已取消')
+    msg.warn('取消解码器重载：' .. reason .. '；已保存的用户选择保留')
+end
+
 local function Local(name, value)
     -- Lua 空表会被 native 接口编码为数组；键值选项用空字符串显式清空。
     local ok, err
@@ -87,6 +99,15 @@ local function Local(name, value)
     end
     if not ok then msg.error('设置解码并行参数失败：' .. name .. '：' .. tostring(err)) end
     return ok
+end
+
+RestoreSeek = function()
+    local saved = seek_restore
+    seek_restore = nil
+    if saved and saved.path == mp.get_property('path')
+        and mp.get_property('hr-seek') == 'yes' then
+        Local('hr-seek', saved.value)
+    end
 end
 
 local function Plan(w, h, params, initial_budget)
@@ -226,12 +247,26 @@ local function Prepare()
     end
 end
 mp.add_hook('on_load', 55, function()
+    if reload_state.active then
+        if reload_state.path ~= mp.get_property('path') then
+            CancelReload('已切换到其他文件')
+        else
+            reload_state.started = true
+        end
+    end
     local loaded_override = false
     if pending and pending.path == mp.get_property('path') and pending.overrides then
         local values = pending.overrides
         Local('hwdec', values.policy)
         Local('vd-lavc-threads', values.threads)
         Local('vd-lavc-o', values.avopts)
+        -- 恢复位置必须精确，不能受用户日常关键帧跳转偏好影响；首帧恢复后还原。
+        RestoreSeek()
+        local seek_mode = mp.get_property('hr-seek', 'yes')
+        if seek_mode ~= 'yes' and seek_mode ~= 'always' then
+            seek_restore = {path = mp.get_property('path'), value = seek_mode}
+            Local('hr-seek', 'yes')
+        end
         Local('start', tostring(values.position))
         Local('resume-playback', false)
         Local('pause', values.pause)
@@ -247,7 +282,8 @@ mp.add_hook('on_load', 55, function()
     end
 end)
 mp.add_hook('on_loaded', 55, Prepare)
-mp.register_event('playback-restart', Tune)
+mp.register_event('playback-restart', function() RestoreSeek(); Tune() end)
+mp.add_hook('on_unload', 55, RestoreSeek)
 mp.observe_property('current-tracks/video/decoder-desc', 'string', Tune)
 
 local function OriginalOptions()
@@ -287,6 +323,8 @@ end
 
 local ApplyHardware
 ApplyHardware = function(policy)
+    -- 新请求使上一事务遗留的延迟回调失效，防止旧选择覆盖新选择。
+    reload_serial = reload_serial + 1
     local threads, avopts = OriginalOptions()
     if ActiveVideo() then
         local safe, reason = CanReposition()
@@ -298,11 +336,11 @@ ApplyHardware = function(policy)
         end
         local position = mp.get_property_number('time-pos')
         reload_state.active, reload_state.path = true, mp.get_property('path')
-        reload_state.queued = nil
+        reload_state.queued, reload_state.started = nil, false
         pending = nil
         local ok, err = Reload(policy, threads, avopts)
         if not ok then
-            reload_state.active, reload_state.path = false, nil
+            CancelReload('重载命令执行失败')
             msg.error('安全重建解码器失败：' .. tostring(err))
             mp.osd_message('解码方式切换失败，当前播放未改变', 4)
             return false
@@ -345,25 +383,45 @@ local function FinishReload()
     if not reload_state.active then return end
     local path = mp.get_property('path')
     if path ~= reload_state.path then
-        reload_state.active, reload_state.path, reload_state.queued = false, nil, nil
-        msg.warn('播放文件已变化，取消未完成的解码器重建')
+        CancelReload('已切换到其他文件')
         return
     end
-    reload_state.active, reload_state.path = false, nil
+    reload_state.active, reload_state.path, reload_state.started = false, nil, false
     local queued = reload_state.queued
     reload_state.queued = nil
-    msg.info('解码器安全重建完成：' .. tostring(requested_policy))
+    msg.info('解码器重载参数已应用：' .. tostring(mp.get_property('hwdec')))
     if queued and queued ~= mp.get_property('hwdec') then
+        local serial, generation = reload_serial, file_generation
         mp.add_timeout(0, function()
-            if reload_state.active then
-                reload_state.queued = queued
-            else
-                ApplyHardware(queued)
-            end
+            if serial ~= reload_serial or generation ~= file_generation
+                or path ~= mp.get_property('path')
+                or mp.get_property_bool('idle-active', false) then return end
+            ApplyHardware(queued)
         end)
     end
 end
 
+mp.register_event('start-file', function()
+    file_generation = file_generation + 1
+    if not reload_state.active then return end
+    if reload_state.started then
+        CancelReload('加载过程已被另一轮打开替换')
+    else
+        reload_state.started = true
+    end
+end)
+mp.register_event('end-file', function(event)
+    file_generation = file_generation + 1
+    if not reload_state.active then return end
+    -- 重播当前项会先结束旧文件；只有这一次正常卸载不能提前解锁。
+    if not reload_state.started and event.reason == 'stop' then return end
+    CancelReload('加载结束（' .. tostring(event.reason) .. '）')
+end)
+mp.observe_property('idle-active', 'bool', function(_, idle)
+    if not idle or not mp.get_property_bool('idle-active', false) then return end
+    file_generation = file_generation + 1
+    if reload_state.active then CancelReload('播放器已停止或返回空闲') end
+end)
 mp.add_hook('on_loaded', 56, FinishReload)
 mp.register_script_message('decode-performance-hwdec', Hardware)
 mp.add_key_binding(nil, 'decode-performance-toggle-hwdec', function()

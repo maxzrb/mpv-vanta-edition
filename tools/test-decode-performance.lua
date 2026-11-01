@@ -1,5 +1,5 @@
 -- 验证资源不足、手动参数、硬解隔离和解码切换的所有权，不依赖视频文件。
-local props, hooks, events, messages, writes, commands = {}, {}, {}, {}, {}, {}
+local props, hooks, events, messages, writes, commands, observers = {}, {}, {}, {}, {}, {}, {}
 local total, available = 32 * 1024^3, 20 * 1024^3
 local function Copy(t)
     if type(t) ~= 'table' then return t end
@@ -29,7 +29,10 @@ function mp.add_hook(name, priority, callback)
     hooks[name][#hooks[name] + 1] = {priority = priority, callback = callback}
 end
 function mp.register_event(name, callback) events[name] = callback end
-function mp.observe_property(_, _, callback) events.observe = callback end
+function mp.observe_property(name, _, callback)
+    observers[name] = callback
+    if name == 'current-tracks/video/decoder-desc' then events.observe = callback end
+end
 function mp.register_script_message(name, callback) messages[name] = callback end
 function mp.add_key_binding(_, _, callback) events.toggle = callback end
 function mp.command_native(command) commands[#commands + 1] = Copy(command) end
@@ -110,18 +113,24 @@ RunHook('on_loaded')
 -- 普通视频必须在可定位位置上重建，不能直接 set 当前 hwdec。
 Start('hevc', 'auto-safe')
 props['hwdec-current'] = 'd3d11va'
+props['hr-seek'] = 'no'
 messages['decode-performance-hwdec']('no')
 assert(#commands == 1 and commands[1][1] == 'playlist-play-index' and props.hwdec == 'auto-safe')
 RunHook('on_load')
 assert(props.hwdec == 'no' and props.start == '12.5' and props.pause == true)
+assert(props['hr-seek'] == 'yes')
 RunHook('on_loaded')
+events['playback-restart']()
+assert(props['hr-seek'] == 'no')
 
 -- 重载期间再次选择只排队，当前事务完成后再重建一次。
 Start('hevc', 'auto-safe')
 messages['decode-performance-hwdec']('no')
 assert(#commands == 1)
+events['end-file']({reason = 'stop'})
 messages['decode-performance-hwdec']('auto-safe')
 assert(#commands == 1)
+events['start-file']()
 RunHook('on_load')
 assert(props.hwdec == 'no')
 RunHook('on_loaded')
@@ -130,6 +139,57 @@ events.timeout()
 assert(#commands == 2 and commands[2][1] == 'playlist-play-index')
 RunHook('on_load')
 RunHook('on_loaded')
+
+-- 新文件打开失败后必须释放事务，空闲时再选解码方式可立即生效。
+Start('hevc', 'auto-safe')
+messages['decode-performance-hwdec']('no')
+events['end-file']({reason = 'stop'})
+events['start-file']()
+RunHook('on_load')
+events['end-file']({reason = 'error'})
+props = {hwdec = 'auto-safe'}
+messages['decode-performance-hwdec']('no')
+assert(props.hwdec == 'no' and #commands == 1)
+
+-- 加载期间停止与尚未开始加载就回到空闲，均不能遗留排队请求。
+for _, started in ipairs({true, false}) do
+    Start('hevc', 'auto-safe')
+    messages['decode-performance-hwdec']('no')
+    messages['decode-performance-hwdec']('auto-safe')
+    events['end-file']({reason = 'stop'})
+    if started then
+        events['start-file']()
+        events['end-file']({reason = 'stop'})
+    else
+        props['idle-active'] = true
+        observers['idle-active']('idle-active', true)
+    end
+    props = {hwdec = 'auto-safe'}
+    messages['decode-performance-hwdec']('no')
+    assert(props.hwdec == 'no' and #commands == 1)
+end
+
+-- 完成加载后排队的零延迟回调，不得覆盖更新的用户选择或影响下一文件。
+for _, interrupt in ipairs({'choice', 'file', 'stop'}) do
+    Start('hevc', 'auto-safe')
+    messages['decode-performance-hwdec']('no')
+    messages['decode-performance-hwdec']('auto-safe')
+    RunHook('on_load')
+    RunHook('on_loaded')
+    local stale = events.timeout
+    if interrupt == 'choice' then
+        messages['decode-performance-hwdec']('no')
+    elseif interrupt == 'file' then
+        events['start-file']()
+        props.path = 'next.mkv'
+    else
+        events['end-file']({reason = 'stop'})
+    end
+    local count = #commands
+    stale()
+    assert(#commands == count)
+    if interrupt == 'choice' then RunHook('on_load'); RunHook('on_loaded') end
+end
 
 -- 不可定位的直播流不能中途破坏解码器；保留当前播放并让选择下次生效。
 Start('hevc', 'd3d11va')
@@ -151,4 +211,4 @@ assert(props.hwdec == 'auto-safe')
 props = {hwdec = 'd3d11va', ['option-info/hwdec/set-locally'] = true}
 RunHook('on_load')
 assert(props.hwdec == 'd3d11va')
-io.write('PASS 编码隔离／手动参数／低内存／安全重建／不可定位保护／空闲直设\n')
+io.write('PASS 编码隔离／安全重建／正常卸载不解锁／失败与停止清理／过期回调隔离／不可定位保护\n')

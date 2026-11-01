@@ -1,0 +1,346 @@
+{
+  "passed": true,
+  "scope": "安全路径覆盖D3D11VA到软件及软件到自动硬解；旧直切在完整配置中进行三轮对照；HEVC额外覆盖播放中切换和外挂字幕选择",
+  "codec_matrix": [
+    {
+      "codec": "hevc",
+      "initial_hwdec": "d3d11va",
+      "transitions": [
+        {
+          "policy": "no",
+          "before": 4.208,
+          "after": 4.208,
+          "pause": true,
+          "log_offset": 82190
+        },
+        {
+          "policy": "auto-safe",
+          "before": 4.208,
+          "after": 4.208,
+          "pause": true,
+          "log_offset": 116234
+        },
+        {
+          "policy": "no",
+          "before": 4.333,
+          "after": 4.458,
+          "pause": false,
+          "log_offset": 145195
+        }
+      ]
+    },
+    {
+      "codec": "h264",
+      "initial_hwdec": "d3d11va",
+      "transitions": [
+        {
+          "policy": "no",
+          "before": 4.208,
+          "after": 4.208,
+          "pause": true,
+          "log_offset": 71558
+        },
+        {
+          "policy": "auto-safe",
+          "before": 4.208,
+          "after": 4.208,
+          "pause": true,
+          "log_offset": 102894
+        }
+      ]
+    },
+    {
+      "codec": "av1",
+      "initial_hwdec": "d3d11va",
+      "transitions": [
+        {
+          "policy": "no",
+          "before": 4.208,
+          "after": 4.208,
+          "pause": true,
+          "log_offset": 71451
+        },
+        {
+          "policy": "auto-safe",
+          "before": 4.208,
+          "after": 4.208,
+          "pause": true,
+          "log_offset": 108469
+        }
+      ]
+    },
+    {
+      "codec": "vp9",
+      "initial_hwdec": "d3d11va",
+      "transitions": [
+        {
+          "policy": "no",
+          "before": 4.208,
+          "after": 4.208,
+          "pause": true,
+          "log_offset": 71300
+        },
+        {
+          "policy": "auto-safe",
+          "before": 4.208,
+          "after": 4.208,
+          "pause": true,
+          "log_offset": 108344
+        }
+      ]
+    },
+    {
+      "codec": "hevc-compat10",
+      "initial_hwdec": "d3d11va",
+      "transitions": [
+        {
+          "policy": "no",
+          "before": 4.2,
+          "after": 4.2,
+          "pause": true,
+          "log_offset": 84184
+        },
+        {
+          "policy": "auto-safe",
+          "before": 4.2,
+          "after": 4.2,
+          "pause": true,
+          "log_offset": 119708
+        },
+        {
+          "policy": "no",
+          "before": 4.333,
+          "after": 4.433,
+          "pause": false,
+          "log_offset": 150184
+        }
+      ]
+    }
+  ],
+  "direct_switch_control": [
+    {
+      "codec": "hevc",
+      "attempts": [
+        {
+          "codec": "hevc-t1",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 225,
+          "errors": [
+            "[   2.822][e][ffmpeg/video] hevc: Could not find ref with POC 115",
+            "[   2.822][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   2.822][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 1",
+            "[   2.822][e][ffmpeg/video] hevc: Could not find ref with POC 115",
+            "[   2.822][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   2.822][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 0",
+            "[   2.823][e][ffmpeg/video] hevc: Could not find ref with POC 115",
+            "[   2.823][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   2.823][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 0",
+            "[   2.823][e][ffmpeg/video] hevc: Could not find ref with POC 118",
+            "[   2.823][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   2.823][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 0"
+          ],
+          "reproduced": true
+        },
+        {
+          "codec": "hevc-t2",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 228,
+          "errors": [
+            "[   0.662][e][ffmpeg/video] hevc: Could not find ref with POC 115",
+            "[   0.662][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   0.662][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 1",
+            "[   0.662][e][ffmpeg/video] hevc: Could not find ref with POC 115",
+            "[   0.662][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   0.662][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 1",
+            "[   0.662][e][ffmpeg/video] hevc: Could not find ref with POC 115",
+            "[   0.662][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   0.662][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 0",
+            "[   0.662][e][ffmpeg/video] hevc: Could not find ref with POC 115",
+            "[   0.662][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   0.662][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 0"
+          ],
+          "reproduced": true
+        },
+        {
+          "codec": "hevc-t3",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 228,
+          "errors": [
+            "[   0.616][e][ffmpeg/video] hevc: Could not find ref with POC 115",
+            "[   0.616][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   0.616][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 1",
+            "[   0.616][e][ffmpeg/video] hevc: Could not find ref with POC 115",
+            "[   0.616][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   0.616][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 1",
+            "[   0.616][e][ffmpeg/video] hevc: Could not find ref with POC 115",
+            "[   0.616][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   0.616][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 0",
+            "[   0.616][e][ffmpeg/video] hevc: Could not find ref with POC 115",
+            "[   0.616][e][ffmpeg/video] hevc: Error constructing the frame RPS.",
+            "[   0.616][w][ffmpeg/video] hevc: Skipping invalid undecodable NALU: 0"
+          ],
+          "reproduced": true
+        }
+      ],
+      "reproduced": true,
+      "max_error_count": 228
+    },
+    {
+      "codec": "h264",
+      "attempts": [
+        {
+          "codec": "h264-t1",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 1,
+          "errors": [
+            "[   0.722][e][ffmpeg/video] h264: mmco: unref short failure"
+          ],
+          "reproduced": true
+        },
+        {
+          "codec": "h264-t2",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 1,
+          "errors": [
+            "[   0.612][e][ffmpeg/video] h264: mmco: unref short failure"
+          ],
+          "reproduced": true
+        },
+        {
+          "codec": "h264-t3",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 1,
+          "errors": [
+            "[   0.647][e][ffmpeg/video] h264: mmco: unref short failure"
+          ],
+          "reproduced": true
+        }
+      ],
+      "reproduced": true,
+      "max_error_count": 1
+    },
+    {
+      "codec": "av1",
+      "attempts": [
+        {
+          "codec": "av1-t1",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 0,
+          "errors": [],
+          "reproduced": false
+        },
+        {
+          "codec": "av1-t2",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 3,
+          "errors": [
+            "[   0.628][w][vd] Error while decoding frame (hardware decoding)!",
+            "[   0.628][w][vd] Error while decoding frame (hardware decoding)!",
+            "[   0.628][w][vd] Error while decoding frame (hardware decoding)!"
+          ],
+          "reproduced": true
+        },
+        {
+          "codec": "av1-t3",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 0,
+          "errors": [],
+          "reproduced": false
+        }
+      ],
+      "reproduced": true,
+      "max_error_count": 3
+    },
+    {
+      "codec": "vp9",
+      "attempts": [
+        {
+          "codec": "vp9-t1",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 3,
+          "errors": [
+            "[   0.637][w][vd] Error while decoding frame (hardware decoding)!",
+            "[   0.637][w][vd] Error while decoding frame (hardware decoding)!",
+            "[   0.637][w][vd] Error while decoding frame (hardware decoding)!"
+          ],
+          "reproduced": true
+        },
+        {
+          "codec": "vp9-t2",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 3,
+          "errors": [
+            "[   0.703][w][vd] Error while decoding frame (hardware decoding)!",
+            "[   0.703][w][vd] Error while decoding frame (hardware decoding)!",
+            "[   0.703][w][vd] Error while decoding frame (hardware decoding)!"
+          ],
+          "reproduced": true
+        },
+        {
+          "codec": "vp9-t3",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 3,
+          "errors": [
+            "[   0.708][w][vd] Error while decoding frame (hardware decoding)!",
+            "[   0.708][w][vd] Error while decoding frame (hardware decoding)!",
+            "[   0.708][w][vd] Error while decoding frame (hardware decoding)!"
+          ],
+          "reproduced": true
+        }
+      ],
+      "reproduced": true,
+      "max_error_count": 3
+    },
+    {
+      "codec": "hevc-compat10",
+      "attempts": [
+        {
+          "codec": "hevc-compat10-t1",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 0,
+          "errors": [],
+          "reproduced": false
+        },
+        {
+          "codec": "hevc-compat10-t2",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 0,
+          "errors": [],
+          "reproduced": false
+        },
+        {
+          "codec": "hevc-compat10-t3",
+          "target": "d3d11va-copy",
+          "actual_before": "no",
+          "error_count": 0,
+          "errors": [],
+          "reproduced": false
+        }
+      ],
+      "reproduced": false,
+      "max_error_count": 0
+    }
+  ],
+  "known_full_config_regression": {
+    "after_hwdec": "d3d11va-copy",
+    "position": 0.0,
+    "errors": [],
+    "artifacts": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\decoder-switch-itsgfihg-full-regression.log"
+  },
+  "boundary": "旧直切为完整配置下的三轮竞态对照，错误是否出现受起播时序影响；安全路径矩阵只验证本机可用D3D11VA，NVDEC、QSV、AMF等共用同一重载事务但未做实际后端认证",
+  "artifacts": "C:\\Program portable\\mpv2\\tmp\\decoder-switch-itsgfihg"
+}

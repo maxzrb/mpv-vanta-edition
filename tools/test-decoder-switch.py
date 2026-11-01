@@ -1,5 +1,6 @@
 """验证解码器切换从安全位置重建，并对照旧直切在多种编码上的错误。"""
 import json
+import argparse
 from pathlib import Path
 import runpy
 import shutil
@@ -11,7 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = Path(tempfile.mkdtemp(prefix='decoder-switch-', dir=ROOT/'tmp'))
 CONFIG = OUT/'config'
 MEDIA = OUT/'media'
-REPORT = ROOT/'docs/modernization/decoder-switch-safety-20261101.json'
+parser = argparse.ArgumentParser()
+parser.add_argument('--output', type=Path,
+                    default=ROOT/'docs/modernization/decoder-switch-safety-20261101.json')
+REPORT = parser.parse_args().output
 Player = runpy.run_path(str(ROOT/'tools/validate-modernization.py'))['Player']
 create_full_config = runpy.run_path(str(ROOT/'tools/isolated-config.py'))['create_config']
 FULL_CONFIG = create_full_config('decoder-switch-full')
@@ -107,7 +111,7 @@ def switch(player, policy, label):
     offset = len(log_tail(player))
     player.command('script-message', 'decode-performance-hwdec', policy)
     wait(lambda: log_tail(player, offset),
-         lambda text: '安全重建解码器：' in text and '解码器安全重建完成：' in text,
+         lambda text: '安全重建解码器：' in text and '解码器重载参数已应用：' in text,
          timeout=20, label=label+'重建')
     expected = (lambda value: value == 'no') if policy == 'no' else (
         lambda value: value not in (None, 'no', ''))
@@ -167,7 +171,7 @@ def full_config_regression(media):
         offset = len(log_tail(player))
         player.command('script-message', 'decode-performance-hwdec', 'd3d11va-copy')
         wait(lambda: log_tail(player, offset),
-             lambda text: '安全重建解码器：' in text and '解码器安全重建完成：' in text,
+             lambda text: '安全重建解码器：' in text and '解码器重载参数已应用：' in text,
              timeout=20, label='完整配置安全重建')
         wait(lambda: player.get('hwdec-current'),
              lambda value: value in ('d3d11va', 'd3d11va-copy'),

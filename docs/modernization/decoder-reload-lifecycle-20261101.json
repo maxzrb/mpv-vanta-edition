@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "package_root": "C:\\Program portable\\mpv2",
+  "rows": [
+    {
+      "mode": "normal",
+      "passed": true,
+      "path": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\compat-hevc10.mkv",
+      "final_hwdec": "no",
+      "final_position": 1.0,
+      "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\decoder-lifecycle-decoder-lifecycle-hlz552og-normal.log",
+      "expected_load_error": false
+    },
+    {
+      "mode": "failure",
+      "passed": true,
+      "path": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\compat-hevc10.mkv",
+      "final_hwdec": "no",
+      "final_position": 0.0,
+      "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\decoder-lifecycle-decoder-lifecycle-hlz552og-failure.log",
+      "expected_load_error": true
+    },
+    {
+      "mode": "stop",
+      "passed": true,
+      "path": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\compat-hevc10.mkv",
+      "final_hwdec": "no",
+      "final_position": 0.0,
+      "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\decoder-lifecycle-decoder-lifecycle-hlz552og-stop.log",
+      "expected_load_error": false
+    },
+    {
+      "mode": "replace",
+      "passed": true,
+      "path": "C:\\Program portable\\mpv2\\tmp\\decoder-lifecycle-hlz552og\\next.mkv",
+      "final_hwdec": "no",
+      "final_position": 1.0,
+      "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\decoder-lifecycle-decoder-lifecycle-hlz552og-replace.log",
+      "expected_load_error": false
+    }
+  ]
+}
