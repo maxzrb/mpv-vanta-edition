@@ -1,5 +1,65 @@
 # STATUS.md — MPV 便携配置项目
 
+## 当前v1.6.6全部构建验收完成，准备上传（2026-11-14 00:21，Asia/Shanghai）
+
+- 用户已明确豁免核心升级Gate，目标1.6.6；功能提交08e50c2。01/04与本地私包重建，02/03按4.1.1由1.6.5原样复用，安装器0.3.14沿用，流程及构建脚本不改。
+- 全部归档完整性/SHA/公开门禁/分卷/ffmpeg与Logo/1.6.6纯标记/个人状态排除/1427配置逐字节覆盖/私包11798并集CRC/安装器及FW占位通过。私包3038159404字节、仅本地。全部构建验收先于上传。
+- 实际公开合并包双后端FATE八项、六组真实播放和四种解码重载生命周期通过；实际私包默认标准模式启动和持续视频通过。安装器真实启动及正常退出码0；147 Lua语法、UTF-8/LF与diff检查通过。
+- 详细清单/SHA：docs/modernization/release-build-results-v1.6.6.json，实播与解码生命周期同目录。个人偏好已逐字节恢复；原有架构/清理文档与.workbuddy-ai未夹带。
+- 下一步：提交构建记录、标签v1.6.6、推送master及该标签，上传六项公开资产并核对远端SHA，正式Latest后同步ModelScope；最后归档build暂存和结果记录。当前尚未上传，不能称为已发布。
+
+## 当前v1.6.6构建验收中（用户已豁免核心升级Gate）
+
+- 用户明确授权“豁免，继续发布”，目标1.6.6；3.2本次豁免有效，流程原件不改。功能提交08e50c2；此前8条本地提交将随本次发行同步。
+- 01/04已构建，02/03由1.6.5逐字节复用并完成全部输入CRC/大小/时间、来源及新归档完整性/SHA核验；安装器0.3.14有效主窗口、正常退出和SHA通过。私包正在原脚本压缩，上传尚未开始。
+- 已验收实际公开合并包：双后端8项HQ FATE、D3D11/Vulkan×SDR/HDR10/HLG六组真实播放/模式往返/窗口变化/暂停恢复，以及正常/失败/停止/换片四组解码重载生命周期。147 Lua语法/源码UTF-8 LF、色彩状态/HDR生命周期、偏好保存九组通过。
+- 本机根路径Vulkan黑帧与同SHA干净路径正常的差异，在备份并移开AMD可再生VkCache后消失，根核心与实际包FATE均通过。原缓存52个parc文件及清单在backup/release-v1.6.6-20261114/amd-vulkan-cache；未改驱动设置、系统HDR或用户播放进程。本轮继续用20261110，不改为未验收构建。
+- 下一步：私包完成后归档门禁/并集/完整配置覆盖/实际私包启动/SHA检查，构建记录提交、标签/分支推送、六项公开资产GitHub正式Latest和ModelScope同步，最后记录收尾。个人偏好由构建finally逐字节恢复；无关架构/清理文档和.workbuddy-ai保持原样。
+
+## 当前v1.6.6发布前检查：等待核心升级Gate豁免（2026-11-13 23:56，Asia/Shanghai）
+
+- 用户要求发布Release、补丁号Z+1；当前标记/线上版本1.6.5，目标确定为1.6.6，尚未修改版本标记或创建标签。
+- 已完整阅读发布流程。3.2明确将mpv核心/运行时升级列为必须停止发布并由用户决定修订或豁免的情形；本次20261008→20261110命中。仅做只读检查与记录，未执行打包/上传/推送，未修改流程原件。
+- 可审阅方案：沿用01→02→03可选→04边界与原构建脚本；01包含已验收20261110核心及配套文件，01/04包含HQ参考白与元数据优先修正，纳入此前未上线的解码安全重载/偏好保存修复。02/03仅在4.1.1核验通过后原样复用；安装器0.3.14无源码变化时沿用；同版私包必须在上传前构建验收，仅本地。
+- 当前fetch成功，master领先origin/master 8、落后0；v1.6.6标签不存在。已有个人偏好、架构清理记录及.workbuddy-ai等差异须保留并审阅，不把无关内容混入功能提交。
+
+## 当前本地核心升级完成（2026-11-13 22:30，Asia/Shanghai）
+
+- 活动核心shinchiro20261110：mpv v0.42.0-19-ga61f6c3ab / libplacebo7.387 / FFmpeg b2b543c07。20261111在本机Vulkan黑帧未采用。双后端HQ FATE八项和完整配置原沙丘播放/模式切换通过，今日HQ策略保留。
+- 6项原核心/配套文件保留backup/core-upgrade-20261113/old；所有替换文件与验收候选SHA一致。README与版本记录已更新。仅本地升级，项目发行仍1.6.5，未打包/提交/推送/发布。未来发布涉及3.2核心运行时Gate。
+
+## 当前HQ亮度修正完成（2026-11-13 20:42，Asia/Shanghai）
+
+- SDR ACM参考白改为有效系统值优先、缺失才80兜底；当前机器使用系统返回80，驱动峰值270不替代工作白。HQ默认关闭逐帧峰值分析，保留片源元数据/手动覆盖；状态页区分来源。
+- D3D11/Vulkan原始GPU输出FATE八项、状态/HDR生命周期、Lua/UTF-8检查通过；原片45秒曝光收窄至0.942–0.944，无峰值Shader。未作物理校准，未一对一捕获用户具体异常帧。
+- 仅本地源码与回归改动，未提交/推送/发布，既有个人改动保留。细节见末尾会话记录与backup/hdr-sdr-fix-20261113/verification.json。
+
+## 当前亮度诊断补充（2026-11-13 20:13，Asia/Shanghai）
+
+- 四组GPU对照已定位大幅动态曝光主要由hdr-compute-peak的逐帧分析驱动，场景阈值可加速响应；只关RPU仍存在。详见末尾会话记录与本地backup/dune-brightness-isolation-20261113/summary.json。
+- 未修改生产播放配置；尚未捕获用户未提供时间点的具体同镜头异常，不能宣称已修复。
+
+## 当前《沙丘》亮度突变诊断（2026-11-13 19:48，Asia/Shanghai）
+
+- 用户反馈《沙丘》DoVi P8 在同一镜头中无固定规律地整体亮度突变；本轮只诊断，没有修改播放脚本、配置或持久偏好，未使用 computer use。
+- ffprobe 实取本地 26,598,334,964 字节片源：3840×1604、HEVC 10-bit、24000/1001fps、BT.2020/PQ，DoVi Profile 8 / compatibility ID 1（HDR10 兼容底层），RPU 有、增强层无；抽样帧静态元数据 MaxCLL=787、MaxFALL=239、母版峰值4000 nits。
+- 最近播放日志为《沙丘》5914秒起播会话，显示 ASUS VG249Q1A、HDR unsupported、HQ sdr-acm、scRGB 80 nits；播放中目标峰值与传递函数未反复切换。dv-map 当前 dynamic，未见切换静态滤镜。
+- 日志含190条 Dynamic tone map target 曝光变化记录，例如进程14.985秒 exposure=0.962x / scene avg=1.3 nits，18.479秒 exposure=0.629x / scene avg=217.7 nits，28.821秒0.706x；直接证明当前渲染路径会按场景统计/元数据改变全图曝光。不同日志点可能跨镜头，不把这些点冒充用户所见同镜头故障复现；尚无精确影片故障时间与同步帧证据。
+- profiles.conf 的 HDR2SDR 启用 tone-mapping=auto、hdr-compute-peak=auto、decay=20、scene threshold=1/3。RPU 动态元数据与逐帧峰值分析都是后续对照变量；不能单凭这些选项认定GPU峰值分析始终实际运行，不能保证只关 hdr-compute-peak 就停止全部动态亮度调整。
+- 现有 ALT+d / 画面→HDR→杜比视界映射 可切静态（忽略RPU）；该选项会保存偏好。无窗口/无配置、vo=null、软件解码、同片5914秒两帧对照均exit=0：默认输出dolbyvision/bt.2020/pq；format=dolbyvision=no输出bt.2020-ncl/bt.2020/pq，确认本片可用HDR10底层作对照。此对照只验证路径与滤镜，不是GPU亮度故障视觉复现。
+- 建议用户先用现有静态入口对照同片；若仍跳，再临时 set hdr-compute-peak no，进一步排查场景分析/核心动态曝光。代价是失去相应动态亮度适配，不应当作所有HDR内容的全局默认修复。
+- Git pull --ff-only 返回 Already up to date；master领先origin/master 8条。保留既有STATUS、架构文档、uosc/window_size_position个人偏好等修改；仅新增本轮HandShake诊断记录，无提交、推送、发布或构建。原日志证据已存本地backup，避免后续播放覆盖。
+
+
+## 开发体积核验与归档（2026-11-02 23:27，Asia/Shanghai）
+
+- 用户要求核验后归档过期开发文件、将可安全删除内容移入 `trash`。活动体积 219.10 GB → 26.42 GB（含 `.git` 0.53 GB），未永久删除。
+- 搬移 35 项／192.70 GB／445,236 文件到 `trash/project-cleanup-20261102-232722/`：`tmp/` 整体、`backup` 下 16 个构建暂存与打包前快照、`release` 中 v1.6.2–v1.6.4 旧版包。失败 0。
+- 核验：v1.6.2–v1.6.5 的 02 两卷与 03 分包 SHA 逐字节相同（纯重复）；v1.6.5 的 01／04／02／03／安装器与 `SHA256SUMS-v1.6.5.txt` 一致；`mpv.exe --version` 正常；`git status` 仅剩清理前已存在的 2 项个人偏好改动。
+- 归档 82,237 个文本文件为 `backup/project-cleanup-20261102-232722/开发文本证据.7z`（58 MiB，`7z t` 通过）。保留 v1.5.7 归档、v1.6.5 最新私包快照与 benchmark 共享夹具。
+- 缺口：`release` 无 `mpv-full-private-v1.6.5.7z`，清单 `f1fc4e91…` 在磁盘无匹配；三份历史构建均不等值，需按 `build-full-private.ps1` 重建。未触发发布流程 3.2 Gate（仅本地文件搬移，未改包结构／构建脚本／核心运行时）。
+- 报告见 [项目清理-20261102.md](../项目清理-20261102.md)；清单见 `backup/project-cleanup-20261102-232722/`（`inventory.json`、`move-manifest.json`、`verification.json`）。
+
 ## 当前1.6.5重载收尾候选完成（2026-11-01 19:43，Asia/Shanghai）
 
 - 用户授权的重载失败／取消清理与精确恢复位置修复已完成，功能提交`ee41c2a`。已使用原脚本重建01／04及同版私包，02／03按4.1.1全输入CRC等核验后复用1.6.4，安装器0.3.14同SHA沿用。
@@ -4420,3 +4480,103 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - 实际归档解压后D3D11／Vulkan×SDR／HDR10／HLG六组持续视频／模式往返／暂停恢复／窗口变化，以及正常重载／加载失败／停止／换片四类生命周期均通过。故障注入的缺失文件错误属预期，恢复阶段无新增目标错误；不作所有硬解后端实机认证。
 - 6／7／7.1：GitHub／ModelScope未上传、Git未推送，原线上v1.6.5及标签`2c3606e`保持不变，私包严格仅本地。8：旧候选与build暂存已归档，根build不存在，release保留本轮产物和公开／私包校验单。
 - 汇总：`docs/modernization/repack-build-results-v1.6.5-reload-cleanup-20261101.json`；私包逻辑解压体积5140982235字节（4.787913GiB），无新增大型依赖。
+
+### 2026-11-13 19:48 — 《沙丘》同镜头亮度突变诊断
+
+- 用户反馈《沙丘》DoVi P8 在同一镜头中无固定规律地整体亮度突变；本轮只诊断，没有修改播放脚本、配置或持久偏好，未使用 computer use。
+- ffprobe 实取本地 26,598,334,964 字节片源：3840×1604、HEVC 10-bit、24000/1001fps、BT.2020/PQ，DoVi Profile 8 / compatibility ID 1（HDR10 兼容底层），RPU 有、增强层无；抽样帧静态元数据 MaxCLL=787、MaxFALL=239、母版峰值4000 nits。
+- 最近播放日志为《沙丘》5914秒起播会话，显示 ASUS VG249Q1A、HDR unsupported、HQ sdr-acm、scRGB 80 nits；播放中目标峰值与传递函数未反复切换。dv-map 当前 dynamic，未见切换静态滤镜。
+- 日志含190条 Dynamic tone map target 曝光变化记录，例如进程14.985秒 exposure=0.962x / scene avg=1.3 nits，18.479秒 exposure=0.629x / scene avg=217.7 nits，28.821秒0.706x；直接证明当前渲染路径会按场景统计/元数据改变全图曝光。不同日志点可能跨镜头，不把这些点冒充用户所见同镜头故障复现；尚无精确影片故障时间与同步帧证据。
+- profiles.conf 的 HDR2SDR 启用 tone-mapping=auto、hdr-compute-peak=auto、decay=20、scene threshold=1/3。RPU 动态元数据与逐帧峰值分析都是后续对照变量；不能单凭这些选项认定GPU峰值分析始终实际运行，不能保证只关 hdr-compute-peak 就停止全部动态亮度调整。
+- 现有 ALT+d / 画面→HDR→杜比视界映射 可切静态（忽略RPU）；该选项会保存偏好。无窗口/无配置、vo=null、软件解码、同片5914秒两帧对照均exit=0：默认输出dolbyvision/bt.2020/pq；format=dolbyvision=no输出bt.2020-ncl/bt.2020/pq，确认本片可用HDR10底层作对照。此对照只验证路径与滤镜，不是GPU亮度故障视觉复现。
+- 建议用户先用现有静态入口对照同片；若仍跳，再临时 set hdr-compute-peak no，进一步排查场景分析/核心动态曝光。代价是失去相应动态亮度适配，不应当作所有HDR内容的全局默认修复。
+- Git pull --ff-only 返回 Already up to date；master领先origin/master 8条。保留既有STATUS、架构文档、uosc/window_size_position个人偏好等修改；仅新增本轮HandShake诊断记录，无提交、推送、发布或构建。原日志证据已存本地backup，避免后续播放覆盖。
+- 原日志备份：`backup/dune-brightness-diagnosis-20261113-194855/mpv-original.log`。
+
+### 2026-11-13 20:04 — 澄清80 nits来源与动态跳变机制
+
+- 80的单位是nits，不是bit。color-target.lua:408–414 的 SDR ACM 分支明确固定 target-peak=80、hdr-reference-white=80，未按面板报告的270 nits自适应；此值用于规范化SDR scRGB工作空间，Windows在SDR Advanced Color下将线性1.0解释为显示参考白，不代表物理面板仅能或实际输出80 nits。微软Advanced Color文档支持此区分。
+- 原生检测脚本另读系统SDR白位，换算公式level/1000*80；该检测值与SDR ACM分支固定80是两件事。固定80有色彩空间依据，但这不能单独证明HDR→SDR观感或物理亮度标定已最优。
+- 核对libplacebo 0d043c7源码：测量值经IIR平滑后可由scene threshold加速至直接采用当前值；color_map优先保留作者动态元数据，仅用测量值补缺。动态target按scene_avg直接计算曝光，未在该计算块另设时间限速。因此测量平滑不保证所有RPU/曝光变化都平滑，不能把“动态”理解为必定缓变。当前二进制含dirty标记，源码用于解释机制，具体用户事件仍须同步帧/参数捕获。
+- 未修改生产配置或代码，仅补充问答诊断记录。
+
+### 2026-11-13 20:13 — 实际GPU四组对照定位SDR动态曝光
+
+- 用户追问80跨设备的依据，并要求确定动态调整触发环节。保持同一本地《沙丘》5914–5959秒、D3D11/auto-safe、HQ SDR ACM等价输出（scRGB、target-peak/reference-white=80、contrast=inf、contrast-recovery=0）、无配置/声音、最小化force-render/untimed，仅改变RPU和hdr-compute-peak开关；四组均exit=0，未使用computer use。
+- 对照：RPU+auto，118条曝光记录，0.629–0.962；RPU+no，3条，0.942–0.944；去RPU+auto，116条，0.630–0.962；去RPU+no，0条动态target日志。实际输出矩阵/峰值Shader与reference.txt完全相符；源元数据内容序列四组相同，观察回调时间最多相差0.042秒（一帧），不宣称逐帧回调完全同步。
+- 定位现有日志的大幅变化主路径为GPU逐帧亮度分析→动态target全图曝光。只关RPU不能消除这一变化，后续排查优先峰值分析/阈值，不再优先只关RPU；RPU仍会影响映射曲线，不能说毫无作用。
+- 进一步RPU/auto下对照场景阈值1/3和0/0：前者118条、后者217条；起播0.962→0.629的直跳变为0.962、0.960、0.958、0.956…渐变，确认场景快速响应会加快曝光调整。更多日志不代表更多闪烁。最大跳变在初始化，不能冒充用户播放中同镜头事件；用户未提供具体异常时间，尚无那一帧视觉/光度复现。
+- 80结论：当前脚本固定80有scRGB/SDR ACM参考归一化依据，可以在相同输出语义下跨设备使用；不是显示器实测峰值，也不能单凭标准保证HDR→SDR映射对所有屏幕最优。HDR或无ACM需另分支，不可将80当所有模式的普适物理峰值。
+- 样本命令、原始日志、reference.txt、actual.txt、summary.json在backup/dune-brightness-isolation-20261113。四组初始化重复RPU警告均53条，不能作为本次差分原因；自动profile hook失败为verbose日志，不是渲染error。只增加本地诊断与HandShake记录，未改生产代码/配置/偏好，无提交/推送/发布。
+
+### 2026-11-13 20:42 — HQ 系统参考白与逐帧曝光修正完成
+
+- 用户授权修正高色准管线，并提出80可作信息缺失兜底。保留输出所需的scRGB语义，SDR ACM改为读取有效Windows系统SDR参考白（10–10000、排除NaN/无穷/无效值），将同一来源显式传入target-peak与hdr-reference-white；缺失时才回退80。EDID/驱动最大亮度不是当前SDR参考白，不自动用270替代。当前实机系统仍报告80，因此使用系统80、没有走兜底。
+- HQ统一默认hdr-compute-peak=no，继续使用片源元数据；该参数纳入原有事务/外部覆盖/恢复逻辑。标准模式仍为auto；用户临时手动开启被识别为会话覆盖，重选HQ恢复默认。没有关闭RPU、改动片源、核心或标准模式默认画质。
+- quality_status区分渲染目标元数据、系统参考白与显示器峰值报告，显示系统/80兜底来源；不再把80描述成面板物理峰值。仅修改color-target.lua、quality_status.lua、color-target.conf及相应回归。
+- 新增FATE风格固定样本tools/fate/samples/hq-sdr.json、参考输出tools/fate/ref/hq-sdr、说明和真实mpv测试tools/test-hq-sdr-fate.py。复用既有D3D11/Vulkan原始FP16交换链读回，无测试应用、无computer use。两后端各4项（独立sRGB EOTF灰阶、固定PQ灰块/周围20→1000nits稳定性、白位有效/缺失和显示身份切换、手动覆盖/标准恢复）均PASS，actual与ref逐字一致；像素容差0.002，读回标尺0.0001。
+- 既有色彩状态故障注入测试补齐mock API并加入120系统白/无效值/兜底恢复/模式策略检查，原生mpv执行通过；HDR生命周期、Lua语法和UTF-8/LF检查通过。
+- 原《沙丘》5914–5959秒同片段，以新color-target +真实display-color/display-info实取系统报告，sdr-acm成功、无峰值分析Shader，曝光仅0.944→0.942→0.944；之前baseline范围0.629–0.962。保留作者元数据的小变化，不宣称关闭所有电影明暗变化，仍无用户未提供时间点的那次异常帧一对一复现。
+- 重要纠正：调试期间截图路径产生约2.54倍差异，后续原始交换链auto对照未复现；不把截图的独立重渲染当作日常播放/auto必然过曝的证据。最终显式查询方案以来源清晰为依据，输出由原始GPU数值验收。未采用相对linear切换或额外归一化Shader，避免改变协商与字幕输出。
+- 原始记录/已校验临时Frida wheel与隔离依赖在backup/hdr-sdr-fix-20261113，不进入播放器运行目录/公开包。验证汇总verification.json，实际FATE夹具在tmp/modernization/hq-sdr-fate。没有物理面板光度/ICC校准，不保证未测试设备实测色准。
+- git pull --ff-only为Already up to date，master仍领先8；保留已有个人配置/架构文档改动。未提交、推送、打包或发布；本轮无版本变更。
+
+### 2026-11-13 20:58 — 追溯GPU分析默认值并确认RPU动态数据实际参与
+
+- 用户质疑为何已有杜比动态元数据仍开GPU峰值分析、是否负收益。git blame确认hdr-compute-peak=auto/99.995/20/1–3在最早可追溯基线92085e5（2026-07-20）已存在。2026-10-06报告以640×360 HDR10开关性能/亮度变化为由保留auto；2026-10-12的16组独立数值参考验证了算法实现一致性，没有证明真实DV内容采用额外GPU分析更接近作者意图。不得把沿用默认值说成已针对本片证明色准收益。
+- 固定libplacebo 0d043c7源码核对：libav_internal.h:1054–1056将DV L1 max_pq/avg_pq映射为max_pq_y/avg_pq_y。renderer.c:1231–1233仅在两类动态统计同时完整时跳过分析；colorspace.c:1862–1871按字段保留作者值并用GPU统计补缺。后续1956–1958的全图曝光优先scene_avg、缺失才回退PQ平均。RPU提供的PQ统计未被删除，但GPU补出的线性scene_avg可主导额外曝光。曲线的nominal_luma选择仍优先使用有效PQ动态数据（colorspace.c:865–869）。因此“杜比完全未利用/GPU必然算错”均超出现有证据；已证实策略对当前片源不合适。
+- 同帧实证：实际本地影片5915.535秒，HQ/hdr-compute-peak=no，RPU保留；D3D11原始GPU源平面SHA、PTS完全一致，仅将libplacebo tone_map_metadata依次设any/hdr10/any。输出最大线性差0.4833984375，恢复any后差0.0且输出哈希一致。证明杜比动态亮度数据确实参与曲线映射；此差值不是色差/物理准确度指标，切换hdr10选择也没有删除RPU色彩重建或关闭其所有其他影响。
+- 固定样本manifest、结果、reference.txt/actual.txt在backup/dovi-metadata-consumption-20261113，输出逐字匹配。首轮含真实display-info DLL的附加探针初始化未完成，已核对自有PID后终止；最终使用同一已知SDR条件注入的隔离进程成功验证，不把未完成探针算通过。未使用computer use，不附加用户播放进程。
+- 当前实现保持上一轮HQ元数据优先/禁额外峰值分析策略，GPU分析仅留手动兼容入口；没有为本次问答额外改渲染代码或强制丢弃RPU。标准模式仍保留原auto。仅补充记录，未提交/推送/发布。
+
+### 2026-11-13 22:30 — 本地mpv核心升级完成，采用通过双后端回归的20261110
+
+- 用户明确要求升级mpv核心。按HandShake/AGENTS/当前STATUS读取基线；git pull --ff-only为Already up to date，保留今天HQ修正及此前个人配置/架构文档等差异。旧版为shinchiro20261008，mpv v0.41.0-1107-g36bf3d529 / libplacebo7.374 / FFmpeg5d4755f7d。
+- GitHub连接器与上游API核实latest为20261111；直链/资产接口下载超时，改用安装器已内置gh-proxy.com通道，所有归档与GitHub发布资产SHA-256一致。只下载已有预编译构建，没有触发GitHub Actions或自行构建。
+- 20261111 mpv v0.42.0-38-gbcde6b93c / libplacebo7.391在本机Vulkan输出黑帧，原始交换链、未附加探针的截图、持续播放/关闭异步均复现；D3D11通过。该构建未保留为活动核心。
+- 最终采用shinchiro20261110 x86_64：mpv v0.42.0-19-ga61f6c3ab、libplacebo v7.387.0 (v7.387.0-21-gba9cf89-dirty)、FFmpeg N-128718-gb2b543c07。归档34140764字节，SHA256=143a2e810cbe36d556d5c7040f08940472bb76b4873829e865ee883de64841b5；7z解压成功、完整输入hash通过。
+- 成套备份/替换6项：mpv.exe、mpv.com、d3dcompiler_43.dll、mpv/fonts.conf、doc/manual.pdf、doc/mpbindings.png。旧版完整保留backup/core-upgrade-20261113/old，原/新/被拒候选SHA见replacement-manifest.json。项目installer/updater、用户配置、HQ策略、独立FFmpeg/Python/VapourSynth运行库未被上游包覆盖。
+- D3D11/Vulkan HQ原始FP16输出FATE共8项与ref逐字匹配；状态事务、HDR入口生命周期通过。最终根目录文件与通过验收的stage-fallback逐字节SHA一致。完整活动配置的隔离副本（资源目录只读复用，files/cache/script-opts隔离）中，两后端均真实播放原沙丘片段，1秒内PTS推进1.001秒，输出sdr-acm，RPU max-pq=0.60928 / avg-pq=0.300122，GPU峰值分析关闭，暂停恢复和standard/HQ往返通过，无Lua/配置解析目标错误。
+- README本地核心说明已更新，项目版本仍1.6.5，已有release归档没有重建或替换。已完整阅读发布流程；核心运行时变化属于3.2 Gate，本轮仅本地升级，不执行发布/打包/推送，不修改发布流程；未来发布须按Gate由用户决定流程修订/豁免。
+- 结果backup/core-upgrade-20261113/upgrade-result.json；原/新version、归档、候选及清单均保留，可按old目录逐路径回退。本轮未使用computer use，未提交/推送/发布。
+
+### 2026-11-13 22:37 — 核对核心升级后的字幕组件变化
+
+- 用户反馈字幕观感似乎变化，询问升级内容。本轮只核对，不改字幕样式或回退组件。旧/新真实二进制日志确认：libass 0.17.5-11-gf61db567→0.17.5-24-gfada3a69；HarfBuzz14.6.0→15.1.0；FriBidi1.0.17→1.0.18。字体提供器两版均DirectWrite(with GDI)。
+- 两版--no-config --list-options的sub-*、blend-subtitles、image-subs-hdr-peak逐项比较无差异；不能把0.42发行说明中早已包含于旧开发构建的默认值变化再算成本次变化。项目mpv.conf字幕字体/字号/描边未修改。
+- mpv/fonts.conf仅移除弃用~/.fonts与~/.fontconfig两条路径，当前DirectWrite字体选择不走Fontconfig，未由此替换字体。新日志仍选HarmonyOS_Sans_SC与Bold。
+- libass固定提交比较共13条提交，其中shaper复用字体/shape plan及只使用OpenType HarfBuzz shaper，另有边界检查与CI更新；不将CI提交作为主动构建/执行。具体用户观感是否来自文字排版、缩放、亮度或字幕轨仍需同帧/同轨信息，不以组件升级直接断言特定变化原因。报告backup/core-upgrade-20261113/subtitle-components.json。
+
+### 2026-11-13 23:56 — v1.6.6发布请求与强制Gate检查
+
+- 用户授权Release、Z+1，目标1.6.6；发布流程第2节版本号已由用户递增规则明确，无须再确认版本号。
+- 3.1：git status清单已核对；git fetch origin成功，master领先8/落后0，无远端未合并改动。功能/构建/结果提交、同步与标签待Gate后执行；不夹带个人偏好及无关未跟踪目录。
+- 3.2：命中mpv核心升级Gate（旧v0.41.0-1107-g36bf3d529→v0.42.0-19-ga61f6c3ab，libplacebo7.374→7.387，FFmpeg更新；字幕libass/HarfBuzz/FriBidi随核心更新）。按明确条文停止打包/发布，待用户决定本次豁免或流程修订；未自行改发布流程。
+- 3.3：本次方案/检查写入STATUS与中文进度；版本记录、README发布内容和纯版本标记待Gate后更新，当前仍1.6.5。
+- 3.4：引用已完成的双后端8项FATE、Lua状态/生命周期、完整配置沙丘持续播放/模式切换验收（backup/core-upgrade-20261113/upgrade-result.json）；不将其冒充尚未构建的1.6.6归档验收。字幕观感原因尚未同帧确定，不宣称字幕修复。
+- 4：只读审核01/04脚本覆盖：mpv.exe、mpv.com、d3dcompiler_43.dll、mpv/fonts.conf、doc/manual.pdf、doc/mpbindings.png均由原01脚本覆盖；HQ两Lua脚本/配置由01/04原配置复制覆盖。无需为这些修改改变打包脚本/包边界。02/03复用核验尚未开始；安装器沿用0.3.14须复核。旧1.6.5私包缺失不作复用，本次必须新建1.6.6私包。
+- 5：未构建1.6.6，归档完整性/SHA/公开门禁/全功能覆盖/版本标记/分卷/实际包播放/私包并集等均待执行，不能记为通过。
+- 6/7/7.1：未提交、打标签、推送、创建Release或上传GitHub/ModelScope；待Gate获准且全部公开/私包构建验收完成后执行。目标公开资产仍六项，私包禁止公开上传。
+- 8：发布尚未执行，结果提交/镜像核验/暂存收尾待后续完成；本轮仅记录检查与明确阻塞。发布流程原件保持不变。
+
+### 2026-11-14 00:08 — 用户豁免核心升级Gate，继续v1.6.6发布
+
+- 用户明确回复“豁免，继续发布”，本次3.2 Gate已获豁免，后续构建/上传/推送获得授权；发布流程原件不变。
+- 02/03全输入集合、大小、CRC和最新时间与上次验收相同，来源/新归档7z t及SHA通过，逐字节复用1.6.5（包内README保留1.6.0/1.5.7）。安装器0.3.14源码无变化，沿用既有候选。
+- 构建前新增Vulkan像素复测发现根路径黑帧、同hash干净路径正常；正在排查AMD Vulkan可再生驱动缓存，不把尚未通过的复测记为通过。
+
+### 2026-11-14 00:16 — v1.6.6实际包播放及核心复核通过
+
+- 实际01/02/04解压包的双后端8项FATE与固定参考逐字一致；六组真实视频及四种解码重载生命周期均通过。根路径缓存故障排除后源核心同样通过FATE，不以仅PTS推进替代像素检查。
+- 147 Lua语法、修改源码UTF-8/LF、色彩事务/HDR生命周期及播放偏好九组通过。初次Lua语法命令误将路径作为待执行脚本，已改为只loadfile解析并全部通过；未将诊断命令失败算代码失败。
+- 01约130.8MiB、04约5.1MiB生成；私包尚在压缩，归档门禁和SHA未完成，尚未上传。安装器0.3.14同SHA真实启动及正常退出码0。
+
+### 2026-11-14 00:21 — v1.6.6流程3～5全部验收通过，准备6～8
+
+- 3.1：fetch无远端未合并改动，功能提交08e50c2已审阅；既有8条本地提交纳入本次发行。个人偏好已恢复，不关本次的架构/清理文档及.workbuddy-ai保留原样。
+- 3.2：用户明确“豁免，继续发布”，本次核心升级Gate获豁免；发布流程原件未改。3.3：STATUS/中文进度/当前1.6.6版本记录及README更新，旧版本历史保留；纯版本标记1.6.6。
+- 3.4：147 Lua语法、修改源码UTF-8/LF、diff、色彩状态/HDR生命周期、偏好九组通过；实际包FATE八项、双后端×三类视频六组、四类解码生命周期和私包默认启动无目标错误。
+- 4：使用原子包入口重建01/04/私包；02/03按4.1.1从1.6.5原样复用，全输入集合/大小/CRC/最新时间及来源/新7z测试/SHA均通过。内部README来源1.6.0/1.5.7已说明。安装器源码无改动，沿用0.3.14同SHA且本次窗口/退出通过。
+- 5：每个逻辑归档7z t、全部资产SHA、公开门禁/备份/版权/分卷限制、01 ffmpeg/Logo、04排除Logo/标记、版本标记逐字节正确、个人窗口状态排除、1427配置逐字节覆盖、私包11798并集大小/CRC和11801文件/安装器SHA/FW仅占位全部通过。SHA记录release/SHA256SUMS-v1.6.6.txt及私包独立清单，版本记录已录入。
+- 6/7/7.1：下一步执行构建记录提交/标签/推送/六公开资产GitHub上传并核SHA/正式Latest/ModelScope同步。全部公开及私包构建和验收已经完成，未提前上传，私包禁止上传。GitHub连接器缺少Release及二进制资产上传能力，后续使用已登录gh CLI；不使用GitHub Actions或computer use。
+- 8：发布结果、远端同步和build暂存归档待上传后收尾。报告release-build-results-v1.6.6.json、release-playback-v1.6.6.json、release-decoder-lifecycle-v1.6.6.json已写入docs/modernization。

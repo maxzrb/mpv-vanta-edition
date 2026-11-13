@@ -1,0 +1,162 @@
+{
+  "version": "1.6.6",
+  "passed": true,
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.6.7z",
+      "bytes": 137127760,
+      "sha256": "07c8f93bf5e33dcb972f95a77c9b80c672cabfb9ed69425c652b69d18f801f39"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.6.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.6.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.6.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+    },
+    {
+      "name": "04-mpv-config-v1.6.6.7z",
+      "bytes": 5374281,
+      "sha256": "cb965d37178e18f0e19277b862ec0e745e339b4fbd1fd4c044ee4ba35b124353"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+    }
+  ],
+  "private_asset": {
+    "name": "mpv-full-private-v1.6.6.7z",
+    "bytes": 3038159404,
+    "sha256": "293852ebec58e4605a8b98cb3ad4f00694848156d6a21031cb4da988d52e65f9"
+  },
+  "archive_files": {
+    "01-mpv-base-v1.6.6.7z": 1323,
+    "02-mpv-extras-v1.6.6.7z.001": 10474,
+    "03-mpv-fasterwhisper-addon-v1.6.6.7z": 5122,
+    "04-mpv-config-v1.6.6.7z": 270,
+    "mpv-full-private-v1.6.6.7z": 11801
+  },
+  "covered_config_files": 1427,
+  "private_union": {
+    "merged_files": 11798,
+    "size_crc_union_identical": true,
+    "installer_sha_identical": true,
+    "placeholder_only": true,
+    "local_only": true,
+    "uploaded": false
+  },
+  "input_reuse": {
+    "extras": {
+      "files": 10473,
+      "bytes": 4603603173,
+      "latest_input_time": 1791366824.1750202,
+      "all_input_size_crc_identical": true,
+      "source_version": "1.6.5"
+    },
+    "fasterwhisper": {
+      "files": 5121,
+      "bytes": 4714825519,
+      "latest_input_time": 1744549392.576642,
+      "all_input_size_crc_identical": true,
+      "source_version": "1.6.5"
+    },
+    "assets": [
+      {
+        "source": "02-mpv-extras-v1.6.5.7z.001",
+        "name": "02-mpv-extras-v1.6.6.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+      },
+      {
+        "source": "02-mpv-extras-v1.6.5.7z.002",
+        "name": "02-mpv-extras-v1.6.6.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+      },
+      {
+        "source": "03-mpv-fasterwhisper-addon-v1.6.5.7z",
+        "name": "03-mpv-fasterwhisper-addon-v1.6.6.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+      }
+    ],
+    "internal_readme_versions": {
+      "extras": "1.6.0",
+      "fasterwhisper": "1.5.7"
+    }
+  },
+  "core_files_sha_identical": true,
+  "merged_root": "C:\\Program portable\\mpv2\\backup\\release-v1.6.6-20261114\\merged",
+  "private_root": "C:\\Program portable\\mpv2\\backup\\release-v1.6.6-20261114\\private-extracted",
+  "checked_at": "2026-11-14 00:19:59 +0800",
+  "timestamp": "2026-11-14 00:21 +0800",
+  "feature_commit": "08e50c2f27ef696279462feaf0d00a28e634e6da",
+  "gate_3_2": {
+    "trigger": "mpv核心升级",
+    "waived": true,
+    "user_authorization": "豁免，继续发布"
+  },
+  "core": {
+    "accepted_asset": "mpv-x86_64-20261110-git-a61f6c3abd.7z",
+    "sha256": "sha256:143a2e810cbe36d556d5c7040f08940472bb76b4873829e865ee883de64841b5",
+    "old_mpv": "v0.41.0-1107-g36bf3d529",
+    "new_mpv": "v0.42.0-19-ga61f6c3ab",
+    "libplacebo": "v7.387.0 (v7.387.0-21-gba9cf89-dirty)",
+    "ffmpeg": "N-128718-gb2b543c07",
+    "rejected_asset": "mpv-x86_64-20261111-git-bcde6b93cc.7z",
+    "rejected_reason": "本机Vulkan原始交换链和无注入截图均为黑帧；D3D11通过，故不采用该构建",
+    "fate_reference_match": true,
+    "full_config": [
+      {
+        "backend": "d3d11",
+        "passed": true,
+        "advanced_seconds": 1.0010000000002037,
+        "mode": "sdr-acm",
+        "hdr_compute_peak": false,
+        "matrix": "dolbyvision",
+        "rpu_max_pq": 0.60928,
+        "rpu_avg_pq": 0.300122
+      },
+      {
+        "backend": "vulkan",
+        "passed": true,
+        "advanced_seconds": 1.0010000000002037,
+        "mode": "sdr-acm",
+        "hdr_compute_peak": false,
+        "matrix": "dolbyvision",
+        "rpu_max_pq": 0.60928,
+        "rpu_avg_pq": 0.300122
+      }
+    ],
+    "backup": "C:\\Program portable\\mpv2\\backup\\core-upgrade-20261113\\old",
+    "published": false
+  },
+  "tests": {
+    "lua_syntax_files": 147,
+    "utf8_lf_passed": true,
+    "source_fate_passed": true,
+    "actual_package_fate_passed": true,
+    "source_state_and_hdr_lifecycle_passed": true,
+    "playback_preferences_nine_groups_passed": true,
+    "actual_package_six_video_groups_passed": true,
+    "actual_package_four_decoder_lifecycle_groups_passed": true,
+    "actual_private_default_startup_passed": true,
+    "installer_window_exit_sha_passed": true
+  },
+  "personal_preferences_restored_byte_identical": true,
+  "published": false,
+  "notes": [
+    "本机根路径Vulkan缓存异常，经备份移开AMD VkCache后，源核心及实际公开合并包FATE通过。缓存只在本机维护，不进包。",
+    "沿用原构建脚本、包边界与覆盖顺序；02/03按4.1.1由1.6.5逐字节复用，内部README仍为1.6.0/1.5.7。",
+    "此前8条本地提交中的解码安全重载与偏好保存修复一并上线；无关原有文档及个人偏好不纳入本次功能提交。"
+  ]
+}
