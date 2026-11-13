@@ -143,7 +143,7 @@ local function show_color_status()
     local renderer = mp.get_property('current-vo','未知')
     table.insert(lines, '渲染器：' .. renderer)
     local target = mp.get_property_native('video-target-params', {}) or {}
-    if target['max-luma'] then table.insert(lines, '目标亮度：' .. tostring(target['max-luma']) .. ' cd/m²') end
+    if target['max-luma'] then table.insert(lines, '渲染目标亮度元数据：' .. tostring(target['max-luma']) .. ' nits') end
     local icc = mp.get_property('icc-profile', '')
     table.insert(lines, 'ICC：' .. (icc ~= '' and icc or mp.get_property_bool('icc-profile-auto', false) and '使用系统描述文件' or '未启用'))
     local color = mp.get_property_native('user-data/color-target', {}) or {}
@@ -162,12 +162,14 @@ local function show_color_status()
     table.insert(lines, 'Windows 显示模式：' .. tostring(mode_names[system_color.mode] or system_color.mode or '未知')
         .. ' / 校色责任：' .. tostring(color.display_color_owner or '未知'))
     if system_color.sdr_white_nits then
-        table.insert(lines, '系统 SDR 白：' .. tostring(system_color.sdr_white_nits) .. ' nits')
+        table.insert(lines, '系统 SDR 参考白：' .. tostring(system_color.sdr_white_nits) .. ' nits（系统参考值）')
     end
     if color.reported_bits then table.insert(lines, '显示链路位深：' .. tostring(color.reported_bits) .. ' bit') end
-    table.insert(lines, 'HDR 峰值来源：' .. tostring(color.peak or '未知') .. ' / ' .. tostring(color.peak_source or '未知'))
+    table.insert(lines, '显示器峰值报告／覆盖：' .. tostring(color.peak or '未知') .. ' nits / ' .. tostring(color.peak_source or '未知'))
     if system_color.mode=='wcg' and color.pipeline=='hq' then
-        table.insert(lines, 'SDR ACM 工作白：1.0（线性）')
+        table.insert(lines, 'SDR ACM 工作白：1.0（线性）；物理亮度由系统与显示器决定')
+        table.insert(lines, 'SDR 参考白策略：' .. tostring(color.reference_white or 'auto') .. '（非面板实测峰值）')
+        table.insert(lines, 'SDR 参考白来源：' .. tostring(color.sdr_reference_source or '未知'))
     else
         table.insert(lines, 'HDR 参考白：' .. tostring(color.reference_white or 'auto'))
     end

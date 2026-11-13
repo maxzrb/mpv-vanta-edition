@@ -9,7 +9,7 @@ options.read_options(o,'color-target')
 local keys={'icc-profile','icc-profile-auto','icc-intent','target-prim','target-trc','target-gamut',
     'target-peak','target-contrast','target-colorspace-hint','target-colorspace-hint-mode',
     'target-colorspace-hint-strict','d3d11-output-format','d3d11-output-csp',
-    'hdr-reference-white','inverse-tone-mapping','hdr-contrast-recovery','treat-srgb-as-power22','dither-depth','libplacebo-opts'}
+    'hdr-reference-white','hdr-compute-peak','inverse-tone-mapping','hdr-contrast-recovery','treat-srgb-as-power22','dither-depth','libplacebo-opts'}
 local baseline, owned, drift, observed = {},{},{},{}
 local playback_retry
 local mode, requested, reason, status_text = '配置目标','auto','','可用'
@@ -81,6 +81,11 @@ local function IccContext()
     local c=SystemColor()
     if not c.identity then return nil end
     return c.identity..'|'..tostring(c.mode)..'|'..tostring(c.system_icc or '')
+end
+local function SystemSdrWhite()
+    local white=tonumber(SystemColor().sdr_white_nits)
+    -- EDID／驱动的最大亮度不是当前 SDR 参考白，不能在此互相替代。
+    if white and white==white and white>=10 and white<=10000 then return white end
 end
 local function DisplayKey()
     local d=Display()
@@ -333,6 +338,7 @@ Publish=function(status)
         hdr_status=d['hdr-status'] or '未知',reported_bits=d['bit-depth'] or '未知',
         peak=peak,peak_source=peak and source or '未知',reference_white=actual['hdr-reference-white'],
         system_color=SystemColor(),
+        sdr_reference_source=SystemSdrWhite() and '系统 SDR 参考白' or '系统 SDR 参考白未知，回退 80 nits',
         display_color_owner=pipeline=='standard' and '继承的自动输出' or SystemColor().mode=='wcg' and 'Windows ACM' or '播放器目标／显式 ICC',
         actual_settings=actual,external_overrides=drift,restore_pending=pending,
         actual_target=mp.get_property_native('video-target-params',{}) or {},
@@ -366,6 +372,7 @@ local function StandardValues()
         ['target-prim']='auto',['target-trc']='auto',['target-gamut']='auto',['target-peak']='auto',['target-contrast']='auto',
         ['target-colorspace-hint']='auto',['target-colorspace-hint-mode']='target',['target-colorspace-hint-strict']=true,
         ['d3d11-output-format']='auto',['d3d11-output-csp']='auto',['hdr-reference-white']='auto',
+        ['hdr-compute-peak']='auto',
         ['inverse-tone-mapping']=false,['hdr-contrast-recovery']=.30,['treat-srgb-as-power22']='auto',
         ['dither-depth']='auto',['libplacebo-opts']=GamutOptions()})
 end
@@ -374,6 +381,8 @@ local function SdrValues(icc)
         ['target-prim']='bt.709',['target-trc']='srgb',['target-gamut']='auto',['target-peak']='auto',['target-contrast']='auto',
         ['target-colorspace-hint']=false,['target-colorspace-hint-mode']='target',['target-colorspace-hint-strict']=true,
         ['d3d11-output-format']='auto',['d3d11-output-csp']='srgb',['hdr-reference-white']='auto',
+        -- HQ 使用片源元数据，不从逐帧统计额外推导全图曝光。
+        ['hdr-compute-peak']='no',
         ['inverse-tone-mapping']=false,['hdr-contrast-recovery']=0,['treat-srgb-as-power22']='no',
         ['dither-depth']='auto',['libplacebo-opts']=GamutOptions()})
 end
@@ -408,10 +417,14 @@ end
 local function SdrManaged(failure,icc)
     local api=mp.get_property('gpu-api')
     if SystemColor().mode~='wcg' or (api~='d3d11' and api~='vulkan') then return Sdr(failure,icc) end
-    -- SDR ACM 的线性 1.0 是显示参考白，不使用 HDR 桌面的绝对亮度比例。
+    -- SDR ACM 的线性 1.0 是显示参考白；亮度元数据交由核心与系统协商。
+    -- 不能将驱动报告的面板标称峰值直接填入 scRGB，否则会改变白色的编码幅度。
     local v=SdrValues(false)
     v['target-prim'],v['target-trc']='bt.709','scrgb'
-    v['target-peak'],v['hdr-reference-white']=80,80
+    -- 显式传入有效系统白位，让目标与参考白使用同一来源，避免混用核心默认值。
+    -- 只有系统白位缺失时才使用 scRGB 的名义 80 nits 兜底。
+    local reference_white=SystemSdrWhite() or 80
+    v['target-peak'],v['hdr-reference-white']=reference_white,reference_white
     -- 此处是交给系统的标准工作色彩空间，不再次做物理面板黑位补偿。
     v['target-contrast']='inf'
     if api=='d3d11' then

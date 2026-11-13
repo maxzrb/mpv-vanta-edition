@@ -1,0 +1,8 @@
+d3d11 sdr-gray-reference PASS
+d3d11 pq-surround-invariance PASS
+d3d11 system-white-or-fallback PASS
+d3d11 manual-override-and-restore PASS
+vulkan sdr-gray-reference PASS
+vulkan pq-surround-invariance PASS
+vulkan system-white-or-fallback PASS
+vulkan manual-override-and-restore PASS

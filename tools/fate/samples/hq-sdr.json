@@ -1,0 +1,9 @@
+{
+  "size": 256,
+  "fps": 24,
+  "frames": 48,
+  "sdr_codes": [0, 0.01, 0.18, 0.5, 1],
+  "pq_probe_nits": 40,
+  "pq_surround_nits": [20, 1000],
+  "source_peak_nits": 1000
+}

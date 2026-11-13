@@ -4,13 +4,17 @@ local props={['libplacebo-opts']={},['gpu-api']='d3d11',vid=1,pause=false,seekab
     ['target-peak']='auto',['target-contrast']='auto',['target-gamut']='',['dither-depth']='auto',['icc-profile']='',['icc-profile-auto']=false,
     ['icc-intent']=1,['target-colorspace-hint']=false,['target-colorspace-hint-mode']='target',
     ['target-colorspace-hint-strict']=true,['d3d11-output-format']='auto',['d3d11-output-csp']='srgb',
-    ['hdr-reference-white']='auto',['inverse-tone-mapping']=false,['hdr-contrast-recovery']=0,
+    ['hdr-reference-white']='auto',['hdr-compute-peak']='auto',['inverse-tone-mapping']=false,['hdr-contrast-recovery']=0,
     ['treat-srgb-as-power22']='no',['video-target-params']={gamma='srgb',pixelformat='rgb10a2'}}
 local messages,events,observers,timers,writes={},{},{},{},{}
 local now,fail_key,fail_value,fail_once=0,nil,nil,false
 local mp={}
 function mp.get_property_native(k,d) if props[k]==nil then return d end;return props[k] end
 function mp.get_property(k) return props[k] end
+function mp.get_property_number(k,d) return tonumber(props[k]) or d end
+function mp.get_property_bool(k,d) if props[k]==nil then return d end;return props[k]==true end
+function mp.find_config_file() return nil end
+function mp.add_hook() end
 function mp.get_time() return now end
 function mp.set_property_native(k,v)
     if k==fail_key and v==fail_value then
@@ -70,6 +74,7 @@ assert(props['target-trc']=='gamma2.2' and #status().restore_pending==0,'恢复�
 props['video-params']={gamma='pq',primaries='bt.709'}
 messages['color-select']('auto');display(true,true)
 assert(props['target-trc']=='scrgb' and status().status=='准备中')
+assert(props['hdr-compute-peak']=='no','HQ 不应从逐帧场景统计推导额外曝光')
 assert(props['target-gamut']=='bt.709','709 HDR scRGB 不能叠加终端色域映射')
 props['video-target-params']={gamma='scrgb',primaries='bt.709',pixelformat='rgba16hf'}
 tick(.2);assert(status().mode=='hdr-scrgb')
@@ -121,10 +126,24 @@ assert(status().status=='准备中','文件切换使旧回调失效')
 events['file-loaded']();tick(.2)
 messages['color-select']('auto')
 display(true,false)
-props['user-data/display-color']={mode='wcg',identity='native-A',system_icc='A.icc'}
+props['user-data/display-color']={mode='wcg',identity='native-A',system_icc='A.icc',sdr_white_nits=80}
 observers['user-data/display-color']()
 props['video-target-params']={gamma='scrgb',primaries='bt.709',pixelformat='rgba16hf'};tick(.2)
 assert(status().mode=='sdr-acm' and props['target-peak']==80 and props['hdr-reference-white']==80)
+props['user-data/display-color']={mode='wcg',identity='native-A',system_icc='A.icc'}
+observers['user-data/display-color']();tick(.2)
+assert(props['hdr-reference-white']==80 and status().sdr_reference_source:find('回退',1,true),'白位未知才回退80')
+props['user-data/display-color']={mode='wcg',identity='native-A',system_icc='A.icc',sdr_white_nits=0/0}
+observers['user-data/display-color']();tick(.2)
+assert(props['hdr-reference-white']==80,'无效系统白位不能传入渲染器')
+props['user-data/display-color']={mode='wcg',identity='native-A',system_icc='A.icc',sdr_white_nits=80}
+observers['user-data/display-color']();tick(.2)
+assert(props['hdr-reference-white']==80 and status().sdr_reference_source=='系统 SDR 参考白','系统白位恢复后退出兜底')
+props['user-data/display-color']={mode='wcg',identity='native-A',system_icc='A.icc',sdr_white_nits=120}
+observers['user-data/display-color']();tick(.2)
+assert(props['target-peak']==120 and props['hdr-reference-white']==120,'有效系统白位不能被硬编码80覆盖')
+props['user-data/display-color']={mode='wcg',identity='native-A',system_icc='A.icc',sdr_white_nits=80}
+observers['user-data/display-color']();tick(.2)
 assert(props['dither-depth']=='no','浮点输出不能提前量化')
 -- scRGB 的 709 交接也须保留源色域，不能额外按物理显示器色域映射。
 props['video-params']={gamma='srgb',primaries='bt.709'}
@@ -140,9 +159,10 @@ props['user-data/display-color']={mode='sdr',identity='native-A',system_icc='A.i
 observers['user-data/display-color']()
 assert(props['target-trc']=='srgb' and props['dither-depth']=='auto' and not props['icc-profile-auto'])
 messages['color-select']('sdr')
-props['user-data/display-color']={mode='wcg',identity='native-A',system_icc='A.icc'}
+props['user-data/display-color']={mode='wcg',identity='native-A',system_icc='A.icc',sdr_white_nits=80}
 observers['user-data/display-color']();tick(.2)
 assert(status().mode=='sdr-acm' and status().requested=='sdr' and status().manual)
+assert(props['target-peak']==80 and props['hdr-reference-white']==80,'SDR ACM 参考白应采用有效系统值')
 props['user-data/display-color']={mode='hdr',identity='native-A',system_icc='A.icc'}
 observers['user-data/display-color']()
 assert(status().mode=='sdr' and props['target-trc']=='srgb','手动 SDR 在桌面切换后须恢复合适输出')
@@ -195,6 +215,7 @@ fail_key=nil
 messages['color-pipeline']('standard')
 assert(status().pipeline=='standard' and status().mode=='standard')
 assert(props['target-trc']=='auto' and props['target-prim']=='auto' and props['hdr-contrast-recovery']==.30)
+assert(props['hdr-compute-peak']=='auto','切回标准模式应恢复原有场景分析策略')
 assert(props['libplacebo-opts'].lut3d_size_C=='32')
 messages['color-select']('hdr','legacy')
 assert(status().pipeline=='standard' and props['target-trc']=='auto','旧 HDR 脚本不得覆盖标准主模式')
