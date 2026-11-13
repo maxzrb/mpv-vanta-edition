@@ -1,5 +1,15 @@
 # STATUS.md — MPV 便携配置项目
 
+## 当前v1.6.6发布完成（2026-11-14 00:37，Asia/Shanghai）
+
+- GitHub正式Latest：https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.6；六项公开资产名称/数量/大小/SHA全部与本地一致，非草稿/非预发布，无私包或重复安装器。ModelScope v1.6.6/六项同步且匿名下载大小一致。
+- 本次包括mpv核心20261110（0.42.0-19-ga61f6c3ab、libplacebo7.387）、HQ元数据优先/关闭逐帧峰值分析、系统SDR参考白优先/80兜底、亮度来源说明，以及此前未上线的解码安全重载/异常恢复/偏好保存和解码菜单整理。字幕排版组件随核心更新，项目字幕样式配置不变。
+- 用户已明确豁免核心升级Gate；流程和构建脚本未修改，01/04及同版私包重建，02/03核验后由1.6.5原样复用，安装器0.3.14沿用。不使用GitHub Actions或computer use。
+- 全部归档完整性/公开门禁/版本/分卷/1427配置逐字节覆盖/私包并集和安装器/FW占位/SHA通过。147 Lua语法、源码UTF-8/LF、色彩状态/HDR生命周期、偏好九组、实际公开包双后端FATE八项/六组视频/四类解码重载、实际私包默认启动通过。
+- 标签v1.6.6=`c701e0683c944ab08ce61b4d938960cd401e6566`，保持构建提交；结果收尾另行提交推送master。原v1.6.5标签不变。工作树保留原有个人偏好、架构/清理文档和.workbuddy-ai，不夹带、不清除；本轮发布文件应全部提交。
+- 私包release/mpv-full-private-v1.6.6.7z仅本地；build已归档backup/release-v1.6.6-20261114/build-staging，release保留公开/私包及校验单。核心旧版及缓存备份保留，历史和偏好未清除。
+- 报告：docs/modernization/release-build-results-v1.6.6.json、release-playback-v1.6.6.json、release-decoder-lifecycle-v1.6.6.json、release-results-v1.6.6.json。
+
 ## 当前v1.6.6全部构建验收完成，准备上传（2026-11-14 00:21，Asia/Shanghai）
 
 - 用户已明确豁免核心升级Gate，目标1.6.6；功能提交08e50c2。01/04与本地私包重建，02/03按4.1.1由1.6.5原样复用，安装器0.3.14沿用，流程及构建脚本不改。
@@ -4580,3 +4590,12 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - 5：每个逻辑归档7z t、全部资产SHA、公开门禁/备份/版权/分卷限制、01 ffmpeg/Logo、04排除Logo/标记、版本标记逐字节正确、个人窗口状态排除、1427配置逐字节覆盖、私包11798并集大小/CRC和11801文件/安装器SHA/FW仅占位全部通过。SHA记录release/SHA256SUMS-v1.6.6.txt及私包独立清单，版本记录已录入。
 - 6/7/7.1：下一步执行构建记录提交/标签/推送/六公开资产GitHub上传并核SHA/正式Latest/ModelScope同步。全部公开及私包构建和验收已经完成，未提前上传，私包禁止上传。GitHub连接器缺少Release及二进制资产上传能力，后续使用已登录gh CLI；不使用GitHub Actions或computer use。
 - 8：发布结果、远端同步和build暂存归档待上传后收尾。报告release-build-results-v1.6.6.json、release-playback-v1.6.6.json、release-decoder-lifecycle-v1.6.6.json已写入docs/modernization。
+
+### 2026-11-14 00:37 — v1.6.6发布完成，流程6～8收尾
+
+- 6：功能08e50c2、构建记录c701e06已提交，v1.6.6标签指向c701e0683c944ab08ce61b4d938960cd401e6566；master/该标签已推送并核对，未移动旧标签。此前8条本地功能/记录提交随master同步；无关原有改动未纳入。
+- 7：GitHub六项公开资产先上传草稿，全部名称/数量/大小/SHA与本地一致后转正式Latest；非草稿/非预发布、无重复资产或私包。Release Note仅本次更新，每行严格[更改]格式；README随master同步，更新01+04说明及核心/HQ策略。
+- 7.1：ModelScope AerithDream/mpv-vanta-edition的v1.6.6/六项公开资产已同步；每项匿名下载状态200或206，Content-Length/Content-Range总大小与本地一致。上传白名单仅六项，未上传私包；保持历史目录，不删除远端其它版本。
+- 8：根build已按校验绝对路径移动至backup/release-v1.6.6-20261114/build-staging；release保留01/02两卷/03/04/安装器/私包及两类SHA清单，安装器publish原产物保留。STATUS、中文进度/版本表和release-results-v1.6.6.json更新，准备提交并推送结果收尾。
+- 用户的keyframes、1600x900和remember_size=no已逐字节恢复；现有架构清理文档与.workbuddy-ai继续保留。工作树仅这些原有差异可保留，不将其误称本轮发布遗留或全树干净。
+- 缓存处理补充：本机AMD VkCache的52个parc及旧portable_config/cache/shaders_cache保留在本轮backup；仅重建可再生缓存，未改系统HDR/驱动设置/播放历史。新核心及实际包D3D11/Vulkan像素FATE通过，不将早前根路径黑帧直接归为上游核心普遍回归。
