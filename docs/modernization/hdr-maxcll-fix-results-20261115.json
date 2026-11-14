@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "timestamp": "2026-11-15 00:11 Asia/Shanghai",
+  "new_fate_cases": 15,
+  "existing_hq_sdr_cases": 8,
+  "static_metadata_reference_cases": 6,
+  "maximum_linear_error": 0.0005888298535475789,
+  "linear_tolerance": 0.002,
+  "real_source": {
+    "mastering_nits": 1000.0,
+    "max_cll_nits": 97.0,
+    "mapping_peak_nits": 97.0,
+    "target_nits": 80.0,
+    "hardware_decoder": "d3d11va",
+    "peak_detection": false,
+    "contrast_recovery": 0
+  },
+  "full_config": {
+    "started": true,
+    "standard_hq_roundtrip": true,
+    "pause_preserved": true,
+    "hardware_decoder": "d3d11va"
+  },
+  "core_changed": false,
+  "version_changed": false,
+  "published": false,
+  "limits": [
+    "无物理面板光度测量",
+    "真实HDR10+/DV与HDR桌面未做本轮端到端GPU验收，保留分支以固定生命周期事件验证",
+    "Frida与显示FFI同时初始化曾等待；原生检测启动与受控GPU回读分开完成"
+  ]
+}

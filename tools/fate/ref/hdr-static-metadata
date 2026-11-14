@@ -1,0 +1,6 @@
+d3d11 mastering-bound independent-spline-reference PASS
+d3d11 content-bound independent-spline-reference PASS
+d3d11 sample-file-unchanged PASS
+vulkan mastering-bound independent-spline-reference PASS
+vulkan content-bound independent-spline-reference PASS
+vulkan sample-file-unchanged PASS

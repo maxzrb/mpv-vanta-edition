@@ -1,0 +1,39 @@
+{
+  "scope": "HQ HDR→SDR 静态峰值选择诊断；生产配置未改；非面板光学验收",
+  "source_metadata": {
+    "mastering_peak_nits": 1000,
+    "max_cll_nits": 97,
+    "max_fall_nits": 55,
+    "minimum_nits": 0.001
+  },
+  "source_frame_max_channel_nits": 77.20167249597498,
+  "source_frame_sha256": "63950393f7de31c9378b1aafd169eb5fb0621695544c437c838c3689f4f4e76f",
+  "fixed_frame_output_contract_identical": true,
+  "target_nits": 80,
+  "hdr_compute_peak": false,
+  "hdr_contrast_recovery": 0,
+  "reference": {
+    "passed": true,
+    "cases": 6,
+    "maximum_linear_error": 0.0006413495389339108,
+    "linear_tolerance": 0.002
+  },
+  "existing_hq_fate": {
+    "passed": true,
+    "cases": 8
+  },
+  "production_settings_changed": false,
+  "evidence_directory": "tmp/modernization/hdr-sdr-audit-20261114",
+  "gray_examples": [
+    {
+      "input_nits": 40,
+      "mastering_bound_output_nits": 18.232421875,
+      "content_bound_output_nits": 35.09765625
+    },
+    {
+      "input_nits": 77,
+      "mastering_bound_output_nits": 27.48046875,
+      "content_bound_output_nits": 64.6484375
+    }
+  ]
+}

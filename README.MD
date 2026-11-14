@@ -257,6 +257,8 @@ gaoxing64/MPV-lazy-full (v2.0.0)
 
 默认不切换 Windows HDR。标准模式继承 `hdr-contrast-recovery=0.30`；HQ 高色准模式使用 0，HDR 采用 scRGB → PQ → SDR 回退。原整合包的 `target-trc=gamma2.2` 是注释项，标准模式恢复的是原有效值 `auto`。模式切换和 HQ 数值等值验证见[本轮模式验收](docs/modernization/标准与HQ色彩模式-20261012.md)。
 
+HQ 的静态 PQ→SDR 优先读取片源 MaxCLL，并随片源元数据变化更新映射边界；MaxCLL 缺失、无效或与其他亮度数据矛盾时保留原有母版信息。原片与原始母版参数保留，标准模式、HDR 输出及带动态亮度元数据的路线不覆盖。查看状态可见当前采用的 MaxCLL；可在 `script-opts/hdr-content-peak.conf` 关闭。说明与回归见 [MaxCLL 修复](docs/modernization/HQ-MaxCLL优先修复-20261115.md)。
+
 ## 项目目录与维护
 
 活动配置在 `portable_config/`；根目录的 Python／VS／DLL 和 `mpv/fonts.conf` 是便携运行支持。维护测试在 `tools/`，项目说明在 `docs/`，旧测试产物与回退快照进入本地 `backup/`，退役入口进入 `trash/`。完整职责、归档清单位置与回退约定见 [项目架构](docs/项目架构.md)。

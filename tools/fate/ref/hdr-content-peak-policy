@@ -1,0 +1,6 @@
+metadata-update-and-no-redundant-rebuild PASS
+invalid-and-missing-maxcll-fallback PASS
+dynamic-hdr-hlg-and-sdr-preservation PASS
+output-route-switch-and-external-target PASS
+user-filter-ownership-and-explicit-refresh PASS
+failed-update-rollback-and-next-file PASS

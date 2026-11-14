@@ -1,0 +1,9 @@
+options-file-loading PASS
+d3d11 automatic-maxcll-independent-reference PASS
+d3d11 source-metadata-change-and-missing-fallback PASS
+d3d11 standard-hq-and-user-filter-preservation PASS
+d3d11 manual-filter-ownership-and-refresh PASS
+vulkan automatic-maxcll-independent-reference PASS
+vulkan source-metadata-change-and-missing-fallback PASS
+vulkan standard-hq-and-user-filter-preservation PASS
+vulkan manual-filter-ownership-and-refresh PASS

@@ -157,6 +157,10 @@ local function show_color_status()
     local color = mp.get_property_native('user-data/color-target', {}) or {}
     table.insert(lines, '色彩模式：' .. tostring(color.pipeline_name or '配置目标') .. ' / ' .. tostring(color.mode or '未知') .. ' / ' .. tostring(color.status or '未知'))
     table.insert(lines, '目标意图：' .. tostring(color.requested or '未知') .. (color.manual and '（本次会话手动覆盖）' or '（自动匹配）'))
+    local content_peak = mp.get_property_native('user-data/hdr-content-peak', {}) or {}
+    if content_peak.active and content_peak.selected_peak then
+        table.insert(lines, 'HDR 映射源峰值：' .. tostring(content_peak.selected_peak) .. ' nits（MaxCLL）')
+    end
     local actual = color.actual_settings or {}
     table.insert(lines, '实际设置：' .. tostring(actual['target-prim'] or '未知') .. ' / ' .. tostring(actual['target-trc'] or '未知')
         .. ' / ' .. tostring(actual['d3d11-output-format'] or '未知') .. ' / ' .. tostring(actual['d3d11-output-csp'] or '未知'))

@@ -17,6 +17,29 @@ python -X utf8 tools/test-hq-sdr-fate.py
 
 检查包括：FP16 原始交换链读回标尺、与独立 sRGB EOTF 参考比较的灰阶、固定 PQ 灰块对周围亮度变化的稳定性、系统白位缺失回退、切换显示身份、手动覆盖与切回标准模式。每个像素检查的线性绝对容差为 0.002；标尺容差为 0.0001。测试不声称测量了显示器的实际发光亮度。
 
+## 静态 HDR 母版峰值与内容峰值
+
+```powershell
+python -X utf8 tools/test-hdr-static-metadata-fate.py
+```
+
+- 固定输入：`samples/hdr-static-metadata.json`，16 个不超过 97 nits 的 PQ 中性灰块，母版峰值 1000 nits、MaxCLL 97 nits。
+- 参考输出：`ref/hdr-static-metadata`；D3D11/Vulkan 六项逐字比较。实际像素另与 `color-map-reference.py` 的独立 float64 样条结果按预定 0.002 线性容差比较。
+- 对照保持 80 nits FP16/scRGB 输出、关闭峰值检测、对比恢复为零；只改变交给映射器的源峰值边界，区分母版能力与内容范围。固定媒体文件的 SHA 在两种映射之间保持不变。
+- 结果写入 `tmp/modernization/hdr-static-metadata-fate/`。本测试验证峰值选择影响及数学实现，不修改日常配置，不证明所有片源的 MaxCLL 都可信，也不替代面板测量。
+- 依赖与上面的 HQ SDR 回归相同；可用 `PYTHONPATH` 指向本地隔离 Frida 目录。
+
+## HQ MaxCLL 自动选择
+
+```powershell
+python -X utf8 tools/test-hdr-content-peak-fate.py
+```
+
+- 输入：`samples/hdr-content-peak.json` 和 `test-hdr-content-peak-lifecycle.lua` 中的固定事件。使用带真实母版/MaxCLL SEI 的无损 HEVC；解码整数平面与固定原始输入逐字节比较。
+- 参考：`ref/hdr-content-peak-policy` 六项生命周期和 `ref/hdr-content-peak` 配置读取及双后端九项；实际像素与独立 float64 样条参考按预定 0.002 容差比较。
+- 覆盖同文件 MaxCLL 更新及免重复改链、换片 97→400→缺失回退、原母版参数保留、标准/HQ 往返、其他滤镜保留、手动接管、显式恢复、更新失败撤销旧边界，以及动态 HDR/HLG/SDR/HDR 输出不覆盖。
+- 实际结果：`tmp/modernization/hdr-content-peak-fate/`。只启动隔离配置的测试进程，不写个人偏好或系统显示设置。
+
 ## 通用过载追赶
 
 ```powershell
