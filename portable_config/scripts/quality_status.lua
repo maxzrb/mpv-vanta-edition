@@ -132,6 +132,14 @@ local function show_color_status()
     end
     table.insert(lines, '解码源：' .. describe(mp.get_property_native('video-dec-params')))
     table.insert(lines, '有效输入：' .. describe(mp.get_property_native('video-params')))
+    local decode = mp.get_property_native('user-data/decode-performance', {}) or {}
+    table.insert(lines, '过载追赶：' .. (decode['catchup-enabled'] and '开启' or '关闭')
+        .. ' / ' .. tostring(decode['catchup-state'] or '完整解码'))
+    if decode['catchup-reason'] then table.insert(lines, '追赶状态：' .. decode['catchup-reason']) end
+    if decode['catchup-enabled'] then
+        table.insert(lines, ('追赶模式切换：%d 次 / 模式内重新同步：%d 次')
+            :format(decode['catchup-switches'] or 0, decode['catchup-resyncs'] or 0))
+    end
     table.insert(lines, '滤镜输出：' .. describe(mp.get_property_native('video-out-params')))
     table.insert(lines, '解码与滤镜交接：' .. (precision_loaded and precision.handoff(
         mp.get_property('hwdec-current','no'),mp.get_property_native('video-out-params'),filters) or '未知'))

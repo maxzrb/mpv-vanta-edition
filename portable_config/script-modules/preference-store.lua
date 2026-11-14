@@ -21,7 +21,7 @@ local sync = {audio = true, ['display-resample'] = true, ['display-tempo'] = tru
 function M.valid(name, value)
     if name == 'hwdec' then return type(value) == 'string' and hardware[value] == true end
     if name == 'video-sync' then return type(value) == 'string' and sync[value] == true end
-    if name == 'hr-seek-framedrop' or name == 'd3d11va-zero-copy' then return type(value) == 'boolean' end
+    if name == 'hr-seek-framedrop' or name == 'd3d11va-zero-copy' or name == 'overload-catchup' then return type(value) == 'boolean' end
     return false
 end
 
@@ -60,6 +60,8 @@ function M.restore(name)
     local value = data[name]
     if value == nil then return end
     if not M.valid(name, value) then return nil, '忽略无效播放偏好：' .. name end
+    -- 过载开关属于脚本策略，没有同名核心选项；临时解码模式不保存。
+    if name == 'overload-catchup' then return value end
     -- 命令行与文件专用配置优先；一次性的启动参数不改写已保存的用户选择。
     if mp.get_property_bool('option-info/' .. name .. '/set-from-commandline', false)
         or mp.get_property_bool('option-info/' .. name .. '/set-locally', false) then return end

@@ -1,0 +1,16 @@
+{
+  "video": {"width": 320, "height": 180, "fps": 24, "seconds": 8, "gop": 24},
+  "policy": {"enter_lag": 0.35, "enter_hold": 1.5, "leave_lag": 0.06, "leave_hold": 8, "minimum": 12, "retry": 30, "settle": 2},
+  "playback_sensors": {"normal": {"lag": 0.01, "dropped": 0, "fps": 24}, "late": {"lag": 1, "dropped": 0, "fps": 24}, "drop_delta": 6},
+  "cases": [
+    {"name": "transient-and-negative-lag", "samples": [[2.1, 0.7], [3, 0.01], [6, -1], [9, 0.5], [10, 0]]},
+    {"name": "enter-recover-backoff", "options": {"recover": true}, "samples": [[2.1, 0.5], [3.7, 0.5], [6, 0], [20, 0], [34, 0], [36.1, 1], [37.7, 1], [40, 0], [71, 0], [98, 0]]},
+    {"name": "pause-seek-cache-guards", "samples": [[2.1, 1], [3.7, 1, true], [6, 1], [7.6, 1, true], [10, 1], [11.6, 1, true], [14, 1], [15.6, 1]]},
+    {"name": "busy-and-missing-lag", "samples": [[2.1, 1, false, true], [4, null], [6.1, 1], [7.7, 1]]},
+    {"name": "reference-stays-until-file-reset", "samples": [[2.1, 0.5], [3.7, 0.5], [6, 0], [34, 0], [98, 0], [500, 0]]},
+    {"name": "small-lag-sustained-drops", "samples": [[2.1, 0.01, false, false, 0], [4.2, 0.01, false, false, 6], [5.8, 0.01, false, false, 12]]},
+    {"name": "single-drop-window-not-sustained", "samples": [[2.1, 0.01, false, false, 0], [4.2, 0.01, false, false, 6], [5.8, 0.01, false, false, 6], [6.3, 0.01, false, false, 6], [10, 0.01, false, false, 0]]},
+    {"name": "drop-guard-clears-pressure", "samples": [[2.1, 0.01, false, false, 0], [4.2, 0.01, false, false, 6], [5.8, 0.01, true, false, 12], [8, 0.01, false, false, 12], [10.1, 0.01, false, false, 12]]},
+    {"name": "reference-repeat-sync-rate-limit", "samples": [[2.1, 1], [3.7, 1], [6, 1], [14, 1], [17, 1], [19, 1], [25, 1], [30, 1, true], [33, 1], [35, 1], [46, 1], [50, 0], [70, 1], [73, 1], [87, 1], [130, 1], [148, 1]]}
+  ]
+}

@@ -1,0 +1,9 @@
+transient-and-negative-lag none
+enter-recover-backoff 3.7:reference,34:full,37.7:reference,98:full
+pause-seek-cache-guards 15.6:reference
+busy-and-missing-lag 7.7:reference
+reference-stays-until-file-reset 3.7:reference
+small-lag-sustained-drops 5.8:reference
+single-drop-window-not-sustained none
+drop-guard-clears-pressure none
+reference-repeat-sync-rate-limit 3.7:reference,14:resync,25:resync,46:resync,87:resync,148:resync

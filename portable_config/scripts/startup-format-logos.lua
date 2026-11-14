@@ -402,6 +402,16 @@ local function has_real_video_track()
         and track.albumart ~= true
 end
 
+local function output_rebuilding()
+    return mp.get_property_bool('user-data/color-output-rebuilding', false)
+        or mp.get_property_bool('user-data/decode-performance/reload-active', false)
+end
+
+local function capture_ready()
+    return state.frame_presented and not output_rebuilding() and has_real_video_track()
+        and mp.get_property_native('video-params') ~= nil
+end
+
 
 local function append_context(parts, value)
     if type(value) == 'string' or type(value) == 'number' then
@@ -1250,6 +1260,7 @@ local function start_yaozhi_bar_followup(file_generation)
             or remaining <= 0 then
             return
         end
+        if not capture_ready() then schedule('bar-followup', interval, request_sample);return end
         remaining = remaining - 1
         local ok, request = pcall(mp.command_native_async, {
             name = 'screenshot-raw', flags = 'video', format = 'bgr0',
@@ -1337,6 +1348,7 @@ local function start_ambiguous_bar_followup(file_generation)
             or state.badge_displayed then
             return
         end
+        if not capture_ready() then schedule('bar-followup', interval, request_sample);return end
         if remaining <= 0 then
             fallback_show()
             return
@@ -1530,7 +1542,7 @@ end
 -- 确认窗仍无黑边才确认右上角；全部不可信则回退常规复检。
 local function start_bar_lookahead(file_generation)
     -- 首帧前不启动额外解码；先让主播放器完成起播与软硬解选择。
-    if not state.frame_presented then return false end
+    if not capture_ready() then return false end
     -- 后瞻仅两种后瞻模式启用；杳知视觉方案与不检测模式不依赖 ffmpeg
     if o.mode ~= 'current' and o.mode ~= 'parallel' then return false end
     local offsets = random_lookahead_offsets(
@@ -1944,7 +1956,7 @@ local function prepare_display_after_frame(reason)
         local function request_sample(index)
             if completed or file_generation ~= state.file_generation or not state.loaded then return end
             -- 几何就绪可能早于首帧；先等待可截图画面，避免无效的高分辨率读回。
-            if not state.frame_presented then
+            if not capture_ready() then
                 schedule('bar-detect-sample', sample_interval, function()
                     request_sample(index)
                 end)
@@ -2015,6 +2027,9 @@ end
 
 
 local function on_video_geometry_ready()
+    if not has_real_video_track() or not mp.get_property_native('video-params') then
+        state.frame_presented = false
+    end
     -- 在视频输出已配置时开始准备，保留当前模式的黑边确认与位置冻结规则。
     -- 同尺寸切集没有重配事件时，playback-restart 继续作为回退。
     if state.loaded and state.waiting_for_frame and not state.frame_ready
@@ -2239,6 +2254,15 @@ end
 mp.register_event('file-loaded', on_file_loaded)
 mp.register_event('playback-restart', on_playback_restart)
 mp.register_event('video-reconfig', on_video_geometry_ready)
+-- 重建开始后取消尚未执行的截图；所有重试都等待新帧，不与撤轨／输出切换争用。
+local function cancel_rebuild_capture()
+    if output_rebuilding() and state.bar_request then
+        pcall(mp.abort_async_command, state.bar_request)
+        state.bar_request = nil
+    end
+end
+mp.observe_property('user-data/color-output-rebuilding', 'bool', cancel_rebuild_capture)
+mp.observe_property('user-data/decode-performance/reload-active', 'bool', cancel_rebuild_capture)
 mp.add_hook('on_unload', 0, function()
     state.loaded = false
     cancel_lookahead_requests()

@@ -55,6 +55,15 @@ if (Test-Path $assetsPath) { Remove-Item -Recurse -Force $assetsPath }
     if (Test-Path $vantaMarker) { Remove-Item -Force $vantaMarker }
 
 # 项目说明文件：显式目标路径复制（README.MD 必须随 04 包分发）
+# 配置包的菜单依赖这两个小型维护入口；单独更新 04 时也必须同步携带。
+$installerDest = Join-Path $Stage 'installer'
+$null = New-Item -ItemType Directory -Force -Path $installerDest
+foreach ($file in @('clear-shader-cache.ps1', 'mpv-清理着色器缓存.cmd')) {
+    $src = Join-Path (Join-Path $Root 'installer') $file
+    if (-not (Test-Path -LiteralPath $src -PathType Leaf)) { throw "缺少缓存维护入口：$file" }
+    Copy-Item -LiteralPath $src -Destination (Join-Path $installerDest $file)
+}
+
 foreach ($file in @('README.MD', '.gitignore')) {
     $src = Join-Path $Root $file
     if (Test-Path -LiteralPath $src) {

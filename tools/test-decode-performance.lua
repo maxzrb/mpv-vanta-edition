@@ -37,7 +37,12 @@ function mp.register_script_message(name, callback) messages[name] = callback en
 function mp.add_key_binding(_, _, callback) events.toggle = callback end
 function mp.command_native(command) commands[#commands + 1] = Copy(command) end
 function mp.add_timeout(_, callback) events.timeout = callback end
-function mp.find_config_file() return 'tools/test-preference-store-stub.lua' end
+function mp.find_config_file(name)
+    if name == 'script-modules/overload-policy.lua' then return 'portable_config/' .. name end
+    return 'tools/test-preference-store-stub.lua'
+end
+function mp.get_time() return 0 end
+function mp.add_periodic_timer() return {kill = function() end} end
 function mp.osd_message() end
 package.loaded.mp = mp
 package.loaded['mp.msg'] = {info = function() end, warn = function() end, error = function(e) error(e) end}

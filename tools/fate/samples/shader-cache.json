@@ -1,0 +1,18 @@
+{
+  "files": {
+    "config/mpv.conf": "gpu-shader-cache-dir=~~/cache/shaders_cache\n",
+    "config/cache/shaders_cache/shader_a": "compiled-a\n",
+    "config/cache/shaders_cache/nested/shader_b": "compiled-b\n",
+    "config/cache/icc_cache/icc-sentinel": "keep-icc\n",
+    "config/shaders/source.glsl": "//!HOOK MAIN\n",
+    "config/files/playback-preferences.json": "{\"overload-catchup\":true}\n",
+    "config/files/mpvHistory.log": "keep-history\n",
+    "config/cache/watch_later/sentinel": "keep-resume\n",
+    "local/AMD/VkCache/012ABC.parc": "driver-a\n",
+    "local/AMD/VkCache/012ABC_1.parc": "driver-b\n",
+    "local/AMD/VkCache/notes.txt": "keep-driver-notes\n",
+    "local/AMD/DxCache/sentinel": "keep-d3d\n"
+  },
+  "mpv_count": 2,
+  "amd_count": 4
+}

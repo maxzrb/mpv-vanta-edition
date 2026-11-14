@@ -12,7 +12,7 @@ OUT = Path(tempfile.mkdtemp(prefix='playback-preferences-', dir=ROOT/'tmp'))
 CONFIG = OUT/'config'
 for name in ('scripts', 'script-modules', 'script-opts'):
     (CONFIG/name).mkdir(parents=True)
-for name in ('safe-file.lua', 'preference-store.lua', 'load-config-scripts.lua'):
+for name in ('safe-file.lua', 'preference-store.lua', 'overload-policy.lua', 'load-config-scripts.lua'):
     shutil.copy2(ROOT/'portable_config/script-modules'/name, CONFIG/'script-modules'/name)
 for name in ('decode-performance.lua', 'playback-preferences.lua', 'persist_properties.lua', 'hwdec-select.lua', 'dyn_menu.lua'):
     shutil.copy2(ROOT/'portable_config/scripts'/name, CONFIG/'scripts'/name)

@@ -15,6 +15,12 @@ local playback_retry
 local mode, requested, reason, status_text = '配置目标','auto','','可用'
 local manual, writing, generation, timer = false,false,0,nil
 local stopping = false
+local output_rebuilding = false
+local function OutputRebuilding(active)
+    if output_rebuilding == active then return end
+    output_rebuilding = active
+    mp.set_property_native('user-data/color-output-rebuilding', active)
+end
 local Select, Publish
 local preferences, legacy_peak_display = {},nil
 local preference_path=mp.command_native({'expand-path','~~/files/color-target-preferences.json'})
@@ -206,10 +212,11 @@ local function Update(values)
     local suspend=rebuild and vid and vid~='no' and mp.get_property_native('video-params')
     if suspend and mp.get_property_native('seekable')==false then return false,'不可定位流无法安全重建输出；保留当前有效目标' end
     if suspend then
+        OutputRebuilding(true)
         local ok,err=Write('pause',true)
-        if not ok then return false,'保留暂停状态失败：'..tostring(err) end
+        if not ok then OutputRebuilding(false);return false,'保留暂停状态失败：'..tostring(err) end
         ok,err=Write('vid','no')
-        if not ok then Write('pause',paused);return false,'暂存视频轨失败：'..tostring(err) end
+        if not ok then OutputRebuilding(false);Write('pause',paused);return false,'暂存视频轨失败：'..tostring(err) end
     end
     local applied,errors={},{}
     local paired=changes['d3d11-output-format']~=nil and changes['d3d11-output-csp']~=nil
@@ -647,7 +654,8 @@ mp.observe_property('video-target-params','native',function(_,value)
     last_target_params=value
     Publish()
 end)
-mp.register_event('start-file',function() Cancel();playback_retry=nil end)
+mp.register_event('playback-restart',function() OutputRebuilding(false) end)
+mp.register_event('start-file',function() OutputRebuilding(false);Cancel();playback_retry=nil end)
 mp.register_event('file-loaded',function()
     if not manual and requested=='auto' then Select('auto','internal')
     elseif requested=='hdr' and mode=='准备 HDR 输出' then
@@ -655,10 +663,12 @@ mp.register_event('file-loaded',function()
     else Publish() end
 end)
 mp.register_event('end-file',function(event)
+    OutputRebuilding(false)
     if event.reason=='quit' then stopping=true end
     Cancel()
 end)
 mp.register_event('shutdown',function()
+    OutputRebuilding(false)
     stopping=true
     Cancel()
     -- 渲染选项属于当前进程，退出时无需恢复；写回输出格式会重新创建已经关闭的窗口。

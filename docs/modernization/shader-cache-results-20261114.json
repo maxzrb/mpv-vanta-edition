@@ -1,0 +1,111 @@
+{
+  "checked_at": "2026-11-14T13:52:53+08:00",
+  "passed": true,
+  "core_modified": false,
+  "automatic_clear_on_start": false,
+  "manual_modes": [
+    "mpv",
+    "amd-vulkan"
+  ],
+  "activation": "菜单安排独立任务，等待全部标准mpv/mpvnet及明确父进程退出后执行；重新枚举退出时写入的缓存",
+  "backup": "根backup/shader-cache/时间-编号，manifest包含原路径/归档路径/SHA256及失败原因",
+  "protected": [
+    "GLSL源文件",
+    "ICC缓存",
+    "播放历史",
+    "播放进度",
+    "个人偏好",
+    "非parc驱动文件"
+  ],
+  "boundaries": [
+    "规范化绝对路径，仅config/cache/shaders_cache及子树",
+    "根或祖先重解析点拒绝，子项重解析点跳过",
+    "AMD仅LOCALAPPDATA/AMD/VkCache根的十六进制编号parc",
+    "占用文件跳过并报告partial，无递归删除"
+  ],
+  "tests": {
+    "fate_lines": [
+      "mpv-cache-only-preserves-source-history-icc-driver PASS",
+      "amd-vulkan-archives-only-parc-and-mpv-cache PASS",
+      "outside-cache-root-rejected PASS",
+      "reparse-root-rejected-and-child-skipped PASS",
+      "locked-file-partial-result-and-retry PASS",
+      "inspect-does-not-write-state-or-cache PASS",
+      "real-mpv-menu-defers-until-all-instances-exit PASS",
+      "late-shutdown-cache-and-duplicate-request PASS",
+      "unicode-apostrophe-path-and-fallback-core PASS",
+      "gpu-cache-regenerates-after-cleanup-d3d11-vulkan PASS",
+      "package-01-04-private-maintenance-coverage PASS"
+    ],
+    "power_shell_5_1": true,
+    "real_cores": [
+      "mpv v0.42.0-19-ga61f6c3ab Copyright © 2000-2026 mpv/MPlayer/mplayer2 projects",
+      "mpv v0.41.0-1107-g36bf3d529 Copyright © 2000-2026 mpv/MPlayer/mplayer2 projects"
+    ],
+    "real_mpv_multi_instance_deferral": true,
+    "unicode_quote_paths": true,
+    "legacy_core_without_optional_module": true,
+    "d3d11_vulkan_real_regeneration": true,
+    "package_04_actual_copy_fragment": true,
+    "package_01_installer_recursive": true,
+    "private_01_04_union_rule": true,
+    "lua_syntax_files": 141,
+    "python_ast": true,
+    "color_and_decode_unit": true,
+    "utf8_lf_diff": true,
+    "playback_preferences_nine_groups": true
+  },
+  "actual_result": {
+    "passed": true,
+    "task": "C:\\Program portable\\mpv2\\tmp\\modernization\\shader-cache-fate\\run-bn5i3evb",
+    "lines": [
+      "mpv-cache-only-preserves-source-history-icc-driver PASS",
+      "amd-vulkan-archives-only-parc-and-mpv-cache PASS",
+      "outside-cache-root-rejected PASS",
+      "reparse-root-rejected-and-child-skipped PASS",
+      "locked-file-partial-result-and-retry PASS",
+      "inspect-does-not-write-state-or-cache PASS",
+      "real-mpv-menu-defers-until-all-instances-exit PASS",
+      "late-shutdown-cache-and-duplicate-request PASS",
+      "unicode-apostrophe-path-and-fallback-core PASS",
+      "gpu-cache-regenerates-after-cleanup-d3d11-vulkan PASS",
+      "package-01-04-private-maintenance-coverage PASS"
+    ]
+  },
+  "logs": [
+    "backup\\shader-cache-maintenance-20261114\\shader-cache-menu.log",
+    "backup\\shader-cache-maintenance-20261114\\shader-cache-old-core.log",
+    "backup\\shader-cache-maintenance-20261114\\shader-cache-other.log",
+    "backup\\shader-cache-maintenance-20261114\\shader-cache-regenerate-d3d11-0.log",
+    "backup\\shader-cache-maintenance-20261114\\shader-cache-regenerate-d3d11-1.log",
+    "backup\\shader-cache-maintenance-20261114\\shader-cache-regenerate-vulkan-0.log",
+    "backup\\shader-cache-maintenance-20261114\\shader-cache-regenerate-vulkan-1.log"
+  ],
+  "source_sha256": {
+    "installer/clear-shader-cache.ps1": "1d5b3b7b33d060d0c80f4d19f5a0381ccce440dd700f1311a706bd133bb7815b",
+    "installer/mpv-清理着色器缓存.cmd": "3fb53f4f833b5b72129012710696a34ac90b3e34ac225aec7c6c36564d0ed5d6",
+    "portable_config/scripts/shader-cache.lua": "1a6cfec843c609f8d3d9472195080af2eaa6ead7c50cd7e2dc99b8f02f08b633",
+    "portable_config/input.conf": "7f5285518b687ce65daf94c91b481152f4675fa1bf27747a62d861ba1ec6988c",
+    "build-04-config.ps1": "3e256d993f4e588715deff3a46f9b0c31df5c15c49ab1ab93920be813bf6b905",
+    "tools/test-shader-cache-fate.py": "42de99c9dcddd867691da1707c64d14bc7579e30e4184a6014a04a473d00ce20",
+    "tools/fate/samples/shader-cache.json": "0fc633f99d523460f0a5246fc04f34779f552c4fdfa10fb4a9b472adf9b9c8c7",
+    "tools/fate/ref/shader-cache": "32cfe0b4b49a210de36002781d3c33f7c6bdbfb48158541fc5e0f2f8209423f1"
+  },
+  "real_user_driver_cache_cleared": false,
+  "user_preferences_unchanged": true,
+  "packaging": {
+    "01": "既有installer递归复制",
+    "04": "显式同步两个installer入口并检查缺失",
+    "private": "既有01/04合并继承",
+    "archives_created": false,
+    "published": false,
+    "future_release_gate_3_2": "04构建脚本变更，正式发布时需按流程评估；当前未执行发布"
+  },
+  "limits": [
+    "不自动检测黑帧或判断内容异常",
+    "不处理NVIDIA/Intel驱动缓存",
+    "外部自定义缓存路径明确拒绝",
+    "AMD驱动缓存为共享目录，选择该模式会影响其他应用的后续编译",
+    "未复现旧黑帧，不声称缓存能修复所有黑屏"
+  ]
+}

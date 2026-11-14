@@ -1,0 +1,12 @@
+d3d11 av1 reference-full-user-hwdec-file-restart PASS
+d3d11 h264 reference-full-user-hwdec-file-restart PASS
+d3d11 hevc reference-full-user-hwdec-file-restart PASS
+d3d11 vp9 reference-full-user-hwdec-file-restart PASS
+d3d11 user-interruption-override-video-only-quality PASS
+d3d11 sustained-drops-sticky-repeat-sync-no-decoder-reopen PASS
+vulkan av1 reference-full-user-hwdec-file-restart PASS
+vulkan h264 reference-full-user-hwdec-file-restart PASS
+vulkan hevc reference-full-user-hwdec-file-restart PASS
+vulkan vp9 reference-full-user-hwdec-file-restart PASS
+vulkan user-interruption-override-video-only-quality PASS
+vulkan sustained-drops-sticky-repeat-sync-no-decoder-reopen PASS
