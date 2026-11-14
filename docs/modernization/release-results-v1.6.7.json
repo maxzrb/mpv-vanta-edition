@@ -1,0 +1,114 @@
+{
+  "version": "1.6.7",
+  "checked_at": "2026-11-14 14:29 Asia/Shanghai",
+  "github": {
+    "tag": "v1.6.7",
+    "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.7",
+    "draft": false,
+    "prerelease": false,
+    "published_at": "2026-11-14T06:27:57Z",
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.7.7z",
+        "bytes": 137139794,
+        "sha256": "5c1055a427f427417fe29ab1af5dcd43ad87e5f46c9df0b0f139bcc28a28f917",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.7/01-mpv-base-v1.6.7.7z"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.7.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.7/02-mpv-extras-v1.6.7.7z.001"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.7.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.7/02-mpv-extras-v1.6.7.7z.002"
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.7.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.7/03-mpv-fasterwhisper-addon-v1.6.7.7z"
+      },
+      {
+        "name": "04-mpv-config-v1.6.7.7z",
+        "bytes": 5385115,
+        "sha256": "8f5b9920284cf71881c44f9b2def2e89c7db7ab16f19a0eaf2c5c41359d5f0c5",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.7/04-mpv-config-v1.6.7.7z"
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.14.exe",
+        "bytes": 69776451,
+        "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8",
+        "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/download/v1.6.7/VantaInstaller-win-x64-v0.3.14.exe"
+      }
+    ],
+    "size_sha_verified": true
+  },
+  "modelscope": {
+    "passed": true,
+    "dataset": "AerithDream/mpv-vanta-edition",
+    "revision": "master",
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.7.7z",
+        "anonymous_http": 206,
+        "bytes": 137139794,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.7%2F01-mpv-base-v1.6.7.7z"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.7.7z.001",
+        "anonymous_http": 206,
+        "bytes": 1992294400,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.7%2F02-mpv-extras-v1.6.7.7z.001"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.7.7z.002",
+        "anonymous_http": 206,
+        "bytes": 830172768,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.7%2F02-mpv-extras-v1.6.7.7z.002"
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.7.7z",
+        "anonymous_http": 206,
+        "bytes": 1476001942,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.7%2F03-mpv-fasterwhisper-addon-v1.6.7.7z"
+      },
+      {
+        "name": "04-mpv-config-v1.6.7.7z",
+        "anonymous_http": 206,
+        "bytes": 5385115,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.7%2F04-mpv-config-v1.6.7.7z"
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.14.exe",
+        "anonymous_http": 206,
+        "bytes": 69776451,
+        "url": "https://modelscope.cn/api/v1/datasets/AerithDream/mpv-vanta-edition/repo?Revision=master&FilePath=v1.6.7%2FVantaInstaller-win-x64-v0.3.14.exe"
+      }
+    ]
+  },
+  "tag_commit": "6e0dd87c76ebbc5c1d82c42c1928158daefabe49",
+  "public_asset_count": 6,
+  "private_uploaded": false,
+  "all_builds_and_validation_completed_before_upload": true,
+  "build_staging_archived": "backup/release-v1.6.7-20261114/build-staging",
+  "personal_preferences_restored_byte_identical": true,
+  "workflow_file_unchanged": true,
+  "github_actions_used": false,
+  "computer_use_used": false,
+  "release_notes": [
+    "[新增]通用软解过载追赶，可依据持续声画落后或持续掉帧省略部分非参考画面，并记忆功能开关",
+    "[更改]追赶模式默认保持到本片结束，持续落后时限频重新同步，协调硬解选择、画质重建和起播截图",
+    "[新增]着色器缓存维护菜单及installer离线入口，支持退出播放器后清理mpv缓存或额外重置AMD Vulkan驱动缓存",
+    "[更改]缓存清理保留备份与结果清单，保护源码和个人状态，两个维护入口同步随01与04分发"
+  ],
+  "private_asset": {
+    "name": "mpv-full-private-v1.6.7.7z",
+    "bytes": 3038059228,
+    "sha256": "744d2974bdf96d2ded5f8c9fe7b2966bb68302926c4afae449eefd110d3ec433"
+  },
+  "evidence": "backup/release-v1.6.7-20261114"
+}

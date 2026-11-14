@@ -107,5 +107,8 @@
     "外部自定义缓存路径明确拒绝",
     "AMD驱动缓存为共享目录，选择该模式会影响其他应用的后续编译",
     "未复现旧黑帧，不声称缓存能修复所有黑屏"
-  ]
+  ],
+  "published": true,
+  "released_version": "1.6.7",
+  "release_tag_commit": "6e0dd87c76ebbc5c1d82c42c1928158daefabe49"
 }

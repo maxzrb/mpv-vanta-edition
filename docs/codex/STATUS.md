@@ -1,5 +1,14 @@
 # STATUS.md — MPV 便携配置项目
 
+## 当前v1.6.7发布完成（2026-11-14 14:29，Asia/Shanghai）
+
+- GitHub正式Latest：https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.7；六项公开资产名称/数量/大小/SHA全部与本地一致，非草稿/非预发布，无私包或重复安装器。ModelScope v1.6.7/六项同步且匿名下载大小一致。
+- 本次发布通用软解过载追赶（持续落后或掉帧触发、本片保持、限频重新同步）和着色器缓存维护（菜单与installer离线入口，保护源码/历史/设置，AMD模式可选重置共享VkCache）。核心沿用已验收20261110，安装器0.3.14同SHA沿用。
+- 用户明确Z+1并放行门禁；流程和构建脚本除已审阅04 installer依赖复制外未改。01/04及同版私包重建，02/03核验后由1.6.6原样复用，包结构/顺序不变。
+- 全部归档完整性/公开门禁/版本/分卷/1429配置逐字节覆盖/私包（3038059228字节）并集和安装器/FW占位/SHA通过。实际公开包双后端HQ八项、六组实播、四类解码重载及过载/缓存FATE通过；实际私包默认启动通过；149 Lua语法与UTF-8/LF/diff通过。
+- 标签v1.6.7=`6e0dd87c76ebbc5c1d82c42c1928158daefabe49`，保持构建提交；结果收尾另行提交推送master。原v1.6.6标签不变。个人uosc/window/playback偏好逐字节恢复；原有架构/清理文档和.workbuddy-ai保持未夹带。
+- 私包release/mpv-full-private-v1.6.7.7z仅本地；build已归档backup/release-v1.6.7-20261114/build-staging，release保留公开/私包及校验单。报告docs/modernization/release-results-v1.6.7.json及build/playback/decoder同目录。
+
 ## 当前v1.6.7全部构建验收完成，待发布（2026-11-14 14:13，Asia/Shanghai）
 
 - 用户授权发布、Z+1且门禁通过；功能提交9e7d57f。01/04及同版私包重建，02/03按4.1.1核验后逐字节复用v1.6.6；包数量和覆盖顺序不变，流程原件未改。
@@ -4711,3 +4720,11 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - 5：全部归档、公开边界、版本/分卷、完整配置覆盖、私包并集/安装器/FW占位/SHA通过；实际公开包色彩/播放/解码/新功能与私包默认启动通过。
 - 1.6.7私包3038059228字节、SHA 744d2974bdf96d2ded5f8c9fe7b2966bb68302926c4afae449eefd110d3ec433，仅本地。02/03 source 1.6.6 unchanged；核心与安装器沿用。无Actions/computer-use。
 - 下一步仅在构建记录提交、标签/分支同步完成后上传；上传清单固定六项公开资产。
+
+## 2026-11-14 14:29 — v1.6.7发布完成，流程6～8收尾
+
+- 6：功能9e7d57f、构建记录6e0dd87已提交；v1.6.7标签指向6e0dd87c76ebbc5c1d82c42c1928158daefabe49，master/标签已推送并核对，旧v1.6.6标签未移动。无关架构/个人差异未提交。
+- 7：六项公开资产先上传草稿，名称/数量/大小/SHA通过后转正式Latest；非草稿/预发布、无重复或私包。Release Note仅四条本次功能，格式符合[新增]/[更改]。
+- 7.1：ModelScope AerithDream/mpv-vanta-edition的v1.6.7/六项同步，每项匿名HTTP 200/206且大小一致；上传白名单仅六项，历史版本未删除，无私包。
+- 8：build已按校验绝对路径移动至backup/release-v1.6.7-20261114/build-staging；release保留六项公开资产、私包及两类SHA清单。STATUS、中文进度/版本表和release-results-v1.6.7.json更新，准备提交结果收尾。
+- 个人关键帧、1600x900/remember_size=no及overload-catchup=true/hwdec=auto-safe逐字节恢复；无GitHub Actions/computer-use。

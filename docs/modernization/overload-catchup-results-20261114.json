@@ -2191,7 +2191,7 @@
     "https://github.com/FFmpeg/FFmpeg/blob/b2b543c07/libavcodec/libdav1d.c",
     "https://github.com/videolan/dav1d/blob/master/include/dav1d/dav1d.h"
   ],
-  "published": false,
+  "published": true,
   "coordination": {
     "color_output_rebuild_flag": true,
     "deferred_logo_capture_and_cancel": true,
@@ -2321,5 +2321,7 @@
       "source_log": "backup/overload-catchup-20261114/final-logs/overload-real-d3d11-True.log"
     }
   },
-  "release_audit_backoff_fix": "同步重试计数封顶4，实际达到60秒退避；固定样本验证130秒不触发、148秒触发"
+  "release_audit_backoff_fix": "同步重试计数封顶4，实际达到60秒退避；固定样本验证130秒不触发、148秒触发",
+  "released_version": "1.6.7",
+  "release_tag_commit": "6e0dd87c76ebbc5c1d82c42c1928158daefabe49"
 }
