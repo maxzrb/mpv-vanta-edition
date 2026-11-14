@@ -1,0 +1,128 @@
+{
+  "version": "1.6.7",
+  "passed": true,
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.7.7z",
+      "bytes": 137139870,
+      "sha256": "de2d9e6e0039962865506722ed0976c77f84e62686ad5fe355a6027164e6ca6c"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.7.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.7.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.7.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+    },
+    {
+      "name": "04-mpv-config-v1.6.7.7z",
+      "bytes": 5385052,
+      "sha256": "74a70828fd21e7ca8b089288c078ad2eee0f7f9b962254b591ccd5f9b13cbbf9"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+    }
+  ],
+  "private_asset": {
+    "name": "mpv-full-private-v1.6.7.7z",
+    "bytes": 3038136371,
+    "sha256": "d0beb141793f691507a0c6979af5fe8861738c7a6642820d9c693dad9a610722"
+  },
+  "archive_files": {
+    "01-mpv-base-v1.6.7.7z": 1327,
+    "02-mpv-extras-v1.6.7.7z.001": 10474,
+    "03-mpv-fasterwhisper-addon-v1.6.7.7z": 5122,
+    "04-mpv-config-v1.6.7.7z": 274,
+    "mpv-full-private-v1.6.7.7z": 11805
+  },
+  "covered_config_files": 1429,
+  "private_union": {
+    "merged_files": 11802,
+    "size_crc_union_identical": true,
+    "installer_sha_identical": true,
+    "placeholder_only": true,
+    "local_only": true,
+    "uploaded": false
+  },
+  "input_reuse": {
+    "extras": {
+      "files": 10473,
+      "bytes": 4603603173,
+      "latest_input_time": 1791366824.1750202,
+      "all_input_size_crc_identical": true,
+      "source_version": "1.6.6"
+    },
+    "fasterwhisper": {
+      "files": 5121,
+      "bytes": 4714825519,
+      "latest_input_time": 1744549392.576642,
+      "all_input_size_crc_identical": true,
+      "source_version": "1.6.6"
+    },
+    "assets": [
+      {
+        "source": "02-mpv-extras-v1.6.6.7z.001",
+        "name": "02-mpv-extras-v1.6.7.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+      },
+      {
+        "source": "02-mpv-extras-v1.6.6.7z.002",
+        "name": "02-mpv-extras-v1.6.7.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+      },
+      {
+        "source": "03-mpv-fasterwhisper-addon-v1.6.6.7z",
+        "name": "03-mpv-fasterwhisper-addon-v1.6.7.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+      }
+    ],
+    "internal_readme_versions": {
+      "extras": "1.6.0",
+      "fasterwhisper": "1.5.7"
+    }
+  },
+  "core_files_sha_identical": true,
+  "merged_root": "C:\\Program portable\\mpv2\\backup\\release-v1.6.7-defensive-replace-20261114\\merged",
+  "private_root": "C:\\Program portable\\mpv2\\backup\\release-v1.6.7-defensive-replace-20261114\\private-extracted",
+  "checked_at": "2026-11-14 20:28:12 +0800",
+  "replacement": {
+    "reason": "撤回未发布 Punch 路线；精简杜比视界映射状态提示，移除防御性后缀",
+    "source_commit": "16368dd",
+    "changed_public_assets": [
+      "01-mpv-base-v1.6.7.7z",
+      "04-mpv-config-v1.6.7.7z"
+    ],
+    "unchanged_public_assets": [
+      "02-mpv-extras-v1.6.7.7z.001",
+      "02-mpv-extras-v1.6.7.7z.002",
+      "03-mpv-fasterwhisper-addon-v1.6.7.7z",
+      "VantaInstaller-win-x64-v0.3.14.exe"
+    ],
+    "old_assets": {
+      "01-mpv-base-v1.6.7.7z": {
+        "bytes": 137139794,
+        "sha256": "5c1055a427f427417fe29ab1af5dcd43ad87e5f46c9df0b0f139bcc28a28f917"
+      },
+      "04-mpv-config-v1.6.7.7z": {
+        "bytes": 5385115,
+        "sha256": "8f5b9920284cf71881c44f9b2def2e89c7db7ab16f19a0eaf2c5c41359d5f0c5"
+      }
+    },
+    "tag_policy": "v1.6.7 tag remains at 6e0dd87c76ebbc5c1d82c42c1928158daefabe49; same-version asset replacement only",
+    "private_uploaded": false,
+    "remote_replace_pending": true
+  }
+}

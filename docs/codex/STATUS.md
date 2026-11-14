@@ -1,5 +1,15 @@
 # STATUS.md — MPV 便携配置项目
 
+## 当前v1.6.7同版本替换：本地构建验收完成，待上传（2026-11-14 20:36，Asia/Shanghai）
+
+- 用户指令：撤回未发布的 Punch 路线；将去除杜比视界防御性后缀的版本替换今天 v1.6.7 发布。目标仍为 v1.6.7，原标签 `6e0dd87c76ebbc5c1d82c42c1928158daefabe49` 不移动，仅覆盖 01/04 同名资产。
+- 功能提交 `16368dd`（`fix: trim DV mapping status text`）：OSD 只保留“杜比视界映射：动态/静态”，移除“当前未应用静态”“RPU 已关闭”等后缀；P5 静态不支持的真实功能提示保留。未发布 Punch 文件和入口已全部移除。
+- 3.1/3.2：master 与 origin/master 起始均为 3f6e44a；普通 Lua 文案/未发布菜单清理，不改核心、运行时、构建脚本、包边界、安装方式或版权范围，不触发 Gate；流程原件未改。
+- 3.4：149 Lua 语法、dv-map/input UTF-8 无 BOM/LF、`git diff --check` 通过；实际公开包双后端 HQ 八项、六组实播、四类解码生命周期、过载 FATE、缓存维护 FATE 和私包默认启动通过。
+- 4/5：01 `137139870` 字节/`de2d9e6e…e6ca6c`，04 `5385052` 字节/`74a70828…3cbbf9`，私包 `3038136371` 字节/`d0beb141…a610722`；02/03 与安装器0.3.14原样沿用。全部归档 7z t、公开边界、1429 配置逐字节覆盖、私包11802并集/CRC、安装器/FW占位/SHA通过；04 内无 Punch。
+- 报告：`docs/modernization/release-build-results-v1.6.7-defensive-20261114.json`；旧 01/04/私包及校验单硬链接留档 `backup/release-v1.6.7-defensive-replace-20261114/old-release`，个人偏好已逐字节恢复。
+- 6/7/7.1：尚未提交记录、推送 master、覆盖 GitHub 01/04 或同步 ModelScope；私包仅本地，不得上传。
+
 ## 当前v1.6.7发布完成（2026-11-14 14:29，Asia/Shanghai）
 
 - GitHub正式Latest：https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.7；六项公开资产名称/数量/大小/SHA全部与本地一致，非草稿/非预发布，无私包或重复安装器。ModelScope v1.6.7/六项同步且匿名下载大小一致。
