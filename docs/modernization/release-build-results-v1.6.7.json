@@ -1,0 +1,1143 @@
+{
+  "version": "1.6.7",
+  "passed": true,
+  "checked_at": "2026-11-14 14:13 Asia/Shanghai",
+  "gate_3_2": {
+    "user_decision": "门禁通过",
+    "scope": "04构建脚本显式同步两个installer缓存维护入口",
+    "flow_file_modified": false
+  },
+  "core": "shinchiro 20261110 / mpv v0.42.0-19-ga61f6c3ab / libplacebo v7.387.0 / FFmpeg b2b543c07; unchanged",
+  "installer": {
+    "name": "VantaInstaller-win-x64-v0.3.14.exe",
+    "reused": true,
+    "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8",
+    "prior_valid_start_exit": true
+  },
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.7.7z",
+      "bytes": 137139794,
+      "sha256": "5c1055a427f427417fe29ab1af5dcd43ad87e5f46c9df0b0f139bcc28a28f917"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.7.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.7.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.7.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+    },
+    {
+      "name": "04-mpv-config-v1.6.7.7z",
+      "bytes": 5385115,
+      "sha256": "8f5b9920284cf71881c44f9b2def2e89c7db7ab16f19a0eaf2c5c41359d5f0c5"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+    }
+  ],
+  "private_asset": {
+    "name": "mpv-full-private-v1.6.7.7z",
+    "bytes": 3038059228,
+    "sha256": "744d2974bdf96d2ded5f8c9fe7b2966bb68302926c4afae449eefd110d3ec433"
+  },
+  "archive_files": {
+    "01-mpv-base-v1.6.7.7z": 1327,
+    "02-mpv-extras-v1.6.7.7z.001": 10474,
+    "03-mpv-fasterwhisper-addon-v1.6.7.7z": 5122,
+    "04-mpv-config-v1.6.7.7z": 274,
+    "mpv-full-private-v1.6.7.7z": 11805
+  },
+  "covered_config_files": 1429,
+  "private_union": {
+    "merged_files": 11802,
+    "size_crc_union_identical": true,
+    "installer_sha_identical": true,
+    "placeholder_only": true,
+    "local_only": true,
+    "uploaded": false
+  },
+  "input_reuse": {
+    "extras": {
+      "files": 10473,
+      "bytes": 4603603173,
+      "latest_input_time": 1791366824.1750202,
+      "all_input_size_crc_identical": true,
+      "source_version": "1.6.6"
+    },
+    "fasterwhisper": {
+      "files": 5121,
+      "bytes": 4714825519,
+      "latest_input_time": 1744549392.576642,
+      "all_input_size_crc_identical": true,
+      "source_version": "1.6.6"
+    },
+    "assets": [
+      {
+        "source": "02-mpv-extras-v1.6.6.7z.001",
+        "name": "02-mpv-extras-v1.6.7.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+      },
+      {
+        "source": "02-mpv-extras-v1.6.6.7z.002",
+        "name": "02-mpv-extras-v1.6.7.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+      },
+      {
+        "source": "03-mpv-fasterwhisper-addon-v1.6.6.7z",
+        "name": "03-mpv-fasterwhisper-addon-v1.6.7.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+      }
+    ],
+    "internal_readme_versions": {
+      "extras": "1.6.0",
+      "fasterwhisper": "1.5.7"
+    }
+  },
+  "core_files_sha_identical": true,
+  "tests": {
+    "source_validation": {
+      "passed": true,
+      "checked_at": "2026-11-14T14:09:34+08:00",
+      "lua_files": 149,
+      "python_ast": true,
+      "policy_fate_reference": true,
+      "shader_cache_fate_11": true,
+      "overload_real_fate_24": true,
+      "color_state": true,
+      "hdr_lifecycle": true,
+      "decode_performance": true,
+      "feature_commit": "9e7d57f",
+      "computer_use": false,
+      "github_actions": false
+    },
+    "package_hq_fate": {
+      "passed": true,
+      "actual": "d3d11 sdr-gray-reference PASS\nd3d11 pq-surround-invariance PASS\nd3d11 system-white-or-fallback PASS\nd3d11 manual-override-and-restore PASS\nvulkan sdr-gray-reference PASS\nvulkan pq-surround-invariance PASS\nvulkan system-white-or-fallback PASS\nvulkan manual-override-and-restore PASS\n"
+    },
+    "playback": {
+      "path": "docs/modernization/release-playback-v1.6.7.json",
+      "passed": true
+    },
+    "decoder_lifecycle": {
+      "path": "docs/modernization/release-decoder-lifecycle-v1.6.7.json",
+      "passed": true
+    },
+    "overload_fixed_reference": {
+      "passed": true,
+      "rows": [
+        {
+          "codec": "av1",
+          "backend": "d3d11",
+          "passed": true,
+          "states": [
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 1,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true
+              }
+            },
+            {
+              "reference": false,
+              "position": 2.0,
+              "state": {
+                "catchup-state": "完整解码",
+                "catchup-switches": 2,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": false
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 3,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 5,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 6,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true
+              }
+            }
+          ],
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-fate-restart-d3d11-av1.log"
+        },
+        {
+          "codec": "h264",
+          "backend": "d3d11",
+          "passed": true,
+          "states": [
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "state": "标准解码",
+                "catchup-switches": 1,
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "reload-active": false,
+                "catchup-reason": "新文件",
+                "catchup-auto-recover": false,
+                "catchup-resyncs": 0
+              }
+            },
+            {
+              "reference": false,
+              "position": 2.0,
+              "state": {
+                "state": "标准解码",
+                "catchup-switches": 2,
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": false,
+                "catchup-state": "完整解码",
+                "reload-active": false,
+                "catchup-reason": "新文件",
+                "catchup-auto-recover": false,
+                "catchup-resyncs": 0
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "state": "标准解码",
+                "catchup-switches": 3,
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "reload-active": false,
+                "catchup-reason": "新文件",
+                "catchup-auto-recover": false,
+                "catchup-resyncs": 0
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "state": "标准解码",
+                "catchup-switches": 5,
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "reload-active": false,
+                "catchup-reason": "新文件",
+                "catchup-auto-recover": false,
+                "catchup-resyncs": 0
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "state": "标准解码",
+                "catchup-switches": 6,
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "reload-active": false,
+                "catchup-reason": "用户选择解码方式",
+                "catchup-auto-recover": false,
+                "catchup-resyncs": 0
+              }
+            }
+          ],
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-fate-restart-d3d11-h264.log"
+        },
+        {
+          "codec": "hevc",
+          "backend": "d3d11",
+          "passed": true,
+          "states": [
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "catchup-switches": 1,
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "state": "标准解码",
+                "catchup-resyncs": 0
+              }
+            },
+            {
+              "reference": false,
+              "position": 2.0,
+              "state": {
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "catchup-switches": 2,
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": false,
+                "catchup-state": "完整解码",
+                "state": "标准解码",
+                "catchup-resyncs": 0
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "catchup-switches": 3,
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "state": "标准解码",
+                "catchup-resyncs": 0
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "catchup-switches": 5,
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "state": "标准解码",
+                "catchup-resyncs": 0
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-auto-recover": false,
+                "catchup-reason": "用户选择解码方式",
+                "reload-active": false,
+                "catchup-switches": 6,
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "state": "标准解码",
+                "catchup-resyncs": 0
+              }
+            }
+          ],
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-fate-restart-d3d11-hevc.log"
+        },
+        {
+          "codec": "vp9",
+          "backend": "d3d11",
+          "passed": true,
+          "states": [
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 1
+              }
+            },
+            {
+              "reference": false,
+              "position": 2.0,
+              "state": {
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": false,
+                "catchup-state": "完整解码",
+                "catchup-switches": 2
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 3
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 5
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "用户选择解码方式",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 6
+              }
+            }
+          ],
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-fate-restart-d3d11-vp9.log"
+        },
+        {
+          "action": "off",
+          "backend": "d3d11",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-d3d11-off.log"
+        },
+        {
+          "action": "hardware",
+          "backend": "d3d11",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-d3d11-hardware.log"
+        },
+        {
+          "action": "stop",
+          "backend": "d3d11",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-d3d11-stop.log"
+        },
+        {
+          "action": "replace",
+          "backend": "d3d11",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-d3d11-replace.log"
+        },
+        {
+          "action": "explicit",
+          "backend": "d3d11",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-d3d11-explicit.log"
+        },
+        {
+          "action": "video-only",
+          "backend": "d3d11",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-d3d11-video-only.log"
+        },
+        {
+          "action": "quality",
+          "backend": "d3d11",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-d3d11-quality.log"
+        },
+        {
+          "backend": "d3d11",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-continuing-d3d11.log",
+          "repeated_resyncs": 2,
+          "decoder_opens_during_resync": 0
+        },
+        {
+          "codec": "av1",
+          "backend": "vulkan",
+          "passed": true,
+          "states": [
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 1,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码"
+              }
+            },
+            {
+              "reference": false,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": false,
+                "catchup-state": "完整解码",
+                "catchup-switches": 2,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码"
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 3,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码"
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 5,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码"
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 6,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码"
+              }
+            }
+          ],
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-fate-restart-vulkan-av1.log"
+        },
+        {
+          "codec": "h264",
+          "backend": "vulkan",
+          "passed": true,
+          "states": [
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 1,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true
+              }
+            },
+            {
+              "reference": false,
+              "position": 2.0,
+              "state": {
+                "catchup-state": "完整解码",
+                "catchup-switches": 2,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": false
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 3,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 5,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 6,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码",
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true
+              }
+            }
+          ],
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-fate-restart-vulkan-h264.log"
+        },
+        {
+          "codec": "hevc",
+          "backend": "vulkan",
+          "passed": true,
+          "states": [
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "state": "标准解码",
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 1,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "catchup-enabled": true
+              }
+            },
+            {
+              "reference": false,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "state": "标准解码",
+                "catchup-active": false,
+                "catchup-state": "完整解码",
+                "catchup-switches": 2,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "新文件",
+                "reload-active": false,
+                "catchup-enabled": true
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "state": "标准解码",
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 3,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "catchup-enabled": true
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "state": "标准解码",
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 5,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "catchup-enabled": true
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "state": "标准解码",
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 6,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "catchup-enabled": true
+              }
+            }
+          ],
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-fate-restart-vulkan-hevc.log"
+        },
+        {
+          "codec": "vp9",
+          "backend": "vulkan",
+          "passed": true,
+          "states": [
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 1,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码"
+              }
+            },
+            {
+              "reference": false,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": false,
+                "catchup-state": "完整解码",
+                "catchup-switches": 2,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码"
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 3,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码"
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 5,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码"
+              }
+            },
+            {
+              "reference": true,
+              "position": 2.0,
+              "state": {
+                "hwdec-policy": "no",
+                "catchup-enabled": true,
+                "catchup-active": true,
+                "catchup-state": "参考帧追赶",
+                "catchup-switches": 6,
+                "catchup-resyncs": 0,
+                "catchup-auto-recover": false,
+                "catchup-reason": "暂停／跳转／缓存期间不触发",
+                "reload-active": false,
+                "state": "标准解码"
+              }
+            }
+          ],
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-fate-restart-vulkan-vp9.log"
+        },
+        {
+          "action": "off",
+          "backend": "vulkan",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-vulkan-off.log"
+        },
+        {
+          "action": "hardware",
+          "backend": "vulkan",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-vulkan-hardware.log"
+        },
+        {
+          "action": "stop",
+          "backend": "vulkan",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-vulkan-stop.log"
+        },
+        {
+          "action": "replace",
+          "backend": "vulkan",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-vulkan-replace.log"
+        },
+        {
+          "action": "explicit",
+          "backend": "vulkan",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-vulkan-explicit.log"
+        },
+        {
+          "action": "video-only",
+          "backend": "vulkan",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-vulkan-video-only.log"
+        },
+        {
+          "action": "quality",
+          "backend": "vulkan",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-boundary-vulkan-quality.log"
+        },
+        {
+          "backend": "vulkan",
+          "passed": true,
+          "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\overload-continuing-vulkan.log",
+          "repeated_resyncs": 2,
+          "decoder_opens_during_resync": 0
+        }
+      ]
+    },
+    "shader_cache_fixed_reference": {
+      "passed": true,
+      "task": "C:\\Program portable\\mpv2\\tmp\\modernization\\shader-cache-fate\\run-d6me4x25",
+      "lines": [
+        "mpv-cache-only-preserves-source-history-icc-driver PASS",
+        "amd-vulkan-archives-only-parc-and-mpv-cache PASS",
+        "outside-cache-root-rejected PASS",
+        "reparse-root-rejected-and-child-skipped PASS",
+        "locked-file-partial-result-and-retry PASS",
+        "inspect-does-not-write-state-or-cache PASS",
+        "real-mpv-menu-defers-until-all-instances-exit PASS",
+        "late-shutdown-cache-and-duplicate-request PASS",
+        "unicode-apostrophe-path-and-fallback-core PASS",
+        "gpu-cache-regenerates-after-cleanup-d3d11-vulkan PASS",
+        "package-01-04-private-maintenance-coverage PASS"
+      ]
+    },
+    "private_default_startup": {
+      "passed": true,
+      "package_root": "C:\\Program portable\\mpv2\\backup\\release-v1.6.7-20261114\\private-extracted",
+      "color": {
+        "manual": false,
+        "display": "ASUS VG249Q1A",
+        "status": "可用",
+        "display_id": "260",
+        "hdr_active": false,
+        "hdr_supported": false,
+        "pipeline_name": "标准",
+        "reported_bits": "8",
+        "peak_source": "驱动／系统",
+        "reference_white": "auto",
+        "system_color": {
+          "window_id": 3412058,
+          "source": "DisplayConfig v2",
+          "identity": "00000000:0000daf7:260",
+          "advanced_active": true,
+          "sdr_white_nits": 80,
+          "target_id": 260,
+          "bits": 8,
+          "encoding": 0,
+          "mode": "wcg",
+          "system_icc": "C:\\WINDOWS\\system32\\spool\\drivers\\color\\sRGB Color Space Profile.icm",
+          "device": "\\\\.\\DISPLAY1"
+        },
+        "sdr_reference_source": "系统 SDR 参考白",
+        "display_color_owner": "继承的自动输出",
+        "peak": 270,
+        "external_overrides": [],
+        "restore_pending": [
+          "icc-profile",
+          "icc-profile-auto",
+          "icc-intent",
+          "target-prim",
+          "target-trc",
+          "target-gamut",
+          "target-peak",
+          "target-contrast",
+          "target-colorspace-hint",
+          "target-colorspace-hint-mode",
+          "target-colorspace-hint-strict",
+          "d3d11-output-format",
+          "d3d11-output-csp",
+          "hdr-reference-white",
+          "hdr-compute-peak",
+          "inverse-tone-mapping",
+          "hdr-contrast-recovery",
+          "treat-srgb-as-power22",
+          "dither-depth",
+          "libplacebo-opts"
+        ],
+        "actual_target": {
+          "min-luma": 0.08,
+          "max-luma": 80,
+          "max-cll": 0,
+          "max-fall": 0,
+          "w": 767,
+          "pixelformat": "rgb10a2",
+          "aspect": 1.779582,
+          "dw": 767,
+          "dh": 431,
+          "aspect-name": "16:9",
+          "par": "-nan(ind)",
+          "sar": 1.779582,
+          "sar-name": "16:9",
+          "colormatrix": "rgb",
+          "colorlevels": "full",
+          "primaries": "bt.709",
+          "sig-peak": 0.394089,
+          "light": "auto",
+          "chroma-location": "unknown",
+          "stereo-in": "mono",
+          "gamma": "bt.1886",
+          "rotate": 0,
+          "alpha": "premul",
+          "h": 431
+        },
+        "intermediate": "gpu-next 自动选择；实际纹理格式见日志",
+        "swapchain": "未知",
+        "mode": "standard",
+        "requested": "auto",
+        "reason": "",
+        "pipeline": "standard",
+        "actual_settings": {
+          "icc-profile": "",
+          "icc-profile-auto": false,
+          "icc-intent": 1,
+          "target-prim": "auto",
+          "target-trc": "auto",
+          "target-gamut": "auto",
+          "target-peak": "auto",
+          "target-contrast": "auto",
+          "target-colorspace-hint": "auto",
+          "target-colorspace-hint-mode": "target",
+          "target-colorspace-hint-strict": true,
+          "d3d11-output-format": "auto",
+          "d3d11-output-csp": "auto",
+          "hdr-reference-white": "auto",
+          "hdr-compute-peak": "auto",
+          "inverse-tone-mapping": false,
+          "hdr-contrast-recovery": 0.3,
+          "treat-srgb-as-power22": "auto",
+          "dither-depth": "auto",
+          "libplacebo-opts": {
+            "lut3d_size_I": "48",
+            "lut3d_size_C": "32",
+            "lut3d_size_h": "256"
+          }
+        },
+        "hdr_status": "unsupported"
+      },
+      "decode": {
+        "hwdec-policy": "auto-safe",
+        "catchup-enabled": false,
+        "catchup-active": false,
+        "catchup-state": "关闭",
+        "catchup-switches": 0,
+        "catchup-resyncs": 0,
+        "catchup-auto-recover": false,
+        "catchup-reason": "新文件",
+        "reload-active": false,
+        "state": "标准解码"
+      },
+      "playback": {
+        "samples": [
+          0.467,
+          0.733,
+          1.0
+        ],
+        "output": {
+          "pixelformat": "d3d11",
+          "hw-pixelformat": "p010",
+          "average-bpp": 24,
+          "w": 640,
+          "h": 360,
+          "dw": 640,
+          "dh": 360,
+          "crop-x": 0,
+          "crop-y": 0,
+          "crop-w": 640,
+          "crop-h": 360,
+          "aspect": 1.777778,
+          "aspect-name": "16:9",
+          "par": 1.0,
+          "sar": 1.777778,
+          "sar-name": "16:9",
+          "colormatrix": "bt.709",
+          "colorlevels": "limited",
+          "primaries": "bt.709",
+          "gamma": "bt.1886",
+          "sig-peak": 0.0,
+          "light": "display",
+          "chroma-location": "mpeg2/4/h264",
+          "stereo-in": "mono",
+          "rotate": 0,
+          "alpha": "none"
+        }
+      },
+      "log": "C:\\Program portable\\mpv2\\tmp\\modernization\\validation\\private-smoke-v1.6.7.log"
+    },
+    "installer": {
+      "pid": 18208,
+      "has_window": true,
+      "exited_early": false,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8",
+      "exit_code": 0,
+      "reused_validation_from": "v1.6.6 same day, identical installer SHA, no installer source changes"
+    }
+  },
+  "packaging": {
+    "public_count": 6,
+    "private_local_only": true,
+    "upload_started": false,
+    "workflow_file_unchanged": true,
+    "github_actions_used": false,
+    "computer_use_used": false
+  },
+  "evidence": "backup/release-v1.6.7-20261114"
+}
