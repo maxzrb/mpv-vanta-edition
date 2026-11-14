@@ -4746,3 +4746,4 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - GitHub v1.6.7仍为正式Latest，01/04已同名覆盖；六项名称/数量/大小/SHA一致，无重复或私包。Release Note追加“杜比视界映射状态提示精简为动态/静态，移除防御性后缀”。
 - ModelScope v1.6.7/01、04已替换，六项匿名HTTP 206及大小核验通过；私包仅本地，未上传。
 - 旧01/04/私包硬链接留档backup/release-v1.6.7-defensive-replace-20261114/old-release；个人偏好逐字节恢复，原有架构文档和.workbuddy-ai未夹带。报告release-build/release-results同名替换JSON。
+- 环境说明：实际包测试首次在GPU readback处发现临时Frida依赖目录缺失；随后用Python 3.12临时安装frida 17.26.3完成HQ FATE，未进入播放器、公开包或私包。后续维护测试仍应优先使用隔离依赖目录。
