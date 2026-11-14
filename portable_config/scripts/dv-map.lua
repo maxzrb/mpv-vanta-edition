@@ -110,13 +110,13 @@ local function Apply(mode, announce, save)
     Publish()
     if not announce then return end
     if HasStaticFilter() then
-        mp.osd_message('杜比视界映射：静态（忽略 RPU 动态亮度）', 3)
+        mp.osd_message('杜比视界映射：静态', 3)
     elseif mode == 'static' and not is_dv then
-        mp.osd_message('杜比视界映射：已设为静态；当前片源不是杜比视界', 4)
+        mp.osd_message('杜比视界映射：静态', 4)
     elseif mode == 'static' and profile == 5 then
         mp.osd_message('杜比视界 P5 不支持静态映射，保持动态', 4)
     else
-        mp.osd_message('杜比视界映射：动态（RPU）', 3)
+        mp.osd_message('杜比视界映射：动态', 3)
     end
 end
 
@@ -135,7 +135,7 @@ mp.register_event('file-loaded', function()
     mp.add_timeout(0.15, function()
         Apply(preference, false, false)
         if preference == 'static' then
-            local mode = HasStaticFilter() and '静态（RPU 已关闭）' or '动态（当前未应用静态）'
+            local mode = HasStaticFilter() and '静态' or '动态'
             mp.osd_message('杜比视界映射：' .. mode, 2)
         end
     end)
