@@ -1,0 +1,151 @@
+{
+  "version": "1.6.8",
+  "passed": true,
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.8.7z",
+      "bytes": 137141416,
+      "sha256": "3ff7df5f88049d64ccdf3f1d282bd20609eca73358bcad015689c4f0f83c8cc2"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.8.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.8.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.8.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+    },
+    {
+      "name": "04-mpv-config-v1.6.8.7z",
+      "bytes": 5386542,
+      "sha256": "1d591eeb7f7c24b059d96855731d5acf1a2f2c6667dee53279620c09d9cc2a79"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+    }
+  ],
+  "private_asset": {
+    "name": "mpv-full-private-v1.6.8.7z",
+    "bytes": 3038195672,
+    "sha256": "262d2e66edb3413c10ff1415fba0aae71e320ccb45ab6dafdfa1bbce6a408af7"
+  },
+  "archive_files": {
+    "01-mpv-base-v1.6.8.7z": 1329,
+    "02-mpv-extras-v1.6.8.7z.001": 10474,
+    "03-mpv-fasterwhisper-addon-v1.6.8.7z": 5122,
+    "04-mpv-config-v1.6.8.7z": 276,
+    "mpv-full-private-v1.6.8.7z": 11807
+  },
+  "covered_config_files": 1431,
+  "private_union": {
+    "merged_files": 11804,
+    "size_crc_union_identical": true,
+    "installer_sha_identical": true,
+    "placeholder_only": true,
+    "local_only": true,
+    "uploaded": false
+  },
+  "input_reuse": {
+    "extras": {
+      "files": 10473,
+      "bytes": 4603603173,
+      "latest_input_time": 1791366824.1750202,
+      "all_input_size_crc_identical": true,
+      "source_version": "1.6.7"
+    },
+    "fasterwhisper": {
+      "files": 5121,
+      "bytes": 4714825519,
+      "latest_input_time": 1744549392.576642,
+      "all_input_size_crc_identical": true,
+      "source_version": "1.6.7"
+    },
+    "assets": [
+      {
+        "source": "02-mpv-extras-v1.6.7.7z.001",
+        "name": "02-mpv-extras-v1.6.8.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+      },
+      {
+        "source": "02-mpv-extras-v1.6.7.7z.002",
+        "name": "02-mpv-extras-v1.6.8.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+      },
+      {
+        "source": "03-mpv-fasterwhisper-addon-v1.6.7.7z",
+        "name": "03-mpv-fasterwhisper-addon-v1.6.8.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+      }
+    ],
+    "internal_readme_versions": {
+      "extras": "1.6.0",
+      "fasterwhisper": "1.5.7"
+    }
+  },
+  "core_files_sha_identical": true,
+  "merged_root": "C:\\Program portable\\mpv2\\backup\\release-v1.6.8-20261115\\merged",
+  "private_root": "C:\\Program portable\\mpv2\\backup\\release-v1.6.8-20261115\\private-extracted",
+  "checked_at": "2026-11-15 00:30 Asia/Shanghai",
+  "functional_commit": "551fa2fb6abaef8e18397944f761849eaf1af2b9",
+  "validation": {
+    "packaged_lua_syntax_files": 150,
+    "maxcll_fate": {
+      "cases": 15,
+      "passed": true,
+      "max_linear_error": 0.0005888298535475789
+    },
+    "hq_fate": {
+      "cases": 8,
+      "passed": true
+    },
+    "real_playback": {
+      "cases": 6,
+      "passed": true
+    },
+    "private_startup": {
+      "passed": true,
+      "color_pipeline": "standard"
+    },
+    "personal_preferences_restored": true,
+    "installer": {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8",
+      "source_unchanged": true,
+      "prior_smoke": {
+        "pid": 18208,
+        "has_window": true,
+        "exited_early": false,
+        "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8",
+        "exit_code": 0,
+        "reused_validation_from": "v1.6.6 same day, identical installer SHA, no installer source changes"
+      },
+      "reuse_reason": "与已成功启动及正常退出验收的安装器逐字节同SHA，源码未改"
+    }
+  },
+  "packaging": {
+    "public_count": 6,
+    "private_local_only": true,
+    "upload_started": false,
+    "published": false,
+    "workflow_file_unchanged": true,
+    "build_scripts_unchanged": true,
+    "github_actions_used": false,
+    "computer_use_used": false,
+    "build_staging_archived": "C:\\Program portable\\mpv2\\backup\\release-v1.6.8-20261115\\build-staging"
+  },
+  "evidence": "C:\\Program portable\\mpv2\\backup\\release-v1.6.8-20261115",
+  "remaining": "用户要求暂不上传发布；未创建标签、推送、创建Release或上传镜像"
+}
