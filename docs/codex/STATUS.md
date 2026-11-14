@@ -1,14 +1,14 @@
 # STATUS.md — MPV 便携配置项目
 
-## 当前v1.6.7同版本替换：本地构建验收完成，待上传（2026-11-14 20:36，Asia/Shanghai）
+## 当前v1.6.7同版本替换完成（2026-11-14 20:44，Asia/Shanghai）
 
-- 用户指令：撤回未发布的 Punch 路线；将去除杜比视界防御性后缀的版本替换今天 v1.6.7 发布。目标仍为 v1.6.7，原标签 `6e0dd87c76ebbc5c1d82c42c1928158daefabe49` 不移动，仅覆盖 01/04 同名资产。
-- 功能提交 `16368dd`（`fix: trim DV mapping status text`）：OSD 只保留“杜比视界映射：动态/静态”，移除“当前未应用静态”“RPU 已关闭”等后缀；P5 静态不支持的真实功能提示保留。未发布 Punch 文件和入口已全部移除。
-- 3.1/3.2：master 与 origin/master 起始均为 3f6e44a；普通 Lua 文案/未发布菜单清理，不改核心、运行时、构建脚本、包边界、安装方式或版权范围，不触发 Gate；流程原件未改。
-- 3.4：149 Lua 语法、dv-map/input UTF-8 无 BOM/LF、`git diff --check` 通过；实际公开包双后端 HQ 八项、六组实播、四类解码生命周期、过载 FATE、缓存维护 FATE 和私包默认启动通过。
-- 4/5：01 `137139870` 字节/`de2d9e6e…e6ca6c`，04 `5385052` 字节/`74a70828…3cbbf9`，私包 `3038136371` 字节/`d0beb141…a610722`；02/03 与安装器0.3.14原样沿用。全部归档 7z t、公开边界、1429 配置逐字节覆盖、私包11802并集/CRC、安装器/FW占位/SHA通过；04 内无 Punch。
-- 报告：`docs/modernization/release-build-results-v1.6.7-defensive-20261114.json`；旧 01/04/私包及校验单硬链接留档 `backup/release-v1.6.7-defensive-replace-20261114/old-release`，个人偏好已逐字节恢复。
-- 6/7/7.1：尚未提交记录、推送 master、覆盖 GitHub 01/04 或同步 ModelScope；私包仅本地，不得上传。
+- 用户指令已完成：撤回未发布的 Punch 路线；去除杜比视界防御性后缀的版本已替换今天 v1.6.7 发布。标签 `6e0dd87c76ebbc5c1d82c42c1928158daefabe49` 保持不动，仅覆盖 01/04。
+- 功能提交 `16368dd`、构建记录提交 `7fc6482` 已推送 master；OSD 只保留“杜比视界映射：动态/静态”，移除“当前未应用静态”“RPU 已关闭”等后缀；P5 真实功能提示保留。
+- GitHub [v1.6.7](https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.7) 仍为正式 Latest/非草稿/非预发布；01/04 同名资产已覆盖，02/03/安装器0.3.14未变。远端六项名称/数量/字节/SHA与本地一致，无重复资产、无私包。
+- ModelScope `AerithDream/mpv-vanta-edition` 的 v1.6.7/01、04 已替换；六项匿名 HTTP 206 且大小逐项一致，历史版本未删除，私包未上传。
+- 本地 01 `137139870` 字节/`de2d9e6e…e6ca6c`，04 `5385052` 字节/`74a70828…3cbbf9`，私包 `3038136371` 字节/`d0beb141…a610722`，仅本地。149 Lua、UTF-8/LF/diff、全部归档、1429 配置覆盖、11802 私包并集、HQ/实播/解码/过载/缓存 FATE 和私包实启均通过。
+- 旧 01/04/私包及校验单硬链接留档 `backup/release-v1.6.7-defensive-replace-20261114/old-release`；个人 uosc/window/playback 偏好已逐字节恢复，架构文档与 .workbuddy-ai 未夹带。
+- 报告：`docs/modernization/release-build-results-v1.6.7-defensive-20261114.json`、`docs/modernization/release-results-v1.6.7-defensive-20261114.json`。
 
 ## 当前v1.6.7发布完成（2026-11-14 14:29，Asia/Shanghai）
 
@@ -4738,3 +4738,11 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - 7.1：ModelScope AerithDream/mpv-vanta-edition的v1.6.7/六项同步，每项匿名HTTP 200/206且大小一致；上传白名单仅六项，历史版本未删除，无私包。
 - 8：build已按校验绝对路径移动至backup/release-v1.6.7-20261114/build-staging；release保留六项公开资产、私包及两类SHA清单。STATUS、中文进度/版本表和release-results-v1.6.7.json更新，准备提交结果收尾。
 - 个人关键帧、1600x900/remember_size=no及overload-catchup=true/hwdec=auto-safe逐字节恢复；无GitHub Actions/computer-use。
+
+## 2026-11-14 20:44 — v1.6.7同版本替换发布完成
+
+- 用户要求撤回未发布 Punch 路线并替换今天发布；功能提交16368dd、构建记录7fc6482已推送master，v1.6.7标签未移动。
+- 01/04与同版私包重建，02/03/安装器0.3.14沿用；149 Lua、UTF-8/LF/diff、7z完整性、公开边界、1429配置逐字节覆盖、11802私包并集、HQ/实播/解码/过载/缓存FATE及私包实启通过。
+- GitHub v1.6.7仍为正式Latest，01/04已同名覆盖；六项名称/数量/大小/SHA一致，无重复或私包。Release Note追加“杜比视界映射状态提示精简为动态/静态，移除防御性后缀”。
+- ModelScope v1.6.7/01、04已替换，六项匿名HTTP 206及大小核验通过；私包仅本地，未上传。
+- 旧01/04/私包硬链接留档backup/release-v1.6.7-defensive-replace-20261114/old-release；个人偏好逐字节恢复，原有架构文档和.workbuddy-ai未夹带。报告release-build/release-results同名替换JSON。

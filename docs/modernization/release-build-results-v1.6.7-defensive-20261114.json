@@ -123,6 +123,7 @@
     },
     "tag_policy": "v1.6.7 tag remains at 6e0dd87c76ebbc5c1d82c42c1928158daefabe49; same-version asset replacement only",
     "private_uploaded": false,
-    "remote_replace_pending": true
+    "remote_replace_pending": false,
+    "release_results": "docs/modernization/release-results-v1.6.7-defensive-20261114.json"
   }
 }
