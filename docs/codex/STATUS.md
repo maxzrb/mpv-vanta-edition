@@ -1,15 +1,16 @@
 # STATUS.md — MPV 便携配置项目
 
-## 当前 v1.6.8 正式发布执行中（2026-11-15 14:45，Asia/Shanghai）
+## 当前 v1.6.8 已正式发布（2026-11-15 14:55，Asia/Shanghai）
 
 - 用户已明确授权按《发布流程.md》发布 Release。流程原件已再次完整阅读且不修改；本次仍为普通 HQ 静态 PQ→SDR MaxCLL 修复，核心、运行时、构建脚本、包结构、覆盖顺序和版权边界未变，3.2 大改动 Gate 不触发。
 - 3.1：`git fetch origin` 成功，`origin/master` 为 HEAD 的祖先；释放源为功能提交 `551fa2f` 和构建/校验记录提交 `e39c48d`，`master` 领先 `origin/master` 2 个提交。远端无 `v1.6.8` 标签或 Release，未发现上次中断产生的半完成发布。
 - 3.1 工作树中原有 `docs/项目架构.md`、个人 `uosc.conf`/`window_size_position.conf`、`$null`、`.workbuddy-ai/` 和 `docs/项目架构清理-20261102.md` 均属发布前已有用户本地差异；本轮保持逐字节不变、不提交、不进入包，发布标签从干净 HEAD 创建。
 - 3.3：`STATUS.md`、`version/工作进度.md`、`version/版本迭代记录.md` 和 README 已记录 1.6.8 功能、构建、SHA 与升级边界。3.4：实际公开包 MaxCLL 15 项、HQ 8 项、静态元数据 6 项、双后端六组实播、私包启动、150 份包内 Lua 语法、UTF-8/LF 和 `git diff --check` 均通过。
 - 4/4.1.1：01/04 与个人私包已构建；02 两卷/03 在完整输入集合、大小、CRC、时间、来源及新归档完整性核验后原样复用 v1.6.7，归档内 README 版本说明差异已记录。5：全部公开归档、版本标记、公开边界、1431 项配置覆盖、11804 项私包公开并集、安装器/FW 占位、分卷大小、实际包播放和 SHA 均通过。
-- 6～7：待创建 `v1.6.8` 标签、推送 master/tag，再以草稿上传六项公开资产并核对名称/数量/大小/SHA，全部一致后转正式 Latest。`mpv-full-private-v1.6.8.7z`、两份 SHA 清单及其他本地证据不进入 GitHub 公开 Release。
-- 7.1：GitHub 完成后同步 ModelScope `AerithDream/mpv-vanta-edition/v1.6.8/` 六项公开资产，匿名核验大小；若镜像故障则记录跳过原因。私包严禁上传 GitHub 或 ModelScope。
-- 8：发布后追加结果记录并收尾；`release/` 保留产物，根 `build/` 不重建、不残留。
+- 6：发布前记录提交 `41da4e0`；`v1.6.8` 标签和 master 已推送，二者均指向 `41da4e055bf34a3cc5bb2bd11cfde54e313f399f`，远端核验一致。
+- 7：GitHub [v1.6.8](https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.8) 于 `2026-11-15 14:49:12 Asia/Shanghai` 正式发布，`draft=false`、`prerelease=false` 且为仓库 Latest。草稿上传六项后备注明/数量/大小/SHA全部与本地一致，之后才切换正式状态；无重复资产或私包。
+- 7.1：ModelScope `AerithDream/mpv-vanta-edition/v1.6.8/` 六项公开资产已同步；六条匿名 Range 请求均 HTTP 206，`Content-Range` 总大小与本地一致，CDN `X-Linked-ETag` SHA-256 逐项一致。私包未上传 GitHub 或 ModelScope。
+- 8：结果已写入 `docs/modernization/release-results-v1.6.8.json`、版本记录和中文进度；即将提交推送结果记录。`release/` 保留全部本地产物与公开/私包 SHA 清单，根 `build/` 无残留；发布使用的临时干净工作树在收尾后移除。
 
 ## v1.6.8 全部本地构建验收完成（2026-11-15 00:30，Asia/Shanghai）
 

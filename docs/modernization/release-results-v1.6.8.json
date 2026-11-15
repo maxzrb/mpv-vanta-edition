@@ -1,0 +1,78 @@
+{
+  "version": "1.6.8",
+  "status": "released",
+  "released_at": "2026-11-15T06:49:12Z",
+  "released_at_local": "2026-11-15 14:49:12 Asia/Shanghai",
+  "tag": "v1.6.8",
+  "tag_commit": "41da4e055bf34a3cc5bb2bd11cfde54e313f399f",
+  "functional_commit": "551fa2fb6abaef8e18397944f761849eaf1af2b9",
+  "build_commit": "e39c48d1bd7f4cc95fae436ffc792f22cc257b1e",
+  "github_release": {
+    "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.8",
+    "draft": false,
+    "prerelease": false,
+    "latest": true,
+    "asset_count": 6,
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.8.7z",
+        "bytes": 137141416,
+        "sha256": "3ff7df5f88049d64ccdf3f1d282bd20609eca73358bcad015689c4f0f83c8cc2"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.8.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.8.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e7251558e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.8.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+      },
+      {
+        "name": "04-mpv-config-v1.6.8.7z",
+        "bytes": 5386542,
+        "sha256": "1d591eeb7f7c24b059d96855731d5acf1a2f2c6667dee53279620c09d9cc2a79"
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.14.exe",
+        "bytes": 69776451,
+        "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+      }
+    ]
+  },
+  "modelscope": {
+    "dataset": "AerithDream/mpv-vanta-edition",
+    "revision": "master",
+    "path": "v1.6.8/",
+    "asset_count": 6,
+    "anonymous_range_status": 206,
+    "all_sizes_verified": true,
+    "all_cdn_sha256_verified": true,
+    "historical_versions_preserved": true
+  },
+  "private_asset": {
+    "name": "mpv-full-private-v1.6.8.7z",
+    "bytes": 3038195672,
+    "local_only": true,
+    "uploaded_to_github": false,
+    "uploaded_to_modelscope": false
+  },
+  "release_note": [
+    "[更改]HQ静态PQ转SDR优先读取片源MaxCLL，并随元数据和换片更新映射边界，缺失或无效时保留原有母版信息",
+    "[新增]色彩状态显示实际采用的MaxCLL源峰值，保留原始母版记录及硬解",
+    "[更改]源峰值覆盖随标准/HQ及输出路线切换恢复，尊重用户滤镜接管，补齐独立参考和生命周期回归"
+  ],
+  "checks": {
+    "local_sha256_manifests_match": true,
+    "github_asset_names_sizes_and_sha256_match": true,
+    "github_private_package_absent": true,
+    "modelscope_private_package_absent": true,
+    "release_note_format_valid": true
+  }
+}
