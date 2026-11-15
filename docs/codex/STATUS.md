@@ -10,7 +10,7 @@
 - 6：发布前记录提交 `41da4e0`；`v1.6.8` 标签和 master 已推送，二者均指向 `41da4e055bf34a3cc5bb2bd11cfde54e313f399f`，远端核验一致。
 - 7：GitHub [v1.6.8](https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.8) 于 `2026-11-15 14:49:12 Asia/Shanghai` 正式发布，`draft=false`、`prerelease=false` 且为仓库 Latest。草稿上传六项后备注明/数量/大小/SHA全部与本地一致，之后才切换正式状态；无重复资产或私包。
 - 7.1：ModelScope `AerithDream/mpv-vanta-edition/v1.6.8/` 六项公开资产已同步；六条匿名 Range 请求均 HTTP 206，`Content-Range` 总大小与本地一致，CDN `X-Linked-ETag` SHA-256 逐项一致。私包未上传 GitHub 或 ModelScope。
-- 8：结果已写入 `docs/modernization/release-results-v1.6.8.json`、版本记录和中文进度；即将提交推送结果记录。`release/` 保留全部本地产物与公开/私包 SHA 清单，根 `build/` 无残留；发布使用的临时干净工作树在收尾后移除。
+- 8：结果已写入 `docs/modernization/release-results-v1.6.8.json`、版本记录和中文进度；结果记录提交 `b7b9f8a` 已推送，远端 master 同步。`release/` 保留全部本地产物与公开/私包 SHA 清单，根 `build/` 无残留；发布使用的临时干净工作树已移除。
 
 ## v1.6.8 全部本地构建验收完成（2026-11-15 00:30，Asia/Shanghai）
 
