@@ -1,0 +1,109 @@
+{
+  "version": "1.6.9",
+  "status": "released",
+  "released_at": "2026-11-18T16:21:40Z",
+  "released_at_local": "2026-11-19 00:21:40 Asia/Shanghai",
+  "tag": "v1.6.9",
+  "tag_commit": "0ef332ef1f99560085e05943f0c2b190f0466377",
+  "functional_commit": "908763a0663694b98237df604193c61b91b5b5ba",
+  "build_commit": "0ef332ef1f99560085e05943f0c2b190f0466377",
+  "github_release": {
+    "url": "https://github.com/maxzrb/mpv-vanta-edition/releases/tag/v1.6.9",
+    "draft": false,
+    "prerelease": false,
+    "latest": true,
+    "asset_count": 6,
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.9.7z",
+        "bytes": 137192168,
+        "sha256": "2eb4e1a7cea541afb5ea1b31135cfd9b656dcabe95195c9bfa7bb3ed722a4178"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.9.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+      },
+      {
+        "name": "02-mpv-extras-v1.6.9.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.9.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+      },
+      {
+        "name": "04-mpv-config-v1.6.9.7z",
+        "bytes": 5386546,
+        "sha256": "4a779aaef9375d56f45b6ff19c5f1e2a7cd3827f3d446c0f817a5e959ab86888"
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.14.exe",
+        "bytes": 69776451,
+        "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+      }
+    ]
+  },
+  "modelscope": {
+    "dataset": "AerithDream/mpv-vanta-edition",
+    "revision": "master",
+    "path": "v1.6.9/",
+    "assets": [
+      {
+        "name": "01-mpv-base-v1.6.9.7z",
+        "bytes": 137192168,
+        "sha256": "2eb4e1a7cea541afb5ea1b31135cfd9b656dcabe95195c9bfa7bb3ed722a4178",
+        "status": 206
+      },
+      {
+        "name": "02-mpv-extras-v1.6.9.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5",
+        "status": 206
+      },
+      {
+        "name": "02-mpv-extras-v1.6.9.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9",
+        "status": 206
+      },
+      {
+        "name": "03-mpv-fasterwhisper-addon-v1.6.9.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2",
+        "status": 206
+      },
+      {
+        "name": "04-mpv-config-v1.6.9.7z",
+        "bytes": 5386546,
+        "sha256": "4a779aaef9375d56f45b6ff19c5f1e2a7cd3827f3d446c0f817a5e959ab86888",
+        "status": 206
+      },
+      {
+        "name": "VantaInstaller-win-x64-v0.3.14.exe",
+        "bytes": 69776451,
+        "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8",
+        "status": 206
+      }
+    ],
+    "asset_count": 6,
+    "anonymous_range_status": 206,
+    "all_sizes_verified": true,
+    "all_cdn_sha256_verified": true,
+    "private_package_absent": true
+  },
+  "private_asset": {
+    "name": "mpv-full-private-v1.6.9.7z",
+    "bytes": 3038250020,
+    "sha256": "2113cf82c4788c602f7ac863945a4b696e93173524e660d02ae70ce0692f0a00",
+    "local_only": true,
+    "uploaded_to_github": false,
+    "uploaded_to_modelscope": false
+  },
+  "release_note": [
+    "[更改]更新 mpv 核心至 shinchiro 20261111，修复 HQ 高色准模式下 HLG 暗边可能出现的黑块",
+    "[新增]HLG 黑位与近黑灰阶的 D3D11／Vulkan 固定样本回归"
+  ]
+}
