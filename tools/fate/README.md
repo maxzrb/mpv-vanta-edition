@@ -17,6 +17,16 @@ python -X utf8 tools/test-hq-sdr-fate.py
 
 检查包括：FP16 原始交换链读回标尺、与独立 sRGB EOTF 参考比较的灰阶、固定 PQ 灰块对周围亮度变化的稳定性、系统白位缺失回退、切换显示身份、手动覆盖与切回标准模式。每个像素检查的线性绝对容差为 0.002；标尺容差为 0.0001。测试不声称测量了显示器的实际发光亮度。
 
+## HQ HLG 黑边
+
+```powershell
+python -X utf8 tools/test-hq-hlg-black-edge-fate.py
+```
+
+- 固定输入为 `samples/hq-hlg-black-edge.json` 中的 10-bit HLG 低于黑位、纯黑及近黑灰阶条带。测试生成有限范围原始 YUV，使用 Catmull–Rom 线性缩小，并固定 80 nit 参考白和 FP16/scRGB 输出。
+- 参考输出为 `ref/hq-hlg-black-edge`。D3D11／Vulkan 均逐像素检查 RGB 有限值，并在条带中心检查黑位（绝对容差 0.000001）与近黑灰阶顺序。
+- 实际结果和生成样本位于 `tmp/modernization/hq-hlg-black-edge-fate/`。可用 `--mpv <路径>` 验证指定核心。读回依赖与 HQ SDR 回归相同，无需私有原片。
+
 ## 静态 HDR 母版峰值与内容峰值
 
 ```powershell

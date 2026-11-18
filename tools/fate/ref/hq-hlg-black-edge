@@ -1,0 +1,6 @@
+d3d11 nonfinite-rgb-pixels 0
+d3d11 black-is-zero yes
+d3d11 near-black-order-preserved yes
+vulkan nonfinite-rgb-pixels 0
+vulkan black-is-zero yes
+vulkan near-black-order-preserved yes

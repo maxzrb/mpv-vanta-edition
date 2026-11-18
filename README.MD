@@ -201,7 +201,7 @@ Faster-Whisper 占位说明；AI 字幕运行时按需另行解压 03。
 
 首次使用默认「标准」色彩模式，继承原整合包的自动目标及 HDR 映射设置；「HQ 高色准」保留已验证的自动色彩管线和加密色域表。缩放档位独立，默认仍使用 HQ 线性缩小。HQ 分别识别 Windows SDR ACM 与 HDR：SDR ACM 输出线性 BT.709 FP16 scRGB，由 Windows 负责显示校色；经典 SDR 保留 sRGB／可信 ICC 路线。可信 ICC 偏好同时检查显示身份、桌面模式和系统 ICC 报告路径。视频滤镜的直属「清空全部视频滤镜」会清除全部 VF，包括外部 VF；着色器仍单独清空。
 
-本版核心已更新为 shinchiro 20261110（mpv v0.42.0-19-ga61f6c3ab、libplacebo v7.387.0），通过 D3D11／Vulkan 的 HQ 数值回归；20261111 构建在本机 Vulkan 路线出现黑帧，未采用。scRGB 高光及广色域负值的历史修复继续保留。原始 FP16 GPU 读回与色彩软件验证见[SDR ACM 与 FP16 输出优化](docs/modernization/SDR-ACM与FP16输出优化-20261008.md)。FP16 指浮点存储格式，不表示所有源、增强模型和显示面板都具有 16bit 有效精度。
+本版采用 shinchiro 20261111（mpv v0.42.0-38-gbcde6b93c、libplacebo v7.391.0）。上游 HLG 黑位修复消除了 HQ 高色准模式下原本可在高对比边缘出现的黑块，D3D11／Vulkan 均通过回归。HQ SDR ACM 继续使用系统参考白和 FP16/scRGB 输出。原始 FP16 GPU 读回与色彩软件验证见[SDR ACM 与 FP16 输出优化](docs/modernization/SDR-ACM与FP16输出优化-20261008.md)，HLG 固定样本和参考输出见 [FATE 回归](tools/fate/README.md#hq-hlg-黑边)。
 
 HQ 优先使用片源提供的 HDR 动态元数据，默认关闭 GPU 逐帧峰值分析，避免额外曝光随场景统计变化；仍保留手动兼容入口。SDR ACM 使用有效的 Windows 系统 SDR 参考白，信息缺失或无效时才回退 80 nits；该参考白不等于显示器物理峰值。标准模式保留原自动策略。
 

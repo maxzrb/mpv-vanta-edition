@@ -1,0 +1,7 @@
+{
+  "band_width": 64,
+  "height": 256,
+  "luma_codes": [32, 64, 72, 88, 112, 160, 224, 352, 512],
+  "neutral_chroma_code": 512,
+  "reference_white_nits": 80
+}
