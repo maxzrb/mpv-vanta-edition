@@ -1,0 +1,125 @@
+{
+  "version": "1.6.9",
+  "passed": true,
+  "assets": [
+    {
+      "name": "01-mpv-base-v1.6.9.7z",
+      "bytes": 137192168,
+      "sha256": "2eb4e1a7cea541afb5ea1b31135cfd9b656dcabe95195c9bfa7bb3ed722a4178"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.9.7z.001",
+      "bytes": 1992294400,
+      "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+    },
+    {
+      "name": "02-mpv-extras-v1.6.9.7z.002",
+      "bytes": 830172768,
+      "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+    },
+    {
+      "name": "03-mpv-fasterwhisper-addon-v1.6.9.7z",
+      "bytes": 1476001942,
+      "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+    },
+    {
+      "name": "04-mpv-config-v1.6.9.7z",
+      "bytes": 5386546,
+      "sha256": "4a779aaef9375d56f45b6ff19c5f1e2a7cd3827f3d446c0f817a5e959ab86888"
+    },
+    {
+      "name": "VantaInstaller-win-x64-v0.3.14.exe",
+      "bytes": 69776451,
+      "sha256": "10754fa478c23390fc67f5b4fe7e1f9721ddc9c90c2ba5b31e11690bb9ca07a8"
+    }
+  ],
+  "private_asset": {
+    "name": "mpv-full-private-v1.6.9.7z",
+    "bytes": 3038250020,
+    "sha256": "2113cf82c4788c602f7ac863945a4b696e93173524e660d02ae70ce0692f0a00"
+  },
+  "archive_files": {
+    "01-mpv-base-v1.6.9.7z": 1329,
+    "02-mpv-extras-v1.6.9.7z.001": 10474,
+    "03-mpv-fasterwhisper-addon-v1.6.9.7z": 5122,
+    "04-mpv-config-v1.6.9.7z": 276,
+    "mpv-full-private-v1.6.9.7z": 11807
+  },
+  "covered_config_files": 1431,
+  "private_union": {
+    "merged_files": 11804,
+    "size_crc_union_identical": true,
+    "installer_sha_identical": true,
+    "placeholder_only": true,
+    "local_only": true,
+    "uploaded": false
+  },
+  "input_reuse": {
+    "extras": {
+      "files": 10473,
+      "bytes": 4603603173,
+      "latest_input_time": 1791366824.1750202,
+      "all_input_size_crc_identical": true,
+      "source_version": "1.6.8"
+    },
+    "fasterwhisper": {
+      "files": 5121,
+      "bytes": 4714825519,
+      "latest_input_time": 1744549392.576642,
+      "all_input_size_crc_identical": true,
+      "source_version": "1.6.8"
+    },
+    "assets": [
+      {
+        "source": "02-mpv-extras-v1.6.8.7z.001",
+        "name": "02-mpv-extras-v1.6.9.7z.001",
+        "bytes": 1992294400,
+        "sha256": "ff2d0b0c3e70253aa23a9996f5c65602091100f472a3a79797388f3c3ded08f5"
+      },
+      {
+        "source": "02-mpv-extras-v1.6.8.7z.002",
+        "name": "02-mpv-extras-v1.6.9.7z.002",
+        "bytes": 830172768,
+        "sha256": "8b3a5cb602e725155e082f8323e6a78721dfc765d66a64569e3da1680246b3f9"
+      },
+      {
+        "source": "03-mpv-fasterwhisper-addon-v1.6.8.7z",
+        "name": "03-mpv-fasterwhisper-addon-v1.6.9.7z",
+        "bytes": 1476001942,
+        "sha256": "e139fb897c53b1610b62cd6a4c6a0e57c8d2544225005f720ec43fd1f927e2b2"
+      }
+    ],
+    "internal_readme_versions": {
+      "extras": "1.6.0",
+      "fasterwhisper": "1.5.7"
+    }
+  },
+  "core_files_sha_identical": true,
+  "merged_root": "backup/release-v1.6.9-20261118/merged",
+  "private_root": "backup/release-v1.6.9-20261118/private-extracted",
+  "checked_at": "2026-11-19T00:07:56+08:00",
+  "functional_commit": "908763a0663694b98237df604193c61b91b5b5ba",
+  "gate_3_2_waived": true,
+  "core": {
+    "build": "shinchiro 20261111",
+    "mpv": "bcde6b93c",
+    "libplacebo": "c2cf6e7",
+    "ffmpeg": "cd4e96eb3",
+    "hlg_fix": "20b98c635a84"
+  },
+  "validation": {
+    "packaged_lua_syntax_files": 150,
+    "packaged_color_fate_cases": 35,
+    "full_config_playback_cases": 6,
+    "hlg_original_and_uosc_all_rgb_finite": true,
+    "private_startup": true,
+    "installer_identical_to_previously_smoke_tested_binary": true
+  },
+  "packaging": {
+    "build_scripts_unchanged": true,
+    "workflow_file_unchanged": true,
+    "personal_preferences_restored": true,
+    "private_local_only": true,
+    "build_staging_archived": "backup/release-v1.6.9-20261118/build-staging"
+  }
+}

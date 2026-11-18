@@ -1,5 +1,28 @@
 # STATUS.md — MPV 便携配置项目
 
+## 当前 v1.6.9 构建验收通过（2026-11-19 00:04，Asia/Shanghai）
+
+- 用户要求更新 Release、版本号 Z+1。GitHub 正式版与本地版本标记均为 1.6.8，目标为 v1.6.9。`git fetch origin` 成功，`master...origin/master` 为 `0 0`，远端无 v1.6.9 标签，授权仓库的 Release 列表无 v1.6.9。
+- 已完整阅读《发布流程.md》。本次公开 01 Base 将收录 shinchiro 20261111，较 v1.6.8 的 20261110 更换 `mpv.exe`、`mpv.com` 及随附手册。个人私包通过 01 Base 继承新核心。上游 HLG 黑位修复和本机双后端验收见下方；实际发布包尚待构建和验证。
+- 用户已明确豁免第 3.2 节核心变更 Gate。开始发布准备，既有个人窗口偏好、项目架构文档和未跟踪本地文件保留在发布范围以外，HLG FATE 三项新文件及说明纳入发布源码提交。
+- 第 3.3／3.4 节已更新 README、版本记录和版本标记。实际公开包通过 35 项色彩回归、双后端六组完整配置实播、原 HLG 冻结帧和 uosc 双后端读回，两后端菜单合成前后均无无效像素。150 份实际包 Lua 语法及发行修改 UTF-8 无 BOM／LF、`git diff --check` 通过。
+- 第 4／5 节已构建 01／04 与同版私包，02 两卷和 03 经完整输入、CRC、字节数、时间、来源归档和新归档核验后复用 v1.6.8。包内说明仍为 Extras 1.6.0／Faster-Whisper 1.5.7。VantaInstaller 0.3.14 沿用已通过启动及退出验收的同 SHA-256 文件。
+- 已验证全部归档、SHA-256、分卷、公开包边界、1431 个配置与素材、版本标记、11804 项私包并集、根级安装器和 Faster-Whisper 占位。实际私包默认启动并持续输出视频。个人偏好逐字节恢复，`build/` 移入本地发行备份。下一步是提交、标签及发布六项公开资产。
+
+## 当前 HQ HLG 黑边修复（2026-11-18 23:40，Asia/Shanghai）
+
+- 本机活动核心已从 shinchiro 20261110 更新为 20261111，mpv `bcde6b93c`、libplacebo `c2cf6e7`。上游比较确认 `20b98c635a84` 是候选 libplacebo 的祖先。该提交修复 HLG 系统伽马低于 1 时黑位求幂产生 NaN 的问题。
+- 固定 4K HLG 原帧、1600×900 下，旧版 D3D11 有 8065 个 NaN 像素，电缆区域有 3999 个。候选 D3D11／Vulkan 读回均为零。活动 `mpv.exe` 以完整配置副本复测，进入 HQ SDR ACM，保留系统 80 nit 参考白、Catmull–Rom 线性缩小和 FP16/scRGB。双后端播放及开启 uosc 模糊菜单的交换链均为有限值且画面正常。
+- 新增 `tools/test-hq-hlg-black-edge-fate.py` 及合成 10-bit HLG 样本和固定参考。旧版 D3D11／Vulkan 各有 4352 个无效像素，新版均为零、黑位及近黑顺序通过。活动核心 HLG 6 项、HQ SDR 8 项、PQ 静态元数据 6 项和 MaxCLL 15 项全部通过。
+- 候选归档 `backup/core-upgrade-20261113/mpv-x86_64-20261111-git-bcde6b93cc.7z`，SHA-256 `f259b5fd4b5c395617c948a4fadcdf55bba1c5282fb7c13e88626b3f71072baf`。回退副本及哈希清单位于 `backup/hq-hlg-core-fix-20261118-233913/`，更新文件为 `mpv.exe`、`mpv.com`、`doc/manual.pdf`。
+- 本轮为本机修复。个人播放配置及 Windows 显示设置未改，未清理着色器或驱动缓存。已发布 v1.6.8 仍使用 20261110；后续带新核心发布须按《发布流程.md》3.2 处理。
+
+## HQ HLG 暗边读回诊断（2026-11-18 23:16，Asia/Shanghai）
+
+- 同一冻结 4K 10-bit HLG 帧缩至 1600×900，以既有 D3D11 探针在 `Present` 前读取原始 FP16/scRGB。整帧 8065 个像素含 NaN，其中电缆区域 3999 个。强制 `dither-depth=8` 后 RGB 数值及 NaN 分布相同，关闭线性缩小后整帧降至 342 个。
+- 本机 HLG OOTF shader 在 `hdr-reference-white=80` 使用负指数 `-0.18227762`，零亮度可触发零底数的负幂。单改 `target-peak` 至 500 时计数不变，单改 `hdr-reference-white` 至 500 时指数为正且整帧 NaN 为 0。后者改变 HLG 曲线，仅作诊断。上游源码已有零亮度保护，待验证包含保护的核心。
+- 纠正先前对 Windows 8-bit 量化及 VSP 实际交换链的确定归因。VSP 实播尚未读回。生产配置、核心与版本未改。私有固定帧与 `summary.json` 位于忽略目录 `tmp/modernization/hlg-edge-mv3tx9tx/`。
+
 ## 当前本地清理与分支归档完成（2026-11-15 15:15，Asia/Shanghai）
 
 - 用户要求清理分支并把可清理的旧内容暂存到 `trash/`，同时明确仓库继续使用 `master`，不创建或改名 `main`。
@@ -4840,3 +4863,29 @@ mpv稳定段保持D3D11硬解、准确sRGB、1280×720，输出／解码新增�
 - 全部归档/门禁/版本/分卷/1431配置全覆盖、11804私包并集、安装器SHA及FW占位通过。实际包MaxCLL15/HQ8/完整实播6组、私包默认启动及持续视频通过，150 Lua与编码/AST/diff通过。
 - 个人偏好逐字节恢复，build安全归档；release保留所有本地产物及两份校验单。报告与版本历史/中文进度同步，准备本地构建记录提交。
 - 用户明确暂不上传发布：未创建标签、推送、创建GitHub Release、上传GitHub/ModelScope，线上仍v1.6.7。原个人/架构工作区差异未夹带；无Actions或computer use。
+
+## 2026-11-18 23:16 — HQ HLG 暗边交换链复核
+
+- 用户提出由 mpv 接管量化。原始交换链在 Windows 合成前已有 NaN，优先处理 HLG 着色器零亮度奇点，后续回归使用固定 HLG 黑色边缘样本和 FATE 参考输出。
+- 临时 FFV1 样本字节核对失败后改用 FFmpeg 原始 YUV 冻结帧和显式源标记。Git `pull --ff-only` 显示已同步，本轮更新状态与进度记录，无提交或发布。
+
+## 2026-11-18 23:40 — HQ HLG 黑边修复与本机核心切换
+
+- 核对 `20b98c635a84...c2cf6e7` 比较结果为 ahead 14、behind 0。用独立配置及原始交换链验证候选。完整配置首轮探针 IPC 超时，普通启动正常；重测补齐暂存目录的 LuaSocket 运行库后完整配置双后端通过。
+- 根目录核对候选和原文件哈希，备份并替换三项不同文件，三项内容相同的配套文件沿用。根目录 `mpv.com --version` 已确认新核心，D3D11／Vulkan 完整配置复测含 uosc 菜单合成。证据见忽略目录 `tmp/modernization/hlg-edge-mv3tx9tx/active-smoke.json` 及 `tmp/modernization/hq-hlg-black-edge-fate/baseline.txt`。
+- `python -X utf8` 执行 `tools/test-hq-hlg-black-edge-fate.py`、`tools/test-hq-sdr-fate.py`、`tools/test-hdr-static-metadata-fate.py`、`tools/test-hdr-content-peak-fate.py`。Frida 由 `PYTHONPATH` 指向 `backup/hdr-sdr-fix-20261113/deps`。两类 HLG 样本的实测限于交换链及 uosc 合成前后，未测面板发光。
+- `master` 与 `origin/master` 同步，测试和记录留在工作树。本地核心位于 Git 忽略路径。保留原架构文档、窗口偏好及未跟踪文件的本地差异。无提交、打包、发布、GitHub Actions 构建或 computer use。
+
+## 2026-11-18 23:50 — v1.6.9 发布前置检查
+
+- 第 2 节确认 Z+1 为 1.6.9。第 3.1 节已获取远端，分支同步并核对工作区；发布提交和标签待 Gate 决定。第 3.2 节确认 01 Base 使用根目录的新核心，私包合并该 01，触发核心更换 Gate。
+- 第 3.3 节已记录发布范围与暂停原因，版本记录待 Gate 通过后更新。第 3.4 节已有活动核心完整配置双后端读回及 35 项色彩回归，发布候选复测仍待执行。第 4–8 节待 Gate 决定；公开和个人私包均须构建并验收后才开始上传公开资产。
+
+## 2026-11-18 23:52 — v1.6.9 获准继续发布
+
+- 用户回复“豁免”，第 3.2 节核心更换放行。远端复核仍同步，安装器及公开包构建脚本无差异。开始核验 02／03 的全部输入与源归档，准备 01／04 和个人私包。
+
+## 2026-11-19 00:04 — v1.6.9 构建和验收完成
+
+- 功能提交 `908763a` 收录 HLG FATE 和版本标记、README 说明。01 Base 新增的二进制内容差异限于核心及配套手册，04 Config 差异限于发行说明；已逐项对比 v1.6.8 归档。个人工作区差异仍未暂存。
+- 第 3.4 节实际包 HLG 6 项、HQ SDR 8 项、PQ 静态元数据 6 项、MaxCLL 15 项、双后端六组完整播放、原片 uosc 交换链读回、150 份 Lua 全部通过。第 4／5 节归档完整性、版本标记、SHA、公开边界、私包并集与实际启动均通过。记录在 `backup/release-v1.6.9-20261118/`，构建暂存已归档至其 `build-staging/`。
